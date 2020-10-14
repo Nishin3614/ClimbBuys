@@ -1,0 +1,63 @@
+#==============================================================================
+#
+# [パーティクルエディター] スクリプトファイル [data/LOAD/ParticleInfo.txt]
+# Author : KOKI NISHIYAMA
+#
+#==============================================================================
+SCRIPT
+
+#==============================================================================
+# [0] Balloon
+#==============================================================================
+OFFSET
+	# 位置ランダム
+	SET_POSRAND
+		POSX = 1150 0
+		POSY = 100 0
+		POSZ = 0 0
+	ENDSET_POSRAND
+	# 色ランダム
+	SET_COLRAND
+		RED
+		GREEN
+		BLUE
+	ENDSET_COLRAND
+	# サイズランダム
+	SET_SIZERAND
+		SIZEX = 10 60
+		SIZEY = 10 60
+	ENDSET_SIZERAND
+	# スピードランダム
+	SET_SPEEDRAND
+		MAX = 5
+		MIN = 10
+	ENDSET_SPEEDRAND
+	# 位置情報
+	POS = -600.0 400.0 0.0
+	# 色情報
+	COL = 1.0 1.0 1.0 1.0
+	# サイズ情報
+	SIZE = 0.0 0.0
+	SIZE_CHANGE = 0.0
+	# 回転情報
+	ROT = 0.0 0.0 0.0
+	# 方向情報
+	VECTOR = 0.0 0.0 0.0
+	# スピード情報
+	SPEED = 0.0
+	# ライフ情報
+	LIFE = 500
+	# フレーム情報
+	FRAME = 40
+	# 一度に出せる個数情報
+	NUMBER = 13
+	# テクスチャータイプ情報
+	TEXTYPE = 55
+	# エフェクトタイプ情報
+	EFFECTTYPE = 4
+	# パーティクルタイプ情報
+	PARTICLETYPE = 0
+	# ブレンドタイプ情報
+	BLEND = 1
+END_OFFSET
+END_SCRIPT

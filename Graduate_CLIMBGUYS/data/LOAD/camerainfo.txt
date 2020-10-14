@@ -1,0 +1,65 @@
+//------------------------------------------------
+// ÉJÉÅÉâèÓïÒ
+//------------------------------------------------
+
+/* óÒãìå^ */
+{
+		TYPE_FOLLOW = 0,
+		TYPE_TITLEBEFORE,
+		TYPE_TITLEAFTER,
+		TYPE_EVENTPERFOM,
+		TYPE_STATICTIS,
+		TYPE_GAMECLEAR,
+		TYPE_GAMEDIED,
+		TYPE_RANKING,
+}
+
+TYPE 0
+	ROT = 0.0 0.0 0.0
+	OFFSET = 0.0 100.0 0.0
+	LENGH = 350.0
+	HEIGHT = 120.0
+END_TYPE
+TYPE 1
+	ROT = 0.0 -1.57 0.0
+	OFFSET = -100.0 100.0 0.0
+	LENGH = 500.0
+	HEIGHT = 0.0
+END_TYPE
+TYPE 2
+	ROT = 0.0 -1.57 0.0
+	OFFSET = -100.0 100.0 -0.0
+	LENGH = 300.0
+	HEIGHT = 0.0
+END_TYPE
+TYPE 3
+	ROT = 0.0 3.14 0.0
+	OFFSET = 0.0 150.0 0.0
+	LENGH = 500.0
+	HEIGHT = 0.0
+END_TYPE
+TYPE 4
+	ROT = 0.0 0.0 0.0
+	OFFSET = 0.0 50.0 0.0
+	LENGH = 200.0
+	HEIGHT = 0.0
+END_TYPE
+TYPE 5
+	ROT = 0.0 0.0 0.0
+	OFFSET = 0.0 50.0 0.0
+	LENGH = 200.0
+	HEIGHT = 0.0
+END_TYPE
+TYPE 6
+	ROT = 0.0 0.0 0.0
+	OFFSET = 0.0 50.0 0.0
+	LENGH = 200.0
+	HEIGHT = 0.0
+END_TYPE
+TYPE 7
+	ROT = 0.0 3.14 0.0
+	OFFSET = 50.0 50.0 0.0
+	LENGH = 200.0
+	HEIGHT = 0.0
+END_TYPE
+END

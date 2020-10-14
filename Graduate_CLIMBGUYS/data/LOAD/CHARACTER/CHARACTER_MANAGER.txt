@@ -1,0 +1,1 @@
+data/LOAD/CHARACTER/NPC.txt

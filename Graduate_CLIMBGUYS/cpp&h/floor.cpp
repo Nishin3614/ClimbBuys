@@ -39,7 +39,7 @@
 // 静的変数宣言
 //
 // ----------------------------------------
-LPD3DXEFFECT CFloor::m_pEffect = NULL;
+//LPD3DXEFFECT CFloor::m_pEffect = NULL;
 
 // ----------------------------------------
 // コンストラクタ処理
@@ -49,7 +49,7 @@ CFloor::CFloor() : CScene()
 	/* 変数の初期化 */
 	// 回転量
 	m_pTexture = NULL;
-	m_pMaskTex = NULL;
+	//m_pMaskTex = NULL;
 	m_pVtxBuff = NULL;
 	m_pIndex = NULL;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -88,6 +88,7 @@ void CFloor::Init(void)
 	LPDIRECT3DDEVICE9 pDevice =				// デバイス
 		CManager::GetRenderer()->GetDevice();
 
+	/*
 	if (m_pEffect == NULL)
 	{
 		//シェーダーを読み込む
@@ -103,7 +104,7 @@ void CFloor::Init(void)
 		CManager::GetRenderer()->GetDevice(),
 		TEXTURE_MASK,
 		&m_pMaskTex);
-
+*/
 	// ブロック描画の原点の初期設定
 	m_OriginBlock = D3DXVECTOR3(
 		m_size.x * -0.5f * m_nBlock_Width,
@@ -242,13 +243,13 @@ void CFloor::Uninit(void)
 		m_pIndex->Release();
 		m_pIndex = NULL;
 	}
-	*/
 	// シェーダーの開放
 	if (m_pEffect != NULL)
 	{
 		m_pEffect->Release();
 		m_pEffect = NULL;
 	}
+	*/
 }
 
 // ----------------------------------------
@@ -300,6 +301,7 @@ void CFloor::Draw(void)
 	// 頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));
 
+	/*
 	if (m_bCalculation)
 	{
 		// シェーダー処理
@@ -314,6 +316,7 @@ void CFloor::Draw(void)
 			m_pEffect->BeginPass(0);
 		}
 	}
+	*/
 
 	// インデックスバッファをデータストリームを設定
 	pDevice->SetIndices(
@@ -327,6 +330,7 @@ void CFloor::Draw(void)
 		0,
 		CTexture_manager::GetTexture(m_nTexType));
 
+	/*
 	if (m_pEffect != NULL)
 	{
 		//ワールド行列の逆行列の転置行列を渡す
@@ -358,6 +362,7 @@ void CFloor::Draw(void)
 		m_pEffect->SetFloat("uv_width", 1.0f);
 		m_pEffect->SetFloat("uv_height", 1.0f);
 	}
+	*/
 
 	// ポリゴンの描画
 	pDevice->DrawIndexedPrimitive(
@@ -368,6 +373,7 @@ void CFloor::Draw(void)
 		0,
 		m_nNumPolygon);
 
+	/*
 	if (m_bCalculation)
 	{
 		// シェーダー終了
@@ -377,6 +383,7 @@ void CFloor::Draw(void)
 			m_pEffect->End();
 		}
 	}
+	*/
 }
 
 #ifdef _DEBUG

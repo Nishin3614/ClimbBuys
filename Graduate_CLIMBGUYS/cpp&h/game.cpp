@@ -23,6 +23,7 @@
 #include "keyboard.h"
 #include "ui_group.h"
 #include "3Dmap.h"
+#include "player.h"
 
 /* ポーズ */
 //#include "pause.h"
@@ -61,8 +62,6 @@ void CGame::Init(void)
 {
 	// モードの初期化
 	CBaseMode::Init();
-	// カメラのタイプ設定
-	//CManager::GetRenderer()->GetCamera()->SetType(CCamera::TYPE_GAME);
 
 	/* 初期化 */
 	// 静的変数の初期化
@@ -77,6 +76,8 @@ void CGame::Init(void)
 		D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),
 		D3DVECTOR3_ZERO, 10, 10, 0
 	);
+	// プレイヤーの生成
+	CPlayer::Create();
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),

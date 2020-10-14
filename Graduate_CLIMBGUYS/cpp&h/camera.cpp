@@ -13,7 +13,7 @@
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define CAMERA_FILE ("data/LOAD/camerainfo.txt")
-#define CAMERA_INIT (0.03f)
+#define CAMERA_INIT (1.0f)
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 静的変数宣言
@@ -44,7 +44,7 @@ CCamera::CCamera()
 	m_fHeight = 500.0f;
 	m_RotSpeed.x = CAMERA_INIT;				// 回転スピード
 	m_RotSpeed.y = -CAMERA_INIT;			// 回転スピード
-	m_fIntertia = 0.1f;
+	m_fIntertia = 1.0f;
 	m_bSet = false;
 }
 
@@ -134,7 +134,7 @@ void CCamera::Debug(void)
 		// 慣性
 		ImGui::DragFloat("Intertia", &m_fIntertia, 0.01f,0.01f,1.0f);
 		// 回転スピード
-		ImGui::DragFloat2("RotSpeed", m_RotSpeed, 0.01f, 0.03f, 0.1f);
+		ImGui::DragFloat2("RotSpeed", m_RotSpeed, 0.01f, 0.03f, 1.0f);
 
 		// 長さ
 		if (ImGui::TreeNode("LENGH&HEIGHT"))

@@ -131,7 +131,7 @@ private:
 
 	/* 変数 */
 	LPDIRECT3DTEXTURE9 m_pTexture;
-	LPDIRECT3DTEXTURE9 m_pMaskTex;
+	//LPDIRECT3DTEXTURE9 m_pMaskTex;
 
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;					// 頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9	m_pIndex;					// インデックスバッファのポインタ
@@ -148,6 +148,6 @@ private:
 	int m_nBlock_Width;									// 横ブロック数
 	int m_nTexType;										// テクスチャータイプ
 	bool m_bCalculation;									// 床の起伏計算フラグ
-	static LPD3DXEFFECT		m_pEffect;
+	//static LPD3DXEFFECT		m_pEffect;
 };
 #endif

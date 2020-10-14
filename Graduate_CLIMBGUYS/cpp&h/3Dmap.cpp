@@ -127,6 +127,7 @@ HRESULT C3DMap::LoadCreate(MAP const &map)
 		CFloor::Create(
 			m_vec_floor[map][nCntMap].pos,
 			D3DXVECTOR3(m_vec_floor[map][nCntMap].size.x,0.0f, m_vec_floor[map][nCntMap].size.y),
+			D3DXCOLOR_INI,
 			m_vec_floor[map][nCntMap].rot,
 			m_vec_floor[map][nCntMap].nBlockWidth,
 			m_vec_floor[map][nCntMap].nBlockDepth,
@@ -237,6 +238,7 @@ void C3DMap::LoadScript(char *add)
 						CFloor *pField;
 						pField = CFloor::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 							D3DXVECTOR3(50.0f, 50.0f, 50.0f),
+							D3DXCOLOR_INI,
 							D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 							50,
 							50,

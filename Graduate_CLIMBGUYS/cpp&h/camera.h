@@ -27,17 +27,13 @@ class CCamera
 {
 public:
 	/* 列挙型 */
+	// タイプ
 	typedef enum
 	{
-		TYPE_FOLLOW = 0,
-		TYPE_TITLEBEFORE,
-		TYPE_TITLEAFTER,
-		TYPE_EVENTPERFOM,
-		TYPE_STATICTIS,
-		TYPE_GAMECLEAR,
-		TYPE_GAMEDIED,
-		TYPE_RANKING,
-		TYPE_MAX
+		TYPE_TITLE = 0,// タイトル
+		TYPE_GAME,	   // ゲーム
+		TYPE_RESULT,   // リザルト
+		TYPE_MAX	   // 最大数
 	} TYPE;
 	/* 構造体 */
 	// 読み込み用
@@ -50,16 +46,23 @@ public:
 		int nType;			// タイプ
 	} LOAD;
 	/* 関数 */
+	// コンストラクタ
 	CCamera();
+	// デストラクタ
 	~CCamera();
+	// 初期化処理
 	void Init(void);
+	// 終了処理
 	void Uninit(void);
+	// 更新処理
 	void Update(void);
+	// 描画処理
 	void Draw(void);
 #ifdef _DEBUG
+	// デバッグ処理
 	void Debug(void);
 #endif // _DEBUG
-
+	// 生成処理
 	static CCamera * Create(void);	// 作成
 	// 読み込み
 	static HRESULT Load(void);
@@ -79,9 +82,6 @@ public:
 		D3DXVECTOR3 const & pos,	// 位置情報
 		D3DXVECTOR3 const & rot		// 回転情報
 	);
-	void SetPosDestRPlayer(
-		D3DXVECTOR3 const & pos,
-		D3DXVECTOR3 const & rot);
 	// 注視点の設定
 	void SetPosR(
 		D3DXVECTOR3 const & pos,	// 位置情報
@@ -89,34 +89,29 @@ public:
 	);
 	// カメラ情報設定の使用状態設定
 	void SetCamera_InfoSet(bool const &bSet) { m_bSet = bSet; };
-	// カメラモーションの設定
-	void SetCamera_Motion(
-		D3DXVECTOR3 const &posR,	// 注視点の位置
-		D3DXVECTOR3 const &rot,		// 回転
-		float const & fLength,		// 長さ
-		float const & fHeight,		// 高さ
-		float const & fIntertia		// 慣性の比率
-	);
-	// カメラ演出の設定
-	void SetCamera_Perfom(
-		D3DXVECTOR3 const &posR,	// 注視点の位置
-		D3DXVECTOR3 const &rot,		// 回転
-		float const & fLength,		// 長さ
-		float const & fHeight		// 高さ
-	);
 	// カメラタイプの設定
 	void SetType(
 		TYPE type
 	);
-
-	// カメラ情報の変更
-	static void ChangeInfo(void);
 	// 回転情報取得
 	D3DXVECTOR3 GetRot(void);
 	// 回転スピード取得
 	D3DXVECTOR2 &GetRotSpeed(void);
 	// カメラ設定すべての初期化
 	void SetCameraInfo(void);
+	// カメラモーション設定
+	//	posR		: 位置R
+	//	rot			: 回転
+	//	fLength		: 長さ
+	//	fHeight		: 高さ
+	//	fIntertia	: 慣性
+	void SetCamera_Motion(
+		D3DXVECTOR3 const & posR,	// 位置R
+		D3DXVECTOR3 const & rot,	// 回転
+		float const & fLength,		// 長さ
+		float const & fHeight,		// 高さ
+		float const & fIntertia		// 慣性
+	);
 	// カメラの視点取得
 	D3DXVECTOR3 &GetPosV(void) { return m_posV; };
 protected:
@@ -124,8 +119,6 @@ protected:
 private:
 	/* 関数 */
 	void Update_Play(void);						// プレイ時のカメラ
-	void Perfom_Normal(void);					// 通常状態のカメラ演出
-	void Rot(void);								// 回転処理
 	/* 変数 */
 	static	LOAD	m_load[TYPE_MAX];			// 情報保存
 	D3DXVECTOR3		m_posV;						// 視点
@@ -134,9 +127,9 @@ private:
 	D3DXVECTOR3		m_posR;						// 注視点
 	D3DXVECTOR3		m_posRDest;					// 目標注視点
 	D3DXVECTOR3		m_posRDiff;					// 目的注視点から注視点
+	D3DXVECTOR3		m_offset;					// 注視点のオフセット
 	D3DXVECTOR3		m_posU;						// 上方向ベクトル
-	D3DXVECTOR3		m_between;					// プレイヤーとの距離
-	D3DXVECTOR3		m_last;						//
+	D3DXVECTOR3		m_between;					// 基準との距離
 	D3DXVECTOR3		m_move;						// 移動量
 	D3DXVECTOR3		m_rot;						// 視点の回転量
 	D3DXVECTOR3		m_rotDest;					// 視点の目的回転地点

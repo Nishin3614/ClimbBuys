@@ -62,7 +62,7 @@ void CGame::Init(void)
 	// モードの初期化
 	CBaseMode::Init();
 	// カメラのタイプ設定
-	CManager::GetRenderer()->GetCamera()->SetType(CCamera::TYPE_FOLLOW);
+	//CManager::GetRenderer()->GetCamera()->SetType(CCamera::TYPE_GAME);
 
 	/* 初期化 */
 	// 静的変数の初期化
@@ -70,15 +70,18 @@ void CGame::Init(void)
 	/* 作成 */
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
+	// フィールドの生成
+	CFloor::Create(
+		D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+		D3DXVECTOR3(1000.0f, 0.0f, 1000.0f),
+		D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),
+		D3DVECTOR3_ZERO, 10, 10, 0
+	);
+	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),
 		10000.0f);
-	// 3Dマップ生成
-	C3DMap::LoadCreate(C3DMap::MAP_STAGE_2);
-	// ポーズの生成
-	//m_pause = new CPause();
-	// ポーズの初期化
-	//m_pause->Init();
+		*/
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -118,6 +121,16 @@ void CGame::Update(void)
 		}
 	}
 	*/
+	// リザルト遷移
+	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN))
+	{
+		// フェード状態が何も起こっていない状態なら
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		{
+			//CManager::SetMode(CManager::MODE_RESULT);
+		}
+	}
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

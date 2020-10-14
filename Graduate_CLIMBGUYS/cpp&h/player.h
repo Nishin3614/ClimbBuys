@@ -22,35 +22,10 @@
 #define PLAYER_FRONTFORCE		(10)
 #define PLAYER_G				(0.5f)								// 重力
 #define PLAYER_RESISTANCE		(0.5f)								// 抵抗力
-#define PLAYER_MOTIONFILE		"data/LOAD/PLAYER/Tricker.txt"		// モーションのファイル名
-#define PLAYER_FALL				(-20.0f)							// 落ちる位置条件
-#define PLAYER_UI_MP_POS		(D3DXVECTOR3(78.5f, 690.0f, 0.0f))	// UI_MPの位置
-#define FISH_APPONENTPOS		(-40.0f)							// 魚出現位置
-#define FISH_APPONENTTIME		(300)								// 魚出現タイム
-#define MPUP_BREAKBALLOON		(100)								// 風船を割った時のMPUP
-#define MAX_DIFFERENCE			(1000)								// 移動限界距離
-#define MAX_FISHAPPONENT		(3)									// 魚の出現場所
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 列挙体定義
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ---------キャラクタータイプ---------- //
-typedef enum
-{
-	CHARATYPE_SPEED_UP = 0,
-	CHARATYPE_SCORE_UP,
-	CHARATYPE_INVISIBLE,
-	CHARATYPE_REVIVAL,
-	CHARATYPE_MAX
-} CHARATYPE;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class C2DGauge;		// 2Dゲージクラス
-class CRank;		// ランククラス
-class CFramework;	// フレームワーククラス
-class CMeshdome;	// メッシュドームクラス
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // クラス
@@ -61,17 +36,20 @@ public:
 	// ---------モーションタイプ---------- //
 	typedef enum
 	{
-		MOTIONTYPE_MOVE = CCharacter::MOTIONTYPE_MAX,
-		MOTIONTYPE_JAMP,
-		MOTIONTYPE_DANCE,
-		MOTIONTYPE_MAX
+		MOTIONTYPE_MAX = CCharacter::MOTIONTYPE_MAX
 	} MOTIONTYPE;
 	/* 関数 */
+	// コンストラクタ
 	CPlayer(CCharacter::CHARACTER const &character);
+	// デストラクタ
 	virtual ~CPlayer();
+	// 初期化処理
 	virtual void Init(void);
+	// 終章処理
 	virtual void Uninit(void);
+	// 更新処理
 	virtual void Update(void);
+	// 描画処理
 	virtual void Draw(void);
 	// プレイヤーが死んだときの関数
 	virtual void Die(void);
@@ -104,17 +82,18 @@ public:
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	);
-	void Camera(void);					// カメラ処理
 #ifdef _DEBUG
 	void Debug(void);
 #endif // _DEBUG
-	static HRESULT Load(void);			// 読み込み
-	static void UnLoad(void);			// UnLoadする
-	// MP上げ処理
-	//	nMpUp	: MP上げ値
-	void MpUp(int const & nMpUp);
-	// ゲージ初期化処理
-	void GaugeStatusInit(void);
+	// 生成処理
+	//	pos	: 位置
+	static CPlayer * Create(
+		D3DXVECTOR3 const & pos = D3DVECTOR3_ZERO	// 位置
+);
+	// リソースの読み込み処理
+	static HRESULT Load(void);
+	// リソースの開放処理
+	static void UnLoad(void);
 protected:
 private:
 	/* 構造体 */
@@ -126,8 +105,7 @@ private:
 	// 状態によってのモーション設定処理
 	void StatusMotion(void);
 	/* 変数 */
-	C2DGauge	*m_p2DMPGauge;						// MPゲージ
-	int m_nMP;										// MP
+
 	CXInputPad		*m_pPad;						// パッドのポインタ
 
 };

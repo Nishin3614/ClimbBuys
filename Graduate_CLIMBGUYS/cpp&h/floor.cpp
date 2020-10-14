@@ -39,7 +39,7 @@
 // 静的変数宣言
 //
 // ----------------------------------------
-LPD3DXEFFECT CFloor::m_pEffect = NULL;
+//LPD3DXEFFECT CFloor::m_pEffect = NULL;
 
 // ----------------------------------------
 // コンストラクタ処理
@@ -49,7 +49,7 @@ CFloor::CFloor() : CScene()
 	/* 変数の初期化 */
 	// 回転量
 	m_pTexture = NULL;
-	m_pMaskTex = NULL;
+	//m_pMaskTex = NULL;
 	m_pVtxBuff = NULL;
 	m_pIndex = NULL;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -88,6 +88,7 @@ void CFloor::Init(void)
 	LPDIRECT3DDEVICE9 pDevice =				// デバイス
 		CManager::GetRenderer()->GetDevice();
 
+	/*
 	if (m_pEffect == NULL)
 	{
 		//シェーダーを読み込む
@@ -103,7 +104,7 @@ void CFloor::Init(void)
 		CManager::GetRenderer()->GetDevice(),
 		TEXTURE_MASK,
 		&m_pMaskTex);
-
+*/
 	// ブロック描画の原点の初期設定
 	m_OriginBlock = D3DXVECTOR3(
 		m_size.x * -0.5f * m_nBlock_Width,
@@ -168,7 +169,7 @@ void CFloor::Init(void)
 					(m_size.z * nCountDirect));
 
 			// カラーの設定
-			pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[0].col = m_col;
 
 			// テクスチャーの設定
 			pVtx[0].tex = D3DXVECTOR2(1.0f * nCountWidth, 1.0f * nCountDirect);
@@ -242,13 +243,13 @@ void CFloor::Uninit(void)
 		m_pIndex->Release();
 		m_pIndex = NULL;
 	}
-	*/
 	// シェーダーの開放
 	if (m_pEffect != NULL)
 	{
 		m_pEffect->Release();
 		m_pEffect = NULL;
 	}
+	*/
 }
 
 // ----------------------------------------
@@ -300,6 +301,7 @@ void CFloor::Draw(void)
 	// 頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));
 
+	/*
 	if (m_bCalculation)
 	{
 		// シェーダー処理
@@ -314,6 +316,7 @@ void CFloor::Draw(void)
 			m_pEffect->BeginPass(0);
 		}
 	}
+	*/
 
 	// インデックスバッファをデータストリームを設定
 	pDevice->SetIndices(
@@ -327,6 +330,7 @@ void CFloor::Draw(void)
 		0,
 		CTexture_manager::GetTexture(m_nTexType));
 
+	/*
 	if (m_pEffect != NULL)
 	{
 		//ワールド行列の逆行列の転置行列を渡す
@@ -358,6 +362,7 @@ void CFloor::Draw(void)
 		m_pEffect->SetFloat("uv_width", 1.0f);
 		m_pEffect->SetFloat("uv_height", 1.0f);
 	}
+	*/
 
 	// ポリゴンの描画
 	pDevice->DrawIndexedPrimitive(
@@ -368,6 +373,7 @@ void CFloor::Draw(void)
 		0,
 		m_nNumPolygon);
 
+	/*
 	if (m_bCalculation)
 	{
 		// シェーダー終了
@@ -377,6 +383,7 @@ void CFloor::Draw(void)
 			m_pEffect->End();
 		}
 	}
+	*/
 }
 
 #ifdef _DEBUG
@@ -451,15 +458,23 @@ void CFloor::UnLoad(void)
 }
 
 // ----------------------------------------
-// 作成処理
+// 生成
+//	pos			: 位置
+//	size		: サイズ
+//	col			: 色
+//	rot			: 回転
+//	nWidth		: 横ブロック
+//	nDepth		: 縦ブロック
+//	nTexType	: テクスチャータイプ
 // ----------------------------------------
 CFloor * CFloor::Create(
-	D3DXVECTOR3 const &pos,
-	D3DXVECTOR3 const & size,
-	D3DXVECTOR3 const & rot,
-	int const & nWidth,
-	int const & nDepth,
-	int const & nTexType
+	D3DXVECTOR3 const &pos,		// 位置
+	D3DXVECTOR3 const & size,	// サイズ
+	D3DXCOLOR const & col,		// 色
+	D3DXVECTOR3 const & rot,	// 回転
+	int const & nWidth,			// 横ブロック
+	int const & nDepth,			// 縦ブロック
+	int const & nTexType		// テクスチャータイプ
 )
 {
 	// 変数宣言
@@ -472,6 +487,8 @@ CFloor * CFloor::Create(
 	pFloor->m_pos = pos;
 	// サイズ情報
 	pFloor->m_size = size;
+	// 色情報
+	pFloor->m_col = col;
 	// 回転情報
 	pFloor->m_rot = rot;
 	// 横ブロック
@@ -573,6 +590,80 @@ float CFloor::GetHeight(D3DXVECTOR3 &pos)
 	m_pVtxBuff->Unlock();
 	// 高さを返す
 	return 0.0f;
+}
+
+// ----------------------------------------
+// サイズ設定
+// ----------------------------------------
+void CFloor::SetSize(D3DXVECTOR3 const & size)
+{
+	// 変数宣言
+	VERTEX_3D * pVtx;						// 3D頂点情報
+	// 設定
+	m_size = size;							// サイズ
+	// 頂点データの範囲をロックし、頂点バッファへのポインタ
+	m_pVtxBuff->Lock(
+		0,
+		0,
+		(void **)&pVtx,
+		0);
+
+	//頂点設定 //
+	//行ループ
+	for (int nCountDirect = 0; nCountDirect < m_nBlock_Depth + 1; nCountDirect++)
+	{
+		// 列ループ
+		for (int nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
+		{
+			// 頂点座標の設定
+			pVtx[0].pos =
+				D3DXVECTOR3(
+					m_OriginBlock.x +
+					(m_size.x * nCountWidth),
+					m_OriginBlock.y,
+					m_OriginBlock.z -
+					(m_size.z * nCountDirect));
+
+			// ポイント合わせ
+			pVtx++;
+		}
+	}
+	// アンロック
+	m_pVtxBuff->Unlock();
+}
+
+// ----------------------------------------
+// 色設定
+// ----------------------------------------
+void CFloor::SetCol(D3DXCOLOR const & col)
+{
+	// 変数宣言
+	VERTEX_3D * pVtx;						// 3D頂点情報
+											// 設定
+	m_col = col;							// 色
+											// 頂点データの範囲をロックし、頂点バッファへのポインタ
+	m_pVtxBuff->Lock(
+		0,
+		0,
+		(void **)&pVtx,
+		0);
+
+	//頂点設定 //
+	//行ループ
+	for (int nCountDirect = 0; nCountDirect < m_nBlock_Depth + 1; nCountDirect++)
+	{
+		// 列ループ
+		for (int nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
+		{
+			// カラーの設定
+			pVtx[0].col = m_col;
+
+			// ポイント合わせ
+			pVtx++;
+		}
+	}
+	// アンロック
+	m_pVtxBuff->Unlock();
 }
 
 // ----------------------------------------

@@ -15,7 +15,7 @@
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define CAMERA_FILE ("data/LOAD/camerainfo.txt")
-#define CAMERA_INIT (0.03f)
+#define CAMERA_INIT (1.0f)
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 静的変数宣言
@@ -35,17 +35,18 @@ CCamera::CCamera()
 	m_posRDest = m_posR;
 	m_posRDiff = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	m_offset = D3DVECTOR3_ZERO;
 	m_move = D3DXVECTOR3(1.0f, 3.0f, 3.0f);
 	m_rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
 	m_rotDest = m_rot;
 	m_rotDiff = D3DVECTOR3_ZERO;
 	m_rotOrigin = D3DVECTOR3_ZERO;
-	m_type = TYPE_FOLLOW;
-	m_fLength = m_load[m_type].fLengh;
-	m_fHeight = m_load[m_type].fHeight;
+	m_type = TYPE_TITLE;
+	m_fLength = 500.0f;
+	m_fHeight = 500.0f;
 	m_RotSpeed.x = CAMERA_INIT;				// 回転スピード
 	m_RotSpeed.y = -CAMERA_INIT;			// 回転スピード
-	m_fIntertia = 0.1f;
+	m_fIntertia = 1.0f;
 	m_bSet = false;
 }
 
@@ -76,16 +77,6 @@ void CCamera::Uninit(void)
 void CCamera::Update(void)
 {
 	Update_Play();
-
-#ifdef _DEBUG
-	/*
-	CDebugproc::Print("回転量X%.3f\n", m_rot.x);
-	CDebugproc::Print("回転量X%.3f\n", m_posVDest.y);
-	// CDebugproc::Print("カメラの視点x:%f,y:%f,z:%f\n", m_posVDest.x, m_posVDest.y, m_posVDest.z);
-	// CDebugproc::Print("カメラの注視点x:%f,y:%f,z:%f\n", m_posR.x, m_posR.y, m_posR.z);
-	// CDebugproc::Print("カメラの角度x:%f,y:%f,z:%f\n", m_rot.x, m_rot.y, m_rot.z);
-	*/
-#endif // _DEBUG
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,7 +84,15 @@ void CCamera::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Update_Play(void)
 {
-	Perfom_Normal();
+	// 目的の視点
+	m_posV.x =
+		m_posR.x + sinf(m_rot.y) * m_fLength;
+	m_posV.y =
+		m_posR.y + cosf(m_rot.x) * m_fHeight;
+	m_posV.z =
+		m_posR.z + cosf(m_rot.y) * m_fLength;
+
+	/*
 	// 目的の角度から現在の角度の差
 	m_rotDiff =
 		m_rotDest - m_rot;
@@ -109,15 +108,7 @@ void CCamera::Update_Play(void)
 	CCalculation::Rot_One_Limit(m_rot.x);
 	CCalculation::Rot_One_Limit(m_rot.y);
 	CCalculation::Rot_One_Limit(m_rot.z);
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 通常状態のカメラ演出
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCamera::Perfom_Normal(void)
-{
-	// 回転
-	Rot();
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,24 +127,22 @@ void CCamera::Debug(void)
 	// カメラの情報
 	if (ImGui::CollapsingHeader("Camera"))
 	{
+		// 注視点位置
+		ImGui::DragFloat3("PosR", m_posR);
+		// 注視点オフセット位置
+		ImGui::DragFloat3("OffsetPosR", m_offset);
+		// 回転
+		ImGui::DragFloat3("ROT", m_rot, 0.01f, -D3DX_PI, D3DX_PI);
 		// 慣性
-		if (ImGui::TreeNode("Intertia"))
-		{
-			ImGui::DragFloat("Intertia", &m_fIntertia, 0.01f,0.1f,0.01f);
-			ImGui::TreePop();
-		}
+		ImGui::DragFloat("Intertia", &m_fIntertia, 0.01f,0.01f,1.0f);
 		// 回転スピード
-		if (ImGui::TreeNode("RotSpeed"))
-		{
-			ImGui::DragFloat("x", &m_RotSpeed.x, 0.01f, 0.03f, 0.1f);
-			ImGui::DragFloat("y", &m_RotSpeed.y, 0.01f, 0.03f, 0.1f);
-			ImGui::TreePop();
-		}
+		ImGui::DragFloat2("RotSpeed", m_RotSpeed, 0.01f, 0.03f, 1.0f);
+
 		// 長さ
 		if (ImGui::TreeNode("LENGH&HEIGHT"))
 		{
-			ImGui::DragFloat("lengh", &m_fLength, 0, 5000, 1.0f);
-			ImGui::DragFloat("height", &m_fHeight, 0, 5000, 1.0f);
+			ImGui::DragFloat("lengh", &m_fLength);
+			ImGui::DragFloat("height", &m_fHeight);
 			ImGui::TreePop();
 		}
 	}
@@ -190,11 +179,11 @@ HRESULT CCamera::Load(void)
 
 	// 変数宣言
 	int	nCntObj = 0;		// シャドウマッピングカウント
-	char cRaedText[128] = {};	// 文字として読み取り用
-	char cHeadText[128] = {};	// 比較するよう
-	char cDie[128] = {};			// 不必要な文字
+	char cRaedText[128];	// 文字として読み取り用
+	char cHeadText[128];	// 比較するよう
+	char cDie[128];			// 不必要な文字
 
-	// ファイル開
+							// ファイル開
 	pFile = fopen(CAMERA_FILE, "r");
 
 	// 開けた
@@ -292,9 +281,9 @@ void CCamera::InfoInit(
 	// 回転
 	m_rot = rot;
 	// ゲームのカメラの回転の目的地
-	m_posRDest.x = pos.x + sinf(m_rot.y + D3DX_PI) * m_load[m_type].offset.x;
-	m_posRDest.y = pos.y + m_load[m_type].offset.y;
-	m_posRDest.z = pos.z + cosf(m_rot.y + D3DX_PI) * m_load[m_type].offset.x;
+	m_posRDest.x = pos.x + sinf(m_rot.y + D3DX_PI) * m_offset.x;
+	m_posRDest.y = pos.y + m_offset.y;
+	m_posRDest.z = pos.z + cosf(m_rot.y + D3DX_PI) * m_offset.x;
 	// 注視点
 	m_posR = m_posRDest;
 	// 視点
@@ -306,8 +295,6 @@ void CCamera::InfoInit(
 		m_posR.z + cosf(m_rot.y) * m_fLength;
 	m_posVDest = m_posV;
 	m_rotDest = m_rot;
-	// 慣性情報初期化
-
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -355,59 +342,12 @@ void CCamera::SetPosDestR(
 	D3DXVECTOR3 const & rot		// 回転情報
 )
 {
-	m_fLength = m_load[m_type].fLengh;
-	m_fHeight = m_load[m_type].fHeight;
-	m_rotDest = rot + m_load[m_type].rot;
-	// 注視点軸に回転 //
-
+	// 回転設定
+	m_rot = rot;
 	// ゲームのカメラの回転の目的地
-	m_posRDest.x = pos.x + m_load[m_type].offset.x;
-	m_posRDest.y = pos.y + m_load[m_type].offset.y;
-	m_posRDest.z = pos.z + m_load[m_type].offset.z;
-	//-------------------- 視点移動 --------------------//
-	// 目的地から現在地の距離(視点)
-	m_posRDiff =
-		m_posRDest - m_posR;
-
-	// 注視点に慣性
-	m_posR.x += m_posRDiff.x * m_fIntertia;
-	m_posR.y += m_posRDiff.y * m_fIntertia;
-	m_posR.z += m_posRDiff.z * m_fIntertia;
-
-	// 目的の視点
-	m_posVDest.x =
-		m_posRDest.x + sinf(m_rot.y) * m_fLength;
-	m_posVDest.y =
-		m_posRDest.y + cosf(m_rot.x) * m_fHeight;
-	m_posVDest.z =
-		m_posRDest.z + cosf(m_rot.y) * m_fLength;
-	// 目的地から現在地の距離(注視点)
-	m_posVDiff =
-		m_posVDest - m_posV;
-
-	// 注視点に慣性
-	m_posV.x += m_posVDiff.x * m_fIntertia;
-	m_posV.y += m_posVDiff.y * m_fIntertia;
-	m_posV.z += m_posVDiff.z * m_fIntertia;
-
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// カメラの目的注視点設定
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCamera::SetPosDestRPlayer(
-	D3DXVECTOR3 const & pos,	// 位置情報
-	D3DXVECTOR3 const & rot		// 回転情報
-)
-{
-	m_fLength = m_load[m_type].fLengh;
-	m_fHeight = m_load[m_type].fHeight;
-	// 注視点軸に回転 //
-
-	// ゲームのカメラの回転の目的地
-	m_posRDest.x = pos.x + m_load[m_type].offset.x;
-	m_posRDest.y = pos.y + m_load[m_type].offset.y;
-	m_posRDest.z = pos.z + m_load[m_type].offset.z;
+	m_posRDest.x = pos.x + sinf(m_rot.y + D3DX_PI) * m_offset.x;
+	m_posRDest.y = pos.y + m_offset.y;
+	m_posRDest.z = pos.z + cosf(m_rot.y + D3DX_PI) * m_offset.x;
 	//-------------------- 視点移動 --------------------//
 	// 目的地から現在地の距離(視点)
 	m_posRDiff =
@@ -441,13 +381,12 @@ void CCamera::SetPosDestRPlayer(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::SetPosR(D3DXVECTOR3 const & pos, D3DXVECTOR3 const & rot)
 {
-	m_fLength = m_load[m_type].fLengh;
-	m_fHeight = m_load[m_type].fHeight;
-	m_rot = rot + m_load[m_type].rot;
+	// 回転設定
+	m_rot = rot;
 	// ゲームのカメラの回転の目的地
-	m_posRDest.x = pos.x + m_load[m_type].offset.x;
-	m_posRDest.y = pos.y + m_load[m_type].offset.y;
-	m_posRDest.z = pos.z + m_load[m_type].offset.z;
+	m_posRDest.x = pos.x + sinf(m_rot.y + D3DX_PI) * m_offset.x;
+	m_posRDest.y = pos.y + m_offset.y;
+	m_posRDest.z = pos.z + cosf(m_rot.y + D3DX_PI) * m_offset.x;
 	// ゲームのカメラの回転の目的地
 	m_posR = m_posRDest;
 	// 目的の視点
@@ -468,14 +407,6 @@ void CCamera::SetType(
 	TYPE type
 )
 {
-	if (type == TYPE_FOLLOW)
-	{
-		m_rotOrigin = m_rotDest;
-	}
-	if (type == TYPE_FOLLOW)
-	{
-		m_rotDest = m_rotOrigin;
-	}
 	if (type > TYPE_MAX ||
 		type < 0)
 	{
@@ -509,6 +440,35 @@ void CCamera::SetCameraInfo(void)
 	m_RotSpeed.y = -CAMERA_INIT;				// 回転スピード
 }
 
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// カメラモーションの設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CCamera::SetCamera_Motion(
+	D3DXVECTOR3 const &posR,	// 注視点の位置
+	D3DXVECTOR3 const &rot,		// 回転
+	float const & fLength,		// 長さ
+	float const & fHeight,		// 高さ
+	float const & fIntertia		// 慣性の比率
+)
+{
+	// 注視点
+	m_posRDest = posR;
+	// 回転
+	m_rotDest = rot;
+	// 長さ
+	m_fLength = fLength;
+	// 高さ
+	m_fHeight = fHeight;
+	// 慣性の比率
+	m_fIntertia = fIntertia;
+	// 回転上限
+	CCalculation::Rot_One_Limit(m_rotDest.x);
+	CCalculation::Rot_One_Limit(m_rotDest.y);
+	CCalculation::Rot_One_Limit(m_rotDest.z);
+}
+
+/*
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 回転
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -601,71 +561,4 @@ void CCamera::Rot(void)
 		m_rotDest.x = -2.5f;
 	}
 }
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// カメラモーションの設定
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCamera::SetCamera_Motion(
-	D3DXVECTOR3 const &posR,	// 注視点の位置
-	D3DXVECTOR3 const &rot,		// 回転
-	float const & fLength,		// 長さ
-	float const & fHeight,		// 高さ
-	float const & fIntertia		// 慣性の比率
-)
-{
-	// 注視点
-	m_posRDest = posR;
-	// 回転
-	m_rotDest = rot;
-	// 長さ
-	m_fLength = fLength;
-	// 高さ
-	m_fHeight = fHeight;
-	// 慣性の比率
-	m_fIntertia = fIntertia;
-	// 回転上限
-	CCalculation::Rot_One_Limit(m_rotDest.x);
-	CCalculation::Rot_One_Limit(m_rotDest.y);
-	CCalculation::Rot_One_Limit(m_rotDest.z);
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// カメラの演出
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCamera::SetCamera_Perfom(
-	D3DXVECTOR3 const & posR,
-	D3DXVECTOR3 const & rot,
-	float const & fLength,
-	float const & fHeight
-)
-{
-	// 回転
-	m_rot = rot;
-	// ゲームのカメラの回転の目的地
-	m_posRDest.x = posR.x;
-	m_posRDest.y = posR.y;
-	m_posRDest.z = posR.z;
-	// 注視点
-	m_posR = m_posRDest;
-	// 長さ
-	m_fLength = fLength;
-	// 高さ
-	m_fHeight = fHeight;
-	// 視点
-	m_posV.x =
-		m_posR.x + sinf(m_rot.y) * m_fLength;
-	m_posV.y =
-		m_posR.y + cosf(m_rot.x) * m_fHeight;
-	m_posV.z =
-		m_posR.z + cosf(m_rot.y) * m_fLength;
-	m_posVDest = m_posV;
-	m_rotDest = m_rot;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// カメラ情報変更
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCamera::ChangeInfo(void)
-{
-
-}
+*/

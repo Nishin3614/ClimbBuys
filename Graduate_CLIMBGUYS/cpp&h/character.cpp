@@ -42,7 +42,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 MODEL_ALL	*CCharacter::m_modelAll[CHARACTER_MAX] = {};		// キャラクター全体の情報
 CModel_info	*CCharacter::m_model_info[CHARACTER_MAX] = {};		// キャラクター情報
-std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX];				// キャラクター番号
+std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX];		// キャラクター番号
 D3DXVECTOR3	CCharacter::m_CharacterSize[CHARACTER_MAX] = {};	// キャラクターのサイズ
 CCharacter::STATUS CCharacter::m_sStatus[CHARACTER_MAX] = {};	// キャラクターすべてのスタータス情報
 int			CCharacter::m_NumParts[CHARACTER_MAX] = {};			// 動かすキャラクター数
@@ -58,7 +58,7 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 {
 	m_pMeshobit = NULL;								// 軌跡
 	m_pModel = NULL;								// モデル
-	m_character = CHARACTER_NPC;				// キャラクター
+	m_character = CHARACTER_NPC;					// キャラクター
 	m_pos = D3DXVECTOR3(0.0f,0.0f,0.0f);			// 位置
 	m_posold = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 前の位置
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
@@ -72,14 +72,10 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 	m_nFrame = 0;									// フレームカウント
 	m_nMotionFrame = 0;								// モーション一つののフレームカウント
 	m_nMaxMotion = 0;								// 最大モーション数
-	m_nCntDamage = 0;								// ダメージカウント
 	m_State = STATE_NORMAL;							// 現状のステータス
 	m_nCntState = 0;								// カウントステータス
 	m_fLength = 0;									// 攻撃の当たり範囲
 	m_fAlpha = 1.0f;								// アルファ値
-	m_bMotionCamera = false;						// モーションカメラの切り替え
-	m_bLanding = false;								// 着地状態
-	m_bMove = false;								// 移動状態
 	m_Directvector = D3DVECTOR3_ONE;				// 方向ベクトル
 	m_pStencilshadow = NULL;						// ステンシルシャドウ
 	// ワールドマトリックスの初期化
@@ -300,8 +296,6 @@ void CCharacter::Update(void)
 	m_posold = m_pos;
 	// 通常時の更新処理
 	Update_Normal();
-	// 当たり判定処理
-	Collision();
 	// ステンシルシャドウの位置設定
 	if (m_pStencilshadow != NULL)
 	{
@@ -313,39 +307,6 @@ void CCharacter::Update(void)
 	}
 }
 
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// それぞれの当たり判定処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCharacter::Collision(void)
-{
-	/*
-	// 変数宣言
-	CCollision * pCollision;
-	int nCnt = CScene::GetMaxLayer(LAYER_COLLISION);
-	// あたり判定判定
-	for (int nCntLayer = 0; nCntLayer < CScene::GetMaxLayer(LAYER_COLLISION); nCntLayer++)
-	{
-		// あたり判定の情報取得
-		pCollision = (CCollision *)CScene::GetScene(LAYER_COLLISION, nCntLayer);
-		// 自分の当たり判定の情報がNULLなら
-		// ->ループスキップ
-		if (m_pCharacterCollision == NULL) continue;
-		// あたり判定情報入っていない場合
-		// ->ループスキップ
-		else if (pCollision == NULL) continue;
-		// キャラクターの当たり判定と取得した当たり判定が同じなら
-		// ->ループスキップ
-		else if (m_pCharacterCollision == pCollision)
-		{
-			continue;
-		}
-		// キャラクターとあたり判定同士の当たり判定処理
-		else if (m_pCharacterCollision->CollisionDetection(pCollision))
-		{
-		}
-	}
-	*/
-}
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 通常時の更新処理
@@ -446,8 +407,6 @@ void CCharacter::Motion(void)
 		m_nFrame = 0;	// フレーム
 		// カウントアップ
 		m_keyinfoCnt++;
-		// モーションカメラの切り替えの初期化
-		m_bMotionCamera = false;
 		// キー情報が超えたら
 		if (m_keyinfoCnt >= m_modelAll[m_character]->pMotion[m_nMotiontype]->nNumKey)
 		{
@@ -482,22 +441,6 @@ void CCharacter::ModelUpdate(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// カメラ追尾
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCharacter::TrackCamera(void)
-{
-	//// モードが選択画面とチュートリアルの場合
-	//if (CManager::GetMode() == CManager::MODE_SELECT)
-	//{
-	//	// カメラの注視点設定
-	//	CManager::GetRenderer()->GetCamera()->SetPosDestRPlayer(
-	//		CCharacter::GetPos(),
-	//		CCharacter::GetRot()
-	//	);
-	//}
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 制限区域
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::Limit(void)
@@ -524,11 +467,11 @@ void CCharacter::Limit(void)
 	//	m_pos.z = 950;
 	//	m_move.z = 0.0f;
 	//}
-	if (m_pos.y > 1000.0f)
-	{
-		m_pos.y = 1000.0f;
-		m_move.y = 0.0f;
-	}
+	//if (m_pos.y > 1000.0f)
+	//{
+	//	m_pos.y = 1000.0f;
+	//	m_move.y = 0.0f;
+	//}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -605,6 +548,7 @@ void CCharacter::Motion_Obit()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::MotionCamera(void)
 {
+	/*
 	// 変数宣言
 	// 情報取得
 	static CCamera * pCamera = CManager::GetRenderer()->GetCamera();	// カメラ
@@ -626,6 +570,7 @@ void CCharacter::MotionCamera(void)
 			m_bMotionCamera = true;
 		}
 	}
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -753,26 +698,20 @@ bool CCharacter::GetFloorHeight(void)
 							// 情報取得
 	for (int nCntLayer = 0; nCntLayer < CScene::GetMaxLayer(CScene::LAYER_3DOBJECT); nCntLayer++)
 	{
-		pFloor = (CFloor*)CScene::GetScene( CScene::LAYER_3DOBJECT, nCntLayer,CFloor());	// 床
+		pFloor = (CFloor*)CScene::GetScene(CScene::LAYER_3DOBJECT, nCntLayer, CFloor());	// 床
 		if (pFloor != NULL)
 		{
-			if (pFloor->GetCalculation())
+			// 床の高さを代入
+			if (m_pos.y < pFloor->GetHeight(m_pos))
 			{
-				// 床の高さを代入
-				if (m_pos.y < pFloor->GetHeight(m_pos))
-				{
-					m_pos.y = pFloor->GetHeight(m_pos);
-					m_move.y = 0;
-					// 着地状態をtrueに
-					m_bLanding = true;
-					return true;
-				}
-				// それ以外
-				else
-				{
-					// 着地状態をfalseに
-					m_bLanding = false;
-				}
+				m_pos.y = pFloor->GetHeight(m_pos);
+				m_move.y = 0;
+				return true;
+			}
+			// それ以外
+			else
+			{
+
 			}
 		}
 	}
@@ -1015,47 +954,18 @@ HRESULT CCharacter::LoadStatus(void)
 		{
 			switch (nCntItem)
 			{
-				// 風船の個数
+				// 移動力
 			case 0:
-				m_sStatus[nCntLine].nMaxBalloon = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// 風船の個数
-			case 1:
-				m_sStatus[nCntLine].nMaxPopBalloon = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
+				m_sStatus[nCntLine].fMaxMove = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
 				break;
 				// 慣性力
-			case 2:
+			case 1:
 				m_sStatus[nCntLine].fMaxInertia = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
 				break;
 				// ジャンプ力
-			case 3:
+			case 2:
 				m_sStatus[nCntLine].fMaxJump = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
 				break;
-				// 移動力
-			case 4:
-				m_sStatus[nCntLine].fMaxMove = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// 最大MP数
-			case 5:
-				m_sStatus[nCntLine].nMaxMp = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// マイフレームで増えるMP数
-			case 6:
-				m_sStatus[nCntLine].nMaxMpUp_Every = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// 倒したときのMP数
-			case 7:
-				m_sStatus[nCntLine].nMaxMpUp_KnockDown = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// スキル使用時の減る量
-			case 8:
-				m_sStatus[nCntLine].nMaxMpDown = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// 能力の倍率
-			case 9:
-				m_sStatus[nCntLine].fMaxSkill = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-
 			default:
 				break;
 			}
@@ -1110,21 +1020,7 @@ void CCharacter::Debug(void)
 void CCharacter::AllDebug(void)
 {
 	/*
-	// キャラクターステータスの表示 //
-	CDebugproc::Print("//----------キャラクターステータス情報----------//\n");
-	for (int nCntCharacter = 0; nCntCharacter < CHARACTER_MAX; nCntCharacter++)
-	{
-		CDebugproc::Print("// [%d]\n",nCntCharacter);
-		CDebugproc::Print("最大持っていける風船数:%d\n", m_sStatus[nCntCharacter].nMaxBalloon);
-		CDebugproc::Print("最大出現風船数:%d\n", m_sStatus[nCntCharacter].nMaxPopBalloon);
-		CDebugproc::Print("慣性力:%.2f\n", m_sStatus[nCntCharacter].fMaxInertia);
-		CDebugproc::Print("ジャンプ力:%.2f\n", m_sStatus[nCntCharacter].fMaxJump);
-		CDebugproc::Print("移動力:%.2f\n", m_sStatus[nCntCharacter].fMaxMove);
-		CDebugproc::Print("移動力:%.2f\n", m_sStatus[nCntCharacter].fMaxMove);
-		CDebugproc::Print("移動力:%.2f\n", m_sStatus[nCntCharacter].fMaxMove);
-		CDebugproc::Print("移動力:%.2f\n", m_sStatus[nCntCharacter].fMaxMove);
 
-	}
 	*/
 }
 #endif // _DEBUG

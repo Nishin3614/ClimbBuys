@@ -16,7 +16,6 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CExtrusion;
 class CMeshobit;
 class CCollision;
 class CStencilshadow;
@@ -48,8 +47,9 @@ public:
 	// キャラクター
 	typedef enum
 	{
-		CHARACTER_NPC = 0,	// NPC
-		CHARACTER_MAX,							// キャラクター全体数
+		CHARACTER_PLAYER = 0,	// プレイヤー
+		CHARACTER_NPC,			// NPC
+		CHARACTER_MAX,			// キャラクター全体数
 	} CHARACTER;
 
 	/* 構造体 */
@@ -60,38 +60,27 @@ public:
 		// 初期化
 		STATUS()
 		{
-			nMaxBalloon = 0;			// 最大風船数
-			nMaxPopBalloon = 0;			// 最大出現風船数
 			fMaxInertia = 0;			// 慣性力
 			fMaxJump = 0;				// ジャンプ力
 			fMaxMove = 0;				// 移動力
-			nMaxMp = 0;					// 最大MP数
-			nMaxMpUp_Every = 0;			// マイフレームで増えるMP数
-			nMaxMpUp_KnockDown = 0;		// 倒したときのMP数
-			nMaxMpDown = 0;				// スキル使用時の減る量
-			fMaxSkill = 0;				// 能力の倍率
 		}
 		/* 変数 */
-		int			nMaxBalloon;		// 最大風船数
-		int			nMaxPopBalloon;		// 最大出現風船数
 		float		fMaxInertia;		// 慣性力
 		float		fMaxJump;			// ジャンプ力
 		float		fMaxMove;			// 移動力
-		int			nMaxMp;				// 最大MP数
-		int			nMaxMpUp_Every;		// マイフレームで増えるMP数
-		int			nMaxMpUp_KnockDown;	// 倒したときのMP数
-		int			nMaxMpDown;			// スキル使用時の減る量
-		float		fMaxSkill;			// 能力の倍率
-		// ポイントゾーン ポイント加算(100)
-		// スコアをとった時のゲージの上昇率
-		// ポイントの倍率
 	} STATUS, *PSTATUS;
 	/* 関数 */
+	// コンストラクタ
 	CCharacter(CHARACTER const &character);
+	// デストラクタ
 	virtual ~CCharacter();
+	// 初期化処理
 	virtual void Init(void);
+	// 更新処理
 	virtual void Uninit(void);
+	// 更新処理
 	virtual void Update(void);
+	// 描画処理
 	virtual void Draw(void);
 	// キャラクターが死んだとき
 	virtual void Die(void);
@@ -139,10 +128,6 @@ public:
 	void SetMove(D3DXVECTOR3 const &move)					{ m_move = move; };
 	// 回転
 	void SetRot(D3DXVECTOR3 const &rot)						{ m_rot = rot; };
-	// 着地状態設定
-	void SetbLanding(bool const &bLanding)					{ m_bLanding = bLanding; };
-	// 移動状態設定
-	void SetbMove(bool const &bMove)						{ m_bMove = bMove; };
 	// 方向ベクトル設定
 	void SetDirectionVec(D3DXVECTOR3 const &direct)			{ m_Directvector = direct; };
 	// 取得 //
@@ -167,10 +152,6 @@ public:
 	// ステータス(キャラクター別)
 	// 引数:キャラクター番号
 	static STATUS &GetStatus(CHARACTER const &character)	{ return m_sStatus[character]; };
-	// 着地状態取得
-	bool GetbLanding(void)									{ return m_bLanding; };
-	// 移動状態取得
-	bool GetbMove(void)										{ return m_bMove; };
 	// 前方方向ベクトル取得
 	D3DXVECTOR3 GetDirectionVec(void)						{ return m_Directvector; };
 	// 床の高さ
@@ -241,20 +222,17 @@ protected:
 	void Limit(void);										// 制限区域
 private:
 	/* 関数 */
-	void Collision(void);									// それぞれの当たり判定
 	void Update_Normal(void);								// 通常時の更新
 	void NextKeyMotion(void);								// 次のモーション
 	void Move(void);										// 移動
 	void Motion(void);										// モーション
 	void ModelUpdate(void);									// モデルの更新
-	void TrackCamera(void);									// カメラ追尾
 	void Motion_Effect(void);								// モーションエフェクト
 	void Motion_Obit(void);									// モーション軌跡
-	static void Status_Reset(void);								// ステータスリセット
 	/* 変数 */
 	/* 構造体のスタティックにする */
 	static MODEL_ALL				*m_modelAll[CHARACTER_MAX];				// モデル全体の情報
-	static std::vector<int>				m_modelId[CHARACTER_MAX];			// モデル番号
+	static std::vector<int>			m_modelId[CHARACTER_MAX];				// モデル番号
 	static CModel_info				*m_model_info[CHARACTER_MAX];			// モデル情報
 	static D3DXVECTOR3				m_CharacterSize[CHARACTER_MAX];			// キャラクターのサイズ
 	static int						m_NumModel[CHARACTER_MAX];				// 最大モデル数
@@ -275,12 +253,7 @@ private:
 	int								m_keyinfoCnt;							// キー情報のカウント
 	int								m_nFrame;								// フレームカウント
 	int								m_nMotionFrame;							// 一つのモーションのカウント
-	int								m_nIdAttackKey;							// 攻撃用のキーID
-	int								m_nCntDamage;							// ダメージカウント
 	float							m_fLength;								// 攻撃の当たり範囲
-	bool							m_bMotionCamera;						// モーションカメラの切り替えON・OFF
-	bool							m_bLanding;								// 着地状態
-	bool							m_bMove;								// 移動状態
 	D3DXVECTOR3						m_Directvector;							// 方向のベクトル
 	CCollision						*m_pCharacterCollision;					// キャラクターの当たり判定
 	std::vector<std::unique_ptr<CCollision>>	m_vec_AttackCollision;		// 攻撃当たり判定

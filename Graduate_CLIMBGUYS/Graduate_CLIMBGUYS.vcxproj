@@ -160,6 +160,7 @@
     <ClCompile Include="cpp&amp;h\3Dline.cpp" />
     <ClCompile Include="cpp&amp;h\3Dmap.cpp" />
     <ClCompile Include="cpp&amp;h\3Dparticle.cpp" />
+    <ClCompile Include="cpp&amp;h\baseblock.cpp" />
     <ClCompile Include="cpp&amp;h\basemode.cpp" />
     <ClCompile Include="cpp&amp;h\Calculation.cpp" />
     <ClCompile Include="cpp&amp;h\camera.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="cpp&amp;h\circleshadow.cpp" />
     <ClCompile Include="cpp&amp;h\collision.cpp" />
     <ClCompile Include="cpp&amp;h\columncollision.cpp" />
+    <ClCompile Include="cpp&amp;h\connectblock.cpp" />
     <ClCompile Include="cpp&amp;h\debugcollision.cpp" />
     <ClCompile Include="cpp&amp;h\debugproc.cpp" />
     <ClCompile Include="cpp&amp;h\effect.cpp" />
@@ -232,6 +234,7 @@
     <ClInclude Include="cpp&amp;h\3Dline.h" />
     <ClInclude Include="cpp&amp;h\3Dmap.h" />
     <ClInclude Include="cpp&amp;h\3Dparticle.h" />
+    <ClInclude Include="cpp&amp;h\baseblock.h" />
     <ClInclude Include="cpp&amp;h\basemode.h" />
     <ClInclude Include="cpp&amp;h\Calculation.h" />
     <ClInclude Include="cpp&amp;h\camera.h" />
@@ -239,6 +242,7 @@
     <ClInclude Include="cpp&amp;h\circleshadow.h" />
     <ClInclude Include="cpp&amp;h\collision.h" />
     <ClInclude Include="cpp&amp;h\columncollision.h" />
+    <ClInclude Include="cpp&amp;h\connectblock.h" />
     <ClInclude Include="cpp&amp;h\debugcollision.h" />
     <ClInclude Include="cpp&amp;h\debugproc.h" />
     <ClInclude Include="cpp&amp;h\effect.h" />

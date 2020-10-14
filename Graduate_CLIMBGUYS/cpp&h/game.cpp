@@ -24,6 +24,8 @@
 #include "ui_group.h"
 #include "3Dmap.h"
 #include "player.h"
+#include "baseblock.h"
+#include "connectblock.h"
 
 /* ポーズ */
 //#include "pause.h"
@@ -78,6 +80,8 @@ void CGame::Init(void)
 	);
 	// プレイヤーの生成
 	CPlayer::Create();
+	// 結合されたブロックの生成
+	CConnectblock::Create(D3DVECTOR3_ZERO,CConnectblock::SHAPE_RECT);
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),

@@ -273,6 +273,12 @@
     <ClCompile Include="cpp&amp;h\character.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\baseblock.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\connectblock.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dgauge.h">
@@ -489,6 +495,12 @@
       <Filter>Mode</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\character.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\baseblock.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\connectblock.h">
       <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>

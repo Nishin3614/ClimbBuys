@@ -42,7 +42,10 @@ public:
 	typedef enum
 	{
 		MOTIONTYPE_NEUTRAL = 0,		// 待機モーション
-		MOTIONTYPE_MAX
+		MOTIONTYPE_MOVE,			// 移動モーション
+		MOTIONTYPE_DASH,			// ダッシュモーション
+		MOTINOTYPE_JUMP,			// ジャンプモーション
+		MOTIONTYPE_MAX				// 最大数
 	} MOTIONTYPE;
 	// キャラクター
 	typedef enum

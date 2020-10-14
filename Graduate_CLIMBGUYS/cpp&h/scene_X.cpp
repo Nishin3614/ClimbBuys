@@ -48,7 +48,6 @@ CScene_X::CScene_X() : CScene::CScene()
 	m_fShadowAlpha = 1.0f;		// 影のα値
 	m_fModelAlpha = 1.0f;		// プレイヤーのα値
 	m_bShadowMap = false;		// シャドウマッピングにするかしないか
-	m_pExtrusion = NULL;		// 当たり判定
 	m_pParentMtx = NULL;		// 親マトリックス
 	m_pShadow = NULL;			// シャドウ
 	m_Collision = NULL;			// 当たり判定
@@ -276,12 +275,16 @@ void CScene_X::CollisionDelete(void)
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 作成処理(シーン管理)
+//	pos			: 位置
+//	rot			: 回転
+//	nModelId	: モデル番号
+//	bShadowMap	: シャドウマッピング状態
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CScene_X * CScene_X::Create(
-	D3DXVECTOR3 const & pos,
-	D3DXVECTOR3 const & rot,
-	int const & nModelId,
-	bool const & bShadowMap
+	D3DXVECTOR3 const & pos,	// 位置
+	D3DXVECTOR3 const & rot,	// 回転
+	int const & nModelId,		// モデル番号
+	bool const & bShadowMap		// シャドウマッピング状態
 )
 {
 	// 変数宣言
@@ -304,12 +307,16 @@ CScene_X * CScene_X::Create(
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 作成処理(個人管理)
+//	pos			: 位置
+//	rot			: 回転
+//	nModelId	: モデル番号
+//	bShadowMap	: シャドウマッピング状態
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CScene_X * CScene_X::Create_Self(
-	D3DXVECTOR3 const & pos,
-	D3DXVECTOR3 const & rot,
-	int const & nModelId,
-	bool const & bShadowMap
+	D3DXVECTOR3 const & pos,	// 位置
+	D3DXVECTOR3 const & rot,	// 回転
+	int const & nModelId,		// モデル番号
+	bool const & bShadowMap		// シャドウマッピング状態
 )
 {
 	// 変数宣言
@@ -329,12 +336,16 @@ CScene_X * CScene_X::Create_Self(
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 作成処理(個人管理)
+//	pos			: 位置
+//	rot			: 回転
+//	nModelId	: モデル番号
+//	bShadowMap	: シャドウマッピング状態
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CScene_X> CScene_X::Create_Uni(
-	D3DXVECTOR3 const & pos,
-	D3DXVECTOR3 const & rot,
-	int const & nModelId,
-	bool const & bShadowMap
+	D3DXVECTOR3 const & pos,	// 位置
+	D3DXVECTOR3 const & rot,	// 回転
+	int const & nModelId,		// モデル番号
+	bool const & bShadowMap		// シャドウマッピング状態
 )
 {
 	// 変数宣言

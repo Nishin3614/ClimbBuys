@@ -200,7 +200,7 @@ void CPlayer::MyMove(void)
 	/* ジョイパッド */
 	// パッド用 //
 	float fValueH, fValueV;	// ゲームパッドのスティック情報の取得用
-	float fMove;			// 移動速度
+	float fMove = 1.0f;			// 移動速度
 	float fAngle;			// スティック角度の計算用変数
 	fAngle = 0.0f;			// 角度
 
@@ -223,15 +223,6 @@ void CPlayer::MyMove(void)
 			else if (fAngle < -D3DX_PI)
 			{
 				fAngle += D3DX_PI * 2;
-			}
-			// 速度の計算
-			if (abs(nValueH) > abs(nValueV))
-			{
-				fMove = (abs(nValueH) * 10.0f) / 1024.0f;
-			}
-			else
-			{
-				fMove = (abs(nValueV) * 10.0f) / 1024.0f;
 			}
 			rot.y = fAngle + fRot;
 			vec = D3DXVECTOR3(sinf(fAngle + fRot), 0.0f, cosf(fAngle + fRot));

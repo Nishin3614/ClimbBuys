@@ -13,13 +13,13 @@
 #include "collision.h"
 #include "game.h"
 #include "score.h"
-#include "joypad.h"
+#include "XInputPad.h"
+#include "keyboard.h"
 #include "2Dgauge.h"
 #include "rank.h"
 #include "ui_group.h"
 #include "meshdome.h"
 #include "3Dparticle.h"
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
@@ -40,9 +40,10 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
-	m_p2DMPGauge = NULL;			// MPゲージ
-	m_nCntState = 0;				// ステートカウント
-	m_nMP = 0;						// MP
+	m_p2DMPGauge	= NULL;			// MPゲージ
+	m_nCntState		= 0;			// ステートカウント
+	m_nMP			= 0;			// MP
+	m_pPad			= nullptr;		// ゲームパッド
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,6 +81,9 @@ void CPlayer::Init(void)
 	m_p2DMPGauge->SetMainCol(
 		D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f),
 		D3DXCOLOR(0.0f, 0.7f, 0.3f, 1.0f));
+
+	// パッドのポインタ取得
+	m_pPad = CManager::CManager::GetPad(GetPlayerTag());
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -146,7 +150,6 @@ void CPlayer::MyMove(void)
 	fRot = CManager::GetRenderer()->GetCamera()->GetRot().y;	// カメラ回転
 	vec = CCharacter::GetDirectionVec();						// ベクトル
 	CKeyboard *pKeyboard = CManager::GetKeyboard();
-	CJoypad *pJoypad = CManager::GetJoy();
 
 	// 移動 //
 	/* キーボード */
@@ -244,22 +247,22 @@ void CPlayer::MyMove(void)
 
 	/* ジョイパッド */
 	// パッド用 //
-	int nValueH, nValueV;	// ゲームパッドのスティック情報の取得用
+	float fValueH, fValueV;	// ゲームパッドのスティック情報の取得用
 	float fMove;			// 移動速度
 	float fAngle;			// スティック角度の計算用変数
 	fAngle = 0.0f;			// 角度
 
-	if (CManager::GetJoy() != NULL)
+	if (m_pPad)
 	{
 		// ゲームパッドのスティック情報を取得
-		CManager::GetJoy()->GetStickLeft(0, nValueH, nValueV);
+		m_pPad->GetStickLeft(&fValueH, &fValueV);
 
 		// プレイヤー移動
 		// ゲームパッド移動
-		if (nValueH != 0 || nValueV != 0)
+		if (fValueH != 0 || fValueV != 0)
 		{
 			// 角度の計算
-			fAngle = atan2f((float)nValueH, (float)nValueV);
+			fAngle = atan2f((float)fValueH, (float)fValueV);
 
 			if (fAngle > D3DX_PI)
 			{
@@ -273,13 +276,13 @@ void CPlayer::MyMove(void)
 			if (!CCharacter::GetbLanding())
 			{
 				// 速度の計算
-				if (abs(nValueH) > abs(nValueV))
+				if (abs(fValueH) > abs(fValueV))
 				{
-					fMove = (abs(nValueH) * 10.0f) / 1024.0f;
+					fMove = (abs(fValueH) * 10.0f) / 1024.0f;
 				}
 				else
 				{
-					fMove = (abs(nValueV) * 10.0f) / 1024.0f;
+					fMove = (abs(fValueV) * 10.0f) / 1024.0f;
 				}
 			}
 			rot.y = fAngle + fRot;

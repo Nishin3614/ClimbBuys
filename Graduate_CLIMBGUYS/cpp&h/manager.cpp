@@ -7,6 +7,18 @@
 /* My */
 #include "manager.h"
 
+/* 入力デバイス */
+#include "keyboard.h"
+#include "XInputPad.h"
+#include "mouse.h"
+#include "keyconfig.h"
+
+/* サウンド */
+#include "sound.h"
+
+/* デバッグ表示 */
+#include "debugproc.h"
+
 /* 描画 */
 #include "scene.h"
 #include "game.h"
@@ -31,17 +43,17 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------
-CRenderer *CManager::m_renderer = NULL;							// レンダラー
-CKeyboard * CManager::m_keyboard = NULL;						// キーボード
-CJoypad * CManager::m_joypad = NULL;							// ジョイパッド
-CMouse * CManager::m_mouse = NULL;								// マウス
-CKeyConfig * CManager::m_keyconfig = NULL;						// キー詳細
-CSound * CManager::m_sound = NULL;								// サウンド
-CFade * CManager::m_fade = NULL;								// フェード
-CBaseMode * CManager::m_BaseMode = NULL;						// ベースモード
-CManager::MODE CManager::m_mode = CManager::MODE_TITLE;			// モード
-bool CManager::m_bWire = false;									// ワイヤー
-CLoadScreen * CManager::m_pLoadScreen = NULL;					// 読み込み画面
+CRenderer		*CManager::m_renderer								= NULL;					// レンダラー
+CKeyboard		* CManager::m_keyboard								= NULL;					// キーボード
+CXInputPad		* CManager::m_pPad[(int)PLAYER_TAG::PLAYER_MAX]		= {};					// ゲームパッド
+CMouse			* CManager::m_mouse									= NULL;					// マウス
+CKeyConfig		* CManager::m_keyconfig								= NULL;					// キー詳細
+CSound			* CManager::m_sound									= NULL;					// サウンド
+CFade			* CManager::m_fade									= NULL;					// フェード
+CBaseMode		* CManager::m_BaseMode								= NULL;					// ベースモード
+CManager::MODE	CManager::m_mode									= CManager::MODE_TITLE;	// モード
+bool			CManager::m_bWire									= false;				// ワイヤー
+CLoadScreen		* CManager::m_pLoadScreen							= NULL;					// 読み込み画面
 
 // ----------------------------------------------------------------------------------------------------
 // コンストラクタ
@@ -67,7 +79,10 @@ HRESULT CManager::Init(HWND hWnd, BOOL bWindow, HINSTANCE hInstance)
 	// キーボードの生成
 	m_keyboard = new CKeyboard;
 	// ジョイパッドの生成
-	m_joypad = new CJoypad;
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		m_pPad[nCnt] = new CXInputPad;
+	}
 	// マウスの生成
 	m_mouse = new CMouse;
 	// キー詳細の生成
@@ -88,11 +103,14 @@ HRESULT CManager::Init(HWND hWnd, BOOL bWindow, HINSTANCE hInstance)
 		m_keyboard = NULL;
 	}
 	// ジョイパッド
-	if (!m_joypad->Init(hInstance, hWnd) == S_OK)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
-		m_joypad->Uninit();
-		delete m_joypad;
-		m_joypad = NULL;
+		if (!m_pPad[nCnt]->Init(hInstance, hWnd, (PLAYER_TAG)nCnt) == S_OK)
+		{
+			m_pPad[nCnt]->Uninit();
+			delete m_pPad[nCnt];
+			m_pPad[nCnt] = nullptr;
+		}
 	}
 	// マウス
 	if (!m_mouse->Init(hInstance, hWnd) == S_OK)
@@ -149,12 +167,16 @@ void CManager::Uninit(void)
 		m_keyboard = NULL;
 	}
 	// ジョイパッド
-	if (m_joypad != NULL)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
-		m_joypad->Uninit();
-		delete m_joypad;
-		m_joypad = NULL;
+		if (m_pPad[nCnt])
+		{
+			m_pPad[nCnt]->Uninit();
+			delete m_pPad[nCnt];
+			m_pPad[nCnt] = NULL;
+		}
 	}
+
 	// マウス
 	if (m_mouse != NULL)
 	{
@@ -219,9 +241,12 @@ void CManager::Update(void)
 		m_keyboard->Update();
 	}
 	// ジョイパッド
-	if (m_joypad != NULL)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
-		m_joypad->Update();
+		if (m_pPad[nCnt])
+		{
+			m_pPad[nCnt]->Update();
+		}
 	}
 	// マウス
 	if (m_mouse != NULL)
@@ -240,6 +265,8 @@ void CManager::Update(void)
 		m_BaseMode->Debug();
 #endif // _DEBUG
 	}
+	// 前回のスティック情報
+	CCalculation::SaveLastStickInfo();
 
 	// 画面遷移
 	m_fade->Update();

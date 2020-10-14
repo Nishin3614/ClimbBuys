@@ -16,18 +16,57 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{5dc6e167-2441-411c-a8cc-3257f77e82d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{beb24cb1-7cbb-40dd-8420-5d809e6d51ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProjectBase">
+      <UniqueIdentifier>{4c3aafaa-b485-4b8b-a2fc-503a84a9b6e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mode">
+      <UniqueIdentifier>{24744b30-f6cf-4faa-b26d-cd979a832919}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Effect">
+      <UniqueIdentifier>{ce2585e8-4608-48fd-a141-a6539cd3ca71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{d1249f42-77d8-4a98-9bdb-be057ea8a42b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model\Player">
+      <UniqueIdentifier>{86ec2074-5b87-491a-8b43-559631b1dc86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{e8f5d921-0b66-4ad0-b13e-f29d916d514c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model\Enemy">
+      <UniqueIdentifier>{8e3d00de-c2cd-4fb2-8d98-5ab7368b643e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collision">
+      <UniqueIdentifier>{6206a8de-091a-4fd5-8397-ffe51ef59b30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{b9a827ae-656c-4b48-8301-8bf9b94eb3e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{1fd58e65-5ea5-4524-82e6-42e76957408f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{33fd1130-a503-4e20-9fb4-0025c9fbbae1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture_UI">
+      <UniqueIdentifier>{089f3ea7-c3f7-42b8-a11d-ca2a63f74b34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shadow">
+      <UniqueIdentifier>{7b5a67da-9d19-44ba-be6d-1e4de30fac50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Option">
+      <UniqueIdentifier>{dc4912e2-7149-4f5b-9995-a574b70a4a90}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cpp&amp;h\2Deffect.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\2Dgauge.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\3Deffect.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\3Dline.cpp">
@@ -36,175 +75,19 @@
     <ClCompile Include="cpp&amp;h\3Dmap.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\3Dparticle.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\basemode.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\Calculation.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\camera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\character.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\circleshadow.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\collision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\columncollision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\debugcollision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\debugproc.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\effect.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\enemy.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\fade.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\floor.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\game.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\input.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\joypad.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\keyboard.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\keyconfig.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\lake.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\light.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\load.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\loadscreen.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\manager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\meshdome.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\meshobit.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\meshsphere.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\meshwall.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\model.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\model_info.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\mouse.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\number.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\player.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\rank.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\ranking.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\rectcollision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\renderer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\result.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\scene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\scene_load.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\scene_three.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\scene_two.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\scene_X.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\score.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\shadow_mapping.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\shape.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\solider.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\sound.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\spherecollision.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\stencilshadow.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\texture_manager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\title.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\title_select.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\tutorial.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\ui.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\ui_group.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\ImGui\imgui.cpp">
@@ -225,18 +108,177 @@
     <ClCompile Include="cpp&amp;h\ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\scene_load.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\scene_three.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\scene_two.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\scene_X.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\main.cpp">
+      <Filter>ProjectBase</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\manager.cpp">
+      <Filter>ProjectBase</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\renderer.cpp">
+      <Filter>ProjectBase</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\basemode.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\game.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\result.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\ranking.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\title.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\3Deffect.cpp">
+      <Filter>Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\2Deffect.cpp">
+      <Filter>Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\3Dparticle.cpp">
+      <Filter>Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\player.cpp">
+      <Filter>Model\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\effect.cpp">
+      <Filter>Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\keyconfig.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\keyboard.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\joypad.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\input.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\enemy.cpp">
+      <Filter>Model\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\collision.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\columncollision.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\debugcollision.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\debugproc.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\lake.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\floor.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\tutorial.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\meshdome.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\meshobit.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\meshsphere.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\meshwall.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\model.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\model_info.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\ui.cpp">
+      <Filter>Texture_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\ui_group.cpp">
+      <Filter>Texture_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\texture_manager.cpp">
+      <Filter>Texture_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\mouse.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\XInputPad.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\solider.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\spherecollision.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\shadow_mapping.cpp">
+      <Filter>Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\stencilshadow.cpp">
+      <Filter>Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\circleshadow.cpp">
+      <Filter>Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\camera.cpp">
+      <Filter>Option</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\light.cpp">
+      <Filter>Option</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\fade.cpp">
+      <Filter>Option</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\sound.cpp">
+      <Filter>Option</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\rectcollision.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\Calculation.cpp">
+      <Filter>Option</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\shape.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\title_select.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\character.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cpp&amp;h\2Deffect.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\2Dgauge.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\3Deffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\3Dline.h">
@@ -245,175 +287,22 @@
     <ClInclude Include="cpp&amp;h\3Dmap.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\3Dparticle.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\basemode.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\Calculation.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\camera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\character.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\circleshadow.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\collision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\columncollision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\debugcollision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\debugproc.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\effect.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\fade.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\floor.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\game.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\input.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\joypad.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\keyboard.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\keyconfig.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\lake.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\light.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\load.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\loadscreen.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\main.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\manager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\meshdome.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\meshobit.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\meshsphere.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\meshwall.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\model.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\model_info.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\mouse.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\number.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\player.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\rank.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\ranking.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\rectcollision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\renderer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\result.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\scene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\scene_load.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\scene_three.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\scene_two.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\scene_X.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\score.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\shadow_mapping.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\shape.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\solider.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\sound.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\spherecollision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\stencilshadow.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\texture_manager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\title.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\title_select.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\tutorial.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\ui.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\ui_group.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\ImGui\imconfig.h">
@@ -439,6 +328,168 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\ImGui\imstb_truetype.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\scene_load.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\scene_three.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\scene_two.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\scene_X.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\main.h">
+      <Filter>ProjectBase</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\manager.h">
+      <Filter>ProjectBase</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\renderer.h">
+      <Filter>ProjectBase</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\game.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\basemode.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\ranking.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\result.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\title.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\2Deffect.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\3Deffect.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\3Dparticle.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\player.h">
+      <Filter>Model\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\effect.h">
+      <Filter>Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\input.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\joypad.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\keyboard.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\keyconfig.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\enemy.h">
+      <Filter>Model\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\columncollision.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\collision.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\debugcollision.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\debugproc.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\floor.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\lake.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\tutorial.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\meshdome.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\meshobit.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\meshsphere.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\meshwall.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\model_info.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\model.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\ui_group.h">
+      <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\ui.h">
+      <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\texture_manager.h">
+      <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\mouse.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\XInputPad.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\solider.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\spherecollision.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\circleshadow.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\stencilshadow.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\shadow_mapping.h">
+      <Filter>Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\camera.h">
+      <Filter>Option</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\light.h">
+      <Filter>Option</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\fade.h">
+      <Filter>Option</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\sound.h">
+      <Filter>Option</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\rectcollision.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\Calculation.h">
+      <Filter>Option</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\title_select.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\character.h">
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

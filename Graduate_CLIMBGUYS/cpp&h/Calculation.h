@@ -71,6 +71,34 @@ namespace MYLIBLARY
 
 }
 
+// 方向
+enum class DIRECTION
+{
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+};
+
+// タグ
+enum class PLAYER_TAG
+{
+	NONE = -1,
+	PLAYER_1,			// プレイヤー1
+	PLAYER_2,			// プレイヤー2
+	PLAYER_MAX,			// 最大数
+};
+// タグを管理するクラス
+class CPlayerTAG
+{
+public:
+	void				SetPlayerTag(PLAYER_TAG Tag)	{ m_PlayerTag = Tag; };		// コントローラータグの設定
+	PLAYER_TAG			GetPlayerTag()					{ return m_PlayerTag; };	// コントローラータグの取得
+
+private:
+	PLAYER_TAG			m_PlayerTag;	// コントローラータグ
+};
+
 // 整数型2個
 typedef struct INTEGER2
 {
@@ -495,29 +523,6 @@ public:
 		float const & e = 1		// 反発係数
 	);
 
-	// 2つの球の衝突までの時間と位置を取得
-	// 双方の球は指定のベクトル方向に等速で進むと仮定
-	// fStepSec : 双方の球が進む時間
-	// SphereA : 球A
-	// VecA : 球Aの速度ベクトル
-	// SphereB : 球B
-	// VecB : 球Bの速度ベクトル
-	// fOutSec : 衝突時刻
-	// outColPos : 衝突位置（接点）
-	// outColPosS1(option) : 衝突時のパーティクルAの中心座標
-	// outColPosS2(option) : 衝突時のパーティクルBの中心座標
-	static bool CalcIntervalSphereSphere(
-		float fStepSec,						// fStepSec : 双方の球が進む時間
-		CSphereShape *SphereA,				// SphereA : 球A
-		const D3DXVECTOR3 &VecA,			// VecA : 球Aの速度ベクトル
-		CSphereShape *SphereB,				// SphereB : 球B
-		const D3DXVECTOR3 &VecB,			// VecB : 球Bの速度ベクトル
-		float &fOutSec,						// fOutSec : 衝突時刻
-		D3DXVECTOR3 &outColPos,				// outColPos : 衝突位置（接点）
-		D3DXVECTOR3 *outColPosS1 = NULL,	// outColPosS1(option) : 衝突時のパーティクルAの中心座標
-		D3DXVECTOR3 *outColPosS2 = NULL		// outColPosS2(option) : 衝突時のパーティクルBの中心座標
-	);
-
 	// 球同士の衝突後速度位置算出
 	// 引数1:衝突中の球Aの中心位置
 	// 引数2:衝突の瞬間の球Aの速度
@@ -575,12 +580,55 @@ public:
 		char delimiter			// 区切り文字
 	);
 
+	// 2D 外積計算
+	static float Vec2Cross(D3DXVECTOR2 const &rVecA, D3DXVECTOR2 const &rVecB);
+	// ワールドマトリックス
+	static void CalcMatrix(D3DXMATRIX *pMtx, D3DXVECTOR3 const &rPos, D3DXVECTOR3 const &rRot);
+	// ビルボード設定　XとZのみ
+	static void SetBillboard_XZ_Only(D3DXMATRIX *pMtx);
+	// -3.14から3.14までのランダムで返す
+	static float Random_PI();
+	// 入力された値の+-ランダムな値で返す
+	static float Random(float fInputValue);
+	// ランダムなvector3型で値を返す
+	static D3DXVECTOR3 RandomVector3(float Max);
+	// 回転を360度以内にする計算
+	static void CalcRotation(float &fRot);
+	// 回転を360度以内にする計算
+	static void CalcRotation_XYZ(D3DXVECTOR3 &rot);
+
+	/* XInputのパッド用関数 */
+	// 前回のスティック情報
+	static void SaveLastStickInfo();
+	// スティックを倒している方向をチェック
+	static DIRECTION CheckPadStick();
+	// いずれかのボタンを押したとき
+	static bool PressAnyButton(void);
+	// パッドの入力方向の判定
+	static bool PadMoveInput(D3DXVECTOR3 & rMove, DIRECTION & direction, bool bJump, PLAYER_TAG PlayerTag);
+
+	// パッドのスティックの情報
+	typedef struct
+	{
+		float		fLeftStickValue_X;			//Lスティック( 横 )
+		float		fLeftStickValue_Y;			//Lスティック( 縦 )
+		bool		bLeftStickDown_X;			//Lスティック( 横 )が入力されているか
+		bool		bLeftStickDown_Y;			//Lスティック( 縦 )が入力されているか
+	}PAD_STICK;
+
+	static PAD_STICK	m_PadStick[(int)PLAYER_TAG::PLAYER_MAX];		// コントローラーのスティック情報
+	static DIRECTION	m_direction;					//方向
+
 	/* ImGui用関数 */
 	// ImGuiによるデバッグ情報
 	static void ImG_DebugInfo(void);
 
 	// ImGuiによる並列処理
 	static void ImG_Parallel(void);
+
+	// ImGuiのコンボボックス
+	static bool ImGui_Combobox(std::vector<std::string> aItemNameList, std::string aTitle, int &nValue);
+
 protected:
 
 private:

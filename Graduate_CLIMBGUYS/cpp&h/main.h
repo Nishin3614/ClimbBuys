@@ -38,6 +38,7 @@
 
 #define DIRECTINPUT_VERSION (0x0800)	// 警告対処用
 #include "dinput.h"						// 入力機器用
+#include <Xinput.h>
 #include "xaudio2.h"					// BGM
 
 // ------------------------------------------
@@ -89,6 +90,13 @@ typedef struct
 	D3DCOLOR col;		// 頂点カラー
 	D3DXVECTOR2 tex;		// テクスチャー
 } VERTEX_3D;
+
+// ------------------------------------------
+//
+// 前方宣言
+//
+// ------------------------------------------
+#include "Calculation.h"
 
 // ------------------------------------------
 //

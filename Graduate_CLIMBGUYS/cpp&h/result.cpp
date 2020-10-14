@@ -13,6 +13,7 @@
 #include "player.h"
 #include "manager.h"
 #include "ui.h"
+#include "keyboard.h"
 
 //=============================================================================
 //

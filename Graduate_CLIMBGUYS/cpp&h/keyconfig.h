@@ -69,6 +69,6 @@ private:
 	/* 関数 */
 	/* 変数 */
 	int m_nKeyboardId[CONFIG_MAX];			// キーボードID
-	int m_JoypadId[CONFIG_MAX];				// ジョイパッドID
+	int m_nPadID[CONFIG_MAX];					// ジョイパッドID
 };
 #endif

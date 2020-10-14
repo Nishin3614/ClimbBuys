@@ -13,6 +13,9 @@
 #include "camera.h"
 #include "light.h"
 #include "loadscreen.h"
+#include "keyboard.h"
+#include "mouse.h"
+
 // ƒeƒXƒg
 #include "3Dmap.h"
 

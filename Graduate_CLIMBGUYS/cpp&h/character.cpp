@@ -18,6 +18,7 @@
 #include "columncollision.h"
 #include "circleshadow.h"
 #include "stencilshadow.h"
+#include "debugproc.h"
 
 #include "fade.h"
 

@@ -14,22 +14,7 @@
 // ------------------------------------------
 /* 基本 */
 #include "main.h"
-#include "Calculation.h"
-
-/* 描画 */
 #include "renderer.h"
-
-/* 入力デバイス */
-#include "keyboard.h"
-#include "joypad.h"
-#include "mouse.h"
-#include "keyconfig.h"
-
-/* サウンド */
-#include "sound.h"
-
-/* デバッグ表示 */
-#include "debugproc.h"
 
 // ------------------------------------------
 //
@@ -46,9 +31,15 @@
 // 前方宣言
 //
 // ------------------------------------------
+class CRenderer;	// レンダラークラス
 class CFade;		// 画面遷移
 class CBaseMode;	// ベースモードクラス
 class CLoadScreen;	// 読み込み画面
+class CKeyboard;	// キーボードクラス
+class CXInputPad;	// ゲームパッドクラス
+class CMouse;		// マウスクラス
+class CKeyConfig;	// キー詳細
+class CSound;		// サウンドクラス
 
 // ------------------------------------------
 //
@@ -100,8 +91,8 @@ public:
 	static CRenderer * GetRenderer(void) { return m_renderer; };
 	// キーボード情報取得
 	static CKeyboard * GetKeyboard(void) { return m_keyboard; };
-	// ジョイパッド情報取得
-	static CJoypad * GetJoy(void) { return m_joypad; };
+	// ゲームパッド情報取得
+	static CXInputPad * GetPad(PLAYER_TAG Tag) { return m_pPad[(int)Tag]; };
 	// マウス情報取得
 	static CMouse * GetMouse(void) { return m_mouse; };
 	// キー詳細取得
@@ -118,17 +109,17 @@ protected:
 
 private:
 	/* 変数 */
-	static CRenderer * m_renderer;			// レンダリング
-	static CSound * m_sound;				// サウンド
-	static CKeyboard * m_keyboard;			// キーボード
-	static CJoypad * m_joypad;				// ジョイパッド
-	static CMouse * m_mouse;				// マウス
-	static CKeyConfig * m_keyconfig;		// キー詳細
-	static CFade * m_fade;					// 画面遷移
-	static CBaseMode * m_BaseMode;			// 現在のモード
-	static CLoadScreen * m_pLoadScreen;		// 読み込み画面
-	static MODE m_mode;						// モード
-	static bool	m_bWire;					// ワイヤーモード
+	static CRenderer * m_renderer;							// レンダリング
+	static CSound * m_sound;								// サウンド
+	static CKeyboard * m_keyboard;							// キーボード
+	static CXInputPad *m_pPad[(int)PLAYER_TAG::PLAYER_MAX];	// ゲームパッド( XInput )
+	static CMouse * m_mouse;								// マウス
+	static CKeyConfig * m_keyconfig;						// キー詳細
+	static CFade * m_fade;									// 画面遷移
+	static CBaseMode * m_BaseMode;							// 現在のモード
+	static CLoadScreen * m_pLoadScreen;						// 読み込み画面
+	static MODE m_mode;										// モード
+	static bool	m_bWire;									// ワイヤーモード
 };
 
 #endif // !_MANAGER_H_

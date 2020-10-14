@@ -6,6 +6,8 @@
 // ------------------------------------------
 #include "keyconfig.h"
 #include "manager.h"
+#include "XInputPad.h"
+#include "keyboard.h"
 
 // ------------------------------------------
 //
@@ -55,21 +57,21 @@ void CKeyConfig::Init(void)
 	m_nKeyboardId[CONFIG_TRICK1] = DIK_U;
 	m_nKeyboardId[CONFIG_TRICK2] = DIK_I;
 	// ジョイパッドIDの設定
-	m_JoypadId[CONFIG_DECISION] = CJoypad::KEY_B;
-	m_JoypadId[CONFIG_BACK] = CJoypad::KEY_A;
-	m_JoypadId[CONFIG_POUSE] = CJoypad::KEY_START;
-	m_JoypadId[CONFIG_UP] = CJoypad::KEY_UP;
-	m_JoypadId[CONFIG_DOWN] = CJoypad::KEY_DOWN;
-	m_JoypadId[CONFIG_LEFT] = CJoypad::KEY_LEFT;
-	m_JoypadId[CONFIG_RIGHT] = CJoypad::KEY_RIGHT;
-	m_JoypadId[CONFIG_CAMERAUP] = CJoypad::KEY_UP;
-	m_JoypadId[CONFIG_CAMERADOWN] = CJoypad::KEY_DOWN;
-	m_JoypadId[CONFIG_CAMERALEFT] = CJoypad::KEY_LEFT;
-	m_JoypadId[CONFIG_CAMERARIGHT] = CJoypad::KEY_RIGHT;
-	m_JoypadId[CONFIG_JUMP] = CJoypad::KEY_A;
-	m_JoypadId[CONFIG_BALLOONCREATE] = CJoypad::KEY_B;
-	m_JoypadId[CONFIG_TRICK1] = CJoypad::KEY_LEFT_1;
-	m_JoypadId[CONFIG_TRICK2] = CJoypad::KEY_RIGHT_1;
+	m_nPadID[CONFIG_DECISION]			= CXInputPad::JOYPADKEY_B;
+	m_nPadID[CONFIG_BACK]				= CXInputPad::JOYPADKEY_A;
+	m_nPadID[CONFIG_POUSE]				= CXInputPad::JOYPADKEY_START;
+	m_nPadID[CONFIG_UP]					= CXInputPad::JOYPADKEY_UP;
+	m_nPadID[CONFIG_DOWN]				= CXInputPad::JOYPADKEY_DOWN;
+	m_nPadID[CONFIG_LEFT]				= CXInputPad::JOYPADKEY_LEFT;
+	m_nPadID[CONFIG_RIGHT]				= CXInputPad::JOYPADKEY_RIGHT;
+	m_nPadID[CONFIG_CAMERAUP]			= CXInputPad::JOYPADKEY_UP;
+	m_nPadID[CONFIG_CAMERADOWN]			= CXInputPad::JOYPADKEY_DOWN;
+	m_nPadID[CONFIG_CAMERALEFT]			= CXInputPad::JOYPADKEY_LEFT;
+	m_nPadID[CONFIG_CAMERARIGHT]		= CXInputPad::JOYPADKEY_RIGHT;
+	m_nPadID[CONFIG_JUMP]				= CXInputPad::JOYPADKEY_A;
+	m_nPadID[CONFIG_BALLOONCREATE]		= CXInputPad::JOYPADKEY_B;
+	m_nPadID[CONFIG_TRICK1]				= CXInputPad::JOYPADKEY_L1;
+	m_nPadID[CONFIG_TRICK2]				= CXInputPad::JOYPADKEY_R1;
 }
 
 // ------------------------------------------
@@ -93,12 +95,16 @@ bool const CKeyConfig::GetKeyConfigPress(CONFIG const & config)
 {
 	// キーボードが押されていたらtrueを返す
 	if (CManager::GetKeyboard()->GetKeyboardPress(m_nKeyboardId[config])) return true;
-	// ジョイパッドがNULLではないのなら
-	else if (CManager::GetJoy() != NULL)
-	{
-		// ジョイパッドが押されていたらtrueを返す
-		if (CManager::GetJoy()->GetPress(0, (CJoypad::KEY)m_JoypadId[config])) return true;
-	}
+
+	//for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	//{
+	//	// ジョイパッドがNULLではないのなら
+	//	if (CManager::GetPad((PLAYER_TAG)nCnt) != NULL)
+	//	{
+	//		// ジョイパッドが押されていたらtrueを返す
+	//		if (CManager::GetPad((PLAYER_TAG)nCnt)->GetPress((CXInputPad::XINPUT_KEY)m_nPadID[config])) return true;
+	//	}
+	//}
 	return false;
 }
 
@@ -109,11 +115,11 @@ bool const CKeyConfig::GetKeyConfigTrigger(CONFIG const & config)
 {
 	// キーボードが押されていたらtrueを返す
 	if (CManager::GetKeyboard()->GetKeyboardTrigger(m_nKeyboardId[config])) return true;
-	// ジョイパッドがNULLではないのなら
-	else if (CManager::GetJoy() != NULL)
-	{
-		// ジョイパッドが押されていたらtrueを返す
-		if (CManager::GetJoy()->GetTrigger(0, (CJoypad::KEY)m_JoypadId[config])) return true;
-	}
+	//// ジョイパッドがNULLではないのなら
+	//else if (CManager::GetPad() != NULL)
+	//{
+	//	// ジョイパッドが押されていたらtrueを返す
+	//	if (CManager::GetPad()->GetTrigger((CXInputPad::XINPUT_KEY)m_nPadID[config])) return true;
+	//}
 	return false;
 }

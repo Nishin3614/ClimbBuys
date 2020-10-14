@@ -15,6 +15,8 @@
 #include "fade.h"
 #include "ui.h"
 #include "camera.h"
+#include "XInputPad.h"
+#include "keyboard.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -117,50 +119,51 @@ void CTitle_select::Uninit(void)
 void CTitle_select::Update(void)
 {
 	/* ジョイパッド */
-	if (CManager::GetJoy() != NULL)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
-		// スティックの下方向に傾けたとき |
-		// 下矢印が押されたとき |
-		// ->次の項目へ
-		if (CManager::GetJoy()->GetBoolStickLeft(0, CJoypad::DIRECTION_DOWN) ||
-			CManager::GetJoy()->GetTrigger(0, CJoypad::KEY_DOWN))
+		if (CManager::GetPad((PLAYER_TAG)nCnt) != NULL)
 		{
-			m_nSelect++;
-			// 上限超えたら
-			if (m_nSelect >= TITLE_SELECT_MAX)
+			// スティックの下方向に傾けたとき |
+			// 下矢印が押されたとき |
+			// ->次の項目へ
+			if (CCalculation::CheckPadStick() == DIRECTION::DOWN)
 			{
-				m_nSelect = TITLE_SELECT_GAME;
+				m_nSelect++;
+				// 上限超えたら
+				if (m_nSelect >= TITLE_SELECT_MAX)
+				{
+					m_nSelect = TITLE_SELECT_GAME;
+				}
+				// 選択UIの位置更新
+				m_uni_SelectUi->SetPosition(m_Ui[m_nSelect]->GetScene_Two()->GetPosition());
+				m_uni_SelectUi->Set_Vtx_Pos();
+				// カーソル音
+				//CManager::GetSound()->PlaySound(CSound::LABEL_SE_CURSOL);
 			}
-			// 選択UIの位置更新
-			m_uni_SelectUi->SetPosition(m_Ui[m_nSelect]->GetScene_Two()->GetPosition());
-			m_uni_SelectUi->Set_Vtx_Pos();
-			// カーソル音
-			//CManager::GetSound()->PlaySound(CSound::LABEL_SE_CURSOL);
-		}
-		// スティックの上方向に傾けたとき |
-		// 上矢印が押されたとき |
-		// ->前の項目へ
-		else if (CManager::GetJoy()->GetBoolStickLeft(0, CJoypad::DIRECTION_UP) ||
-			CManager::GetJoy()->GetTrigger(0, CJoypad::KEY_UP))
-		{
-			m_nSelect--;
-			// 下限超えたら
-			if (m_nSelect < TITLE_SELECT_GAME)
+			// スティックの上方向に傾けたとき |
+			// 上矢印が押されたとき |
+			// ->前の項目へ
+			else if (CCalculation::CheckPadStick() == DIRECTION::UP)
 			{
-				m_nSelect = TITLE_SELECT_MAX - 1;
-			}
-			// 選択UIの位置更新
-			m_uni_SelectUi->SetPosition(m_Ui[m_nSelect]->GetScene_Two()->GetPosition());
-			m_uni_SelectUi->Set_Vtx_Pos();
+				m_nSelect--;
+				// 下限超えたら
+				if (m_nSelect < TITLE_SELECT_GAME)
+				{
+					m_nSelect = TITLE_SELECT_MAX - 1;
+				}
+				// 選択UIの位置更新
+				m_uni_SelectUi->SetPosition(m_Ui[m_nSelect]->GetScene_Two()->GetPosition());
+				m_uni_SelectUi->Set_Vtx_Pos();
 
-			// カーソル音
-			//CManager::GetSound()->PlaySound(CSound::LABEL_SE_CURSOL);
-		}
-		// Bボタンを押したら |
-		// ->選択している項目の処理
-		if (CManager::GetJoy()->GetTrigger(0, CJoypad::KEY_B))
-		{
-			Select();
+				// カーソル音
+				//CManager::GetSound()->PlaySound(CSound::LABEL_SE_CURSOL);
+			}
+			// Bボタンを押したら |
+			// ->選択している項目の処理
+			if (CManager::GetPad((PLAYER_TAG)nCnt)->GetTrigger(CXInputPad::JOYPADKEY_B, 1))
+			{
+				Select();
+			}
 		}
 	}
 	/* キーボード */

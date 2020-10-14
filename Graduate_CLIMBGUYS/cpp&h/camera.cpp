@@ -8,6 +8,8 @@
 #include "manager.h"
 #include "debugproc.h"
 #include "player.h"
+#include "XInputPad.h"
+#include "keyboard.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
@@ -514,38 +516,38 @@ void CCamera::Rot(void)
 {
 	// ジョイパッド用 //
 	// パッド用 //
-	int nValueH, nValueV;	// ゲームパッドのスティック情報の取得用
+	float fValueH, fValueV;	// ゲームパッドのスティック情報の取得用
 	float fRot;			// 移動速度
 
 	// ジョイパッドの処理 //
-	if (CManager::GetJoy() != NULL)
+	if (CManager::GetPad(PLAYER_TAG::PLAYER_1) != NULL)
 	{
 		// ゲームパッドのスティック情報を取得
-		CManager::GetJoy()->GetStickRight(0, nValueH, nValueV);
-		if (nValueH != 0 || nValueV != 0)
+		CManager::GetPad(PLAYER_TAG::PLAYER_1)->GetStickRight(&fValueH, &fValueV);
+		if (fValueH != 0 || fValueV != 0)
 		{
 			// y回転の角度を計算
-			if (nValueH < 0)
+			if (fValueH < 0)
 			{
-				fRot = abs(nValueH) / 1024.0f * m_RotSpeed.y;
+				fRot = abs(fValueH) / 1024.0f * m_RotSpeed.y;
 				m_rotDest.y += fRot;
 
 			}
-			else if (nValueH > 0)
+			else if (fValueH > 0)
 			{
-				fRot = abs(nValueH) / 1024.0f * m_RotSpeed.y;
+				fRot = abs(fValueH) / 1024.0f * m_RotSpeed.y;
 				m_rotDest.y -= fRot;
 			}
 			// x回転の角度を計算
-			if (nValueV < 0)
+			if (fValueV < 0)
 			{
-				fRot = abs(nValueV) / 1024.0f * m_RotSpeed.x;
+				fRot = abs(fValueV) / 1024.0f * m_RotSpeed.x;
 				m_rotDest.x += fRot;
 
 			}
-			else if (nValueV > 0)
+			else if (fValueV > 0)
 			{
-				fRot = abs(nValueV) / 1024.0f * m_RotSpeed.x;
+				fRot = abs(fValueV) / 1024.0f * m_RotSpeed.x;
 				m_rotDest.x -= fRot;
 
 			}

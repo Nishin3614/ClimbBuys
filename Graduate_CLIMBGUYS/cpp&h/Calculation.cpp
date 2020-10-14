@@ -13,6 +13,14 @@
 #include "Calculation.h"
 #include "debugproc.h"
 #include "renderer.h"
+#include "XInputPad.h"
+#include "keyboard.h"
+
+// ----------------------------------------------------------------------------------------------------
+// 静的メンバ変数の初期化
+// ----------------------------------------------------------------------------------------------------
+CCalculation::PAD_STICK CCalculation::m_PadStick[(int)PLAYER_TAG::PLAYER_MAX]	= {};				// パッドの情報
+DIRECTION CCalculation::m_direction												= DIRECTION::LEFT;	// 方向
 
 // ----------------------------------------------------------------------------------------------------
 //
@@ -727,120 +735,6 @@ void CCalculation::CollisionAfter_VerticalComponent(
 	fAfterSpeedB = fSpeedA + fSpeedB + e * (fSpeedA - fSpeedB);
 }
 
-// 2つの球の衝突までの時間と位置を取得
-// 双方の球は指定のベクトル方向に等速で進むと仮定
-// stepSec : 双方の球が進む時間
-// SphereA : 球A
-// VecA : 球Aの速度ベクトル
-// SphereB : 球B
-// VecB : 球Bの速度ベクトル
-// outSec : 衝突時刻
-// outColPos : 衝突位置（接点）
-// outColPosS1(option) : 衝突時の球Aの中心座標
-// outColPosS2(option) : 衝突時の球Bの中心座標
-bool CCalculation::CalcIntervalSphereSphere(
-	float fStepSec,				// fStepSec : 双方の球が進む時間
-	CSphereShape *SphereA,		// SphereA : 球A
-	const D3DXVECTOR3 &VecA,	// VecA : 球Aの速度ベクトル
-	CSphereShape *SphereB,		// SphereB : 球B
-	const D3DXVECTOR3 &VecB,	// VecB : 球Bの速度ベクトル
-	float &fOutSec,				// fOutSec : 衝突時刻
-	D3DXVECTOR3 &outColPos,		// outColPos : 衝突位置（接点）
-	D3DXVECTOR3 *outColPosS1,	// outColPosS1(option) : 衝突時のパーティクルAの中心座標
-	D3DXVECTOR3 *outColPosS2	// outColPosS2(option) : 衝突時のパーティクルBの中心座標
-)
-{
-	/*
-	// 前位置及び到達位置における球間のベクトルを算出
-	D3DXVECTOR3 SphereA_Pos = *SphereA->Get_PosCore() + SphereA->GetOffset();	// 球Aの位置
-	D3DXVECTOR3 SphereB_Pos = *SphereB->Get_PosCore() + SphereB->GetOffset();	// 球Bの位置
-	D3DXVECTOR3 A1 = SphereA_Pos + VecA * fStepSec;								// 球Aの位置(t=1)
-	D3DXVECTOR3 B1 = SphereB_Pos + VecB * fStepSec;								// 球Bの位置(t=1)
-	D3DXVECTOR3 C0 = SphereB_Pos - SphereA_Pos;									// 球Aと球B間のベクトル(t=0)
-	D3DXVECTOR3 C1 = B1 - A1;																							// 球Aと球B間のベクトル(t=1)
-	D3DXVECTOR3 D = C1 - C0;																							// C1とC0間のベクトル
-	float rAB = SphereA->GetRadius() + SphereB->GetRadius();															// 球Aと球Bの半径の合計
-	float rABSq = rAB * rAB;																							// 半径の合計の2乗
-	float P = D3DXVec3LengthSq(&D);																						// C1とC0間の距離の2乗
-
-	// 衝突判定に解の公式を使えるか？
-	if (P == 0) {
-		// 平行移動 //
-		// t = 0で衝突しているか？
-		if (D3DXVec3LengthSq(&(SphereB_Pos - SphereA_Pos)) > rABSq) {
-			return false;
-		}
-		fOutSec = 0.0f;
-		if (outColPosS1 != 0)
-			*outColPosS1 = SphereA_Pos;
-		if (outColPosS2 != 0)
-			*outColPosS2 = SphereB_Pos;
-		if (SphereB_Pos  == SphereA_Pos) {
-			// 中心点も一緒なので中心点を衝突点として返す
-			outColPos = SphereA_Pos;
-			return true;
-		}
-
-		// 球A->Bのベクトル方向に長さrAの所を衝突点とする
-		outColPos = SphereA_Pos + (SphereA->GetRadius() / rAB) * C0;
-		return true; // 同じ方向に移動
-	}
-
-	// 衝突検知可能 //
-
-	// 最初から衝突している？
-	if (D3DXVec3LengthSq(&(SphereB_Pos  - SphereA_Pos)) <= rABSq) {
-		fOutSec = 0.0f;
-		outColPos = SphereA_Pos + SphereA->GetRadius() / rAB * C0;
-		if (outColPosS1 != 0)
-			*outColPosS1 = SphereA_Pos;
-		if (outColPosS2 != 0)
-			*outColPosS2 = SphereB_Pos ;
-		return true;
-	}
-
-	float Q = D3DXVec3Dot(&C0, &D);
-	float R = D3DXVec3LengthSq(&C0);
-
-	// 衝突判定式
-	float judge = Q * Q - P * (R - rAB * rAB);
-	if (judge < 0) {
-		// 衝突していない
-		return false;
-	}
-
-	// 衝突時間の算出
-	float judge_rt = sqrtf(judge);
-	float t_plus = (-Q + judge_rt) / P;
-	float t_minus = (-Q - judge_rt) / P;
-	if (t_minus > t_plus) {
-		// t_minusを小さい方に
-		float tmp = t_minus;
-		t_minus = t_plus;
-		t_plus = tmp;
-	}
-
-	// 時間外衝突か？
-	if (t_minus < 0.0f || t_minus > 1.0f) {
-		return false;
-	}
-
-	// 衝突位置の決定
-	fOutSec = t_minus * fStepSec;
-	D3DXVECTOR3 Atc = SphereA_Pos + VecA * fStepSec * t_minus;
-	D3DXVECTOR3 Btc = SphereB_Pos  + VecB * fStepSec * t_minus;
-	outColPos = Atc + SphereA->GetRadius() / rAB * (Btc - Atc);
-
-	if (outColPosS1 != 0)
-		*outColPosS1 = Atc;
-	if (outColPosS2 != 0)
-		*outColPosS2 = Btc;
-		*/
-
-
-	return true; // 衝突
-
-}
 
 // ----------------------------------------------------------------------------------------------------
 // 球同士の衝突後速度位置算出
@@ -1178,6 +1072,282 @@ std::vector<std::vector<std::string>> CCalculation::FileContens(
 	return svec_Char;
 }
 
+//------------------------------------------------------------------------------
+// 2Dの外積計算
+//------------------------------------------------------------------------------
+float CCalculation::Vec2Cross(D3DXVECTOR2 const & rVecA, D3DXVECTOR2 const & rVecB)
+{
+	return rVecA.x * rVecB.y - rVecB.x * rVecA.y;
+}
+
+//------------------------------------------------------------------------------
+// マトリックス計算
+//------------------------------------------------------------------------------
+void CCalculation::CalcMatrix(D3DXMATRIX * pMtx, D3DXVECTOR3 const & rPos, D3DXVECTOR3 const & rRot)
+{
+	D3DXMATRIX	mtxRot, mtxTrans;			//計算用
+
+	//ワールドマトリックスの初期化
+	D3DXMatrixIdentity(pMtx);
+
+	// 回転を反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, rRot.y, rRot.x, rRot.z);
+	D3DXMatrixMultiply(pMtx, pMtx, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, rPos.x, rPos.y, rPos.z);
+	D3DXMatrixMultiply(pMtx, pMtx, &mtxTrans);
+}
+
+//------------------------------------------------------------------------------
+// ビルボード設定 XとZのみ
+//------------------------------------------------------------------------------
+void CCalculation::SetBillboard_XZ_Only(D3DXMATRIX * pMtx)
+{
+	// デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
+
+	//計算用変数
+	D3DXMATRIX mtxView;
+
+	//ビューマトリックス初期化
+	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
+
+	//ビルボード設定
+	pMtx->_11 = mtxView._11;
+	pMtx->_12 = mtxView._21;
+	pMtx->_13 = mtxView._31;
+	//pMtx->_21 = mtxView._12;
+	//pMtx->_22 = mtxView._22;
+	//pMtx->_23 = mtxView._32;
+	pMtx->_31 = mtxView._13;
+	pMtx->_32 = mtxView._23;
+	pMtx->_33 = mtxView._33;
+}
+
+//------------------------------------------------------------------------------
+// -3.14～3.14を返す
+//------------------------------------------------------------------------------
+float CCalculation::Random_PI()
+{
+	return Random(3.14f);
+}
+
+//------------------------------------------------------------------------------
+// 入力された値の+-ランダムな値で返す
+//------------------------------------------------------------------------------
+float CCalculation::Random(float fInputValue)
+{
+	//0除算防止
+	if (fInputValue <= 0.0f)
+	{
+		return 0.0f;
+	}
+
+	int nValue = int(fInputValue * 100);
+
+	float fValue;
+
+	rand() % 2 ?
+		fValue = float(rand() % nValue / 100.0f) :
+		fValue = -float(rand() % nValue / 100.0f);
+
+	return fValue;
+}
+
+//------------------------------------------------------------------------------
+// ランダムなvector3型で値を返す
+//------------------------------------------------------------------------------
+D3DXVECTOR3 CCalculation::RandomVector3(float Max)
+{
+	D3DXVECTOR3 Value = D3DVECTOR3_ZERO;
+
+	Value.x = Random(Max);
+	Value.y = Random(Max);
+	//Value.z = Random(Max);
+
+	return Value;
+}
+
+//------------------------------------------------------------------------------
+// 回転の計算　360度以内にする
+//------------------------------------------------------------------------------
+void CCalculation::CalcRotation(float & fRot)
+{
+	//差分が3.14を以上の時
+	if (fRot > D3DX_PI)
+	{
+		//6.28引く
+		fRot -= D3DX_PI * 2;
+	}
+	//差分が-3.14以下の時
+	if (fRot < -D3DX_PI)
+	{
+		//6.28加算
+		fRot += D3DX_PI * 2;
+	}
+}
+
+//------------------------------------------------------------------------------
+// 回転の計算　360度以内にする
+//------------------------------------------------------------------------------
+void CCalculation::CalcRotation_XYZ(D3DXVECTOR3 & rot)
+{
+	CCalculation::CalcRotation(rot.x);
+	CCalculation::CalcRotation(rot.y);
+	CCalculation::CalcRotation(rot.z);
+}
+/*
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// XInputのパッド用関数
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+//------------------------------------------------------------------------------
+// 前回のスティック情報を保存
+//------------------------------------------------------------------------------
+void CCalculation::SaveLastStickInfo()
+{
+	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		InpudPad[nCnt] =  CManager::GetPad((PLAYER_TAG)nCnt);
+
+		if (InpudPad[nCnt])
+		{
+			// 上下の入力判定
+			if (fabsf(m_PadStick[nCnt].fLeftStickValue_Y / STICK_MAX_RANGE) > 0.8f)
+			{
+				m_PadStick[nCnt].bLeftStickDown_Y = true;
+			}
+			else
+			{
+				m_PadStick[nCnt].bLeftStickDown_Y = false;
+			}
+			// 左スティックの入力取得
+			InpudPad[nCnt]->GetStickLeft(&m_PadStick[nCnt].fLeftStickValue_X, &m_PadStick[nCnt].fLeftStickValue_Y);
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+// スティックを倒している方向をチェック
+//------------------------------------------------------------------------------
+DIRECTION CCalculation::CheckPadStick()
+{
+	// 変数
+	CKeyboard	*Keyboard								= CManager::GetKeyboard();
+	CXInputPad	*InpudPad[(int)PLAYER_TAG::PLAYER_MAX]	= {};
+	DIRECTION	Direction								= (DIRECTION)-1;
+
+	// ゲームパッド
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		InpudPad[nCnt] = CManager::GetPad((PLAYER_TAG)nCnt);
+
+		if (InpudPad[nCnt])
+		{
+			// 上
+			if (InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_UP, 1) || ((m_PadStick[nCnt].fLeftStickValue_Y / STICK_MAX_RANGE) > 0.8f && m_PadStick[nCnt].bLeftStickDown_Y == false))
+			{
+				Direction = DIRECTION::UP;
+				return Direction;
+			}
+			// 下
+			if (InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_DOWN, 1) || ((m_PadStick[nCnt].fLeftStickValue_Y / STICK_MAX_RANGE) <= -0.8f && m_PadStick[nCnt].bLeftStickDown_Y == false))
+			{
+				Direction = DIRECTION::DOWN;
+				return Direction;
+			}
+		}
+	}
+	// キーボード
+	// 上
+	if (Keyboard->GetKeyboardTrigger(DIK_UP) || Keyboard->GetKeyboardTrigger(DIK_W))
+	{
+		Direction = DIRECTION::UP;
+		return Direction;
+	}
+	// 下
+	if (Keyboard->GetKeyboardTrigger(DIK_DOWN) || Keyboard->GetKeyboardTrigger(DIK_S))
+	{
+		Direction = DIRECTION::DOWN;
+		return Direction;
+	}
+
+	return Direction;
+}
+
+//------------------------------------------------------------------------------
+// 何かしらキーを押したとき
+//------------------------------------------------------------------------------
+bool CCalculation::PressAnyButton(void)
+{
+	// 変数
+	CKeyboard *Keyboard									= CManager::GetKeyboard();
+	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX]	= {};
+
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		InpudPad[nCnt] = CManager::GetPad((PLAYER_TAG)nCnt);
+
+		if (Keyboard->GetKeyboardTrigger(DIK_RETURN) ||
+			Keyboard->GetKeyboardTrigger(DIK_SPACE) ||
+			InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_START, 1) ||
+			InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_A, 1) ||
+			InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_B, 1) ||
+			InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_X, 1) ||
+			InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_Y, 1))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+//------------------------------------------------------------------------------
+// パッドの入力処理
+//------------------------------------------------------------------------------
+bool CCalculation::PadMoveInput(D3DXVECTOR3 & rMove, DIRECTION & direction, bool bJump, PLAYER_TAG PlayerTag)
+{
+	// 変数
+	bool bInput = false;
+	D3DXVECTOR3 InputValue = D3DVECTOR3_ZERO;
+	InputValue.x /= STICK_MAX_RANGE;//値の正規化
+	InputValue.y /= STICK_MAX_RANGE;//値の正規化
+	CXInputPad *pad = CManager::GetPad(PlayerTag);	// パッドのポインタ
+	pad->GetStickLeft(&InputValue.x, &InputValue.y);//パッドの入力値を代入
+
+	//右
+	if (InputValue.x > 0.5f)
+	{
+		rMove = D3DXVECTOR3(-0.5f, -0.5f, 0.0f);
+		direction = DIRECTION::RIGHT;
+		bInput = true;
+
+	}
+	//左
+	else if (InputValue.x < -0.5f)
+	{
+		rMove = D3DXVECTOR3(0.5f, 0.5f, 0.0f);
+		direction = DIRECTION::LEFT;
+		bInput = true;
+
+	}
+	//上
+	if (InputValue.y > 0.6f)
+	{
+		direction = DIRECTION::UP;
+
+	}
+	//下
+	else if (InputValue.y < -0.6f && bJump == false)
+	{
+		direction = DIRECTION::DOWN;
+	}
+	return bInput;
+}
+
 /*
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ImGui用関数
@@ -1210,6 +1380,40 @@ void CCalculation::ImG_Parallel(void)
 	ImGui::Dummy(ImVec2(10.0f, 0.0f));
 	// 改行
 	ImGui::SameLine();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ImGuiのコンボボックス
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool CCalculation::ImGui_Combobox(std::vector<std::string> aItemNameList, std::string aTitle, int & nValue)
+{
+	bool bChange = false;
+
+#ifdef _DEBUG
+	//combo開始
+	if (ImGui::BeginCombo(aTitle.data(), aItemNameList[nValue].data()))
+	{
+		//要素分繰り返す
+		for (size_t nCnt = 0; nCnt < aItemNameList.size(); nCnt++)
+		{
+
+			//選択番号があってるかどうか
+			bool is_selected = (aItemNameList[nValue] == aItemNameList[nCnt]);
+
+			//選択された時の処理
+			if (ImGui::Selectable(aItemNameList[nCnt].data(), is_selected))
+			{
+				//現在の選択項目設定
+				nValue = nCnt;
+				bChange = true;
+			}
+		}
+		//combo終了
+		ImGui::EndCombo();
+
+	}
+#endif //DEBUG
+	return bChange;
 }
 
 

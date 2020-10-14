@@ -222,6 +222,7 @@
     <ClCompile Include="cpp&amp;h\tutorial.cpp" />
     <ClCompile Include="cpp&amp;h\ui.cpp" />
     <ClCompile Include="cpp&amp;h\ui_group.cpp" />
+    <ClCompile Include="cpp&amp;h\XInputPad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Deffect.h" />
@@ -295,6 +296,7 @@
     <ClInclude Include="cpp&amp;h\tutorial.h" />
     <ClInclude Include="cpp&amp;h\ui.h" />
     <ClInclude Include="cpp&amp;h\ui_group.h" />
+    <ClInclude Include="cpp&amp;h\XInputPad.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

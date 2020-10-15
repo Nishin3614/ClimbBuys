@@ -200,7 +200,7 @@ void CPlayer::MyMove(void)
 	/* ジョイパッド */
 	// パッド用 //
 	float fValueH, fValueV;	// ゲームパッドのスティック情報の取得用
-	float fMove = 1.0f;			// 移動速度
+	float fMove = 3.0f;			// 移動速度
 	float fAngle;			// スティック角度の計算用変数
 	fAngle = 0.0f;			// 角度
 
@@ -378,7 +378,7 @@ void CPlayer::Debug(void)
 // 生成処理
 //	pos	: 位置
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CPlayer * CPlayer::Create(
+CPlayer * CPlayer::Create(PLAYER_TAG tag,
 	D3DXVECTOR3 const & pos	// 位置
 )
 {
@@ -390,6 +390,8 @@ CPlayer * CPlayer::Create(
 	pPlayer->ManageSetting(CScene::LAYER_CHARACTER);
 	// 位置情報
 	pPlayer->m_pos = pos;
+	// プレイヤータグの設定
+	pPlayer->SetPlayerTag(tag);
 	// 初期化処理
 	pPlayer->Init();
 	// 生成したオブジェクトを返す

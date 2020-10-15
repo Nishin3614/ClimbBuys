@@ -78,8 +78,15 @@ void CGame::Init(void)
 		D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),
 		D3DVECTOR3_ZERO, 10, 10, 0
 	);
-	// プレイヤーの生成
-	CPlayer::Create();
+
+	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	// プレイヤーの生成	試験的
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1);
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2);
+
+	pPlayer[(int)PLAYER_TAG::PLAYER_2]->SetPos(D3DXVECTOR3(200.0f, 0.0f, 0.0f));
+
 	// 結合されたブロックの生成
 	CConnectblock::Create(D3DVECTOR3_ZERO,CConnectblock::SHAPE_RECT);
 	/*

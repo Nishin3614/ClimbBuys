@@ -107,9 +107,9 @@ HRESULT CManager::Init(HWND hWnd, BOOL bWindow, HINSTANCE hInstance)
 	{
 		if (!m_pPad[nCnt]->Init(hInstance, hWnd, (PLAYER_TAG)nCnt) == S_OK)
 		{
-			m_pPad[nCnt]->Uninit();
-			delete m_pPad[nCnt];
-			m_pPad[nCnt] = nullptr;
+			//m_pPad[nCnt]->Uninit();
+			//delete m_pPad[nCnt];
+			//m_pPad[nCnt] = nullptr;
 		}
 	}
 	// É}ÉEÉX

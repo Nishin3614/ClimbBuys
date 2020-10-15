@@ -86,8 +86,10 @@ public:
 	void Debug(void);
 #endif // _DEBUG
 	// 生成処理
+	//	tag	: プレイヤータグ
 	//	pos	: 位置
 	static CPlayer * Create(
+		PLAYER_TAG tag,								// プレイヤータグ
 		D3DXVECTOR3 const & pos = D3DVECTOR3_ZERO	// 位置
 );
 	// リソースの読み込み処理

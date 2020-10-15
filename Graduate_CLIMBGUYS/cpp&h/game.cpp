@@ -83,8 +83,8 @@ void CGame::Init(void)
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 	// プレイヤーの生成	試験的
-	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1);
-	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2);
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1,D3DXVECTOR3(0.0,300.0f,0.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
 
 	pPlayer[(int)PLAYER_TAG::PLAYER_2]->SetPos(D3DXVECTOR3(200.0f, 0.0f, 0.0f));
 

@@ -572,7 +572,8 @@ void CScene_X::SetCollision(
 			this,
 			pParent,
 			bPush,
-			bOpponent
+			bOpponent,
+			&m_pos
 		);
 		// 位置情報の更新(行列渡し)
 		m_Collision->GetShape()->PassMatrix(m_mtxWorld);

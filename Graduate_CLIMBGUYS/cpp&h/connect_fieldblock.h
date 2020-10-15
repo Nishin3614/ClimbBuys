@@ -1,20 +1,21 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// ベースブロック処理 [baseblock.h]
+// 結合フィールドブロック処理 [connect_fieldblock.h]
 // Author : KOKI NISHIYAMA
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#ifndef _BASEBLOCK_H_
-#define _BASEBLOCK_H_
+#ifndef _CONNECT_FIELDBLOCK_H_
+#define _CONNECT_FIELDBLOCK_H_
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#include "scene_x.h"
+#include "scene.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class CBaseblock;	// ベースブロッククラス
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 構造体
@@ -23,25 +24,29 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // クラス
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CBaseblock : public CScene_X
+class CConnect_fieldblock : public CScene
 {
 public:
 	/* 列挙型 */
-	// ベースブロック
+	// マップによるs
+	// フィールドタイプ情報
 	typedef enum
 	{
-		TYPE_NORMAL = 0,	// 通常
-		TYPE_FIELD,			// フィールドブロック
-		TYPE_MAX,			// タイプ全体数
+		TYPE_RECT = 0,
+		TYPE_MAX
 	} TYPE;
-
 	/* 構造体 */
-
+	// 読み込み情報
+	typedef struct
+	{
+		int		nFailId;		// おちる番号
+		bool	bUse;			// 使用状況
+	} LOAD;
 	/* 関数 */
 	// コンストラクタ
-	CBaseblock();
+	CConnect_fieldblock();
 	// デストラクタ
-	virtual ~CBaseblock();
+	virtual ~CConnect_fieldblock();
 	// 初期化処理
 	virtual void Init(void);
 	// 更新処理
@@ -79,38 +84,35 @@ public:
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
-
-	// ベースブロック
-	void SetType(TYPE const type)	{ m_type = type; };
-	// ベースブロック
-	TYPE	GetType(void) const					{ return m_type; };
-	// ベースブロック全ソースの読み込み
+	// ポインター位置情報を取得
+	D3DXVECTOR3 * Scene_GetPPos(void) { return NULL; };
+	// ポインター過去の位置情報を取得
+	D3DXVECTOR3 * Scene_GetPPosold(void) { return NULL; };
+	// ポインター移動量情報の取得
+	D3DXVECTOR3 * Scene_GetPMove(void) { return NULL; };
+	// 結合フィールドブロック全ソースの読み込み
 	static HRESULT Load(void);
-	// ベースブロック全ソースの開放
+	// 結合フィールドブロック全ソースの開放
 	static void UnLoad(void);
+
+	/* おちてくるブロックの生成 */
 	// 作成(シーン管理)
-	//	pos			: 位置
-	//	nModelId	: モデル番号
+	//	type		: タイプ情報
 	//	layer		: レイヤー
-	static CBaseblock * Create(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId,								// モデル番号
-		CScene::LAYER	const & layer = CScene::LAYER_UI				// レイヤー
+	static CConnect_fieldblock * Create(
+		TYPE			const & type,									// タイプ情報
+		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT			// レイヤー
 	);
 	// 作成(個人管理)
-	//	pos			: 位置
-	//	nModelId	: モデル番号
-	static CBaseblock * Create_Self(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId								// モデル番号
+	//	type		: タイプ情報
+	static CConnect_fieldblock * Create_Self(
+		TYPE			const & type									// タイプ情報
 		);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
-	//	pos			: 位置
-	//	nModelId	: モデル番号
-	static std::unique_ptr<CBaseblock> Creat_Unique(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId								// モデル番号
+	//	type		: タイプ情報
+	static std::unique_ptr<CConnect_fieldblock> Creat_Unique(
+		TYPE			const & type									// タイプ情報
 	);
 #ifdef _DEBUG
 	// デバッグ処理
@@ -123,7 +125,9 @@ private:
 	/* 関数 */
 
 	/* 変数 */
-	TYPE							m_type;							// ベースブロック
+	static std::vector<std::vector<LOAD>>	m_Dvec_pFileLoad;		// ファイルの読み込み情報
+	std::vector<std::vector<CBaseblock *>>	m_Dvec_pFieldBlock;		// フィールドブロック情報
+	int										m_nMaxField;			// フィールドの最大数
 };
 
 #endif

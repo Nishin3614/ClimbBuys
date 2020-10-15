@@ -308,12 +308,8 @@ void CCollision::CollisionDetection(void)
 		{
 			continue;
 		}
-		// !オブジェクトタイプがプレイヤーなら ||
-		// !オプジェクトタイプがエネミーなら ||
-		// !オブジェクトタイプが魚なら
-		else if (!(pCollision1->m_nMyObjectId == OBJTYPE_PLAYER ||
-			pCollision1->m_nMyObjectId == OBJTYPE_ENEMY ||
-			pCollision1->m_nMyObjectId == OBJTYPE_FISH)
+		// !オブジェクトタイプがプレイヤーなら
+		else if (!(pCollision1->m_nMyObjectId == OBJTYPE_PLAYER)
 			)
 		{
 			continue;
@@ -345,13 +341,6 @@ void CCollision::CollisionDetection(void)
 			// ->関数を抜ける
 			else if (pCollision1->m_pOwner == NULL ||
 				pCollision1->m_pOwner == pCollision2->m_pParent)
-			{
-				continue;
-			}
-			else if ((pCollision1->m_nMyObjectId == OBJTYPE_FISH &&
-				pCollision2->m_nMyObjectId == OBJTYPE_ENEMY_BALLOON) ||
-				(pCollision1->m_nMyObjectId == OBJTYPE_FISH &&
-					pCollision2->m_nMyObjectId == OBJTYPE_PLAYER_BALLOON))
 			{
 				continue;
 			}

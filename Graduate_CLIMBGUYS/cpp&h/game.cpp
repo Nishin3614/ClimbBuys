@@ -26,6 +26,7 @@
 #include "player.h"
 #include "baseblock.h"
 #include "connectblock.h"
+#include "connect_fieldblock.h"
 
 /* ポーズ */
 //#include "pause.h"
@@ -89,6 +90,8 @@ void CGame::Init(void)
 
 	// 結合されたブロックの生成
 	CConnectblock::Create(D3DVECTOR3_ZERO,CConnectblock::SHAPE_RECT);
+	// 結合されたフィールドブロックの生成
+	CConnect_fieldblock::Create(CConnect_fieldblock::TYPE_RECT);
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),
@@ -123,6 +126,7 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
+	CCollision::CollisionDetection();
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)

@@ -46,7 +46,7 @@ void CRectCollision::Init(void)
 {
 #ifdef _DEBUG
 	// 矩形のデバッグ表示
-	CDebugcollision::Create_Rect(m_pRectShape->Get_PPos(),m_pRectShape->GetSize());
+	//CDebugcollision::Create_Rect(m_pRectShape->Get_PPos(),m_pRectShape->GetSize());
 #endif // _DEBUG
 }
 
@@ -140,8 +140,16 @@ CRectCollision *CRectCollision::Create(
 	CRectCollision *pRectCollision;
 	// メモリ確保
 	pRectCollision = new CRectCollision();
-	// 矩形の設定
-	pRectCollision->m_pRectShape = std::move(CRectShape::Create(offset, size,bPush,bOpponent, pPos, pPosold));
+	if (pPos != NULL)
+	{
+		// 矩形の設定
+		pRectCollision->m_pRectShape = std::move(CRectShape::Create(offset, size, bPush, bOpponent, pPos, pPosold));
+	}
+	else
+	{
+		// 矩形の設定
+		pRectCollision->m_pRectShape = std::move(CRectShape::Create(offset, size, bPush, bOpponent));
+	}
 	pRectCollision->SetObjectID(obj);
 	pRectCollision->SetOwnScene(pOwner);
 	pRectCollision->SetParent(pParent);

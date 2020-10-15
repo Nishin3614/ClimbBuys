@@ -60,16 +60,10 @@ public:
 	typedef enum
 	{
 		OBJTYPE_ACTOR = 0,			// オブジェクト_ACTOR
+		OBJTYPE_BLOCK,				// オブジェクト_ブロック
+		OBJTYPE_ATTACK,				// オブジェクト_攻撃
 		OBJTYPE_PLAYER,				// オブジェクト_プレイヤー
 		OBJTYPE_ENEMY,				// オブジェクト_敵
-		OBJTYPE_FISH,				// オブジェクト_魚
-		OBJTYPE_PLAYER_BALLOON,		// オブジェクト_プレイヤーバルーン
-		OBJTYPE_ENEMY_BALLOON,		// オブジェクト_敵バルーン
-		OBJTYPE_ATTACK,				// オブジェクト_攻撃
-		OBJTYPE_ITEM,				// オブジェクト_アイテム
-		OBJTYPE_APPEFISH1,			// オブジェクト_魚出現ポイント1
-		OBJTYPE_APPEFISH2,			// オブジェクト_魚出現ポイント2
-		OBJTYPE_APPEFISH3,			// オブジェクト_魚出現ポイント3
 		OBJTYPE_MAX					// オブジェクト_最大数
 	} OBJTYPE;
 	/* 関数 */

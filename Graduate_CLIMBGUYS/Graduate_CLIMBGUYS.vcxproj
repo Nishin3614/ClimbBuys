@@ -169,6 +169,7 @@
     <ClCompile Include="cpp&amp;h\collision.cpp" />
     <ClCompile Include="cpp&amp;h\columncollision.cpp" />
     <ClCompile Include="cpp&amp;h\connectblock.cpp" />
+    <ClCompile Include="cpp&amp;h\damagefloor.cpp" />
     <ClCompile Include="cpp&amp;h\debugcollision.cpp" />
     <ClCompile Include="cpp&amp;h\debugproc.cpp" />
     <ClCompile Include="cpp&amp;h\effect.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="cpp&amp;h\collision.h" />
     <ClInclude Include="cpp&amp;h\columncollision.h" />
     <ClInclude Include="cpp&amp;h\connectblock.h" />
+    <ClInclude Include="cpp&amp;h\damagefloor.h" />
     <ClInclude Include="cpp&amp;h\debugcollision.h" />
     <ClInclude Include="cpp&amp;h\debugproc.h" />
     <ClInclude Include="cpp&amp;h\effect.h" />

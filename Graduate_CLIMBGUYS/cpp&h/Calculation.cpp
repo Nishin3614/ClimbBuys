@@ -1216,14 +1216,24 @@ void CCalculation::SaveLastStickInfo()
 		if (InpudPad[nCnt])
 		{
 			// 上下の入力判定
-			if (fabsf(m_PadStick[nCnt].fLeftStickValue_Y / STICK_MAX_RANGE) > 0.8f)
-			{
-				m_PadStick[nCnt].bLeftStickDown_Y = true;
-			}
-			else
-			{
-				m_PadStick[nCnt].bLeftStickDown_Y = false;
-			}
+			//if (fabsf(m_PadStick[nCnt].fLeftStickValue_Y / STICK_MAX_RANGE) > 0.8f)
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_Y = true;
+			//}
+			//else
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_Y = false;
+			//}
+
+			//if (fabsf(m_PadStick[nCnt].fLeftStickValue_X / STICK_MAX_RANGE) > 0.8f)
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_X = true;
+			//}
+			//else
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_X = false;
+			//}
+
 			// 左スティックの入力取得
 			InpudPad[nCnt]->GetStickLeft(&m_PadStick[nCnt].fLeftStickValue_X, &m_PadStick[nCnt].fLeftStickValue_Y);
 		}
@@ -1259,6 +1269,19 @@ DIRECTION CCalculation::CheckPadStick()
 				Direction = DIRECTION::DOWN;
 				return Direction;
 			}
+			// 左
+			if (InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_LEFT, 1) || ((m_PadStick[nCnt].fLeftStickValue_X / STICK_MAX_RANGE) < -0.8f && m_PadStick[nCnt].bLeftStickDown_X == false))
+			{
+				Direction = DIRECTION::LEFT;
+				return Direction;
+			}
+			// 右
+			if (InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_RIGHT, 1) || ((m_PadStick[nCnt].fLeftStickValue_X / STICK_MAX_RANGE) >= +0.8f && m_PadStick[nCnt].bLeftStickDown_X == false))
+			{
+				Direction = DIRECTION::RIGHT;
+				return Direction;
+			}
+
 		}
 	}
 	// キーボード
@@ -1274,7 +1297,6 @@ DIRECTION CCalculation::CheckPadStick()
 		Direction = DIRECTION::DOWN;
 		return Direction;
 	}
-
 	return Direction;
 }
 

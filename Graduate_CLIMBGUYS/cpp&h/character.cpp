@@ -315,6 +315,8 @@ void CCharacter::Update_Normal(void)
 {
 	// 移動
 	Move();
+	// 重力
+	FagGravity();
 	// 高さ
 	GetFloorHeight();
 	// モーション
@@ -751,7 +753,7 @@ int CCharacter::GetCameraCharacter(void)
 void CCharacter::FagGravity(void)
 {
 	// 重力処理
-	//m_move.y -= 1.0f;
+	m_move.y -= CHARACTER_G;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

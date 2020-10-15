@@ -54,6 +54,7 @@ public:
 	// プレイヤーが死んだときの関数
 	virtual void Die(void);
 	void OtherDie(void);
+	bool GetDieFlag(void) { return m_bDieFlag; };
 	// 当たった後の処理
 	//	nObjType	: オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
@@ -109,6 +110,6 @@ private:
 	/* 変数 */
 
 	CXInputPad		*m_pPad;						// パッドのポインタ
-
+	bool			m_bDieFlag;						// 死亡フラグ
 };
 #endif

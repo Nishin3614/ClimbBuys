@@ -61,6 +61,9 @@
     <Filter Include="Option">
       <UniqueIdentifier>{dc4912e2-7149-4f5b-9995-a574b70a4a90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Model\Block">
+      <UniqueIdentifier>{00e28d2a-b0ba-4b93-be00-7c7bc84449b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpp&amp;h\2Dgauge.cpp">
@@ -192,9 +195,6 @@
     <ClCompile Include="cpp&amp;h\lake.cpp">
       <Filter>Map</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\floor.cpp">
-      <Filter>Map</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\tutorial.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
@@ -273,11 +273,20 @@
     <ClCompile Include="cpp&amp;h\character.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\floor.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\damagefloor.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
     <ClCompile Include="cpp&amp;h\baseblock.cpp">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\fieldblock.cpp">
+      <Filter>Model\Block</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\connectblock.cpp">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -416,9 +425,6 @@
     <ClInclude Include="cpp&amp;h\debugproc.h">
       <Filter>Debug</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\floor.h">
-      <Filter>Map</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\lake.h">
       <Filter>Map</Filter>
     </ClInclude>
@@ -497,11 +503,20 @@
     <ClInclude Include="cpp&amp;h\character.h">
       <Filter>Model</Filter>
     </ClInclude>
+    <ClInclude Include="cpp&amp;h\floor.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\damagefloor.h">
+      <Filter>Map</Filter>
+    </ClInclude>
     <ClInclude Include="cpp&amp;h\baseblock.h">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\fieldblock.h">
+      <Filter>Model\Block</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\connectblock.h">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

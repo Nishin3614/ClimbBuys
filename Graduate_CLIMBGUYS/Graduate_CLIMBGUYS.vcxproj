@@ -169,11 +169,13 @@
     <ClCompile Include="cpp&amp;h\collision.cpp" />
     <ClCompile Include="cpp&amp;h\columncollision.cpp" />
     <ClCompile Include="cpp&amp;h\connectblock.cpp" />
+    <ClCompile Include="cpp&amp;h\damagefloor.cpp" />
     <ClCompile Include="cpp&amp;h\debugcollision.cpp" />
     <ClCompile Include="cpp&amp;h\debugproc.cpp" />
     <ClCompile Include="cpp&amp;h\effect.cpp" />
     <ClCompile Include="cpp&amp;h\enemy.cpp" />
     <ClCompile Include="cpp&amp;h\fade.cpp" />
+    <ClCompile Include="cpp&amp;h\fieldblock.cpp" />
     <ClCompile Include="cpp&amp;h\floor.cpp" />
     <ClCompile Include="cpp&amp;h\game.cpp" />
     <ClCompile Include="cpp&amp;h\ImGui\imgui.cpp" />
@@ -243,11 +245,13 @@
     <ClInclude Include="cpp&amp;h\collision.h" />
     <ClInclude Include="cpp&amp;h\columncollision.h" />
     <ClInclude Include="cpp&amp;h\connectblock.h" />
+    <ClInclude Include="cpp&amp;h\damagefloor.h" />
     <ClInclude Include="cpp&amp;h\debugcollision.h" />
     <ClInclude Include="cpp&amp;h\debugproc.h" />
     <ClInclude Include="cpp&amp;h\effect.h" />
     <ClInclude Include="cpp&amp;h\enemy.h" />
     <ClInclude Include="cpp&amp;h\fade.h" />
+    <ClInclude Include="cpp&amp;h\fieldblock.h" />
     <ClInclude Include="cpp&amp;h\floor.h" />
     <ClInclude Include="cpp&amp;h\game.h" />
     <ClInclude Include="cpp&amp;h\ImGui\imconfig.h" />

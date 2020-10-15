@@ -26,7 +26,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define PLAYER_GRAVITY (0.1f)
-#define PLAYER_UPMOVELIMIT		(10.0f)	// プレイヤーの上昇移動量制限
+#define PLAYER_UPMOVELIMIT		(30.0f)	// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ void CPlayer::MyMove(void)
 
 	}
 
-	/* ジョイパッド */
+	/* ゲームパッド */
 	// パッド用 //
 	float fValueH, fValueV;	// ゲームパッドのスティック情報の取得用
 	float fMove = 3.0f;			// 移動速度
@@ -229,6 +229,35 @@ void CPlayer::MyMove(void)
 			// スティックの角度によってプレイヤー移動
 			move.x -= sinf(fAngle + fRot) * (fMove);
 			move.z -= cosf(fAngle + fRot) * (fMove);
+		}
+
+		// 試験的ジャンプ
+		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1))
+		{
+			move.y += 12.0f;
+		}
+
+		// 試験的タックル
+		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
+		{
+			switch (CCalculation::CheckPadStick())
+			{
+			case DIRECTION::LEFT:
+				move.x -= 100.0f;
+				break;
+
+			case DIRECTION::RIGHT:
+				move.x += 100.0f;
+				break;
+
+			case DIRECTION::UP:
+				move.z += 100.0f;
+				break;
+
+			case DIRECTION::DOWN:
+				move.z -= 100.0f;
+				break;
+			}
 		}
 	}
 	if (vec.x < 0)

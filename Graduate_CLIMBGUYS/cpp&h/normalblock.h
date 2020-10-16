@@ -1,16 +1,16 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// ベースブロック処理 [baseblock.h]
+// 普通ブロック処理 [normalblock.h]
 // Author : KOKI NISHIYAMA
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#ifndef _BASEBLOCK_H_
-#define _BASEBLOCK_H_
+#ifndef _NORMALBLOCK_H_
+#define _NORMALBLOCK_H_
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#include "scene_x.h"
+#include "baseblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -23,25 +23,18 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // クラス
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CBaseblock : public CScene_X
+class CNormalblock : public CBaseblock
 {
 public:
 	/* 列挙型 */
-	// ベースブロック
-	typedef enum
-	{
-		TYPE_NORMAL = 0,	// 通常
-		TYPE_FIELD,			// フィールドブロック
-		TYPE_MAX,			// タイプ全体数
-	} TYPE;
 
 	/* 構造体 */
 
 	/* 関数 */
 	// コンストラクタ
-	CBaseblock();
+	CNormalblock();
 	// デストラクタ
-	virtual ~CBaseblock();
+	virtual ~CNormalblock();
 	// 初期化処理
 	virtual void Init(void);
 	// 更新処理
@@ -52,55 +45,51 @@ public:
 	virtual void Draw(void);
 
 	// 当たった後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
 	virtual void Scene_MyCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	);
 	// 相手に当てられた後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
 	virtual void Scene_OpponentCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	);
 	// 自分から当たらなかった後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
 	virtual void Scene_NoMyCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
 	// 相手に当てられなかった後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
 	virtual void Scene_NoOpponentCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
 
-	// ベースブロック
-	void SetType(TYPE const type)	{ m_type = type; };
-	// ベースブロック
-	TYPE	GetType(void) const					{ return m_type; };
-	// ベースブロック全ソースの読み込み
+	// 普通ブロック全ソースの読み込み
 	static HRESULT Load(void);
-	// ベースブロック全ソースの開放
+	// 普通ブロック全ソースの開放
 	static void UnLoad(void);
 	// 作成(シーン管理)
 	//	pos			: 位置
 	//	nModelId	: モデル番号
 	//	layer		: レイヤー
-	static CBaseblock * Create(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId,								// モデル番号
-		CScene::LAYER	const & layer = CScene::LAYER_UI				// レイヤー
+	static CNormalblock * Create(
+		D3DXVECTOR3		const & pos,								// 位置
+		int				const & nModelId,							// モデル番号
+		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT		// レイヤー
 	);
 	// 作成(個人管理)
 	//	pos			: 位置
 	//	nModelId	: モデル番号
-	static CBaseblock * Create_Self(
+	static CNormalblock * Create_Self(
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId								// モデル番号
 		);
@@ -108,14 +97,10 @@ public:
 	// ※戻り値はstd::moveで受け取る
 	//	pos			: 位置
 	//	nModelId	: モデル番号
-	static std::unique_ptr<CBaseblock> Creat_Unique(
+	static std::unique_ptr<CNormalblock> Creat_Unique(
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId								// モデル番号
 	);
-	// 落ちる状態設定
-	void SetFall(bool const & bFall) { m_bFall = bFall; };
-	// 落ちる状態取得
-	bool & GetFall(void) { return m_bFall; };
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
@@ -127,8 +112,7 @@ private:
 	/* 関数 */
 
 	/* 変数 */
-	TYPE	m_type;		// ベースブロック
-	bool	m_bFall;	// 落ちる状態
+
 };
 
 #endif

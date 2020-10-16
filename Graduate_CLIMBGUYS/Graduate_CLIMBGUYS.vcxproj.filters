@@ -264,6 +264,9 @@
     <ClCompile Include="cpp&amp;h\connect_fieldblock.cpp">
       <Filter>Model\Block</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\normalblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -468,6 +471,9 @@
       <Filter>Model\Block</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\connect_fieldblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\normalblock.h">
       <Filter>Model\Block</Filter>
     </ClInclude>
   </ItemGroup>

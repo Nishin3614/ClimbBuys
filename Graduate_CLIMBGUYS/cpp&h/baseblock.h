@@ -112,6 +112,8 @@ public:
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId								// モデル番号
 	);
+	// タイトル用 ブロックを一斉に生成
+	static void CreateInBulkBlock();
 	// 落ちる状態設定
 	void SetFall(bool const & bFall) { m_bFall = bFall; };
 	// 落ちる状態取得

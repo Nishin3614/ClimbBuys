@@ -189,7 +189,6 @@
     <ClCompile Include="cpp&amp;h\joypad.cpp" />
     <ClCompile Include="cpp&amp;h\keyboard.cpp" />
     <ClCompile Include="cpp&amp;h\keyconfig.cpp" />
-    <ClCompile Include="cpp&amp;h\lake.cpp" />
     <ClCompile Include="cpp&amp;h\light.cpp" />
     <ClCompile Include="cpp&amp;h\load.cpp" />
     <ClCompile Include="cpp&amp;h\loadscreen.cpp" />
@@ -205,7 +204,6 @@
     <ClCompile Include="cpp&amp;h\number.cpp" />
     <ClCompile Include="cpp&amp;h\player.cpp" />
     <ClCompile Include="cpp&amp;h\rank.cpp" />
-    <ClCompile Include="cpp&amp;h\ranking.cpp" />
     <ClCompile Include="cpp&amp;h\rectcollision.cpp" />
     <ClCompile Include="cpp&amp;h\renderer.cpp" />
     <ClCompile Include="cpp&amp;h\result.cpp" />
@@ -217,13 +215,11 @@
     <ClCompile Include="cpp&amp;h\score.cpp" />
     <ClCompile Include="cpp&amp;h\shadow_mapping.cpp" />
     <ClCompile Include="cpp&amp;h\shape.cpp" />
-    <ClCompile Include="cpp&amp;h\solider.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
     <ClCompile Include="cpp&amp;h\spherecollision.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
     <ClCompile Include="cpp&amp;h\title.cpp" />
-    <ClCompile Include="cpp&amp;h\title_select.cpp" />
     <ClCompile Include="cpp&amp;h\tutorial.cpp" />
     <ClCompile Include="cpp&amp;h\ui.cpp" />
     <ClCompile Include="cpp&amp;h\ui_group.cpp" />
@@ -268,7 +264,6 @@
     <ClInclude Include="cpp&amp;h\joypad.h" />
     <ClInclude Include="cpp&amp;h\keyboard.h" />
     <ClInclude Include="cpp&amp;h\keyconfig.h" />
-    <ClInclude Include="cpp&amp;h\lake.h" />
     <ClInclude Include="cpp&amp;h\light.h" />
     <ClInclude Include="cpp&amp;h\load.h" />
     <ClInclude Include="cpp&amp;h\loadscreen.h" />
@@ -284,7 +279,6 @@
     <ClInclude Include="cpp&amp;h\number.h" />
     <ClInclude Include="cpp&amp;h\player.h" />
     <ClInclude Include="cpp&amp;h\rank.h" />
-    <ClInclude Include="cpp&amp;h\ranking.h" />
     <ClInclude Include="cpp&amp;h\rectcollision.h" />
     <ClInclude Include="cpp&amp;h\renderer.h" />
     <ClInclude Include="cpp&amp;h\result.h" />
@@ -296,13 +290,11 @@
     <ClInclude Include="cpp&amp;h\score.h" />
     <ClInclude Include="cpp&amp;h\shadow_mapping.h" />
     <ClInclude Include="cpp&amp;h\shape.h" />
-    <ClInclude Include="cpp&amp;h\solider.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
     <ClInclude Include="cpp&amp;h\spherecollision.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />
     <ClInclude Include="cpp&amp;h\texture_manager.h" />
     <ClInclude Include="cpp&amp;h\title.h" />
-    <ClInclude Include="cpp&amp;h\title_select.h" />
     <ClInclude Include="cpp&amp;h\tutorial.h" />
     <ClInclude Include="cpp&amp;h\ui.h" />
     <ClInclude Include="cpp&amp;h\ui_group.h" />

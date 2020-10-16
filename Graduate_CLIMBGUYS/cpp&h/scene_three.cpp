@@ -31,6 +31,7 @@ CScene_THREE::CScene_THREE() : CScene::CScene()
 	m_col = D3DXCOLOR_INI;
 	m_fLengh = 0;
 	m_fAngle = 0;
+	m_nTexType = -1;
 	m_bBillboard = false;
 	m_bZEneble = false;
 	m_bLighting = false;

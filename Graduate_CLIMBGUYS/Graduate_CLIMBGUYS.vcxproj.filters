@@ -144,9 +144,6 @@
     <ClCompile Include="cpp&amp;h\result.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\ranking.cpp">
-      <Filter>Mode</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\title.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
@@ -192,9 +189,6 @@
     <ClCompile Include="cpp&amp;h\debugproc.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\lake.cpp">
-      <Filter>Map</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\tutorial.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
@@ -231,9 +225,6 @@
     <ClCompile Include="cpp&amp;h\XInputPad.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\solider.cpp">
-      <Filter>Model</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\spherecollision.cpp">
       <Filter>Collision</Filter>
     </ClCompile>
@@ -266,9 +257,6 @@
     </ClCompile>
     <ClCompile Include="cpp&amp;h\shape.cpp">
       <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\title_select.cpp">
-      <Filter>Mode</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\character.cpp">
       <Filter>Model</Filter>
@@ -377,9 +365,6 @@
     <ClInclude Include="cpp&amp;h\basemode.h">
       <Filter>Mode</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\ranking.h">
-      <Filter>Mode</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\result.h">
       <Filter>Mode</Filter>
     </ClInclude>
@@ -428,9 +413,6 @@
     <ClInclude Include="cpp&amp;h\debugproc.h">
       <Filter>Debug</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\lake.h">
-      <Filter>Map</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\tutorial.h">
       <Filter>Mode</Filter>
     </ClInclude>
@@ -467,9 +449,6 @@
     <ClInclude Include="cpp&amp;h\XInputPad.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\solider.h">
-      <Filter>Model</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\spherecollision.h">
       <Filter>Collision</Filter>
     </ClInclude>
@@ -499,9 +478,6 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\Calculation.h">
       <Filter>Option</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\title_select.h">
-      <Filter>Mode</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\character.h">
       <Filter>Model</Filter>

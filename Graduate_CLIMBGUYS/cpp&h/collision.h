@@ -202,6 +202,13 @@ public:
 		CColumnShape * const pColumnShapeA,	// ‰~’ŒA
 		CColumnShape * const pColumnShapeB	// ‰~’ŒB
 	);
+#ifdef _DEBUG
+	// “–‚½‚è”»’è‚Ì‰Â‹ó‘Ô‚ğæ“¾
+	static bool &GetDispCollision(void) { return m_bDispCollision; };
+	// “–‚½‚è”»’è‚Ì‰Â‹ó‘Ô‚ğİ’è
+	static void SetDispCollision(bool const & bDispCollision) { m_bDispCollision = bDispCollision; };
+#endif
+
 protected:
 
 private:
@@ -215,7 +222,8 @@ private:
 
 
 #ifdef _DEBUG
-	static int nCollisionTime;
+	static int nCollisionTime;				// “–‚½‚è”»’èƒJƒEƒ“ƒg
+	static bool m_bDispCollision;			// “–‚½‚è”»’è‚Ì‰Â‹ó‘Ô
 #endif
 };
 

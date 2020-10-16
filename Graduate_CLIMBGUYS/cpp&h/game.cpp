@@ -86,7 +86,7 @@ void CGame::Init(void)
 	CConnect_fieldblock::Create(CConnect_fieldblock::TYPE_RECT);
 
 	// É_ÉÅÅ[ÉWè∞ÇÃê∂ê¨
-	CDamageFloor::Create(D3DXVECTOR3(0.0, 0.0f, 0.0f), D3DXVECTOR3(1000.0, 0.0f, 1000.0f));
+	CDamageFloor::Create();
 
 	/*
 	// ãÖÇÃê›íË

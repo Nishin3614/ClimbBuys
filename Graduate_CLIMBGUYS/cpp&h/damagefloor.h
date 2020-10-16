@@ -66,10 +66,7 @@ public:
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
 	// 作成(シーン継承あり)
-	static CDamageFloor * Create(
-		D3DXVECTOR3 const &pos,							// 位置
-		D3DXVECTOR3 const &size							// サイズ
-	);					// 作成
+	static CDamageFloor * Create();					// 作成
 	static HRESULT Load(void);							// 読み込み
 	static void UnLoad(void);							// 破棄
 	// 設定 //

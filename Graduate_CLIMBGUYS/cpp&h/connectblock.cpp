@@ -6,6 +6,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "connectblock.h"
 #include "baseblock.h"
+#include "normalblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -40,11 +41,10 @@ CConnectblock::~CConnectblock()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::Init()
 {
-	// ÉeÉXÉgê∂ê¨
-	for (int nCntBlock = 0; nCntBlock < 4; nCntBlock++)
-	{
-		m_vec_pBaseBlock.push_back(CBaseblock::Create(D3DXVECTOR3(nCntBlock * 100.0f, 0.0f, 0.0f), 2));
-	}
+	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 500.0f, 0.0f), 2));
+	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 600.0f, 0.0f), 2));
+	//m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 700.0f, 0.0f), 2));
+	//m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(100.0f, 500.0f, 0.0f), 2));
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ void CConnectblock::Init()
 void CConnectblock::Uninit(void)
 {
 	// NULLë„ì¸
-	for (int nCntBlock = 0; nCntBlock < 4; nCntBlock++)
+	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
 	{
 		m_vec_pBaseBlock[nCntBlock] = NULL;
 	}

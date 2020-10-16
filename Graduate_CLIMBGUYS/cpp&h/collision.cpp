@@ -310,12 +310,14 @@ void CCollision::CollisionDetection(void)
 		{
 			continue;
 		}
+		/*
 		// !オブジェクトタイプがプレイヤーなら
 		else if (!(pCollision1->m_nMyObjectId == OBJTYPE_PLAYER)
 			)
 		{
 			continue;
 		}
+		*/
 		// 処理
 		for (int nCntLayer2 = 0; nCntLayer2 < CScene::GetMaxLayer(LAYER_COLLISION); nCntLayer2++)
 		{
@@ -348,8 +350,8 @@ void CCollision::CollisionDetection(void)
 			}
 			// 変数宣言
 			bool bJudg = false;	// 当たり判定状態
-								// クラス型比較 //
-								// 矩形クラス
+			// クラス型比較 //
+			// 矩形クラス
 			if (pCollision2->GetShape()->GetType() == CShape::SHAPETYPE_RECT)
 			{
 				bJudg = pCollision1->Judg((CRectShape*)pCollision2->GetShape());
@@ -368,7 +370,6 @@ void CCollision::CollisionDetection(void)
 			// ->情報を保存
 			if (bJudg == true)
 			{
-
 #ifdef _DEBUG
 				// テスト変数
 				nCollisionTime++;

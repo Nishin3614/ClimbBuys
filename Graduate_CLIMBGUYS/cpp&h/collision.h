@@ -61,6 +61,7 @@ public:
 	{
 		OBJTYPE_ACTOR = 0,			// オブジェクト_ACTOR
 		OBJTYPE_BLOCK,				// オブジェクト_ブロック
+		OBJTYPE_FIELDBLOCK,			// オブジェクト_フィールドブロック
 		OBJTYPE_ATTACK,				// オブジェクト_攻撃
 		OBJTYPE_PLAYER,				// オブジェクト_プレイヤー
 		OBJTYPE_ENEMY,				// オブジェクト_敵

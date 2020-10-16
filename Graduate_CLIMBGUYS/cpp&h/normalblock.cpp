@@ -39,6 +39,10 @@ CNormalblock::~CNormalblock()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CNormalblock::Init()
 {
+	// ブロックタイプの設定
+	CBaseblock::SetType(TYPE_NORMAL);	// 普通のブロックタイプ
+	// 落ちる設定
+	CBaseblock::SetFall(true);
 	// ベースブロック初期化処理
 	CBaseblock::Init();
 }
@@ -79,8 +83,16 @@ void CNormalblock::Scene_MyCollision(
 {
 	if (nObjType == CCollision::OBJTYPE_BLOCK)
 	{
-		//if(CScene)
-		CBaseblock::SetFall(false);
+		// シーン情報がNULLなら
+		// ->関数を抜ける
+		if (pScene == NULL) return;
+		// シーン情報の代入
+		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
+		// シーン情報
+		if (pBaseBlock->GetFall())
+		{
+			CBaseblock::SetFall(false);
+		}
 	}
 }
 
@@ -91,7 +103,19 @@ void CNormalblock::Scene_MyCollision(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 {
-
+	if (nObjType == CCollision::OBJTYPE_BLOCK)
+	{
+		// シーン情報がNULLなら
+		// ->関数を抜ける
+		if (pScene == NULL) return;
+		// シーン情報の代入
+		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
+		// シーン情報
+		if (pBaseBlock->GetFall())
+		{
+			CBaseblock::SetFall(false);
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,7 +173,7 @@ CNormalblock * CNormalblock::Create_Self(
 {
 	// 変数宣言
 	CNormalblock * pNormalblock;		// シーン2Dクラス
-									// メモリの生成(初め->基本クラス,後->派生クラス)
+	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pNormalblock = new CNormalblock;
 	// 設定
 	pNormalblock->SetPos(pos);			// 位置

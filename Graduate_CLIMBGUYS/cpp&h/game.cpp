@@ -26,7 +26,6 @@
 #include "connectblock.h"
 #include "connect_fieldblock.h"
 #include "damagefloor.h"
-
 /* É|Å[ÉY */
 //#include "pause.h"
 

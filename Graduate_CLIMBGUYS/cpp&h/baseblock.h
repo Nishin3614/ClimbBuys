@@ -36,7 +36,20 @@ public:
 	} TYPE;
 
 	/* 構造体 */
-
+	// 盤面情報
+	typedef struct GRID
+	{
+		GRID() {}
+		GRID(int const &Line, int const &Column, int const &Height)
+		{
+			nLine = Line;
+			nColumn = Column;
+			nHeight = Height;
+		}
+		int nLine;		// 行
+		int nColumn;	// 列
+		int nHeight;	// 高さ
+	} GRID;
 	/* 関数 */
 	// コンストラクタ
 	CBaseblock();
@@ -81,9 +94,18 @@ public:
 	) {};
 
 	// ベースブロック
-	void SetType(TYPE const type)	{ m_type = type; };
+	void SetType(TYPE const type)		{ m_type = type; };
 	// ベースブロック
-	TYPE	GetType(void) const					{ return m_type; };
+	TYPE GetType(void) const			{ return m_type; };
+	// 落ちる状態設定
+	void SetFall(bool const & bFall)	{ m_bFall = bFall; };
+	// 落ちる状態取得
+	bool & GetFall(void)				{ return m_bFall; };
+	// 盤面情報取得
+	GRID & GetGrid(void)				{ return m_grid; };
+	// 盤面情報設定
+	void SetGrid(GRID const &grid)		{ m_grid = grid; };
+
 	// ベースブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// ベースブロック全ソースの開放
@@ -112,10 +134,6 @@ public:
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId								// モデル番号
 	);
-	// 落ちる状態設定
-	void SetFall(bool const & bFall) { m_bFall = bFall; };
-	// 落ちる状態取得
-	bool & GetFall(void) { return m_bFall; };
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
@@ -125,9 +143,11 @@ protected:
 	// 設定 //
 private:
 	/* 関数 */
-
+	// 落ちる更新処理
+	void Update_Fall(void);
 	/* 変数 */
 	TYPE	m_type;		// ベースブロック
+	GRID	m_grid;		// 盤面情報
 	bool	m_bFall;	// 落ちる状態
 };
 

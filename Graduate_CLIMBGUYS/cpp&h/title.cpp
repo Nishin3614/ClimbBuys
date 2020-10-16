@@ -75,7 +75,7 @@ void CTitle::Update(void)
 		// フェード状態が何も起こっていない状態なら
 		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			CManager::SetMode(CManager::MODE_GAME);
+			CManager::SetMode(CManager::MODE_TUTORIAL);
 		}
 	}
 }

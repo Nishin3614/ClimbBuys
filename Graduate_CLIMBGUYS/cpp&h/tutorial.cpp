@@ -16,9 +16,15 @@
 #include "ui_group.h"
 #include "3Dmap.h"
 #include "camera.h"
+#include "sound.h"
+#include "scene.h"
+#include "manager.h"
+#include "keyboard.h"
 
 /* 描画 */
 #include "fade.h"
+
+
 
 // ------------------------------------------
 //
@@ -69,6 +75,20 @@ void CTutorial::Uninit(void)
 // ------------------------------------------
 void CTutorial::Update(void)
 {
+#ifdef _DEBUG
+	// ゲーム遷移
+	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN))
+	{
+		// フェード状態が何も起こっていない状態なら
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		{
+			CManager::SetMode(CManager::MODE_GAME);
+		}
+	}
+
+
+#endif // _DEBUG
+
 	// モード更新
 	CBaseMode::Update();
 }

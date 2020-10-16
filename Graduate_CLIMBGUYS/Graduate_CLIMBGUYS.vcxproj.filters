@@ -267,6 +267,9 @@
     <ClCompile Include="cpp&amp;h\normalblock.cpp">
       <Filter>Model\Block</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\stand.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -475,6 +478,9 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\normalblock.h">
       <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\stand.h">
+      <Filter>Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

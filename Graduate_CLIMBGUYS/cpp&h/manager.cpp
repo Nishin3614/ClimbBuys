@@ -202,7 +202,7 @@ void CManager::Uninit(void)
 		delete m_fade;
 		m_fade = NULL;
 	}
-	// タイトル
+	// モード全部
 	if (m_BaseMode != NULL)
 	{
 		m_BaseMode->Uninit();

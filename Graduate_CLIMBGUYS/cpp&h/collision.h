@@ -215,7 +215,8 @@ private:
 
 
 #ifdef _DEBUG
-	static int nCollisionTime;
+	static int nCollisionTime;				// “–‚½‚è”»’èƒJƒEƒ“ƒg
+	static bool m_bDispCollision;			// “–‚½‚è”»’è‚Ì‰Â‹ó‘Ô
 #endif
 };
 

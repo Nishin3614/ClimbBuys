@@ -29,6 +29,7 @@
 #include "ui.h"
 #include "scene_X.h"
 #include "3Dmap.h"
+#include "connect_fieldblock.h"
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
@@ -137,6 +138,11 @@ void CScene_load::LoadAll(void)
 	{
 		CCalculation::Messanger("3Dマップ読み取り失敗");
 	}
+	// 結合されたフィールドブロック
+	if (!CConnect_fieldblock::Load() == S_OK)
+	{
+		CCalculation::Messanger("結合されたフィールドブロック読み取り失敗");
+	}
 
 }
 
@@ -172,6 +178,8 @@ void CScene_load::UnLoadAll(void)
 	CFade::UnLoad();
 	// 3Dマップ
 	C3DMap::UnLoad();
+	// 結合されたフィールドブロック
+	CConnect_fieldblock::UnLoad();
 	// シーンX
 	CScene_X::UnLoadModel();
 }

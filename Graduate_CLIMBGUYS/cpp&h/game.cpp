@@ -27,6 +27,7 @@
 #include "baseblock.h"
 #include "connectblock.h"
 #include "connect_fieldblock.h"
+#include "damagefloor.h"
 
 /* ポーズ */
 //#include "pause.h"
@@ -72,13 +73,6 @@ void CGame::Init(void)
 	/* 作成 */
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
-	// フィールドの生成
-	CFloor::Create(
-		D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-		D3DXVECTOR3(1000.0f, 0.0f, 1000.0f),
-		D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),
-		D3DVECTOR3_ZERO, 10, 10, 0
-	);
 
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -92,6 +86,10 @@ void CGame::Init(void)
 	CConnectblock::Create(D3DVECTOR3_ZERO,CConnectblock::SHAPE_RECT);
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CConnect_fieldblock::TYPE_RECT);
+
+	// ダメージ床の生成
+	CDamageFloor::Create(D3DXVECTOR3(0.0, 0.0f, 0.0f), D3DXVECTOR3(1000.0, 0.0f, 1000.0f));
+
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),

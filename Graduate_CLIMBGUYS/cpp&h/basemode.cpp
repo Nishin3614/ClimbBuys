@@ -80,6 +80,8 @@ void CBaseMode::Debug(void)
 	CKeyboard *key = CManager::GetKeyboard();
 
 	CDebugproc::Print(NEWLINE);
+	CDebugproc::Print("[F3] : 一時停止\n");
+	CDebugproc::Print(NEWLINE);
 	CDebugproc::Print("[Ctrl] + テンキー [0] : 現在のModeに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [1] : Titleに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [2] : Gameに遷移\n");
@@ -99,6 +101,12 @@ void CBaseMode::Debug(void)
 	case CManager::MODE_RESULT:
 		CDebugproc::Print("現在のモード : [ Result ]\n");
 		break;
+	}
+
+	// 一時停止
+	if (key->GetKeyboardTrigger(DIK_F3))
+	{
+		CScene::UpdateStop(true);
 	}
 
 	//Ctrl押しながら

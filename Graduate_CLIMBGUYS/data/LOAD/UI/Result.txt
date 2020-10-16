@@ -16,7 +16,7 @@ SCRIPT
 		ROT = 0.0
 		FIRST_TEX = 0.0 0.0
 		LAST_TEX = 1.0 1.0
-		TEXTYPE = 2
+		TEXTYPE = 1
 		OFFSET = 0
 	END_SET
 	#==============================================================================
@@ -30,7 +30,7 @@ SCRIPT
 		ROT = 0.0
 		FIRST_TEX = 0.0 0.0
 		LAST_TEX = 1.0 1.0
-		TEXTYPE = 3
+		TEXTYPE = 2
 		OFFSET = 0
 		# ----------[‹­’²]---------- #
 		COOPERATION

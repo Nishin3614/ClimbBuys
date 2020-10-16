@@ -41,9 +41,10 @@ CResult::~CResult()
 //=============================================================================
 void CResult::Init()
 {
-	//CUi::LoadCreate(CUi::UITYPE_RESULT);
 	// モード初期化
 	CBaseMode::Init();
+	// タイトルUIの生成
+	CUi::LoadCreate(CUi::UITYPE_RESULT);
 }
 
 //=============================================================================

@@ -341,13 +341,13 @@ void CManager::SetMode(MODE const &mode)
 		// リザルト
 	case MODE_RESULT:
 		// リザルト生成
-		//m_BaseMode = CResult::Create();
+		m_BaseMode = CResult::Create();
 		// リザルトBGM
 		break;
 		// ランキング
 	case MODE_RANKING:
 		// ゲーム生成
-		m_BaseMode = CRanking::Create();
+		//m_BaseMode = CRanking::Create();
 		// ゲームBGM
 		break;
 	default:

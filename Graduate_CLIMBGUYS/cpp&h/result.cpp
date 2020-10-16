@@ -22,7 +22,6 @@
 //=============================================================================
 CResult::CResult()
 {
-	nCntSkip = 0;
 }
 
 //=============================================================================
@@ -40,11 +39,11 @@ CResult::~CResult()
 // 初期化処理
 //
 //=============================================================================
-HRESULT CResult::Init()
+void CResult::Init()
 {
-	CUi::LoadCreate(CUi::UITYPE_RESULT);
-	// 初期化
-	return S_OK;
+	//CUi::LoadCreate(CUi::UITYPE_RESULT);
+	// モード初期化
+	CBaseMode::Init();
 }
 
 //=============================================================================
@@ -54,8 +53,8 @@ HRESULT CResult::Init()
 //=============================================================================
 void CResult::Uninit(void)
 {
-	// 全ての開放
-	CScene::ReleaseAll();
+	// モード終了
+	CBaseMode::Uninit();
 }
 
 //=============================================================================
@@ -65,29 +64,18 @@ void CResult::Uninit(void)
 //=============================================================================
 void CResult::Update(void)
 {
-	CFade *pFade = CManager::GetFade();
+	// モード更新
+	CBaseMode::Update();
 
-	// フェードしていないとき
-	if (pFade->GetFade() == CFade::FADE_NONE)
+	// タイトル遷移
+	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN))
 	{
-		// ゲームへ遷移
-		if (CManager::GetKeyboard()->GetKeyboardPress(DIK_RETURN))
+		// フェード状態が何も起こっていない状態なら
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-
-			if (pFade->GetFade() == CFade::FADE_NONE)
-			{
-				// ゲームへ
-				pFade->SetFade(CManager::MODE_TITLE);
-			}
-		}
-		if (nCntSkip >= DERAY_TIME(55))
-		{
-			// ゲームへ
-			pFade->SetFade(CManager::MODE_TITLE);
+			CManager::SetMode(CManager::MODE_TITLE);
 		}
 	}
-	// スキップカウントアップ
-	nCntSkip++;
 }
 
 //=============================================================================
@@ -97,7 +85,8 @@ void CResult::Update(void)
 //=============================================================================
 void CResult::Draw(void)
 {
-
+	// モード描画
+	CBaseMode::Draw();
 }
 
 //=============================================================================
@@ -107,11 +96,8 @@ void CResult::Draw(void)
 //=============================================================================
 CResult * CResult::Create(void)
 {
-	// 変数
-	CResult *pResult;
-
-	// メモリの確保
-	pResult = new CResult;
+	// 変数宣言
+	CResult *pResult = new CResult;
 
 	// 初期化
 	pResult->Init();

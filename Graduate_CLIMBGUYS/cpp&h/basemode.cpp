@@ -7,6 +7,11 @@
 #include "basemode.h"
 #include "game.h"
 #include "scene.h"
+#include "debugproc.h"
+#include "keyboard.h"
+#include "fade.h"
+#include "renderer.h"
+#include "manager.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -71,5 +76,54 @@ void CBaseMode::Draw(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseMode::Debug(void)
 {
+	//キーボード取得
+	CKeyboard *key = CManager::GetKeyboard();
+
+	CDebugproc::Print(NEWLINE);
+	CDebugproc::Print("[Ctrl] + テンキー [0] : 現在のModeに遷移\n");
+	CDebugproc::Print("[Ctrl] + テンキー [1] : Titleに遷移\n");
+	CDebugproc::Print("[Ctrl] + テンキー [2] : Gameに遷移\n");
+	CDebugproc::Print("[Ctrl] + テンキー [3] : Resultに遷移\n");
+	CDebugproc::Print(NEWLINE);
+
+	switch (CManager::GetMode())
+	{
+	case CManager::MODE_TITLE:
+		CDebugproc::Print("現在のモード : [ Title ]\n");
+		break;
+
+	case CManager::MODE_GAME:
+		CDebugproc::Print("現在のモード : [ Game ]\n");
+		break;
+
+	case CManager::MODE_RESULT:
+		CDebugproc::Print("現在のモード : [ Result ]\n");
+		break;
+	}
+
+	//Ctrl押しながら
+	if (key->GetKeyboardPress(DIK_LCONTROL))
+	{
+		//現在のモード再始動
+		if (key->GetKeyboardTrigger(DIK_NUMPAD0))
+		{
+			CManager::SetMode(CManager::GetMode());
+		}
+		//タイトル
+		if (key->GetKeyboardTrigger(DIK_NUMPAD1))
+		{
+			CManager::SetMode(CManager::MODE_TITLE);
+		}
+		//ゲーム
+		if (key->GetKeyboardTrigger(DIK_NUMPAD2))
+		{
+			CManager::SetMode(CManager::MODE_GAME);
+		}
+		//リザルト
+		if (key->GetKeyboardTrigger(DIK_NUMPAD3))
+		{
+			CManager::SetMode(CManager::MODE_RESULT);
+		}
+	}
 }
 #endif // _DEBUG

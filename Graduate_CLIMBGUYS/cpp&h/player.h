@@ -116,5 +116,6 @@ private:
 	CXInputPad		*m_pPad;						// パッドのポインタ
 	bool			m_bDieFlag;						// 死亡フラグ
 	bool			m_bLanding;						// 着地しているかのフラグ
+
 };
 #endif

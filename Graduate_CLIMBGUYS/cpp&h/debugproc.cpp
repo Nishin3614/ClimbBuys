@@ -56,7 +56,7 @@ void CDebugproc::Init(LPDIRECT3DDEVICE9 m_pDevice)
 
 
 	// デバッグ表示用フォントを設定
-	D3DXCreateFont(m_pDevice, 24, 10, 0, 0, FALSE, SHIFTJIS_CHARSET,
+	D3DXCreateFont(m_pDevice, 14, 7, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "ＭＳ ゴシック", &m_pFont);
 #endif // _DEBUG
 }

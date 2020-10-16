@@ -86,13 +86,13 @@ void CBaseMode::Debug(void)
 	CDebugproc::Print("--------- Debug Command ----------\n");
 	CDebugproc::Print("[F3] : 一時停止 [ %d ] : [ OFF : 0 / ON : 1 ]\n", m_bSceneStop);
 	CDebugproc::Print("[F4] : 1Fだけ更新\n");
+	CDebugproc::Print("[F5] : 当たり判定の可視状態\n");
 	CDebugproc::Print(NEWLINE);
 	CDebugproc::Print("[Ctrl] + テンキー [0] : 現在のModeに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [1] : Titleに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [2] : Gameに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [3] : Resultに遷移\n");
 	CDebugproc::Print(NEWLINE);
-	CDebugproc::Print("[LShift] + テンキー [0] : 当たり判定の可視状態\n");
 
 	// 現在のモード表記
 	switch (CManager::GetMode())
@@ -121,6 +121,11 @@ void CBaseMode::Debug(void)
 	{
 		CScene::Set1FUpdate();
 	}
+	//当たり判定の可視状態
+	if (key->GetKeyboardTrigger(DIK_F5))
+	{
+		CCollision::SetDispCollision(!CCollision::GetDispCollision());
+	}
 
 	// Ctrl押しながら
 	if (key->GetKeyboardPress(DIK_LCONTROL))
@@ -144,15 +149,6 @@ void CBaseMode::Debug(void)
 		if (key->GetKeyboardTrigger(DIK_NUMPAD3))
 		{
 			CManager::SetMode(CManager::MODE_RESULT);
-		}
-	}
-	//LCtrl押しながら
-	if (key->GetKeyboardPress(DIK_LSHIFT))
-	{
-		//当たり判定の可視状態
-		if (key->GetKeyboardTrigger(DIK_NUMPAD0))
-		{
-			CCollision::SetDispCollision(!CCollision::GetDispCollision());
 		}
 	}
 }

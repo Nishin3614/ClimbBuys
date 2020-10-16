@@ -26,7 +26,6 @@
 #include "title.h"
 #include "tutorial.h"
 #include "result.h"
-#include "ranking.h"
 #include "scene_two.h"
 #include "loadscreen.h"
 

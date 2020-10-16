@@ -12,14 +12,12 @@
 #include "fade.h"
 #include "collision.h"
 #include "game.h"
-#include "score.h"
 #include "XInputPad.h"
 #include "keyboard.h"
-#include "2Dgauge.h"
-#include "rank.h"
 #include "ui_group.h"
 #include "meshdome.h"
 #include "3Dparticle.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // É}ÉNÉçíËã`

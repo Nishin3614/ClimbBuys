@@ -12,7 +12,6 @@
 #include "debugproc.h"
 #include "camera.h"
 #include "light.h"
-#include "loadscreen.h"
 #include "keyboard.h"
 #include "mouse.h"
 
@@ -324,9 +323,6 @@ void CRenderer::LoadDraw(void)
 	// Direct3D‚É‚æ‚é•`‰æŠJŽn
 	if (SUCCEEDED(m_pDevice->BeginScene()))
 	{
-		CManager::GetLoadScreen()->Update();
-		CManager::GetLoadScreen()->Draw();
-
 		// Direct3D‚É‚æ‚é•`‰æI—¹
 		m_pDevice->EndScene();
 	}

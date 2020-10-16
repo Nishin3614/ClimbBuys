@@ -12,12 +12,14 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#define CONNECT_FIELDBLOCK_FILE	("data/LOAD/MAPPING/fieldblock.csv")
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+std::vector<std::vector<CConnect_fieldblock::LOAD>>	CConnect_fieldblock::m_Dvec_pFileLoad = {};		// ファイルの読み込み情報
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
@@ -38,18 +40,20 @@ CConnect_fieldblock::~CConnect_fieldblock()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnect_fieldblock::Init()
 {
+
 	// フィールドループ
-	for (int nCntField = 0; nCntField < 4; nCntField++)
+	for (size_t nCntField = 0; nCntField < m_Dvec_pFileLoad.size(); nCntField++)
 	{
 		// 変数宣言
 		std::vector<CBaseblock *> vec_Block;	// ベースブロック情報
 		// ブロックのループ
-		for (int nCntBlock = 0; nCntBlock < 4; nCntBlock++)
+		for (size_t nCntBlock = 0; nCntBlock < m_Dvec_pFileLoad[nCntField].size(); nCntBlock++)
 		{
+			if (!m_Dvec_pFileLoad[nCntField][nCntBlock].bUse) continue;
 			vec_Block.emplace_back(
 				CFieldblock::Create(D3DXVECTOR3(nCntBlock * 100.0f, 0.0f, nCntField * 100.0f), 2));
 		}
-		m_Dvec_pFieldBlock.push_back(vec_Block);
+		m_Dvec_pFieldBlock.emplace_back(vec_Block);
 	}
 }
 
@@ -59,10 +63,10 @@ void CConnect_fieldblock::Init()
 void CConnect_fieldblock::Uninit(void)
 {
 	// フィールドループ
-	for (int nCntField = 0; nCntField < 4; nCntField++)
+	for (size_t nCntField = 0; nCntField < m_Dvec_pFieldBlock.size(); nCntField++)
 	{
 		// ブロックのループ
-		for (int nCntBlock = 0; nCntBlock < 4; nCntBlock++)
+		for (size_t nCntBlock = 0; nCntBlock < m_Dvec_pFieldBlock[nCntField].size(); nCntBlock++)
 		{
 			m_Dvec_pFieldBlock[nCntField][nCntBlock] = NULL;
 		}
@@ -121,14 +125,14 @@ HRESULT CConnect_fieldblock::Load(void)
 	// 変数宣言
 	LPDIRECT3DDEVICE9 pDevice =					// デバイスの取得
 		CManager::GetRenderer()->GetDevice();
-	std::vector<LOAD> vec_Load;					// 読み込み情報
 	// ファイルの中身格納用
 	std::vector<std::vector<std::string>> vsvec_Contens;
 	// ファイルの中身を取得する
-	//vsvec_Contens = CCalculation::FileContens(TEXTURE_FILE, ',');
+	vsvec_Contens = CCalculation::FileContens(CONNECT_FIELDBLOCK_FILE, ',');
 	// 行ごとに回す
 	for (size_t nCntLine = 0; nCntLine < vsvec_Contens.size(); nCntLine++)
 	{
+		std::vector<LOAD> vec_Load;					// 読み込み情報
 		// 項目ごとに回す
 		for (size_t nCntItem = 0; nCntItem < vsvec_Contens.at(nCntLine).size(); nCntItem++)
 		{
@@ -138,15 +142,18 @@ HRESULT CConnect_fieldblock::Load(void)
 			{
 				load.bUse = false;
 			}
-
+			else
+			{
+				load.bUse = true;
+			}
 			vec_Load.emplace_back(load);
 		}
+		m_Dvec_pFileLoad.emplace_back(vec_Load);
+		vec_Load.clear();
+		vec_Load.shrink_to_fit();
 	}
 	// std::vectorの多重配列開放
 	std::vector<std::vector<std::string>>().swap(vsvec_Contens);
-	return S_OK;
-
-
 	return S_OK;
 }
 
@@ -155,7 +162,15 @@ HRESULT CConnect_fieldblock::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnect_fieldblock::UnLoad(void)
 {
-
+	// フィールドループ
+	for (size_t nCntField = 0; nCntField < m_Dvec_pFileLoad.size(); nCntField++)
+	{
+		m_Dvec_pFileLoad[nCntField].clear();
+		m_Dvec_pFileLoad[nCntField].shrink_to_fit();
+	}
+	// 読み込んだ情報の開放
+	m_Dvec_pFileLoad.clear();
+	m_Dvec_pFileLoad.shrink_to_fit();
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

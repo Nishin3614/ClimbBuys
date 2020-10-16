@@ -266,7 +266,7 @@ void CScene::UpdateStop(
 	int const &nMaxStop	// ç≈ëÂê√é~éûä‘
 )
 {
-	m_sta_bStop = bStop;
+	m_sta_bStop ^= bStop;
 	m_nMaxStop = nMaxStop;
 	m_nCntStop = 0;
 }

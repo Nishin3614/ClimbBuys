@@ -196,6 +196,11 @@ void CPlayer::MyMove(void)
 	{
 
 	}
+	// 試験的キーボードジャンプ
+	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE))
+	{
+		move.y += 12.0f;
+	}
 
 	/* ゲームパッド */
 	// パッド用 //
@@ -231,13 +236,13 @@ void CPlayer::MyMove(void)
 			move.z -= cosf(fAngle + fRot) * (fMove);
 		}
 
-		// 試験的ジャンプ
+		// 試験的ジャンプ ( のちに中身変わる予定 多分 )
 		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1))
 		{
 			move.y += 12.0f;
 		}
 
-		// 試験的タックル
+		// 試験的タックル ( のちに中身変わる予定 多分 )
 		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 		{
 			switch (CCalculation::CheckPadStick())

@@ -12,14 +12,12 @@
 #include "fade.h"
 #include "collision.h"
 #include "game.h"
-#include "score.h"
 #include "XInputPad.h"
 #include "keyboard.h"
-#include "2Dgauge.h"
-#include "rank.h"
 #include "ui_group.h"
 #include "meshdome.h"
 #include "3Dparticle.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
@@ -88,6 +86,15 @@ void CPlayer::Update(void)
 	// キャラクター更新
 	CCharacter::Update();
 	CCharacter::Limit();
+
+	if (GetDie())
+	{
+		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)
+		{
+			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+		}
+	}
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -366,9 +373,15 @@ void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 	// バルーンキャラクターの当たった後の処理
 	CCharacter::Scene_MyCollision(nObjType, pScene);
 
+	// 当たったオブジェクトがブロックだったらジャンプを可能にする
 	if (nObjType == CCollision::OBJTYPE_BLOCK)
 	{
 		SetJumpAble(true);
+	}
+	// 当たったオブジェクトがダメージ床だったら死亡フラグをtrueにする
+	else if (nObjType == CCollision::OBJTYPE_DAMAGEFLOOR)
+	{
+		SetDie(true);
 	}
 }
 

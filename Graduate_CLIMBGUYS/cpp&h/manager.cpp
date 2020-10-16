@@ -27,7 +27,6 @@
 #include "tutorial.h"
 #include "result.h"
 #include "scene_two.h"
-#include "loadscreen.h"
 
 // ----------------------------------------------------------------------------------------------------
 //
@@ -52,7 +51,6 @@ CFade			* CManager::m_fade									= NULL;					// フェード
 CBaseMode		* CManager::m_BaseMode								= NULL;					// ベースモード
 CManager::MODE	CManager::m_mode									= CManager::MODE_TITLE;	// モード
 bool			CManager::m_bWire									= false;				// ワイヤー
-CLoadScreen		* CManager::m_pLoadScreen							= NULL;					// 読み込み画面
 
 // ----------------------------------------------------------------------------------------------------
 // コンストラクタ
@@ -137,13 +135,6 @@ HRESULT CManager::Init(HWND hWnd, BOOL bWindow, HINSTANCE hInstance)
 		return E_FAIL;
 	}
 
-	// カメラなどの設定
-	// どのプレイヤー番号を追尾するか
-	// ゲームのカメラのアップデートでそれを指定するかも
-
-	// 読み込み画面の生成
-	m_pLoadScreen = CLoadScreen::Create();
-
 	// 画面遷移
 	m_fade = CFade::Create(STARTMODE);
 
@@ -217,13 +208,6 @@ void CManager::Uninit(void)
 		m_BaseMode->Uninit();
 		delete m_BaseMode;
 		m_BaseMode = NULL;
-	}
-	// 読み込み画面
-	if (m_pLoadScreen != NULL)
-	{
-		m_pLoadScreen->Uninit();
-		delete m_pLoadScreen;
-		m_pLoadScreen = NULL;
 	}
 }
 

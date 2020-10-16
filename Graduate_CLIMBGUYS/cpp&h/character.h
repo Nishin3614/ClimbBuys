@@ -133,6 +133,9 @@ public:
 	void SetRot(D3DXVECTOR3 const &rot)						{ m_rot = rot; };
 	// ジャンプできるかどうかのフラグの設定
 	void SetJumpAble(bool const &jump)						{ m_bJumpable = jump; };
+	//  死亡しているかどうかのフラグの設定
+	void SetDie(bool const &die)							{ m_bDie = die; };
+
 	// 方向ベクトル設定
 	void SetDirectionVec(D3DXVECTOR3 const &direct)			{ m_Directvector = direct; };
 	// 取得 //
@@ -144,6 +147,8 @@ public:
 	D3DXVECTOR3 &GetRot(void)								{ return m_rot; };
 	// ジャンプできるかどうかのフラグの取得
 	bool		&GetJumpAble(void)							{ return m_bJumpable; };
+	// 死亡しているかどうかのフラグの取得
+	bool		&GetDie(void)								{ return m_bDie; };
 	// 親と子の回転量
 	D3DXVECTOR3 *GetPartsRot(int const nModelID);
 	// 親と子の位置
@@ -262,6 +267,7 @@ private:
 	int								m_nMotionFrame;							// 一つのモーションのカウント
 	float							m_fLength;								// 攻撃の当たり範囲
 	bool							m_bJumpable;							// ジャンプ可能かどうか
+	bool							m_bDie;									// 死亡フラグ
 	D3DXVECTOR3						m_Directvector;							// 方向のベクトル
 	CCollision						*m_pCharacterCollision;					// キャラクターの当たり判定
 	std::vector<std::unique_ptr<CCollision>>	m_vec_AttackCollision;		// 攻撃当たり判定

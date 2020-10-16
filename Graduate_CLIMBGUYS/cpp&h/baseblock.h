@@ -112,6 +112,10 @@ public:
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId								// モデル番号
 	);
+	// 落ちる状態設定
+	void SetFall(bool const & bFall) { m_bFall = bFall; };
+	// 落ちる状態取得
+	bool & GetFall(void) { return m_bFall; };
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
@@ -123,7 +127,8 @@ private:
 	/* 関数 */
 
 	/* 変数 */
-	TYPE							m_type;							// ベースブロック
+	TYPE	m_type;		// ベースブロック
+	bool	m_bFall;	// 落ちる状態
 };
 
 #endif

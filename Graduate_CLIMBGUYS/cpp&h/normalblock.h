@@ -1,77 +1,118 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// 順位表示処理 [player.h]
+// 普通ブロック処理 [normalblock.h]
 // Author : KOKI NISHIYAMA
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#ifndef _RANK_H_
-#define _RANK_H_
-
-#define _CRT_SECURE_NO_WARNINGS
+#ifndef _NORMALBLOCK_H_
+#define _NORMALBLOCK_H_
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#include "scene_three.h"
+#include "baseblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 構造体
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // クラス
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CRank : public CScene_THREE
+class CNormalblock : public CBaseblock
 {
 public:
+	/* 列挙型 */
+
+	/* 構造体 */
+
 	/* 関数 */
-	CRank();
-	~CRank();
-	void Init(void);
-	void Uninit(void);
-	void Update(void);
-	void Draw(void);
+	// コンストラクタ
+	CNormalblock();
+	// デストラクタ
+	virtual ~CNormalblock();
+	// 初期化処理
+	virtual void Init(void);
+	// 更新処理
+	virtual void Uninit(void);
+	// 更新処理
+	virtual void Update(void);
+	// 描画処理
+	virtual void Draw(void);
 
- 	static CRank *Create(void);
-
-#ifdef _DEBUG
-	void Debug(void) {};
-#endif // _DEBUG
 	// 当たった後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
-	void Scene_MyCollision(
+	virtual void Scene_MyCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
-	) {};
+	);
 	// 相手に当てられた後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
-	void Scene_OpponentCollision(
+	virtual void Scene_OpponentCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
-	) {};
+	);
 	// 自分から当たらなかった後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
-	void Scene_NoMyCollision(
+	virtual void Scene_NoMyCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
 	// 相手に当てられなかった後の処理
-	//	nObjType	: オブジェクトタイプ
+	//	nObjType	: 相手オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
-	void Scene_NoOpponentCollision(
+	virtual void Scene_NoOpponentCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
-	static HRESULT Load(void);			// 読み込み
-	static void UnLoad(void);			// UnLoadする
 
+	// 普通ブロック全ソースの読み込み
+	static HRESULT Load(void);
+	// 普通ブロック全ソースの開放
+	static void UnLoad(void);
+	// 作成(シーン管理)
+	//	pos			: 位置
+	//	nModelId	: モデル番号
+	//	layer		: レイヤー
+	static CNormalblock * Create(
+		D3DXVECTOR3		const & pos,								// 位置
+		int				const & nModelId,							// モデル番号
+		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT		// レイヤー
+	);
+	// 作成(個人管理)
+	//	pos			: 位置
+	//	nModelId	: モデル番号
+	static CNormalblock * Create_Self(
+		D3DXVECTOR3		const & pos,									// 位置
+		int				const & nModelId								// モデル番号
+		);
+	// unique_ptr作成(個人管理unique)
+	// ※戻り値はstd::moveで受け取る
+	//	pos			: 位置
+	//	nModelId	: モデル番号
+	static std::unique_ptr<CNormalblock> Creat_Unique(
+		D3DXVECTOR3		const & pos,									// 位置
+		int				const & nModelId								// モデル番号
+	);
+#ifdef _DEBUG
+	// デバッグ処理
+	virtual void  Debug(void);
+#endif // _DEBUG
 protected:
-private:
-	/* 構造体 */
 	/* 関数 */
+	// 設定 //
+private:
+	/* 関数 */
+
 	/* 変数 */
+
 };
+
 #endif

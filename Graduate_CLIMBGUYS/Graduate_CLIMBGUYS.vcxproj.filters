@@ -66,9 +66,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cpp&amp;h\2Dgauge.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -78,19 +75,7 @@
     <ClCompile Include="cpp&amp;h\3Dmap.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\load.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\loadscreen.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\number.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\rank.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\score.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\ImGui\imgui.cpp">
@@ -279,11 +264,11 @@
     <ClCompile Include="cpp&amp;h\connect_fieldblock.cpp">
       <Filter>Model\Block</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\normalblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cpp&amp;h\2Dgauge.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -293,19 +278,7 @@
     <ClInclude Include="cpp&amp;h\3Dmap.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\load.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\loadscreen.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\number.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\rank.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\score.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\shape.h">
@@ -498,6 +471,9 @@
       <Filter>Model\Block</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\connect_fieldblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\normalblock.h">
       <Filter>Model\Block</Filter>
     </ClInclude>
   </ItemGroup>

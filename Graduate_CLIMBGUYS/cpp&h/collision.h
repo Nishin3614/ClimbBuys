@@ -64,6 +64,7 @@ public:
 		OBJTYPE_ATTACK,				// オブジェクト_攻撃
 		OBJTYPE_PLAYER,				// オブジェクト_プレイヤー
 		OBJTYPE_ENEMY,				// オブジェクト_敵
+		OBJTYPE_DAMAGEFLOOR,		// オブジェクト_ダメージ床
 		OBJTYPE_MAX					// オブジェクト_最大数
 	} OBJTYPE;
 	/* 関数 */

@@ -53,5 +53,6 @@ public:
 #endif // _DEBUG
 protected:
 private:
+	bool	m_bSceneStop;	// シーンを止めるフラグ
 };
 #endif

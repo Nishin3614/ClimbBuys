@@ -128,6 +128,8 @@ public:
 		bool const &bStop,												// 静止するかしないか
 		int const &nMaxStop = 0											// 最大静止時間
 	);	// 更新をとめる
+	// 1Fだけ更新する
+	static void Set1FUpdate() { m_b1FUpdateFlag = true; };
 	// シーン管理設定
 	void ManageSetting(LAYER const &layer);
 	// オブジェクトの更新ストップ状態設定
@@ -159,12 +161,13 @@ private:
 	static void DeadFragAll(void);				// 死亡フラグが立ったものをリリース
 	/* 変数 */
 	static std::vector<CScene*> m_pScene[LAYER_MAX];	// シーン管理用変数
-	static bool	m_sta_bStop;						// 更新を止める
-	static int m_nMaxStop;						// 最大静止時間
-	static int m_nCntStop;						// 静止時間
-	bool m_bDeadFrag;							// フラグ
-	bool m_bStop;								// 更新を止めるか止めないか
-	bool m_bDraw;								// 描画状態
+	static bool	m_sta_bStop;							// 更新を止める
+	static bool m_b1FUpdateFlag;						// 画面停止中に1Fだけ更新するフラグ
+	static int m_nMaxStop;								// 最大静止時間
+	static int m_nCntStop;								// 静止時間
+	bool m_bDeadFrag;									// フラグ
+	bool m_bStop;										// 更新を止めるか止めないか
+	bool m_bDraw;										// 描画状態
 };
 
 #endif

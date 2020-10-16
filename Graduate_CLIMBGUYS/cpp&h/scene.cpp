@@ -23,10 +23,11 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool			CScene::m_sta_bStop = false;				// 更新を止める
-int				CScene::m_nMaxStop = 0;					// 最大静止時間
-int				CScene::m_nCntStop = 0;					// 静止時間
-std::vector<CScene*> CScene::m_pScene[LAYER_MAX] = {};		// シーン管理用変数
+bool			CScene::m_sta_bStop					= false;		// 更新を止める
+bool			CScene::m_b1FUpdateFlag				= false;		// 1Fだけ更新するフラグ
+int				CScene::m_nMaxStop					= 0;			// 最大静止時間
+int				CScene::m_nCntStop					= 0;			// 静止時間
+std::vector<CScene*> CScene::m_pScene[LAYER_MAX]	= {};			// シーン管理用変数
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーロードコンストラクタ
@@ -89,7 +90,7 @@ void CScene::ReleaseAll(void)
 void CScene::UpdateAll(void)
 {
 	// 更新静止状態ではない
-	if (!m_sta_bStop)
+	if (!m_sta_bStop || m_b1FUpdateFlag)
 	{
 		for (int nCntLayer = 0; nCntLayer < LAYER_MAX; nCntLayer++)
 		{
@@ -138,6 +139,7 @@ void CScene::UpdateAll(void)
 			UpdateStop(false);
 		}
 	}
+	m_b1FUpdateFlag = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -266,7 +268,7 @@ void CScene::UpdateStop(
 	int const &nMaxStop	// 最大静止時間
 )
 {
-	m_sta_bStop ^= bStop;
+	m_sta_bStop = bStop;
 	m_nMaxStop = nMaxStop;
 	m_nCntStop = 0;
 }

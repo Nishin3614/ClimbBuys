@@ -58,14 +58,6 @@ void CUi_group::Init(void)
 	m_Ui = std::move(CUi::LoadCreate_Self(
 		m_Uitype
 	));
-	switch (m_Uitype)
-	{
-	case CUi::UITYPE_FINISH:
-		Init_GameFinish();
-		break;
-	default:
-		break;
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,20 +77,6 @@ void CUi_group::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CUi_group::Update(void)
 {
-	switch (m_Uitype)
-	{
-	case CUi::UITYPE_DIE:
-		Update_GameOver();
-		break;
-	case CUi::UITYPE_GAMESTART:
-		Update_GameStart();
-		break;
-	case CUi::UITYPE_FINISH:
-		Update_Finish();
-		break;
-	default:
-		break;
-	}
 	// UIÇÃçXêVèàóù
 	for (int nCntUi = 0; nCntUi < (signed)m_Ui.size(); nCntUi++)
 	{
@@ -280,7 +258,6 @@ void CUi_group::Update_GameOver(void)
 	}
 	if (GetUiGroup_FadeType() == C2DPresents::FADETYPE_END)
 	{
-		CUi_group::Create(CUi::UITYPE_WATCHING);
 		Release();
 	}
 }

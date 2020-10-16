@@ -42,16 +42,17 @@ std::vector<std::unique_ptr<CScene_X::MODEL_LOAD>>  CScene_X::m_pModelLoad;	// ƒ
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CScene_X::CScene_X() : CScene::CScene()
 {
-	m_pos = D3DVECTOR3_ZERO;	// ˆÊ’uî•ñ
-	m_rot = D3DVECTOR3_ZERO;	// ‰ñ“]î•ñ
-	m_nModelId = 0;				// ƒvƒŒƒCƒ„[(—‹)”Ô†
-	m_fShadowAlpha = 1.0f;		// ‰e‚Ìƒ¿’l
-	m_fModelAlpha = 1.0f;		// ƒvƒŒƒCƒ„[‚Ìƒ¿’l
-	m_bShadowMap = false;		// ƒVƒƒƒhƒEƒ}ƒbƒsƒ“ƒO‚É‚·‚é‚©‚µ‚È‚¢‚©
-	m_pParentMtx = NULL;		// eƒ}ƒgƒŠƒbƒNƒX
-	m_pShadow = NULL;			// ƒVƒƒƒhƒE
-	m_Collision = NULL;			// “–‚½‚è”»’è
-	m_pModelCol = NULL;			// ƒ‚ƒfƒ‹ƒJƒ‰[î•ñ
+	m_pos = D3DVECTOR3_ZERO;				// ˆÊ’uî•ñ
+	m_rot = D3DVECTOR3_ZERO;				// ‰ñ“]î•ñ
+	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// ƒTƒCƒYî•ñ
+	m_nModelId = 0;							// ƒvƒŒƒCƒ„[(—‹)”Ô†
+	m_fShadowAlpha = 1.0f;					// ‰e‚Ìƒ¿’l
+	m_fModelAlpha = 1.0f;					// ƒvƒŒƒCƒ„[‚Ìƒ¿’l
+	m_bShadowMap = false;					// ƒVƒƒƒhƒEƒ}ƒbƒsƒ“ƒO‚É‚·‚é‚©‚µ‚È‚¢‚©
+	m_pParentMtx = NULL;					// eƒ}ƒgƒŠƒbƒNƒX
+	m_pShadow = NULL;						// ƒVƒƒƒhƒE
+	m_Collision = NULL;						// “–‚½‚è”»’è
+	m_pModelCol = NULL;						// ƒ‚ƒfƒ‹ƒJƒ‰[î•ñ
 	// ƒ[ƒ‹ƒhƒ}ƒgƒŠƒbƒNƒX‚Ì‰Šú‰»
 	D3DXMatrixIdentity(&m_mtxWorld);
 }
@@ -172,7 +173,6 @@ void CScene_X::Draw(void)
 	D3DXMatrixMultiply(&m_mtxWorld,
 		&m_mtxWorld, &mtxRot);
 
-
 	// ˆÊ’u‚ğ”½‰f //
 	// •½sˆÚ“®s—ñì¬(ƒIƒtƒZƒbƒg)
 	D3DXMatrixTranslation(&mtxTrans,							// ‘‡‚Ì“ü‚ê•¨
@@ -180,10 +180,17 @@ void CScene_X::Draw(void)
 		m_pos.y,
 		m_pos.z);
 
+	// ƒ‚ƒfƒ‹‚ÌŠg‘åk¬
+	D3DXMatrixScaling(&m_mtxWorld,
+		m_size.x,
+		m_size.y,
+		m_size.z);
+
 	// s—ñ‚ÌÏ(1:ƒ[ƒ‹ƒhs—ñ = 2:ƒ[ƒ‹ƒhs—ñ * 3:ˆÚ“®s—ñ)
 	D3DXMatrixMultiply(&m_mtxWorld,	// 1
 		&m_mtxWorld,				// 2
 		&mtxTrans);					// 3
+
 	// eî•ñ‚ğ‚Á‚Ä‚¢‚é‚Æ‚«
 	// ->©•ª‚Ìƒ}ƒgƒŠƒbƒNƒXî•ñ * e‚Ìƒ}ƒgƒŠƒbƒNƒXî•ñ
 	if (m_pParentMtx != NULL)

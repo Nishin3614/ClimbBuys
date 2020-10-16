@@ -90,8 +90,9 @@ void CBaseMode::Debug(void)
 	CDebugproc::Print(NEWLINE);
 	CDebugproc::Print("[Ctrl] + テンキー [0] : 現在のModeに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [1] : Titleに遷移\n");
-	CDebugproc::Print("[Ctrl] + テンキー [2] : Gameに遷移\n");
-	CDebugproc::Print("[Ctrl] + テンキー [3] : Resultに遷移\n");
+	CDebugproc::Print("[Ctrl] + テンキー [2] : Tutorialに遷移\n");
+	CDebugproc::Print("[Ctrl] + テンキー [3] : Gameに遷移\n");
+	CDebugproc::Print("[Ctrl] + テンキー [4] : Resultに遷移\n");
 	CDebugproc::Print(NEWLINE);
 
 	// 現在のモード表記
@@ -99,6 +100,10 @@ void CBaseMode::Debug(void)
 	{
 	case CManager::MODE_TITLE:
 		CDebugproc::Print("現在のモード : [ Title ]\n");
+		break;
+
+	case CManager::MODE_TUTORIAL:
+		CDebugproc::Print("現在のモード : [ Tutorial ]\n");
 		break;
 
 	case CManager::MODE_GAME:
@@ -140,13 +145,18 @@ void CBaseMode::Debug(void)
 		{
 			CManager::SetMode(CManager::MODE_TITLE);
 		}
-		// ゲーム
+		//チュートリアル
 		if (key->GetKeyboardTrigger(DIK_NUMPAD2))
+		{
+			CManager::SetMode(CManager::MODE_TUTORIAL);
+		}
+		// ゲーム
+		if (key->GetKeyboardTrigger(DIK_NUMPAD3))
 		{
 			CManager::SetMode(CManager::MODE_GAME);
 		}
 		// リザルト
-		if (key->GetKeyboardTrigger(DIK_NUMPAD3))
+		if (key->GetKeyboardTrigger(DIK_NUMPAD4))
 		{
 			CManager::SetMode(CManager::MODE_RESULT);
 		}

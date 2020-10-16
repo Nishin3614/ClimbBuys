@@ -52,10 +52,10 @@ public:
 	void Draw(void);
 	// 生成処理
 	static CTutorial * Create(void);
-#ifdef _DEBUG
-	// デバッグ処理
-	void Debug(void) {};
-#endif // _DEBUG
+//#ifdef _DEBUG
+//	// デバッグ処理
+//	void Debug(void);
+//#endif // _DEBUG
 protected:
 private:
 };

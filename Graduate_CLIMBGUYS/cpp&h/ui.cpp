@@ -35,7 +35,7 @@ CUi::CUi()
 {
 	m_pScene_two = NULL;		// シーン2D
 	m_pPresents = NULL;			// 2Dプレゼンツ
-	m_Uitype = UITYPE_GAMEUI;	// UIタイプ
+	m_Uitype = UITYPE_TILTE;	// UIタイプ
 	m_nUi = 0;					// UI
 	//m_nCount = 0;				// カウント
 }
@@ -170,7 +170,7 @@ void CUi::Init(void)
 			m_vec_UiLoad[m_Uitype][m_nUi].col
 		);
 		// テクスチャー座標設定
-		m_pPresents->Set_Vtx_Tex(m_vec_UiLoad[m_Uitype][m_nUi].tex_first, m_vec_UiLoad[m_Uitype][m_nUi].tex_last);
+		m_pScene_two->Set_Vtx_Tex(m_vec_UiLoad[m_Uitype][m_nUi].tex_first, m_vec_UiLoad[m_Uitype][m_nUi].tex_last);
 	}
 }
 

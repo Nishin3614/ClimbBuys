@@ -170,6 +170,8 @@ public:
 	void SetPos(D3DXVECTOR3 const &pos) { m_pos = pos; };
 	// 回転設定
 	void SetRot(D3DXVECTOR3 const &rot) { m_rot = rot; };
+	// サイズ設定
+	void SetSize(D3DXVECTOR3 const &size) { m_size = size; };
 	// モデル番号設定
 	void SetModelId(int const &nModelId) { m_nModelId = nModelId; };
 	// シャドウマッピング設定
@@ -203,6 +205,8 @@ public:
 	D3DXVECTOR3 &GetPos(void) { return m_pos; };
 	// 回転取得
 	D3DXVECTOR3 &GetRot(void) { return m_rot; };
+	// サイズ取得
+	D3DXVECTOR3 &GetSize(void) { return m_size; };
 	// 行列取得
 	D3DXMATRIX &GetMatrix(void) { return m_mtxWorld; };
 	// 当たり判定状態取得
@@ -222,6 +226,7 @@ private:
 	static std::vector<std::unique_ptr<MODEL_LOAD>> m_pModelLoad;	// モデル情報の読み込み用
 	D3DXVECTOR3		m_pos;											// 位置情報
 	D3DXVECTOR3		m_rot;											// 回転情報
+	D3DXVECTOR3		m_size;											// サイズ情報
 	D3DXMATRIX		*m_pParentMtx;									// 親マトリックス
 	D3DXMATRIX		m_mtxWorld;										// ワールドマトリックス
 	int				m_nModelId;										// モデル番号

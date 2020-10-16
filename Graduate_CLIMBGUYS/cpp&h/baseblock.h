@@ -136,10 +136,7 @@ public:
 	);
 	// タイトル用 ブロックを一斉に生成
 	static void CreateInBulkBlock();
-	// 落ちる状態設定
-	void SetFall(bool const & bFall) { m_bFall = bFall; };
-	// 落ちる状態取得
-	bool & GetFall(void) { return m_bFall; };
+
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);

@@ -200,11 +200,13 @@ void CPlayer::MyMove(void)
 	{
 
 	}
+
 	// 試験的キーボードジャンプ
-	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE))
+	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
 	{
 		m_bLanding = true;	// 地面から離れている
 		move.y += PLAYER_JUMP_POWER;
+		SetJumpAble(false);
 	}
 
 	/* ゲームパッド */
@@ -242,10 +244,11 @@ void CPlayer::MyMove(void)
 		}
 
 		// 試験的ジャンプ ( のちに中身変わる予定 多分 )
-		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1))
+		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
 		{
 			m_bLanding = true;	// 地面から離れている
 			move.y += PLAYER_JUMP_POWER;
+			SetJumpAble(false);
 		}
 
 		// 試験的タックル ( のちに中身変わる予定 多分 )
@@ -360,11 +363,13 @@ void CPlayer::OtherDie(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 {
-	// キャラクター情報取得
-	CCharacter::CHARACTER character = CCharacter::GetCharacter();
-	// 変数宣言
 	// バルーンキャラクターの当たった後の処理
 	CCharacter::Scene_MyCollision(nObjType, pScene);
+
+	if (nObjType == CCollision::OBJTYPE_BLOCK)
+	{
+		SetJumpAble(true);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -374,10 +379,7 @@ void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 {
-	// キャラクター情報取得
-	CCharacter::CHARACTER character = CCharacter::GetCharacter();
-
-	// バルーンキャラクターの相手に当てられた後の処理
+	// キャラクターの相手に当てられた後の処理
 	CCharacter::Scene_OpponentCollision(nObjType, pScene);
 
 	// シーン情報がNULLなら
@@ -392,7 +394,6 @@ void CPlayer::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Scene_NoMyCollision(int const & nObjType, CScene * pScene)
 {
-
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -75,6 +75,7 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 	m_State = STATE_NORMAL;							// 現状のステータス
 	m_nCntState = 0;								// カウントステータス
 	m_fLength = 0;									// 攻撃の当たり範囲
+	m_bJumpable = false;							// ジャンプ可能かどうか
 	m_fAlpha = 1.0f;								// アルファ値
 	m_Directvector = D3DVECTOR3_ONE;				// 方向ベクトル
 	m_pStencilshadow = NULL;						// ステンシルシャドウ
@@ -708,12 +709,16 @@ bool CCharacter::GetFloorHeight(void)
 			{
 				m_pos.y = pFloor->GetHeight(m_pos);
 				m_move.y = 0;
+
+				// ジャンプを可能にする
+				SetJumpAble(true);
 				return true;
 			}
 			// それ以外
 			else
 			{
-
+				// ジャンプを不可能にする
+				SetJumpAble(false);
 			}
 		}
 	}

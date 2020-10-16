@@ -100,7 +100,7 @@ CDamageFloor * CDamageFloor::Create()
 	// 位置設定
 	pDamageFloor->SetPos(D3DXVECTOR3(0.0, 0.0f, 0.0f));
 	// サイズ設定
-	pDamageFloor->SetSize(D3DXVECTOR3(1000.0, 0.0f, 1000.0f));
+	pDamageFloor->SetSize(FIELD_SIZE);
 	// 初期化処理
 	pDamageFloor->Init();
 	// 生成したオブジェクトを返す

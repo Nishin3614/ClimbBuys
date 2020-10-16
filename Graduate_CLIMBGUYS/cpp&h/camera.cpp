@@ -31,7 +31,7 @@ CCamera::CCamera()
 	m_posV = D3DXVECTOR3(1.0f, 100.0f, -100.0f);
 	m_posVDest = m_posV;
 	m_posVDiff = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posR = D3DXVECTOR3(0.0f, 500.0f, -400.0f);
 	m_posRDest = m_posR;
 	m_posRDiff = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);

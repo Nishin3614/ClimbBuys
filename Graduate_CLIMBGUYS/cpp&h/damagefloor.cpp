@@ -82,37 +82,25 @@ void CDamageFloor::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::Draw(void)
 {
-	// 変数宣言
-	LPDIRECT3DDEVICE9 pDevice =					// デバイスの取得
-		CManager::GetRenderer()->GetDevice();
-	// 減算 
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	// 描画
 	CScene_THREE::Draw();
-	// 通常ブレンド
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 作成処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-CDamageFloor * CDamageFloor::Create(
-	D3DXVECTOR3 const &pos,							// 位置
-	D3DXVECTOR3 const &size							// サイズ
-)
+CDamageFloor * CDamageFloor::Create()
 {
 	// 変数宣言
 	CDamageFloor * pDamageFloor;		// シーン3Dクラス
 										// メモリの生成(初め->基本クラス,後->派生クラス)
 	pDamageFloor = new CDamageFloor();
+	// シーン管理設定
+	pDamageFloor->ManageSetting(CScene::LAYER_3DOBJECT);
 	// 位置設定
-	pDamageFloor->SetPos(pos);
+	pDamageFloor->SetPos(D3DXVECTOR3(0.0, 0.0f, 0.0f));
 	// サイズ設定
-	pDamageFloor->SetSize(D3DXVECTOR3(size.x, 0.0f, size.z));
+	pDamageFloor->SetSize(D3DXVECTOR3(1000.0, 0.0f, 1000.0f));
 	// 初期化処理
 	pDamageFloor->Init();
 	// 生成したオブジェクトを返す

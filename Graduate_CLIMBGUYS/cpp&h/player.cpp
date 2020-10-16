@@ -28,6 +28,8 @@
 #define PLAYER_GRAVITY (0.1f)
 #define PLAYER_UPMOVELIMIT		(30.0f)	// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
+#define PLAYER_JUMP_POWER		(12.0f)	// プレイヤーのジャンプ力
+#define PLAYER_MOVE				(3.0f)	// プレイヤーの移動速度
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -41,6 +43,8 @@
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
 	m_nCntState = 0;				// ステートカウント
+	m_bDieFlag = false;				// 死亡フラグ
+	m_bLanding = false;				// 着地しているかのフラグ
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -199,15 +203,16 @@ void CPlayer::MyMove(void)
 	// 試験的キーボードジャンプ
 	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE))
 	{
-		move.y += 12.0f;
+		m_bLanding = true;	// 地面から離れている
+		move.y += PLAYER_JUMP_POWER;
 	}
 
 	/* ゲームパッド */
 	// パッド用 //
-	float fValueH, fValueV;	// ゲームパッドのスティック情報の取得用
-	float fMove = 3.0f;			// 移動速度
-	float fAngle;			// スティック角度の計算用変数
-	fAngle = 0.0f;			// 角度
+	float fValueH, fValueV;		// ゲームパッドのスティック情報の取得用
+	float fMove = PLAYER_MOVE;	// 移動速度
+	float fAngle;				// スティック角度の計算用変数
+	fAngle = 0.0f;				// 角度
 
 	if (m_pPad)
 	{
@@ -239,7 +244,8 @@ void CPlayer::MyMove(void)
 		// 試験的ジャンプ ( のちに中身変わる予定 多分 )
 		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1))
 		{
-			move.y += 12.0f;
+			m_bLanding = true;	// 地面から離れている
+			move.y += PLAYER_JUMP_POWER;
 		}
 
 		// 試験的タックル ( のちに中身変わる予定 多分 )

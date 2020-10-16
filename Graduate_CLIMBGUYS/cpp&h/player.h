@@ -54,7 +54,11 @@ public:
 	// プレイヤーが死んだときの関数
 	virtual void Die(void);
 	void OtherDie(void);
+	// 死亡フラグの取得
 	bool GetDieFlag(void) { return m_bDieFlag; };
+	// 着地フラグの取得
+	bool GetLanding(void) { return m_bLanding; };
+
 	// 当たった後の処理
 	//	nObjType	: オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
@@ -111,5 +115,6 @@ private:
 
 	CXInputPad		*m_pPad;						// パッドのポインタ
 	bool			m_bDieFlag;						// 死亡フラグ
+	bool			m_bLanding;						// 着地しているかのフラグ
 };
 #endif

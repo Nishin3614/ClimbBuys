@@ -11,6 +11,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "damagefloor.h"
+#include "rectcollision.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -56,6 +57,11 @@ void CDamageFloor::Init(void)
 #ifdef _DEBUG
 	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif // _DEBUG
+
+	D3DXVECTOR3 size(500.0,100.0,500.0f);
+	D3DXVECTOR3 ofset(0.0, -50.0, 0.0f);
+
+	CRectCollision::Create(size, ofset, CCollision::OBJTYPE_DAMAGEFLOOR,this,nullptr);
 
 	// ÉVÅ[Éì3DÇÃèâä˙âª
 	CScene_THREE::Init();

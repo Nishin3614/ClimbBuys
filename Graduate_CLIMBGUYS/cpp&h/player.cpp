@@ -89,6 +89,7 @@ void CPlayer::Update(void)
 	CCharacter::Update();
 	CCharacter::Limit();
 
+	// Ž€–S”»’è‚ªo‚½‚çƒŠƒUƒ‹ƒg‚É‘JˆÚ‚·‚é
 	if (GetDie())
 	{
 		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)

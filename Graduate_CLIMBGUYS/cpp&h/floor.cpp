@@ -87,24 +87,6 @@ void CFloor::Init(void)
 	// 情報取得
 	LPDIRECT3DDEVICE9 pDevice =				// デバイス
 		CManager::GetRenderer()->GetDevice();
-
-	/*
-	if (m_pEffect == NULL)
-	{
-		//シェーダーを読み込む
-		if (FAILED(D3DXCreateEffectFromFile(pDevice, "data/LOAD/MAPPING/MaskShader.fx", NULL, NULL,
-			0, NULL, &m_pEffect, NULL)))
-		{
-			MessageBox(NULL, "シェーダーファイル読み込み失敗", "", MB_OK);
-		}
-	}
-
-	// テクスチャー生成
-	D3DXCreateTextureFromFile(
-		CManager::GetRenderer()->GetDevice(),
-		TEXTURE_MASK,
-		&m_pMaskTex);
-*/
 	// ブロック描画の原点の初期設定
 	m_OriginBlock = D3DXVECTOR3(
 		m_size.x * -0.5f * m_nBlock_Width,

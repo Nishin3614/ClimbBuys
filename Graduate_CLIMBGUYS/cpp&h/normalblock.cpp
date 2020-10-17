@@ -6,6 +6,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "normalblock.h"
 #include "collision.h"
+#include "debugproc.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -89,7 +90,7 @@ void CNormalblock::Scene_MyCollision(
 		// シーン情報の代入
 		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
 		// シーン情報
-		if (pBaseBlock->GetFall())
+		if (!pBaseBlock->GetFall())
 		{
 			CBaseblock::SetFall(false);
 		}
@@ -111,7 +112,7 @@ void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene
 		// シーン情報の代入
 		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
 		// シーン情報
-		if (pBaseBlock->GetFall())
+		if (!pBaseBlock->GetFall())
 		{
 			CBaseblock::SetFall(false);
 		}
@@ -213,6 +214,17 @@ std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CNormalblock::Debug(void)
 {
+	// 落ちる状態でなければ
+	// 関数を抜ける
+	if (CBaseblock::GetFall())
+	{
+		CDebugproc::Print("NormalBlock::Fall = true\n");
+	}
+	else
+	{
+		CDebugproc::Print("NormalBlock::Fall = false\n");
+	}
+	CDebugproc::Print("NormalBlock::Pos(%.2f,%.2f,%.2f)\n",CScene_X::GetPos().x, CScene_X::GetPos().y, CScene_X::GetPos().z);
 
 }
 #endif // _DEBUG

@@ -43,8 +43,10 @@ void CConnectblock::Init()
 {
 	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 500.0f, 0.0f), 2));
 	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 600.0f, 0.0f), 2));
-	//m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 700.0f, 0.0f), 2));
-	//m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(100.0f, 500.0f, 0.0f), 2));
+	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 800.0f, 0.0f), 2));
+	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 700.0f, 0.0f), 2));
+	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(-100.0f, 500.0f, 0.0f), 2));
+	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(-200.0f, 500.0f, 0.0f), 2));
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

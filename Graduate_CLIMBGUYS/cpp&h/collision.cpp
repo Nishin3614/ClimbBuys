@@ -412,11 +412,24 @@ void CCollision::CollisionDetection(void)
 				{
 					pCollision1->m_pOwner->Scene_NoMyCollision(pCollision2->m_nMyObjectId, pCollision2->m_pOwner);
 				}
+				// それ以外なら
+				// ->当たり判定自体の当たった後の処理を行う
+				else
+				{
+					pCollision1->Scene_NoMyCollision(pCollision2->m_nMyObjectId, pCollision2->m_pOwner);
+				}
+
 				// 相手のシーン情報がNULLではないなら
 				// ->当たった後の処理を行う
 				if (pCollision2->m_pOwner != NULL)
 				{
 					pCollision2->m_pOwner->Scene_NoOpponentCollision(pCollision1->m_nMyObjectId, pCollision1->m_pOwner);
+				}
+				// それ以外なら
+				// ->当たり判定自体の当てられた後の処理を行う
+				else
+				{
+					pCollision2->Scene_NoOpponentCollision(pCollision1->m_nMyObjectId, pCollision1->m_pOwner);
 				}
 			}
 		}
@@ -463,6 +476,14 @@ bool CCollision::RectAndRect(
 	D3DXVECTOR3 const &maxOld_B = pRectShapeB->GetMaxOld();
 	D3DXVECTOR3 *pos_A = NULL;
 	bool bCollision = false;
+	// 接触していないときはfalseを返す
+	if (min_A.x > max_B.x) bCollision = false;
+	else if (max_A.x < min_B.x) bCollision = false;
+	else if (min_A.y > max_B.y) bCollision = false;
+	else if (max_A.y < min_B.y) bCollision = false;
+	else if (min_A.z > max_B.z) bCollision = false;
+	else if (max_A.z < min_B.z) bCollision = false;
+	else bCollision = true;
 	// ポインター位置情報がNULLではないなら
 	// ->位置情報に代入
 	if (pRectShapeA->Get_PPos() != NULL)
@@ -492,8 +513,6 @@ bool CCollision::RectAndRect(
 					// 素材状の左に
 					pos_A->x = min_B.x - pRectShapeA->GetSize().x * 0.6f;
 				}
-				// 接触しているときはtrueを返す
-				bCollision = true;
 			}
 
 			// 当たり判定(右)
@@ -511,8 +530,6 @@ bool CCollision::RectAndRect(
 					// 素材状の左に
 					pos_A->x = max_B.x + pRectShapeA->GetSize().x * 0.6f;
 				}
-				// 接触しているときはtrueを返す
-				bCollision = true;
 			}
 		}
 		// 素材のX範囲
@@ -534,8 +551,6 @@ bool CCollision::RectAndRect(
 					// 素材状の左に
 					pos_A->z = min_B.z - pRectShapeA->GetSize().z * 0.6f;
 				}
-				// 接触しているときはtrueを返す
-				bCollision = true;
 			}
 
 			// 当たり判定(奥)
@@ -554,8 +569,6 @@ bool CCollision::RectAndRect(
 					pos_A->z = max_B.z +
 						pRectShapeA->GetSize().z * 0.6f;
 				}
-				// 接触しているときはtrueを返す
-				bCollision = true;
 			}
 
 		}
@@ -583,8 +596,6 @@ bool CCollision::RectAndRect(
 					// 素材状の左に
 					pos_A->y = min_B.y - pRectShapeA->GetSize().y;
 				}
-				// 接触しているときはtrueを返す
- 				bCollision = true;
 			}
 
 			// 当たり判定(上)
@@ -600,8 +611,6 @@ bool CCollision::RectAndRect(
 					// 素材状の左に
 					pos_A->y = max_B.y + 0.1f;
 				}
-				// 接触しているときはtrueを返す
-				bCollision = true;
 			}
 
 		}
@@ -614,16 +623,6 @@ bool CCollision::RectAndRect(
 	}
 	// 接触しているときはtrueを返す
 	return bCollision;
-
-
-
-
-
-
-	// やること
-	// いったん情報を整理する
-	// いらない情報を消す
-
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -28,20 +28,27 @@ class CConnect_fieldblock : public CScene
 {
 public:
 	/* 列挙型 */
-	// マップによるs
-	// フィールドタイプ情報
+	// ステージ
 	typedef enum
 	{
-		TYPE_RECT = 0,
-		TYPE_MAX
-	} TYPE;
+		STAGE_1 = 0,
+		STAGE_MAX
+	} STAGE;
 	/* 構造体 */
 	// 読み込み情報
 	typedef struct
 	{
 		int		nFailId;		// おちる番号
 		bool	bUse;			// 使用状況
+	} FIELDINFO;
+	// 読み込み情報
+	// 読み込み情報
+	typedef struct
+	{
+		int											nFeed;				// フィード
+		std::vector<std::vector<FIELDINFO>>	Dvec_pFileLoad;		// ファイルの読み込み情報
 	} LOAD;
+
 	/* 関数 */
 	// コンストラクタ
 	CConnect_fieldblock();
@@ -97,22 +104,22 @@ public:
 
 	/* おちてくるブロックの生成 */
 	// 作成(シーン管理)
-	//	type		: タイプ情報
+	//	stage		: ステージ情報
 	//	layer		: レイヤー
 	static CConnect_fieldblock * Create(
-		TYPE			const & type,									// タイプ情報
+		STAGE			const & stage,									// ステージ情報
 		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT			// レイヤー
 	);
 	// 作成(個人管理)
-	//	type		: タイプ情報
+	//	stage		: ステージ情報
 	static CConnect_fieldblock * Create_Self(
-		TYPE			const & type									// タイプ情報
+		STAGE			const & stage									// ステージ情報
 		);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
-	//	type		: タイプ情報
+	//	stage		: ステージ情報
 	static std::unique_ptr<CConnect_fieldblock> Creat_Unique(
-		TYPE			const & type									// タイプ情報
+		STAGE			const & stage									// ステージ情報
 	);
 #ifdef _DEBUG
 	// デバッグ処理
@@ -125,9 +132,10 @@ private:
 	/* 関数 */
 
 	/* 変数 */
-	static std::vector<std::vector<LOAD>>	m_Dvec_pFileLoad;		// ファイルの読み込み情報
-	std::vector<std::vector<CBaseblock *>>	m_Dvec_pFieldBlock;		// フィールドブロック情報
-	int										m_nMaxField;			// フィールドの最大数
+	static std::vector<LOAD>					m_vpLoad;			// ファイルの読み込み情報
+	std::vector<CBaseblock *>					m_Dvec_pFieldBlock;	// フィールドブロック情報
+	STAGE										m_stage;			// ステージ
+	int											m_nMaxField;		// フィールドの最大数
 };
 
 #endif

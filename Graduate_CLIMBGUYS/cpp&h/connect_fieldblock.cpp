@@ -19,7 +19,7 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-std::vector<std::vector<CConnect_fieldblock::LOAD>>	CConnect_fieldblock::m_Dvec_pFileLoad = {};		// ファイルの読み込み情報
+std::vector<CConnect_fieldblock::LOAD>	CConnect_fieldblock::m_vpLoad;									// ファイルの読み込み情報
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
@@ -40,20 +40,26 @@ CConnect_fieldblock::~CConnect_fieldblock()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnect_fieldblock::Init()
 {
+	// 変数宣言
+	int nLine = m_vpLoad[m_stage].nFeed - 1;		// 行
+	int nColumn = -(m_vpLoad[m_stage].nFeed - 1);		// 列
 
 	// フィールドループ
-	for (size_t nCntField = 0; nCntField < m_Dvec_pFileLoad.size(); nCntField++)
+	for (size_t nCntField = 0; nCntField < m_vpLoad[m_stage].Dvec_pFileLoad.size(); nCntField++)
 	{
-		// 変数宣言
-		std::vector<CBaseblock *> vec_Block;	// ベースブロック情報
 		// ブロックのループ
-		for (size_t nCntBlock = 0; nCntBlock < m_Dvec_pFileLoad[nCntField].size(); nCntBlock++)
+		for (size_t nCntBlock = 0; nCntBlock < m_vpLoad[m_stage].Dvec_pFileLoad[nCntField].size(); nCntBlock++)
 		{
-			if (!m_Dvec_pFileLoad[nCntField][nCntBlock].bUse) continue;
-			vec_Block.emplace_back(
-				CFieldblock::Create(D3DXVECTOR3(nCntBlock * 100.0f, 0.0f, nCntField * 100.0f), 2));
+			if (!m_vpLoad[m_stage].Dvec_pFileLoad[nCntField][nCntBlock].bUse) continue;
+			m_Dvec_pFieldBlock.emplace_back(CFieldblock::Create(D3DXVECTOR3(nColumn * 100.0f, 0.0f, nLine * 100.0f), 2));
+			// 列ダウン
+			nColumn++;
+
 		}
-		m_Dvec_pFieldBlock.emplace_back(vec_Block);
+		// 行アップ
+		nLine--;
+		// 列初期化
+		nColumn = -(m_vpLoad[m_stage].nFeed - 1);
 	}
 }
 
@@ -63,15 +69,9 @@ void CConnect_fieldblock::Init()
 void CConnect_fieldblock::Uninit(void)
 {
 	// フィールドループ
-	for (size_t nCntField = 0; nCntField < m_Dvec_pFieldBlock.size(); nCntField++)
+	for (size_t nCntBlock = 0; nCntBlock < m_Dvec_pFieldBlock.size(); nCntBlock++)
 	{
-		// ブロックのループ
-		for (size_t nCntBlock = 0; nCntBlock < m_Dvec_pFieldBlock[nCntField].size(); nCntBlock++)
-		{
-			m_Dvec_pFieldBlock[nCntField][nCntBlock] = NULL;
-		}
-		m_Dvec_pFieldBlock[nCntField].clear();
-		m_Dvec_pFieldBlock[nCntField].shrink_to_fit();
+		m_Dvec_pFieldBlock[nCntBlock] = NULL;
 	}
 	m_Dvec_pFieldBlock.clear();
 	m_Dvec_pFieldBlock.shrink_to_fit();
@@ -127,28 +127,47 @@ HRESULT CConnect_fieldblock::Load(void)
 		CManager::GetRenderer()->GetDevice();
 	// ファイルの中身格納用
 	std::vector<std::vector<std::string>> vsvec_Contens;
+	std::vector<std::vector<FIELDINFO>>	vvpFileLoad;	// ファイルの読み込み情報
 	// ファイルの中身を取得する
 	vsvec_Contens = CCalculation::FileContens(CONNECT_FIELDBLOCK_FILE, ',');
 	// 行ごとに回す
 	for (size_t nCntLine = 0; nCntLine < vsvec_Contens.size(); nCntLine++)
 	{
-		std::vector<LOAD> vec_Load;					// 読み込み情報
+		std::vector<FIELDINFO> vec_Load;					// 読み込み情報
 		// 項目ごとに回す
 		for (size_t nCntItem = 0; nCntItem < vsvec_Contens.at(nCntLine).size(); nCntItem++)
 		{
-			LOAD load;
-			load.nFailId = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
-			if (load.nFailId == 0)
+			// 読み込んだ情報にEndが出力されていたら
+			if (strcmp(vsvec_Contens[nCntLine][nCntItem].c_str(), "End") == 0)
 			{
-				load.bUse = false;
+				LOAD load;
+				load.Dvec_pFileLoad = vvpFileLoad;
+				load.nFeed = ((signed)vvpFileLoad.size() + 1) / 2;
+				// 読み込んだフィードブロックの情報を格納
+				m_vpLoad.emplace_back(load);
+				std::vector<std::vector<FIELDINFO>>().swap(vvpFileLoad);
+				continue;
+			}
+			// 情報が入っていない
+			if (strcmp(vsvec_Contens[nCntLine][nCntItem].c_str(), "") == 0)
+			{
+				continue;
+			}
+			// 変数宣言
+			FIELDINFO fieldinfo;	// フィールド情報
+			// 番号を代入
+			fieldinfo.nFailId = stoi(vsvec_Contens.at(nCntLine).at(nCntItem));
+			if (fieldinfo.nFailId == 0)
+			{
+				fieldinfo.bUse = false;
 			}
 			else
 			{
-				load.bUse = true;
+				fieldinfo.bUse = true;
 			}
-			vec_Load.emplace_back(load);
+			vec_Load.emplace_back(fieldinfo);
 		}
-		m_Dvec_pFileLoad.emplace_back(vec_Load);
+		vvpFileLoad.emplace_back(vec_Load);
 		vec_Load.clear();
 		vec_Load.shrink_to_fit();
 	}
@@ -162,24 +181,28 @@ HRESULT CConnect_fieldblock::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnect_fieldblock::UnLoad(void)
 {
-	// フィールドループ
-	for (size_t nCntField = 0; nCntField < m_Dvec_pFileLoad.size(); nCntField++)
+	// ロードループ
+	for (size_t nCntLoad = 0; nCntLoad < m_vpLoad.size(); nCntLoad++)
 	{
-		m_Dvec_pFileLoad[nCntField].clear();
-		m_Dvec_pFileLoad[nCntField].shrink_to_fit();
+		// フィールドループ
+		for (size_t nCntField = 0; nCntField < m_vpLoad[nCntLoad].Dvec_pFileLoad.size(); nCntField++)
+		{
+			m_vpLoad[nCntLoad].Dvec_pFileLoad[nCntField].clear();
+			m_vpLoad[nCntLoad].Dvec_pFileLoad[nCntField].shrink_to_fit();
+		}
 	}
 	// 読み込んだ情報の開放
-	m_Dvec_pFileLoad.clear();
-	m_Dvec_pFileLoad.shrink_to_fit();
+	m_vpLoad.clear();
+	m_vpLoad.shrink_to_fit();
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 作成(シーン管理)
-//	type		: タイプ情報
+//	stage		: ステージ情報
 //	layer		: レイヤー
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CConnect_fieldblock * CConnect_fieldblock::Create(
-	TYPE			const & type,									// タイプ情報
+	STAGE			const & stage,									// ステージ情報
 	CScene::LAYER	const & layer									// レイヤー
 )
 {
@@ -190,6 +213,8 @@ CConnect_fieldblock * CConnect_fieldblock::Create(
 	// 設定
 	// シーン管理設定
 	pConnect_fieldblock->ManageSetting(layer);
+	// 設定
+	pConnect_fieldblock->m_stage = stage;	// ステージ
 	// 初期化処理
 	pConnect_fieldblock->Init();
 	// 生成したオブジェクトを返す
@@ -198,16 +223,18 @@ CConnect_fieldblock * CConnect_fieldblock::Create(
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 作成(個人管理)
-//	type		: タイプ情報
+//	stage		: ステージ情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CConnect_fieldblock * CConnect_fieldblock::Create_Self(
-	TYPE	const & type									// タイプ情報
+	STAGE	const & stage									// ステージ情報
 )
 {
 	// 変数宣言
 	CConnect_fieldblock * pConnect_fieldblock;		// 結合フィールドブロック
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pConnect_fieldblock = new CConnect_fieldblock;
+	// 設定
+	pConnect_fieldblock->m_stage = stage;	// ステージ
 	// 初期化処理
 	pConnect_fieldblock->Init();
 	// 生成したオブジェクトを返す
@@ -217,14 +244,16 @@ CConnect_fieldblock * CConnect_fieldblock::Create_Self(
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // unique_ptr作成(個人管理unique)
 // ※戻り値はstd::moveで受け取る
-//	type		: タイプ情報
+//	stage		: ステージ情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CConnect_fieldblock> CConnect_fieldblock::Creat_Unique(
-	TYPE	const & type									// タイプ情報
+	STAGE	const & stage									// ステージ情報
 )
 {
 	// 変数宣言
 	std::unique_ptr<CConnect_fieldblock> pConnect_fieldblock(new CConnect_fieldblock);		// 結合フィールドブロック
+	// 設定
+	pConnect_fieldblock->m_stage = stage;	// ステージ
 	// 初期化処理
 	pConnect_fieldblock->Init();
 	// 生成したオブジェクトを返す

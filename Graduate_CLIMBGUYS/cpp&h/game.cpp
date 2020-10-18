@@ -80,7 +80,7 @@ void CGame::Init(void)
 	// 結合されたブロックの生成
 	CConnectblock::Create(D3DVECTOR3_ZERO,CConnectblock::SHAPE_RECT);
 	// 結合されたフィールドブロックの生成
-	CConnect_fieldblock::Create(CConnect_fieldblock::TYPE_RECT);
+	CConnect_fieldblock::Create(CConnect_fieldblock::STAGE_1);
 
 	// ダメージ床の生成
 	CDamageFloor::Create();

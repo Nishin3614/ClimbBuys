@@ -140,7 +140,6 @@ private:
 
 	/* 変数 */
 	std::vector<CBaseblock *>				m_vec_pBaseBlock;		// ベースブロック情報
-	std::vector<std::vector<CBaseblock *>>	m_Dvec_pFieldBlock;		// フィールドブロック情報
 	D3DXVECTOR3								m_pos;					// 位置
 	D3DXVECTOR3								m_move;					// 移動
 };

@@ -1045,11 +1045,11 @@ std::vector<std::vector<std::string>> CCalculation::FileContens(
 )
 {
 	// 変数宣言
-	std::ifstream				ifs_file;	// ファイル用ストリーム
-	std::string					s_Line;		// 1時的に1行読み込む
+	std::ifstream							ifs_file;	// ファイル用ストリーム
+	std::string								s_Line;		// 1時的に1行読み込む
 	std::vector<std::vector<std::string>>	svec_Char;	// ファイルの中身格納用
 
-										// ファイルを開く
+	// ファイルを開く
 	ifs_file.open(cns_cFile);
 	// 読み込みに失敗したらエラー文を出し関数を抜ける
 	if (ifs_file.fail())

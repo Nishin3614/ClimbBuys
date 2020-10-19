@@ -30,7 +30,6 @@ CConnectblock::CConnectblock() : CScene::CScene()
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// ƒ‰ƒ“ƒ_ƒ€‚ÉFî•ñ‚ğİ’è
-	//SetModelColor(CCalculation::GetRandomColor());
 	CCalculation::GetRandomColor(m_col);
 }
 

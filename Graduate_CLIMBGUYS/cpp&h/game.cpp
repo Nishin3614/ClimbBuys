@@ -72,7 +72,7 @@ void CGame::Init(void)
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
 	// 試験的背景の生成
-	//CBg::Create();
+	CBg::Create();
 
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
@@ -123,7 +123,6 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
-	CCollision::CollisionDetection();
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)
@@ -142,7 +141,7 @@ void CGame::Update(void)
 		// フェード状態が何も起こっていない状態なら
 		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			CManager::SetMode(CManager::MODE_RESULT);
+			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
 		}
 	}
 #endif

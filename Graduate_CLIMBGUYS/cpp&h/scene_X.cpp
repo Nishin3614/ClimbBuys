@@ -22,6 +22,7 @@
 #include "spherecollision.h"
 #include "rectcollision.h"
 #include "columncollision.h"
+#include "stencilshadow.h"
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -53,6 +54,7 @@ CScene_X::CScene_X() : CScene::CScene()
 	m_pShadow = NULL;						// シャドウ
 	m_Collision = NULL;						// 当たり判定
 	m_pModelCol = NULL;						// モデルカラー情報
+	m_pStencilshadow = NULL;				// ステンシルシャドウ
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 }
@@ -121,6 +123,12 @@ void CScene_X::Uninit(void)
 		delete m_pModelCol;
 		m_pModelCol = NULL;
 	}
+	// ステンシルシャドウのヌルチェック
+	// ステンシルシャドウの初期化
+	if (m_pStencilshadow != NULL)
+	{
+		m_pStencilshadow = NULL;
+	}
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,6 +142,15 @@ void CScene_X::Update(void)
 	{
 		m_pShadow->SetPos(D3DXVECTOR3(m_pos.x,0.1f,m_pos.z));
 		m_pShadow->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_fShadowAlpha));
+	}
+	// ステンシルシャドウの位置設定
+	if (m_pStencilshadow != NULL)
+	{
+		// 位置取得
+		D3DXVECTOR3 pos = m_pos;
+		pos.y = -1000.0f;
+		// ステンシルシャドウの位置設定
+		m_pStencilshadow->SetPos(pos);
 	}
 	// 当たり判定がNULLではないなら
 	// 更新
@@ -203,17 +220,17 @@ void CScene_X::Draw(void)
 	// シャドウマッピングがオンなら
 	if (m_bShadowMap)
 	{
-		// ステンシルバッファを有効にする
-		pDevice->SetRenderState(D3DRS_STENCILREF, 1);
-		pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
-		// ステンシル対象を設定
-		pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NOTEQUAL);
-		// ステンシルテスト、Zテスト両方とも合格の場合の判定
-		pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
-		// ステンシルテスト合格、Zテスト不合格の場合の判定
-		pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
-		// ステンシルテスト不合格、Zテスト不合格の場合の判定
-		pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+		//// ステンシルバッファを有効にする
+		//pDevice->SetRenderState(D3DRS_STENCILREF, 1);
+		//pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
+		//// ステンシル対象を設定
+		//pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NOTEQUAL);
+		//// ステンシルテスト、Zテスト両方とも合格の場合の判定
+		//pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
+		//// ステンシルテスト合格、Zテスト不合格の場合の判定
+		//pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+		//// ステンシルテスト不合格、Zテスト不合格の場合の判定
+		//pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
 		// シャドウマッピング
 		CShadowmapping::Draw(
 			pDevice,	// デバイス情報
@@ -221,7 +238,7 @@ void CScene_X::Draw(void)
 			m_mtxWorld	// マトリックス情報
 		);
 		// ステンシルバッファを有効にする
-		pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
+		//pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
 	}
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -252,7 +269,6 @@ void CScene_X::Draw(void)
 		// 描画
 		m_pModelLoad[m_nModelId]->pMesh->DrawSubset(nCntMat);
 	}
-
 	// マテリアルをデフォルトに戻す
 	pDevice->SetMaterial(&matDef);
 }
@@ -545,8 +561,21 @@ void CScene_X::ModelSetting(MODEL_LOAD * pModel_load)
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ステンシルシャドウの設定
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CScene_X::SetStencilshadow(bool const & bStencilshadow)
+{
+	// ステンシルシャドウの生成
+	m_pStencilshadow = CStencilshadow::Create(m_pos, D3DXVECTOR3(10.0f, 10000.0f, 10.0f));
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 当たり判定設定
-// 0:矩形、1:球、2:円柱
+//	nShapeType	: 0:矩形、1:球、2:円柱
+//	Obj			: オブジェクトタイプ
+//	bPush		: 押し出し処理
+//	pParent		: 親情報
+//	Offset_pos	: オフセット位置
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CScene_X::SetCollision(
 	int const & nShapeType,
@@ -678,43 +707,4 @@ CScene_X::MODEL_LOAD * CScene_X::GetModelLoad(int const & nModelId)
 		return m_pModelLoad[0].get();
 	}
 	return m_pModelLoad[nModelId].get();
-}
-
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// スクリプトを読み込む
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CScene_X::LoadScrept(char* add)
-{
-	FILE *pFile = NULL;											// ファイル
-	char cReadText[128] = {};									// 文字
-	char cHeadText[128] = {};									// 比較
-	CScene_X *pObject = NULL;
-
-	pFile = fopen(add, "r");									// ファイルを開くまたは作る
-
-	if (pFile != NULL)											// ファイルが読み込めた場合
-	{
-		fgets(cReadText, sizeof(cReadText), pFile);				// 行を飛ばす
-		fgets(cReadText, sizeof(cReadText), pFile);				// 行を飛ばす
-		fgets(cReadText, sizeof(cReadText), pFile);				// 行を飛ばす
-
-		while (strcmp(cHeadText, "End") != 0)
-		{
-			std::string Data = cReadText;
-			std::vector<std::string> splitData = CCalculation::split(Data, ',');
-
-			pObject = CScene_X::Create(D3DXVECTOR3((float)atof(splitData[LOADTYPE_POS_X].c_str()), (float)atof(splitData[LOADTYPE_POS_Y].c_str()), (float)atof(splitData[LOADTYPE_POS_Z].c_str())),
-									D3DXVECTOR3((float)atof(splitData[LOADTYPE_ROT_X].c_str()), (float)atof(splitData[LOADTYPE_ROT_Y].c_str()), (float)atof(splitData[LOADTYPE_ROT_Z].c_str())),
-									atoi(splitData[LOADTYPE_ADD].c_str()));
-
-			fgets(cReadText, sizeof(cReadText), pFile);									// 行を飛ばす
-			sscanf(cReadText, "%s", &cHeadText);
-		}
-
-		fclose(pFile);					// ファイルを閉じる
-	}
-	else
-	{
-		MessageBox(NULL, "モデル情報のアクセス失敗！", "WARNING", MB_ICONWARNING);	// メッセージボックスの生成
-	}
 }

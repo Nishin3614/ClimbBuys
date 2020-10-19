@@ -37,7 +37,7 @@
 //
 // ----------------------------------------
 // テクスチャーID
-int CStencilshadow::m_nTexId[TYPE_MAX] = 
+int CStencilshadow::m_nTexId[TYPE_MAX] =
 {
 	0,
 };
@@ -78,7 +78,7 @@ CStencilshadow::~CStencilshadow()
 void CStencilshadow::Init(void)
 {
 	// 変数宣言
-	LPDIRECT3DDEVICE9 pDevice =		// デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice =				// デバイスの取得
 		CManager::GetRenderer()->GetDevice();
 	D3DXVECTOR3 VecA, VecB;					// ベクトル
 	D3DXVECTOR3 Cross[2000];				// 外積
@@ -101,10 +101,10 @@ void CStencilshadow::Init(void)
 	MakeVertex(pDevice);
 	m_pSceneTwo = std::move(CScene_TWO::Creat_Unique(
 		CScene_TWO::OFFSET_TYPE_CENTER,
-		{ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f }, 
+		{ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f },
 		{ SCREEN_WIDTH,SCREEN_HEIGHT },
 		-1,
-		0.0f, 
+		0.0f,
 		{0.0f,0.0f,0.0f,1.0f}
 	));
 }

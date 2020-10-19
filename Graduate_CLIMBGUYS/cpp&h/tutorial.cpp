@@ -97,13 +97,12 @@ void CTutorial::Update(void)
 		// フェード状態が何も起こっていない状態なら
 		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			CManager::SetMode(CManager::MODE_GAME);
+			CManager::GetFade()->SetFade(CManager::MODE_GAME);
 		}
 	}
 
 
 #endif // _DEBUG
-	CCollision::CollisionDetection();
 
 	// モード更新
 	CBaseMode::Update();

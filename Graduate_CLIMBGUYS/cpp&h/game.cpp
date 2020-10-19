@@ -72,7 +72,7 @@ void CGame::Init(void)
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
 	// 試験的背景の生成
-	//CBg::Create();
+	CBg::Create();
 
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};

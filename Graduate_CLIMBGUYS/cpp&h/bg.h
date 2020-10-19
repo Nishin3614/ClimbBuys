@@ -36,7 +36,6 @@ public:
 
 private:
 	/* メンバ変数 */
-	CScene_TWO					*m_pScene2D;			// シーン2Dのポインタ
 
 };
 

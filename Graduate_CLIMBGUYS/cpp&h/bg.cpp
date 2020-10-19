@@ -25,7 +25,6 @@
 //------------------------------------------------------------------------------
 CBg::CBg()
 {
-	m_pScene2D = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -33,7 +32,6 @@ CBg::CBg()
 //------------------------------------------------------------------------------
 CBg::~CBg()
 {
-	m_pScene2D = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -41,9 +39,6 @@ CBg::~CBg()
 //------------------------------------------------------------------------------
 void CBg::Init()
 {
-	// 背景の生成
-	m_pScene2D = CScene_TWO::Create(OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, SCREEN_SIZE, 3, 0.0f, D3DXCOLOR_INI, LAYER::LAYER_BG);
-
 	CScene_TWO::Init();
 }
 
@@ -78,6 +73,24 @@ CBg *CBg::Create()
 {
 	//メモリ確保
 	CBg *pBg = new CBg;
+
+	// シーン管理設定
+	pBg->ManageSetting(CScene::LAYER_BG);
+
+	// オフセットの設定
+	pBg->SetOffset(OFFSET_TYPE_CENTER);
+
+	// 位置の設定
+	pBg->SetPosition(SCREEN_CENTER_POS);
+
+	// サイズの設定
+	pBg->SetSize(SCREEN_SIZE);
+
+	// テクスチャの設定
+	pBg->BindTexture(3);
+
+	// 色の設定
+	pBg->SetCol(D3DXCOLOR_INI);
 
 	pBg->Init();
 

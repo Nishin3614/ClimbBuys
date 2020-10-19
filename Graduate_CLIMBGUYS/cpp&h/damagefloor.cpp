@@ -55,7 +55,7 @@ void CDamageFloor::Init(void)
 
 	// デバッグ時のみ赤く表示
 #ifdef _DEBUG
-	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
 #endif // _DEBUG
 
 	D3DXVECTOR3 size(500.0,100.0,500.0f);

@@ -45,7 +45,7 @@ public:
 	// 読み込み情報
 	typedef struct
 	{
-		int											nFeed;				// フィード
+		int									nFeed;				// フィード
 		std::vector<std::vector<FIELDINFO>>	Dvec_pFileLoad;		// ファイルの読み込み情報
 	} LOAD;
 
@@ -130,7 +130,8 @@ protected:
 	// 設定 //
 private:
 	/* 関数 */
-
+	// ブロックが落ちる処理
+	void BlockFall(void);
 	/* 変数 */
 	static std::vector<LOAD>					m_vpLoad;			// ファイルの読み込み情報
 	std::vector<CBaseblock *>					m_Dvec_pFieldBlock;	// フィールドブロック情報

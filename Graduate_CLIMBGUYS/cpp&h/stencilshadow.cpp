@@ -78,7 +78,7 @@ CStencilshadow::~CStencilshadow()
 void CStencilshadow::Init(void)
 {
 	// 変数宣言
-	LPDIRECT3DDEVICE9 pDevice =		// デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice =				// デバイスの取得
 		CManager::GetRenderer()->GetDevice();
 	D3DXVECTOR3 VecA, VecB;					// ベクトル
 	D3DXVECTOR3 Cross[2000];				// 外積

@@ -49,9 +49,9 @@
 // 静的変数宣言
 //
 // ----------------------------------------
-std::vector<std::string> CSound::m_vec_Filename = {};						// ファイル名
-std::vector<int> CSound::m_vec_nLoop = {};							// ループカウント
-std::vector<CSound::SOUND> CSound::m_vec_SoundType = {};				// サウンドタイプ
+std::vector<std::string> CSound::m_vec_Filename = {};			// ファイル名
+std::vector<int> CSound::m_vec_nLoop = {};						// ループカウント
+std::vector<CSound::SOUND> CSound::m_vec_SoundType = {};		// サウンドタイプ
 IXAudio2 * CSound::m_pXAudio2 = NULL;							// XAudio2オブジェクトへのインターフェイス
 IXAudio2MasteringVoice * CSound::m_pMasteringVoice = NULL;		// マスターボイス
 BYTE * CSound::m_apDataAudio[LABEL_MAX] = {};					// オーディオデータ
@@ -127,7 +127,7 @@ void CSound::Uninit(void)
 		m_pSoureceVOICE = NULL;
 	}
 	// オーディオの開放
-	for (int nCntSound = 0; nCntSound < LABEL_MAX; nCntSound++)
+	for (size_t nCntSound = 0; nCntSound < m_vec_Filename.size(); nCntSound++)
 	{
 		if (m_apDataAudio[nCntSound] != NULL)
 		{
@@ -409,10 +409,9 @@ HRESULT CSound::SoundCreate(HWND hWnd)
 	DWORD dwFiletype = 0;
 	DWORD dwChunkSize = 0;
 	DWORD dwChunkPosition = 0;
-	int nCntSound;
 
 	// サウンドデータの初期化
-	for (nCntSound = 0; nCntSound < (signed)m_vec_Filename.size(); nCntSound++)
+	for (size_t nCntSound = 0; nCntSound < m_vec_Filename.size(); nCntSound++)
 	{
 		// 初期化
 		hFile = NULL;

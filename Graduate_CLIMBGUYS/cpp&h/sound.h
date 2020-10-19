@@ -42,7 +42,7 @@ public:
 	typedef enum
 	{
 		LABEL_BGM_TITLE = 0,	// ƒoƒ‹[ƒ“‚ğŠ„‚Á‚½‰¹1
-		LABEL_MAX,					//
+		LABEL_MAX,				// Å‘å”
 	} LABEL;
 	/* ŠÖ” */
 	CSound();

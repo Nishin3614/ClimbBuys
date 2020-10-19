@@ -82,25 +82,28 @@ public:
 	//	nModelId	: モデル番号
 	//	layer		: レイヤー
 	static CFieldblock * Create(
-		D3DXVECTOR3		const & pos,								// 位置
-		int				const & nModelId,							// モデル番号
-		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT		// レイヤー
+		D3DXVECTOR3			const & pos,								// 位置
+		int					const & nModelId,							// モデル番号
+		CBaseblock::GRID	const & grid,								// 行列高さの番号
+		CScene::LAYER		const & layer = CScene::LAYER_3DOBJECT		// レイヤー
 	);
 	// 作成(個人管理)
 	//	pos			: 位置
 	//	nModelId	: モデル番号
 	static CFieldblock * Create_Self(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId								// モデル番号
+		D3DXVECTOR3			const & pos,								// 位置
+		int					const & nModelId,							// モデル番号
+		CBaseblock::GRID	const & grid								// 行列高さの番号
 		);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
 	//	pos			: 位置
 	//	nModelId	: モデル番号
 	static std::unique_ptr<CFieldblock> Creat_Unique(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId								// モデル番号
-	);
+		D3DXVECTOR3			const & pos,								// 位置
+		int					const & nModelId,							// モデル番号
+		CBaseblock::GRID	const & grid								// 行列高さの番号
+		);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);

@@ -137,7 +137,6 @@ void CCamera::Debug(void)
 		ImGui::DragFloat("Intertia", &m_fIntertia, 0.01f,0.01f,1.0f);
 		// 回転スピード
 		ImGui::DragFloat2("RotSpeed", m_RotSpeed, 0.01f, 0.03f, 1.0f);
-
 		// 長さ
 		if (ImGui::TreeNode("LENGH&HEIGHT"))
 		{

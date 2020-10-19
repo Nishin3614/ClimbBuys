@@ -41,9 +41,10 @@ CConnect_fieldblock::~CConnect_fieldblock()
 void CConnect_fieldblock::Init()
 {
 	// 変数宣言
-	int nLine = m_vpLoad[m_stage].nFeed - 1;		// 行
-	int nColumn = -(m_vpLoad[m_stage].nFeed - 1);		// 列
-
+	CBaseblock::GRID grid;							// 行列高さの番号
+	grid.nLine = m_vpLoad[m_stage].nFeed - 1;		// 行
+	grid.nColumn = -(m_vpLoad[m_stage].nFeed - 1);	// 列
+	grid.nHeight = 0;								// 高さ
 	// フィールドループ
 	for (size_t nCntField = 0; nCntField < m_vpLoad[m_stage].Dvec_pFileLoad.size(); nCntField++)
 	{
@@ -51,15 +52,15 @@ void CConnect_fieldblock::Init()
 		for (size_t nCntBlock = 0; nCntBlock < m_vpLoad[m_stage].Dvec_pFileLoad[nCntField].size(); nCntBlock++)
 		{
 			if (!m_vpLoad[m_stage].Dvec_pFileLoad[nCntField][nCntBlock].bUse) continue;
-			m_Dvec_pFieldBlock.emplace_back(CFieldblock::Create(D3DXVECTOR3(nColumn * 100.0f, 0.0f, nLine * 100.0f), 2));
+			m_Dvec_pFieldBlock.emplace_back(
+				CFieldblock::Create(D3DXVECTOR3(grid.nColumn * 100.0f, 0.0f, grid.nLine * 100.0f), 2, grid));
 			// 列ダウン
-			nColumn++;
-
+			grid.nColumn++;
 		}
 		// 行アップ
-		nLine--;
+		grid.nLine--;
 		// 列初期化
-		nColumn = -(m_vpLoad[m_stage].nFeed - 1);
+		grid.nColumn = -(m_vpLoad[m_stage].nFeed - 1);
 	}
 }
 
@@ -81,6 +82,14 @@ void CConnect_fieldblock::Uninit(void)
 // 更新処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnect_fieldblock::Update(void)
+{
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックが落ちる処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnect_fieldblock::BlockFall(void)
 {
 
 }

@@ -192,6 +192,7 @@
     <ClCompile Include="cpp&amp;h\light.cpp" />
     <ClCompile Include="cpp&amp;h\main.cpp" />
     <ClCompile Include="cpp&amp;h\manager.cpp" />
+    <ClCompile Include="cpp&amp;h\meshbox.cpp" />
     <ClCompile Include="cpp&amp;h\meshdome.cpp" />
     <ClCompile Include="cpp&amp;h\meshobit.cpp" />
     <ClCompile Include="cpp&amp;h\meshsphere.cpp" />
@@ -212,6 +213,7 @@
     <ClCompile Include="cpp&amp;h\scene_X.cpp" />
     <ClCompile Include="cpp&amp;h\shadow_mapping.cpp" />
     <ClCompile Include="cpp&amp;h\shape.cpp" />
+    <ClCompile Include="cpp&amp;h\signboard.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
     <ClCompile Include="cpp&amp;h\spherecollision.cpp" />
     <ClCompile Include="cpp&amp;h\stand.cpp" />
@@ -265,6 +267,7 @@
     <ClInclude Include="cpp&amp;h\light.h" />
     <ClInclude Include="cpp&amp;h\main.h" />
     <ClInclude Include="cpp&amp;h\manager.h" />
+    <ClInclude Include="cpp&amp;h\meshbox.h" />
     <ClInclude Include="cpp&amp;h\meshdome.h" />
     <ClInclude Include="cpp&amp;h\meshobit.h" />
     <ClInclude Include="cpp&amp;h\meshsphere.h" />
@@ -285,6 +288,7 @@
     <ClInclude Include="cpp&amp;h\scene_X.h" />
     <ClInclude Include="cpp&amp;h\shadow_mapping.h" />
     <ClInclude Include="cpp&amp;h\shape.h" />
+    <ClInclude Include="cpp&amp;h\signboard.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
     <ClInclude Include="cpp&amp;h\spherecollision.h" />
     <ClInclude Include="cpp&amp;h\stand.h" />

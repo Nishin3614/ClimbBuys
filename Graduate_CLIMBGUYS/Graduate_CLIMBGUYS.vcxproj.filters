@@ -273,6 +273,12 @@
     <ClCompile Include="cpp&amp;h\bg.cpp">
       <Filter>Texture_UI</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\signboard.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\meshbox.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -487,6 +493,12 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\bg.h">
       <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\signboard.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\meshbox.h">
+      <Filter>Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

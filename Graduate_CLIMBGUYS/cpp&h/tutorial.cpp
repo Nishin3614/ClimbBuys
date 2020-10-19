@@ -43,6 +43,8 @@
 // ------------------------------------------
 CTutorial::CTutorial()
 {
+	// ステージ決定カウントを設定
+	CStand::SetDeterminationCnt(120);
 }
 
 // ------------------------------------------
@@ -61,7 +63,7 @@ void CTutorial::Init(void)
 	CBaseMode::Init();
 
 	// 床の生成
-	CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,-1);
+	CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
 
 	// 足場の生成
 	CStand::CreateStand_Tutorial();

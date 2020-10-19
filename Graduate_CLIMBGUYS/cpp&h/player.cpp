@@ -12,22 +12,22 @@
 #include "fade.h"
 #include "collision.h"
 #include "game.h"
-#include "score.h"
 #include "XInputPad.h"
 #include "keyboard.h"
-#include "2Dgauge.h"
-#include "rank.h"
 #include "ui_group.h"
 #include "meshdome.h"
 #include "3Dparticle.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define PLAYER_GRAVITY (0.1f)
-#define PLAYER_UPMOVELIMIT		(10.0f)	// プレイヤーの上昇移動量制限
+#define PLAYER_UPMOVELIMIT		(30.0f)	// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
+#define PLAYER_JUMP_POWER		(18.0f)	// プレイヤーのジャンプ力
+#define PLAYER_MOVE				(3.0f)	// プレイヤーの移動速度
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -41,6 +41,7 @@
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
 	m_nCntState = 0;				// ステートカウント
+	m_bDieFlag = false;				// 死亡フラグ
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,6 +85,16 @@ void CPlayer::Update(void)
 	// キャラクター更新
 	CCharacter::Update();
 	CCharacter::Limit();
+
+	// 死亡判定が出たらリザルトに遷移する
+	if (GetDie())
+	{
+		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)
+		{
+			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+		}
+	}
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -197,12 +208,19 @@ void CPlayer::MyMove(void)
 
 	}
 
-	/* ジョイパッド */
+	// 試験的キーボードジャンプ
+	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
+	{
+		move.y += PLAYER_JUMP_POWER;
+		SetJumpAble(false);
+	}
+
+	/* ゲームパッド */
 	// パッド用 //
-	float fValueH, fValueV;	// ゲームパッドのスティック情報の取得用
-	float fMove = 1.0f;			// 移動速度
-	float fAngle;			// スティック角度の計算用変数
-	fAngle = 0.0f;			// 角度
+	float fValueH, fValueV;		// ゲームパッドのスティック情報の取得用
+	float fMove = PLAYER_MOVE;	// 移動速度
+	float fAngle;				// スティック角度の計算用変数
+	fAngle = 0.0f;				// 角度
 
 	if (m_pPad)
 	{
@@ -230,7 +248,50 @@ void CPlayer::MyMove(void)
 			move.x -= sinf(fAngle + fRot) * (fMove);
 			move.z -= cosf(fAngle + fRot) * (fMove);
 		}
+
+		// 試験的ジャンプ ( のちに中身変わる予定 多分 )
+		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
+		{
+			move.y += PLAYER_JUMP_POWER;
+			SetJumpAble(false);
+		}
+
+		// 試験的タックル ( のちに中身変わる予定 多分 )
+		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
+		{
+			switch (CCalculation::CheckPadStick())
+			{
+			case DIRECTION::LEFT:
+				move.x -= 100.0f;
+				break;
+
+			case DIRECTION::RIGHT:
+				move.x += 100.0f;
+				break;
+
+			case DIRECTION::UP:
+				move.z += 100.0f;
+				break;
+
+			case DIRECTION::DOWN:
+				move.z -= 100.0f;
+				break;
+			}
+		}
 	}
+
+	// ジャンプしているときの慣性
+	if (!GetJumpAble())
+	{
+		move.x += ( -m_move.x) * 1.6f;
+		move.z += ( -m_move.z) * 1.6f;
+	}
+	else
+	{
+		move.x += (-m_move.x) * 0.7f;
+		move.z += (-m_move.z) * 0.7f;
+	}
+
 	if (vec.x < 0)
 	{
 		vec.x *= -1;
@@ -320,11 +381,19 @@ void CPlayer::OtherDie(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 {
-	// キャラクター情報取得
-	CCharacter::CHARACTER character = CCharacter::GetCharacter();
-	// 変数宣言
 	// バルーンキャラクターの当たった後の処理
 	CCharacter::Scene_MyCollision(nObjType, pScene);
+
+	// 当たったオブジェクトがブロックだったらジャンプを可能にする
+	if (nObjType == CCollision::OBJTYPE_BLOCK)
+	{
+		SetJumpAble(true);
+	}
+	// 当たったオブジェクトがダメージ床だったら死亡フラグをtrueにする
+	else if (nObjType == CCollision::OBJTYPE_DAMAGEFLOOR)
+	{
+		SetDie(true);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -334,10 +403,7 @@ void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 {
-	// キャラクター情報取得
-	CCharacter::CHARACTER character = CCharacter::GetCharacter();
-
-	// バルーンキャラクターの相手に当てられた後の処理
+	// キャラクターの相手に当てられた後の処理
 	CCharacter::Scene_OpponentCollision(nObjType, pScene);
 
 	// シーン情報がNULLなら
@@ -352,7 +418,6 @@ void CPlayer::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Scene_NoMyCollision(int const & nObjType, CScene * pScene)
 {
-
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -378,7 +443,7 @@ void CPlayer::Debug(void)
 // 生成処理
 //	pos	: 位置
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CPlayer * CPlayer::Create(
+CPlayer * CPlayer::Create(PLAYER_TAG tag,
 	D3DXVECTOR3 const & pos	// 位置
 )
 {
@@ -390,6 +455,8 @@ CPlayer * CPlayer::Create(
 	pPlayer->ManageSetting(CScene::LAYER_CHARACTER);
 	// 位置情報
 	pPlayer->m_pos = pos;
+	// プレイヤータグの設定
+	pPlayer->SetPlayerTag(tag);
 	// 初期化処理
 	pPlayer->Init();
 	// 生成したオブジェクトを返す

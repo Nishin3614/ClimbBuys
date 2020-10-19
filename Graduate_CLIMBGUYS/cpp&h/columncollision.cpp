@@ -90,6 +90,8 @@ void CColumnCollision::Debug(void)
 		m_pDebugdome->SetPos(
 			m_pColumnShape->m_DestPos - D3DXVECTOR3(0.0f, m_pColumnShape->GetVertical() * 0.5f, 0.0f)
 		);
+		// メッシュドームの表示状態設定
+		m_pDebugdome->SetDrawState(CCollision::GetDispCollision());
 	}
 	CCollision::Debug();
 }

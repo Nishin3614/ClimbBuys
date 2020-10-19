@@ -131,6 +131,11 @@ public:
 	void SetMove(D3DXVECTOR3 const &move)					{ m_move = move; };
 	// 回転
 	void SetRot(D3DXVECTOR3 const &rot)						{ m_rot = rot; };
+	// ジャンプできるかどうかのフラグの設定
+	void SetJumpAble(bool const &jump)						{ m_bJumpable = jump; };
+	//  死亡しているかどうかのフラグの設定
+	void SetDie(bool const &die)							{ m_bDie = die; };
+
 	// 方向ベクトル設定
 	void SetDirectionVec(D3DXVECTOR3 const &direct)			{ m_Directvector = direct; };
 	// 取得 //
@@ -140,6 +145,10 @@ public:
 	D3DXVECTOR3 &GetMove(void)								{ return m_move; };
 	// 回転
 	D3DXVECTOR3 &GetRot(void)								{ return m_rot; };
+	// ジャンプできるかどうかのフラグの取得
+	bool		&GetJumpAble(void)							{ return m_bJumpable; };
+	// 死亡しているかどうかのフラグの取得
+	bool		&GetDie(void)								{ return m_bDie; };
 	// 親と子の回転量
 	D3DXVECTOR3 *GetPartsRot(int const nModelID);
 	// 親と子の位置
@@ -178,14 +187,14 @@ public:
 	// キャラクターの静的変数の初期化
 	static void InitStatic(void);
 	// 目標回転量設定
-	void SetRotDest(D3DXVECTOR3 const &rotDest) { m_rotLast = rotDest; };
+	void SetRotDest(D3DXVECTOR3 const &rotDest)		{ m_rotLast = rotDest; };
 	// 目標回転量取得
-	D3DXVECTOR3 GetRotDest(void) const { return m_rotLast; };
+	D3DXVECTOR3 GetRotDest(void) const				{ return m_rotLast; };
 #ifdef _DEBUG
 	virtual void  Debug(void);
 	static void AllDebug(void);
 #endif // _DEBUG
-	CCollision * GetCollision(void) { return m_pCharacterCollision; };
+	CCollision * GetCollision(void)					{ return m_pCharacterCollision; };
 protected:
 	/* 関数 */
 	// 設定 //
@@ -198,7 +207,7 @@ protected:
 	// 重力
 	void FagGravity(void);						// 重力
 	// 透明度の設定
-	static void SetAlpha(float fAlpha) { m_fAlpha = fAlpha; }
+	static void SetAlpha(float fAlpha)				{ m_fAlpha = fAlpha; }
 	// 設定 //
 	// 現在のモーション
 	int GetMotion(void) const						{ return m_nMotiontype; };
@@ -209,15 +218,14 @@ protected:
 	// モーションカメラの更新
 	void MotionCamera(void);
 	/* 変数 */
-	static int						m_nCameraCharacter;		// キャラクターに追尾するID
-	static STATUS					m_sStatus[CHARACTER_MAX];		// キャラクターすべてのスタータス情報
-	D3DXVECTOR3						m_pos;					// 位置
-	D3DXVECTOR3						m_move;					// 移動量
-	D3DXVECTOR3						m_rot;					// 現在回転量
-
+	static int									m_nCameraCharacter;				// キャラクターに追尾するID
+	static STATUS								m_sStatus[CHARACTER_MAX];		// キャラクターすべてのスタータス情報
+	D3DXVECTOR3									m_pos;							// 位置
+	D3DXVECTOR3									m_move;							// 移動量
+	D3DXVECTOR3									m_rot;							// 現在回転量
 	// 仮
-	STATE							m_State;				// 現状のステータス
-	int								m_nCntState;			// カウントステータス
+	STATE										m_State;						// 現状のステータス
+	int											m_nCntState;					// カウントステータス
 
 
 
@@ -234,34 +242,36 @@ private:
 	void Motion_Obit(void);									// モーション軌跡
 	/* 変数 */
 	/* 構造体のスタティックにする */
-	static MODEL_ALL				*m_modelAll[CHARACTER_MAX];				// モデル全体の情報
-	static std::vector<int>			m_modelId[CHARACTER_MAX];				// モデル番号
-	static CModel_info				*m_model_info[CHARACTER_MAX];			// モデル情報
-	static D3DXVECTOR3				m_CharacterSize[CHARACTER_MAX];			// キャラクターのサイズ
-	static int						m_NumModel[CHARACTER_MAX];				// 最大モデル数
-	static int						m_NumParts[CHARACTER_MAX];				// 動かすモデル数
-	static int						m_nAllCharacter;						// 出現しているキャラクター人数
-	static float					m_fAlpha;								// アルファ値
-	CMeshobit						*m_pMeshobit;							// 軌跡
-	CModel 							*m_pModel;								// モデル
-	CHARACTER						m_character;							// キャラクター
-	D3DXMATRIX						m_mtxWorld;								// 行列
-	D3DXVECTOR3						m_posold;								// 前の位置
-	D3DXVECTOR3						m_rotLast;								// 向きたい方向
-	D3DXVECTOR3						m_rotbetween;							// 回転の差分
-	D3DXVECTOR3						m_size;									// キャラクターのサイズ
-	int								m_nMotiontype;							// モーションタイプ
-	int								m_nMotiontypeOld;						// 前回のモーションタイプ
-	int								m_nMaxMotion;							// 最大モーション数
-	int								m_keyinfoCnt;							// キー情報のカウント
-	int								m_nFrame;								// フレームカウント
-	int								m_nMotionFrame;							// 一つのモーションのカウント
-	float							m_fLength;								// 攻撃の当たり範囲
-	D3DXVECTOR3						m_Directvector;							// 方向のベクトル
-	CCollision						*m_pCharacterCollision;					// キャラクターの当たり判定
-	std::vector<std::unique_ptr<CCollision>>	m_vec_AttackCollision;		// 攻撃当たり判定
-	std::vector<std::unique_ptr<CMeshobit>>	m_vec_pMeshObit;				// 奇跡
-	CStencilshadow					* m_pStencilshadow;						// ステンシルシャドウ
+	static MODEL_ALL							*m_modelAll[CHARACTER_MAX];		// モデル全体の情報
+	static std::vector<int>						m_modelId[CHARACTER_MAX];		// モデル番号
+	static CModel_info							*m_model_info[CHARACTER_MAX];	// モデル情報
+	static D3DXVECTOR3							m_CharacterSize[CHARACTER_MAX];	// キャラクターのサイズ
+	static int									m_NumModel[CHARACTER_MAX];		// 最大モデル数
+	static int									m_NumParts[CHARACTER_MAX];		// 動かすモデル数
+	static int									m_nAllCharacter;				// 出現しているキャラクター人数
+	static float								m_fAlpha;						// アルファ値
+	CMeshobit									*m_pMeshobit;					// 軌跡
+	CModel 										*m_pModel;						// モデル
+	CHARACTER									m_character;					// キャラクター
+	D3DXMATRIX									m_mtxWorld;						// 行列
+	D3DXVECTOR3									m_posold;						// 前の位置
+	D3DXVECTOR3									m_rotLast;						// 向きたい方向
+	D3DXVECTOR3									m_rotbetween;					// 回転の差分
+	D3DXVECTOR3									m_size;							// キャラクターのサイズ
+	int											m_nMotiontype;					// モーションタイプ
+	int											m_nMotiontypeOld;				// 前回のモーションタイプ
+	int											m_nMaxMotion;					// 最大モーション数
+	int											m_keyinfoCnt;					// キー情報のカウント
+	int											m_nFrame;						// フレームカウント
+	int											m_nMotionFrame;					// 一つのモーションのカウント
+	float										m_fLength;						// 攻撃の当たり範囲
+	bool										m_bJumpable;					// ジャンプ可能かどうか
+	bool										m_bDie;							// 死亡フラグ
+	D3DXVECTOR3									m_Directvector;					// 方向のベクトル
+	CCollision									* m_pCharacterCollision;		// キャラクターの当たり判定
+	std::vector<std::unique_ptr<CCollision>>	m_vec_AttackCollision;			// 攻撃当たり判定
+	std::vector<std::unique_ptr<CMeshobit>>		m_vec_pMeshObit;				// 奇跡
+	CStencilshadow								* m_pStencilshadow;				// ステンシルシャドウ
 };
 
 #endif

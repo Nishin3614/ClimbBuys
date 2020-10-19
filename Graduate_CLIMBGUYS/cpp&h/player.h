@@ -54,6 +54,9 @@ public:
 	// プレイヤーが死んだときの関数
 	virtual void Die(void);
 	void OtherDie(void);
+	// 死亡フラグの取得
+	bool GetDieFlag(void) { return m_bDieFlag; };
+
 	// 当たった後の処理
 	//	nObjType	: オブジェクトタイプ
 	//	pScene		: 相手のシーン情報
@@ -86,8 +89,10 @@ public:
 	void Debug(void);
 #endif // _DEBUG
 	// 生成処理
+	//	tag	: プレイヤータグ
 	//	pos	: 位置
 	static CPlayer * Create(
+		PLAYER_TAG tag,								// プレイヤータグ
 		D3DXVECTOR3 const & pos = D3DVECTOR3_ZERO	// 位置
 );
 	// リソースの読み込み処理
@@ -107,6 +112,7 @@ private:
 	/* 変数 */
 
 	CXInputPad		*m_pPad;						// パッドのポインタ
+	bool			m_bDieFlag;						// 死亡フラグ
 
 };
 #endif

@@ -22,6 +22,7 @@
 #include "spherecollision.h"
 #include "rectcollision.h"
 #include "columncollision.h"
+#include "stencilshadow.h"
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -42,16 +43,18 @@ std::vector<std::unique_ptr<CScene_X::MODEL_LOAD>>  CScene_X::m_pModelLoad;	// ƒ
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CScene_X::CScene_X() : CScene::CScene()
 {
-	m_pos = D3DVECTOR3_ZERO;	// ˆÊ’uî•ñ
-	m_rot = D3DVECTOR3_ZERO;	// ‰ñ“]î•ñ
-	m_nModelId = 0;				// ƒvƒŒƒCƒ„[(—‹)”Ô†
-	m_fShadowAlpha = 1.0f;		// ‰e‚Ìƒ¿’l
-	m_fModelAlpha = 1.0f;		// ƒvƒŒƒCƒ„[‚Ìƒ¿’l
-	m_bShadowMap = false;		// ƒVƒƒƒhƒEƒ}ƒbƒsƒ“ƒO‚É‚·‚é‚©‚µ‚È‚¢‚©
-	m_pParentMtx = NULL;		// eƒ}ƒgƒŠƒbƒNƒX
-	m_pShadow = NULL;			// ƒVƒƒƒhƒE
-	m_Collision = NULL;			// “–‚½‚è”»’è
-	m_pModelCol = NULL;			// ƒ‚ƒfƒ‹ƒJƒ‰[î•ñ
+	m_pos = D3DVECTOR3_ZERO;				// ˆÊ’uî•ñ
+	m_rot = D3DVECTOR3_ZERO;				// ‰ñ“]î•ñ
+	m_size = D3DXVECTOR3(1.0f, 1.0f, 1.0f);	// ƒTƒCƒYî•ñ
+	m_nModelId = 0;							// ƒvƒŒƒCƒ„[(—‹)”Ô†
+	m_fShadowAlpha = 1.0f;					// ‰e‚Ìƒ¿’l
+	m_fModelAlpha = 1.0f;					// ƒvƒŒƒCƒ„[‚Ìƒ¿’l
+	m_bShadowMap = false;					// ƒVƒƒƒhƒEƒ}ƒbƒsƒ“ƒO‚É‚·‚é‚©‚µ‚È‚¢‚©
+	m_pParentMtx = NULL;					// eƒ}ƒgƒŠƒbƒNƒX
+	m_pShadow = NULL;						// ƒVƒƒƒhƒE
+	m_Collision = NULL;						// “–‚½‚è”»’è
+	m_pModelCol = NULL;						// ƒ‚ƒfƒ‹ƒJƒ‰[î•ñ
+	m_pStencilshadow = NULL;				// ƒXƒeƒ“ƒVƒ‹ƒVƒƒƒhƒE
 	// ƒ[ƒ‹ƒhƒ}ƒgƒŠƒbƒNƒX‚Ì‰Šú‰»
 	D3DXMatrixIdentity(&m_mtxWorld);
 }
@@ -120,6 +123,12 @@ void CScene_X::Uninit(void)
 		delete m_pModelCol;
 		m_pModelCol = NULL;
 	}
+	// ƒXƒeƒ“ƒVƒ‹ƒVƒƒƒhƒE‚Ìƒkƒ‹ƒ`ƒFƒbƒN
+	// ƒXƒeƒ“ƒVƒ‹ƒVƒƒƒhƒE‚Ì‰Šú‰»
+	if (m_pStencilshadow != NULL)
+	{
+		m_pStencilshadow = NULL;
+	}
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -133,6 +142,15 @@ void CScene_X::Update(void)
 	{
 		m_pShadow->SetPos(D3DXVECTOR3(m_pos.x,0.1f,m_pos.z));
 		m_pShadow->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_fShadowAlpha));
+	}
+	// ƒXƒeƒ“ƒVƒ‹ƒVƒƒƒhƒE‚ÌˆÊ’uİ’è
+	if (m_pStencilshadow != NULL)
+	{
+		// ˆÊ’uæ“¾
+		D3DXVECTOR3 pos = m_pos;
+		pos.y = -1000.0f;
+		// ƒXƒeƒ“ƒVƒ‹ƒVƒƒƒhƒE‚ÌˆÊ’uİ’è
+		m_pStencilshadow->SetPos(pos);
 	}
 	// “–‚½‚è”»’è‚ªNULL‚Å‚Í‚È‚¢‚È‚ç
 	// XV
@@ -172,7 +190,6 @@ void CScene_X::Draw(void)
 	D3DXMatrixMultiply(&m_mtxWorld,
 		&m_mtxWorld, &mtxRot);
 
-
 	// ˆÊ’u‚ğ”½‰f //
 	// •½sˆÚ“®s—ñì¬(ƒIƒtƒZƒbƒg)
 	D3DXMatrixTranslation(&mtxTrans,							// ‘‡‚Ì“ü‚ê•¨
@@ -180,10 +197,17 @@ void CScene_X::Draw(void)
 		m_pos.y,
 		m_pos.z);
 
+	// ƒ‚ƒfƒ‹‚ÌŠg‘åk¬
+	D3DXMatrixScaling(&m_mtxWorld,
+		m_size.x,
+		m_size.y,
+		m_size.z);
+
 	// s—ñ‚ÌÏ(1:ƒ[ƒ‹ƒhs—ñ = 2:ƒ[ƒ‹ƒhs—ñ * 3:ˆÚ“®s—ñ)
 	D3DXMatrixMultiply(&m_mtxWorld,	// 1
 		&m_mtxWorld,				// 2
 		&mtxTrans);					// 3
+
 	// eî•ñ‚ğ‚Á‚Ä‚¢‚é‚Æ‚«
 	// ->©•ª‚Ìƒ}ƒgƒŠƒbƒNƒXî•ñ * e‚Ìƒ}ƒgƒŠƒbƒNƒXî•ñ
 	if (m_pParentMtx != NULL)
@@ -196,17 +220,17 @@ void CScene_X::Draw(void)
 	// ƒVƒƒƒhƒEƒ}ƒbƒsƒ“ƒO‚ªƒIƒ“‚È‚ç
 	if (m_bShadowMap)
 	{
-		// ƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ğ—LŒø‚É‚·‚é
-		pDevice->SetRenderState(D3DRS_STENCILREF, 1);
-		pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
-		// ƒXƒeƒ“ƒVƒ‹‘ÎÛ‚ğİ’è
-		pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NOTEQUAL);
-		// ƒXƒeƒ“ƒVƒ‹ƒeƒXƒgAZƒeƒXƒg—¼•û‚Æ‚à‡Ši‚Ìê‡‚Ì”»’è
-		pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
-		// ƒXƒeƒ“ƒVƒ‹ƒeƒXƒg‡ŠiAZƒeƒXƒg•s‡Ši‚Ìê‡‚Ì”»’è
-		pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
-		// ƒXƒeƒ“ƒVƒ‹ƒeƒXƒg•s‡ŠiAZƒeƒXƒg•s‡Ši‚Ìê‡‚Ì”»’è
-		pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+		//// ƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ğ—LŒø‚É‚·‚é
+		//pDevice->SetRenderState(D3DRS_STENCILREF, 1);
+		//pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
+		//// ƒXƒeƒ“ƒVƒ‹‘ÎÛ‚ğİ’è
+		//pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NOTEQUAL);
+		//// ƒXƒeƒ“ƒVƒ‹ƒeƒXƒgAZƒeƒXƒg—¼•û‚Æ‚à‡Ši‚Ìê‡‚Ì”»’è
+		//pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
+		//// ƒXƒeƒ“ƒVƒ‹ƒeƒXƒg‡ŠiAZƒeƒXƒg•s‡Ši‚Ìê‡‚Ì”»’è
+		//pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+		//// ƒXƒeƒ“ƒVƒ‹ƒeƒXƒg•s‡ŠiAZƒeƒXƒg•s‡Ši‚Ìê‡‚Ì”»’è
+		//pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
 		// ƒVƒƒƒhƒEƒ}ƒbƒsƒ“ƒO
 		CShadowmapping::Draw(
 			pDevice,	// ƒfƒoƒCƒXî•ñ
@@ -214,7 +238,7 @@ void CScene_X::Draw(void)
 			m_mtxWorld	// ƒ}ƒgƒŠƒbƒNƒXî•ñ
 		);
 		// ƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ğ—LŒø‚É‚·‚é
-		pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
+		//pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
 	}
 	// ƒ[ƒ‹ƒhƒ}ƒgƒŠƒbƒNƒX‚Ìİ’è
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -245,7 +269,6 @@ void CScene_X::Draw(void)
 		// •`‰æ
 		m_pModelLoad[m_nModelId]->pMesh->DrawSubset(nCntMat);
 	}
-
 	// ƒ}ƒeƒŠƒAƒ‹‚ğƒfƒtƒHƒ‹ƒg‚É–ß‚·
 	pDevice->SetMaterial(&matDef);
 }
@@ -538,8 +561,21 @@ void CScene_X::ModelSetting(MODEL_LOAD * pModel_load)
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ƒXƒeƒ“ƒVƒ‹ƒVƒƒƒhƒE‚Ìİ’è
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CScene_X::SetStencilshadow(bool const & bStencilshadow)
+{
+	// ƒXƒeƒ“ƒVƒ‹ƒVƒƒƒhƒE‚Ì¶¬
+	m_pStencilshadow = CStencilshadow::Create(m_pos, D3DXVECTOR3(10.0f, 10000.0f, 10.0f));
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // “–‚½‚è”»’èİ’è
-// 0:‹éŒ`A1:‹…A2:‰~’Œ
+//	nShapeType	: 0:‹éŒ`A1:‹…A2:‰~’Œ
+//	Obj			: ƒIƒuƒWƒFƒNƒgƒ^ƒCƒv
+//	bPush		: ‰Ÿ‚µo‚µˆ—
+//	pParent		: eî•ñ
+//	Offset_pos	: ƒIƒtƒZƒbƒgˆÊ’u
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CScene_X::SetCollision(
 	int const & nShapeType,
@@ -572,7 +608,8 @@ void CScene_X::SetCollision(
 			this,
 			pParent,
 			bPush,
-			bOpponent
+			bOpponent,
+			&m_pos
 		);
 		// ˆÊ’uî•ñ‚ÌXV(s—ñ“n‚µ)
 		m_Collision->GetShape()->PassMatrix(m_mtxWorld);
@@ -670,43 +707,4 @@ CScene_X::MODEL_LOAD * CScene_X::GetModelLoad(int const & nModelId)
 		return m_pModelLoad[0].get();
 	}
 	return m_pModelLoad[nModelId].get();
-}
-
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ƒXƒNƒŠƒvƒg‚ğ“Ç‚İ‚Ş
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CScene_X::LoadScrept(char* add)
-{
-	FILE *pFile = NULL;											// ƒtƒ@ƒCƒ‹
-	char cReadText[128] = {};									// •¶š
-	char cHeadText[128] = {};									// ”äŠr
-	CScene_X *pObject = NULL;
-
-	pFile = fopen(add, "r");									// ƒtƒ@ƒCƒ‹‚ğŠJ‚­‚Ü‚½‚Íì‚é
-
-	if (pFile != NULL)											// ƒtƒ@ƒCƒ‹‚ª“Ç‚İ‚ß‚½ê‡
-	{
-		fgets(cReadText, sizeof(cReadText), pFile);				// s‚ğ”ò‚Î‚·
-		fgets(cReadText, sizeof(cReadText), pFile);				// s‚ğ”ò‚Î‚·
-		fgets(cReadText, sizeof(cReadText), pFile);				// s‚ğ”ò‚Î‚·
-
-		while (strcmp(cHeadText, "End") != 0)
-		{
-			std::string Data = cReadText;
-			std::vector<std::string> splitData = CCalculation::split(Data, ',');
-
-			pObject = CScene_X::Create(D3DXVECTOR3((float)atof(splitData[LOADTYPE_POS_X].c_str()), (float)atof(splitData[LOADTYPE_POS_Y].c_str()), (float)atof(splitData[LOADTYPE_POS_Z].c_str())),
-									D3DXVECTOR3((float)atof(splitData[LOADTYPE_ROT_X].c_str()), (float)atof(splitData[LOADTYPE_ROT_Y].c_str()), (float)atof(splitData[LOADTYPE_ROT_Z].c_str())),
-									atoi(splitData[LOADTYPE_ADD].c_str()));
-
-			fgets(cReadText, sizeof(cReadText), pFile);									// s‚ğ”ò‚Î‚·
-			sscanf(cReadText, "%s", &cHeadText);
-		}
-
-		fclose(pFile);					// ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚é
-	}
-	else
-	{
-		MessageBox(NULL, "ƒ‚ƒfƒ‹î•ñ‚ÌƒAƒNƒZƒX¸”sI", "WARNING", MB_ICONWARNING);	// ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚Ì¶¬
-	}
 }

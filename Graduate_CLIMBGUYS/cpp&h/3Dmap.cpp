@@ -17,7 +17,6 @@
 #include "meshwall.h"
 #include "scene_X.h"
 #include "scene_three.h"
-#include "solider.h"
 #include "columncollision.h"
 #include "rectcollision.h"
 #include "spherecollision.h"
@@ -96,17 +95,6 @@ HRESULT C3DMap::LoadCreate(MAP const &map)
 			m_vec_obj[map][nCntMap].nModelType,
 			true
 		);
-	}
-	// 敵キャラクターの生成
-	for (nCntMap = 0; nCntMap < (signed)m_vec_char[map].size(); nCntMap++)
-	{
-		// 敵1
-		if (m_vec_char[map][nCntMap].nCharacter == CCharacter::CHARACTER_NPC)
-		{
-				CSolider::Create(m_vec_char[map][nCntMap].pos,
-				m_vec_char[map][nCntMap].rot
-			);
-		}
 	}
 	// ポリゴン
 	for (nCntMap = 0; nCntMap < (signed)m_vec_polygon[map].size(); nCntMap++)

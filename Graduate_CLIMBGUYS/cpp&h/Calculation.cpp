@@ -15,6 +15,7 @@
 #include "renderer.h"
 #include "XInputPad.h"
 #include "keyboard.h"
+#include <random>
 
 // ----------------------------------------------------------------------------------------------------
 // 静的メンバ変数の初期化
@@ -1045,11 +1046,11 @@ std::vector<std::vector<std::string>> CCalculation::FileContens(
 )
 {
 	// 変数宣言
-	std::ifstream				ifs_file;	// ファイル用ストリーム
-	std::string					s_Line;		// 1時的に1行読み込む
+	std::ifstream							ifs_file;	// ファイル用ストリーム
+	std::string								s_Line;		// 1時的に1行読み込む
 	std::vector<std::vector<std::string>>	svec_Char;	// ファイルの中身格納用
 
-										// ファイルを開く
+	// ファイルを開く
 	ifs_file.open(cns_cFile);
 	// 読み込みに失敗したらエラー文を出し関数を抜ける
 	if (ifs_file.fail())
@@ -1169,6 +1170,51 @@ D3DXVECTOR3 CCalculation::RandomVector3(float Max)
 	return Value;
 }
 
+// ----------------------------------------------------------------------------------------------------
+// 範囲の中からランダムに値を求める
+// ----------------------------------------------------------------------------------------------------
+uint64_t CCalculation::GetRandomRange(uint64_t min_value, uint64_t max_value)
+{
+	// メルセンヌ・ツイスター法による擬似乱数生成器を、
+	// ハードウェア乱数をシードにして初期化
+	std::random_device seed_gen;
+	std::mt19937 engine(seed_gen());
+
+	// 乱数生成器
+	static std::mt19937_64 mt64(seed_gen());
+
+	// [min_val, max_val] の一様分布整数 (int) の分布生成器
+	std::uniform_int_distribution<uint64_t> get_rand_uni_int(min_value, max_value);
+
+	// 乱数を生成
+	return get_rand_uni_int(mt64);
+}
+
+// ----------------------------------------------------------------------------------------------------
+// ランダムにカラーを求める
+// α値は1.0f固定
+// ----------------------------------------------------------------------------------------------------
+D3DXCOLOR CCalculation::GetRandomColor(D3DXCOLOR &col)
+{
+	for (int nCol = 0; nCol < 3; nCol++)
+	{
+		if (nCol == 0)
+		{
+			col.r = (0.1f * GetRandomRange(1, 10));
+		}
+		else if (nCol == 1)
+		{
+			col.g = (0.1f * GetRandomRange(1, 10));
+		}
+		else if (nCol == 2)
+		{
+			col.b = (0.1f * GetRandomRange(1, 10));
+		}
+	}
+
+	return col;
+}
+
 //------------------------------------------------------------------------------
 // 回転の計算　360度以内にする
 //------------------------------------------------------------------------------
@@ -1216,14 +1262,24 @@ void CCalculation::SaveLastStickInfo()
 		if (InpudPad[nCnt])
 		{
 			// 上下の入力判定
-			if (fabsf(m_PadStick[nCnt].fLeftStickValue_Y / STICK_MAX_RANGE) > 0.8f)
-			{
-				m_PadStick[nCnt].bLeftStickDown_Y = true;
-			}
-			else
-			{
-				m_PadStick[nCnt].bLeftStickDown_Y = false;
-			}
+			//if (fabsf(m_PadStick[nCnt].fLeftStickValue_Y / STICK_MAX_RANGE) > 0.8f)
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_Y = true;
+			//}
+			//else
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_Y = false;
+			//}
+
+			//if (fabsf(m_PadStick[nCnt].fLeftStickValue_X / STICK_MAX_RANGE) > 0.8f)
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_X = true;
+			//}
+			//else
+			//{
+			//	m_PadStick[nCnt].bLeftStickDown_X = false;
+			//}
+
 			// 左スティックの入力取得
 			InpudPad[nCnt]->GetStickLeft(&m_PadStick[nCnt].fLeftStickValue_X, &m_PadStick[nCnt].fLeftStickValue_Y);
 		}
@@ -1259,6 +1315,19 @@ DIRECTION CCalculation::CheckPadStick()
 				Direction = DIRECTION::DOWN;
 				return Direction;
 			}
+			// 左
+			if (InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_LEFT, 1) || ((m_PadStick[nCnt].fLeftStickValue_X / STICK_MAX_RANGE) < -0.8f && m_PadStick[nCnt].bLeftStickDown_X == false))
+			{
+				Direction = DIRECTION::LEFT;
+				return Direction;
+			}
+			// 右
+			if (InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_RIGHT, 1) || ((m_PadStick[nCnt].fLeftStickValue_X / STICK_MAX_RANGE) >= +0.8f && m_PadStick[nCnt].bLeftStickDown_X == false))
+			{
+				Direction = DIRECTION::RIGHT;
+				return Direction;
+			}
+
 		}
 	}
 	// キーボード
@@ -1274,7 +1343,6 @@ DIRECTION CCalculation::CheckPadStick()
 		Direction = DIRECTION::DOWN;
 		return Direction;
 	}
-
 	return Direction;
 }
 

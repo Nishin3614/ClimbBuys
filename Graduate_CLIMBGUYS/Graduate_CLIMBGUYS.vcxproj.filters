@@ -61,11 +61,11 @@
     <Filter Include="Option">
       <UniqueIdentifier>{dc4912e2-7149-4f5b-9995-a574b70a4a90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Model\Block">
+      <UniqueIdentifier>{00e28d2a-b0ba-4b93-be00-7c7bc84449b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cpp&amp;h\2Dgauge.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -75,19 +75,7 @@
     <ClCompile Include="cpp&amp;h\3Dmap.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\load.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\loadscreen.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\number.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\rank.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\score.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\ImGui\imgui.cpp">
@@ -141,9 +129,6 @@
     <ClCompile Include="cpp&amp;h\result.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\ranking.cpp">
-      <Filter>Mode</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\title.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
@@ -189,12 +174,6 @@
     <ClCompile Include="cpp&amp;h\debugproc.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\lake.cpp">
-      <Filter>Map</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\floor.cpp">
-      <Filter>Map</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\tutorial.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
@@ -231,9 +210,6 @@
     <ClCompile Include="cpp&amp;h\XInputPad.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\solider.cpp">
-      <Filter>Model</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\spherecollision.cpp">
       <Filter>Collision</Filter>
     </ClCompile>
@@ -267,23 +243,38 @@
     <ClCompile Include="cpp&amp;h\shape.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\title_select.cpp">
-      <Filter>Mode</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\character.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\floor.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\damagefloor.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
     <ClCompile Include="cpp&amp;h\baseblock.cpp">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\fieldblock.cpp">
+      <Filter>Model\Block</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\connectblock.cpp">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\connect_fieldblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\normalblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\stand.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\bg.cpp">
+      <Filter>Texture_UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cpp&amp;h\2Dgauge.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -293,19 +284,7 @@
     <ClInclude Include="cpp&amp;h\3Dmap.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\load.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\loadscreen.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\number.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\rank.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\score.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\shape.h">
@@ -365,9 +344,6 @@
     <ClInclude Include="cpp&amp;h\basemode.h">
       <Filter>Mode</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\ranking.h">
-      <Filter>Mode</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\result.h">
       <Filter>Mode</Filter>
     </ClInclude>
@@ -416,12 +392,6 @@
     <ClInclude Include="cpp&amp;h\debugproc.h">
       <Filter>Debug</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\floor.h">
-      <Filter>Map</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\lake.h">
-      <Filter>Map</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\tutorial.h">
       <Filter>Mode</Filter>
     </ClInclude>
@@ -458,9 +428,6 @@
     <ClInclude Include="cpp&amp;h\XInputPad.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\solider.h">
-      <Filter>Model</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\spherecollision.h">
       <Filter>Collision</Filter>
     </ClInclude>
@@ -491,17 +458,35 @@
     <ClInclude Include="cpp&amp;h\Calculation.h">
       <Filter>Option</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\title_select.h">
-      <Filter>Mode</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\character.h">
       <Filter>Model</Filter>
     </ClInclude>
+    <ClInclude Include="cpp&amp;h\floor.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\damagefloor.h">
+      <Filter>Map</Filter>
+    </ClInclude>
     <ClInclude Include="cpp&amp;h\baseblock.h">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\fieldblock.h">
+      <Filter>Model\Block</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\connectblock.h">
-      <Filter>Model</Filter>
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\connect_fieldblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\normalblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\stand.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\bg.h">
+      <Filter>Texture_UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

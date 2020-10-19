@@ -75,6 +75,8 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 	m_State = STATE_NORMAL;							// 現状のステータス
 	m_nCntState = 0;								// カウントステータス
 	m_fLength = 0;									// 攻撃の当たり範囲
+	m_bJumpable = false;							// ジャンプ可能かどうか
+	m_bDie = false;									// 死亡しているかどうか
 	m_fAlpha = 1.0f;								// アルファ値
 	m_Directvector = D3DVECTOR3_ONE;				// 方向ベクトル
 	m_pStencilshadow = NULL;						// ステンシルシャドウ
@@ -315,6 +317,8 @@ void CCharacter::Update_Normal(void)
 {
 	// 移動
 	Move();
+	// 重力
+	FagGravity();
 	// 高さ
 	GetFloorHeight();
 	// モーション
@@ -367,8 +371,8 @@ void CCharacter::Move(void)
 	// 位置情報更新
 	m_pos += m_move;
 	// 抵抗力
-	m_move.x *= m_sStatus[m_character].fMaxInertia;
-	m_move.z *= m_sStatus[m_character].fMaxInertia;
+	//m_move.x *= m_sStatus[m_character].fMaxInertia;
+	//m_move.z *= m_sStatus[m_character].fMaxInertia;
 	// 上限処理
 	Limit();
 
@@ -706,12 +710,16 @@ bool CCharacter::GetFloorHeight(void)
 			{
 				m_pos.y = pFloor->GetHeight(m_pos);
 				m_move.y = 0;
+
+				// ジャンプを可能にする
+				SetJumpAble(true);
 				return true;
 			}
 			// それ以外
 			else
 			{
-
+				// ジャンプを不可能にする
+				SetJumpAble(false);
 			}
 		}
 	}
@@ -751,7 +759,7 @@ int CCharacter::GetCameraCharacter(void)
 void CCharacter::FagGravity(void)
 {
 	// 重力処理
-	//m_move.y -= 1.0f;
+	m_move.y -= CHARACTER_G;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

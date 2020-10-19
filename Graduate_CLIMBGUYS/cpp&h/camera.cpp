@@ -42,12 +42,19 @@ CCamera::CCamera()
 	m_rotDiff = D3DVECTOR3_ZERO;
 	m_rotOrigin = D3DVECTOR3_ZERO;
 	m_type = TYPE_TITLE;
-	m_fLength = 500.0f;
-	m_fHeight = 500.0f;
+	m_fLength = 750.0f;
+	m_fHeight = 1000.0f;
 	m_RotSpeed.x = CAMERA_INIT;				// 回転スピード
 	m_RotSpeed.y = -CAMERA_INIT;			// 回転スピード
 	m_fIntertia = 1.0f;
 	m_bSet = false;
+	// 目的の視点
+	m_posV.x =
+		m_posR.x + sinf(m_rot.y) * m_fLength;
+	m_posV.y =
+		m_posR.y + cosf(m_rot.x) * m_fHeight;
+	m_posV.z =
+		m_posR.z + cosf(m_rot.y) * m_fLength;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,6 +91,8 @@ void CCamera::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Update_Play(void)
 {
+	// カメラ回転の限度設定
+	CCalculation::CalcRotation_XYZ(m_rot);
 	// 目的の視点
 	m_posV.x =
 		m_posR.x + sinf(m_rot.y) * m_fLength;
@@ -129,20 +138,18 @@ void CCamera::Debug(void)
 	{
 		// 注視点位置
 		ImGui::DragFloat3("PosR", m_posR);
-		// 注視点オフセット位置
-		ImGui::DragFloat3("OffsetPosR", m_offset);
 		// 回転
-		ImGui::DragFloat3("ROT", m_rot, 0.01f, -D3DX_PI, D3DX_PI);
+		ImGui::DragFloat3("ROT", m_rot, 0.01f);
 		// 慣性
 		ImGui::DragFloat("Intertia", &m_fIntertia, 0.01f,0.01f,1.0f);
 		// 回転スピード
 		ImGui::DragFloat2("RotSpeed", m_RotSpeed, 0.01f, 0.03f, 1.0f);
-
 		// 長さ
 		if (ImGui::TreeNode("LENGH&HEIGHT"))
 		{
 			ImGui::DragFloat("lengh", &m_fLength);
 			ImGui::DragFloat("height", &m_fHeight);
+			ImGui::Text("PosV(%.3f,%.3f,%.3f)\n", m_posV.x, m_posV.y, m_posV.z);
 			ImGui::TreePop();
 		}
 	}

@@ -21,10 +21,8 @@
 // マクロ関数
 //
 // ------------------------------------------
-#define ONEPLAYER_STAGE		(5)
-#define DOUBLEPLAYER_STAGE	(5)
-#define DERAY_TIME(X)		(X * 60)
-#define MAX_PLAYER			(4)
+#define DERAY_TIME(X)		(X * 60)									// 秒をフレームに変換
+#define FIELD_SIZE			(D3DXVECTOR3(1000.0, 0.0f, 1000.0f))		// フィールドサイズ
 
 // ------------------------------------------
 //
@@ -34,7 +32,6 @@
 class CRenderer;	// レンダラークラス
 class CFade;		// 画面遷移
 class CBaseMode;	// ベースモードクラス
-class CLoadScreen;	// 読み込み画面
 class CKeyboard;	// キーボードクラス
 class CXInputPad;	// ゲームパッドクラス
 class CMouse;		// マウスクラス
@@ -103,8 +100,6 @@ public:
 	static CFade * GetFade(void) { return m_fade; };
 	// モード情報取得
 	static CBaseMode * GetBaseMode(void) { return m_BaseMode; };
-	// 読み込み画面取得
-	static CLoadScreen * GetLoadScreen(void) { return m_pLoadScreen; };
 protected:
 
 private:
@@ -117,7 +112,6 @@ private:
 	static CKeyConfig * m_keyconfig;						// キー詳細
 	static CFade * m_fade;									// 画面遷移
 	static CBaseMode * m_BaseMode;							// 現在のモード
-	static CLoadScreen * m_pLoadScreen;						// 読み込み画面
 	static MODE m_mode;										// モード
 	static bool	m_bWire;									// ワイヤーモード
 };

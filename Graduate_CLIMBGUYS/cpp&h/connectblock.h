@@ -34,6 +34,12 @@ public:
 		SHAPE_RECT = 0,
 		SHAPE_MAX
 	} SHAPE;
+	// フィールドタイプ情報
+	typedef enum
+	{
+		FIELDTYPE_RECT = 0,
+		FIELDTYPE_MAX
+	} FIELDTYPE;
 	/* 構造体 */
 
 	/* 関数 */
@@ -88,6 +94,8 @@ public:
 	static HRESULT Load(void);
 	// 結合ブロック全ソースの開放
 	static void UnLoad(void);
+
+	/* おちてくるブロックの生成 */
 	// 作成(シーン管理)
 	//	pos			: 位置
 	//	shape		: 形情報
@@ -112,6 +120,14 @@ public:
 		D3DXVECTOR3		const & pos,									// 位置
 		SHAPE			const & shape									// 形情報
 	);
+
+	/* フィールド用のブロック生成 */
+	// 作成(シーン管理)
+	//	layer		: レイヤー
+	static CConnectblock * Create_Field(
+		FIELDTYPE		const & fieldtype = FIELDTYPE_RECT,				// フィールドタイプ
+		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT			// レイヤー
+	);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
@@ -123,9 +139,10 @@ private:
 	/* 関数 */
 
 	/* 変数 */
-	std::vector<CBaseblock *> m_vec_pBaseBlock;		// ベースブロック情報
-	D3DXVECTOR3 m_pos;			// 位置
-	D3DXVECTOR3 m_move;			// 移動
+	std::vector<CBaseblock *>				m_vec_pBaseBlock;		// ベースブロック情報
+	D3DXVECTOR3								m_pos;					// 位置
+	D3DXVECTOR3								m_move;					// 移動
+	D3DXCOLOR								m_col;				// まとまりの色情報
 };
 
 #endif

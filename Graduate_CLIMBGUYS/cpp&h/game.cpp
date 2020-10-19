@@ -6,8 +6,6 @@
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "game.h"
 /* 描画 */
-#include "score.h"
-#include "number.h"
 #include "fade.h"
 #include "floor.h"
 #include "player.h"
@@ -26,7 +24,9 @@
 #include "player.h"
 #include "baseblock.h"
 #include "connectblock.h"
-
+#include "connect_fieldblock.h"
+#include "damagefloor.h"
+#include "bg.h"
 /* ポーズ */
 //#include "pause.h"
 
@@ -71,17 +71,24 @@ void CGame::Init(void)
 	/* 作成 */
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
-	// フィールドの生成
-	CFloor::Create(
-		D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-		D3DXVECTOR3(1000.0f, 0.0f, 1000.0f),
-		D3DXCOLOR(1.0f,1.0f,0.0f,1.0f),
-		D3DVECTOR3_ZERO, 10, 10, 0
-	);
-	// プレイヤーの生成
-	CPlayer::Create();
+	// 試験的背景の生成
+	CBg::Create();
+
+	// プレイヤー
+	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	// プレイヤーの生成	試験的
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1,D3DXVECTOR3(0.0,300.0f,0.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
+
 	// 結合されたブロックの生成
 	CConnectblock::Create(D3DVECTOR3_ZERO,CConnectblock::SHAPE_RECT);
+	// 結合されたフィールドブロックの生成
+	CConnect_fieldblock::Create(CConnect_fieldblock::STAGE_1);
+
+	// ダメージ床の生成
+	CDamageFloor::Create();
+
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),
@@ -126,16 +133,18 @@ void CGame::Update(void)
 		}
 	}
 	*/
+
+#ifdef _DEBUG
 	// リザルト遷移
 	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN))
 	{
 		// フェード状態が何も起こっていない状態なら
 		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			//CManager::SetMode(CManager::MODE_RESULT);
+			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
 		}
 	}
-
+#endif
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

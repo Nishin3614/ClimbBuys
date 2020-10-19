@@ -26,9 +26,7 @@
 #include "title.h"
 #include "tutorial.h"
 #include "result.h"
-#include "ranking.h"
 #include "scene_two.h"
-#include "loadscreen.h"
 
 // ----------------------------------------------------------------------------------------------------
 //
@@ -53,7 +51,6 @@ CFade			* CManager::m_fade									= NULL;					// フェード
 CBaseMode		* CManager::m_BaseMode								= NULL;					// ベースモード
 CManager::MODE	CManager::m_mode									= CManager::MODE_TITLE;	// モード
 bool			CManager::m_bWire									= false;				// ワイヤー
-CLoadScreen		* CManager::m_pLoadScreen							= NULL;					// 読み込み画面
 
 // ----------------------------------------------------------------------------------------------------
 // コンストラクタ
@@ -107,9 +104,9 @@ HRESULT CManager::Init(HWND hWnd, BOOL bWindow, HINSTANCE hInstance)
 	{
 		if (!m_pPad[nCnt]->Init(hInstance, hWnd, (PLAYER_TAG)nCnt) == S_OK)
 		{
-			m_pPad[nCnt]->Uninit();
-			delete m_pPad[nCnt];
-			m_pPad[nCnt] = nullptr;
+			//m_pPad[nCnt]->Uninit();
+			//delete m_pPad[nCnt];
+			//m_pPad[nCnt] = nullptr;
 		}
 	}
 	// マウス
@@ -137,13 +134,6 @@ HRESULT CManager::Init(HWND hWnd, BOOL bWindow, HINSTANCE hInstance)
 		m_renderer = NULL;
 		return E_FAIL;
 	}
-
-	// カメラなどの設定
-	// どのプレイヤー番号を追尾するか
-	// ゲームのカメラのアップデートでそれを指定するかも
-
-	// 読み込み画面の生成
-	m_pLoadScreen = CLoadScreen::Create();
 
 	// 画面遷移
 	m_fade = CFade::Create(STARTMODE);
@@ -212,19 +202,12 @@ void CManager::Uninit(void)
 		delete m_fade;
 		m_fade = NULL;
 	}
-	// タイトル
+	// モード全部
 	if (m_BaseMode != NULL)
 	{
 		m_BaseMode->Uninit();
 		delete m_BaseMode;
 		m_BaseMode = NULL;
-	}
-	// 読み込み画面
-	if (m_pLoadScreen != NULL)
-	{
-		m_pLoadScreen->Uninit();
-		delete m_pLoadScreen;
-		m_pLoadScreen = NULL;
 	}
 }
 
@@ -341,13 +324,13 @@ void CManager::SetMode(MODE const &mode)
 		// リザルト
 	case MODE_RESULT:
 		// リザルト生成
-		//m_BaseMode = CResult::Create();
+		m_BaseMode = CResult::Create();
 		// リザルトBGM
 		break;
 		// ランキング
 	case MODE_RANKING:
 		// ゲーム生成
-		m_BaseMode = CRanking::Create();
+		//m_BaseMode = CRanking::Create();
 		// ゲームBGM
 		break;
 	default:

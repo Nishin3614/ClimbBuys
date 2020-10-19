@@ -5,16 +5,19 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "title.h"
+#include "keyboard.h"
+#include "sound.h"
+
 /* 描画 */
 #include "fade.h"
 #include "renderer.h"
-#include "sound.h"
 #include "scene.h"
 #include "manager.h"
 #include "ui.h"
 #include "2Deffect.h"
 #include "3Dparticle.h"
 #include "keyboard.h"
+#include "baseblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -51,6 +54,12 @@ void CTitle::Init(void)
 {
 	// モード初期化
 	CBaseMode::Init();
+
+	// タイトルUIの生成
+	//CUi::LoadCreate(CUi::UITYPE_TILTE);
+
+	// ブロックの生成
+	CBaseblock::CreateInBulkBlock();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,7 +84,7 @@ void CTitle::Update(void)
 		// フェード状態が何も起こっていない状態なら
 		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			CManager::SetMode(CManager::MODE_GAME);
+			CManager::SetMode(CManager::MODE_TUTORIAL);
 		}
 	}
 }

@@ -154,7 +154,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cpp&amp;h\2Deffect.cpp" />
-    <ClCompile Include="cpp&amp;h\2Dgauge.cpp" />
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp" />
     <ClCompile Include="cpp&amp;h\3Deffect.cpp" />
     <ClCompile Include="cpp&amp;h\3Dline.cpp" />
@@ -162,6 +161,7 @@
     <ClCompile Include="cpp&amp;h\3Dparticle.cpp" />
     <ClCompile Include="cpp&amp;h\baseblock.cpp" />
     <ClCompile Include="cpp&amp;h\basemode.cpp" />
+    <ClCompile Include="cpp&amp;h\bg.cpp" />
     <ClCompile Include="cpp&amp;h\Calculation.cpp" />
     <ClCompile Include="cpp&amp;h\camera.cpp" />
     <ClCompile Include="cpp&amp;h\character.cpp" />
@@ -169,11 +169,14 @@
     <ClCompile Include="cpp&amp;h\collision.cpp" />
     <ClCompile Include="cpp&amp;h\columncollision.cpp" />
     <ClCompile Include="cpp&amp;h\connectblock.cpp" />
+    <ClCompile Include="cpp&amp;h\connect_fieldblock.cpp" />
+    <ClCompile Include="cpp&amp;h\damagefloor.cpp" />
     <ClCompile Include="cpp&amp;h\debugcollision.cpp" />
     <ClCompile Include="cpp&amp;h\debugproc.cpp" />
     <ClCompile Include="cpp&amp;h\effect.cpp" />
     <ClCompile Include="cpp&amp;h\enemy.cpp" />
     <ClCompile Include="cpp&amp;h\fade.cpp" />
+    <ClCompile Include="cpp&amp;h\fieldblock.cpp" />
     <ClCompile Include="cpp&amp;h\floor.cpp" />
     <ClCompile Include="cpp&amp;h\game.cpp" />
     <ClCompile Include="cpp&amp;h\ImGui\imgui.cpp" />
@@ -186,10 +189,7 @@
     <ClCompile Include="cpp&amp;h\joypad.cpp" />
     <ClCompile Include="cpp&amp;h\keyboard.cpp" />
     <ClCompile Include="cpp&amp;h\keyconfig.cpp" />
-    <ClCompile Include="cpp&amp;h\lake.cpp" />
     <ClCompile Include="cpp&amp;h\light.cpp" />
-    <ClCompile Include="cpp&amp;h\load.cpp" />
-    <ClCompile Include="cpp&amp;h\loadscreen.cpp" />
     <ClCompile Include="cpp&amp;h\main.cpp" />
     <ClCompile Include="cpp&amp;h\manager.cpp" />
     <ClCompile Include="cpp&amp;h\meshdome.cpp" />
@@ -199,10 +199,9 @@
     <ClCompile Include="cpp&amp;h\model.cpp" />
     <ClCompile Include="cpp&amp;h\model_info.cpp" />
     <ClCompile Include="cpp&amp;h\mouse.cpp" />
+    <ClCompile Include="cpp&amp;h\normalblock.cpp" />
     <ClCompile Include="cpp&amp;h\number.cpp" />
     <ClCompile Include="cpp&amp;h\player.cpp" />
-    <ClCompile Include="cpp&amp;h\rank.cpp" />
-    <ClCompile Include="cpp&amp;h\ranking.cpp" />
     <ClCompile Include="cpp&amp;h\rectcollision.cpp" />
     <ClCompile Include="cpp&amp;h\renderer.cpp" />
     <ClCompile Include="cpp&amp;h\result.cpp" />
@@ -211,16 +210,14 @@
     <ClCompile Include="cpp&amp;h\scene_three.cpp" />
     <ClCompile Include="cpp&amp;h\scene_two.cpp" />
     <ClCompile Include="cpp&amp;h\scene_X.cpp" />
-    <ClCompile Include="cpp&amp;h\score.cpp" />
     <ClCompile Include="cpp&amp;h\shadow_mapping.cpp" />
     <ClCompile Include="cpp&amp;h\shape.cpp" />
-    <ClCompile Include="cpp&amp;h\solider.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
     <ClCompile Include="cpp&amp;h\spherecollision.cpp" />
+    <ClCompile Include="cpp&amp;h\stand.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
     <ClCompile Include="cpp&amp;h\title.cpp" />
-    <ClCompile Include="cpp&amp;h\title_select.cpp" />
     <ClCompile Include="cpp&amp;h\tutorial.cpp" />
     <ClCompile Include="cpp&amp;h\ui.cpp" />
     <ClCompile Include="cpp&amp;h\ui_group.cpp" />
@@ -228,7 +225,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Deffect.h" />
-    <ClInclude Include="cpp&amp;h\2Dgauge.h" />
     <ClInclude Include="cpp&amp;h\2Dpresents.h" />
     <ClInclude Include="cpp&amp;h\3Deffect.h" />
     <ClInclude Include="cpp&amp;h\3Dline.h" />
@@ -236,6 +232,7 @@
     <ClInclude Include="cpp&amp;h\3Dparticle.h" />
     <ClInclude Include="cpp&amp;h\baseblock.h" />
     <ClInclude Include="cpp&amp;h\basemode.h" />
+    <ClInclude Include="cpp&amp;h\bg.h" />
     <ClInclude Include="cpp&amp;h\Calculation.h" />
     <ClInclude Include="cpp&amp;h\camera.h" />
     <ClInclude Include="cpp&amp;h\character.h" />
@@ -243,11 +240,14 @@
     <ClInclude Include="cpp&amp;h\collision.h" />
     <ClInclude Include="cpp&amp;h\columncollision.h" />
     <ClInclude Include="cpp&amp;h\connectblock.h" />
+    <ClInclude Include="cpp&amp;h\connect_fieldblock.h" />
+    <ClInclude Include="cpp&amp;h\damagefloor.h" />
     <ClInclude Include="cpp&amp;h\debugcollision.h" />
     <ClInclude Include="cpp&amp;h\debugproc.h" />
     <ClInclude Include="cpp&amp;h\effect.h" />
     <ClInclude Include="cpp&amp;h\enemy.h" />
     <ClInclude Include="cpp&amp;h\fade.h" />
+    <ClInclude Include="cpp&amp;h\fieldblock.h" />
     <ClInclude Include="cpp&amp;h\floor.h" />
     <ClInclude Include="cpp&amp;h\game.h" />
     <ClInclude Include="cpp&amp;h\ImGui\imconfig.h" />
@@ -262,10 +262,7 @@
     <ClInclude Include="cpp&amp;h\joypad.h" />
     <ClInclude Include="cpp&amp;h\keyboard.h" />
     <ClInclude Include="cpp&amp;h\keyconfig.h" />
-    <ClInclude Include="cpp&amp;h\lake.h" />
     <ClInclude Include="cpp&amp;h\light.h" />
-    <ClInclude Include="cpp&amp;h\load.h" />
-    <ClInclude Include="cpp&amp;h\loadscreen.h" />
     <ClInclude Include="cpp&amp;h\main.h" />
     <ClInclude Include="cpp&amp;h\manager.h" />
     <ClInclude Include="cpp&amp;h\meshdome.h" />
@@ -275,10 +272,9 @@
     <ClInclude Include="cpp&amp;h\model.h" />
     <ClInclude Include="cpp&amp;h\model_info.h" />
     <ClInclude Include="cpp&amp;h\mouse.h" />
+    <ClInclude Include="cpp&amp;h\normalblock.h" />
     <ClInclude Include="cpp&amp;h\number.h" />
     <ClInclude Include="cpp&amp;h\player.h" />
-    <ClInclude Include="cpp&amp;h\rank.h" />
-    <ClInclude Include="cpp&amp;h\ranking.h" />
     <ClInclude Include="cpp&amp;h\rectcollision.h" />
     <ClInclude Include="cpp&amp;h\renderer.h" />
     <ClInclude Include="cpp&amp;h\result.h" />
@@ -287,16 +283,14 @@
     <ClInclude Include="cpp&amp;h\scene_three.h" />
     <ClInclude Include="cpp&amp;h\scene_two.h" />
     <ClInclude Include="cpp&amp;h\scene_X.h" />
-    <ClInclude Include="cpp&amp;h\score.h" />
     <ClInclude Include="cpp&amp;h\shadow_mapping.h" />
     <ClInclude Include="cpp&amp;h\shape.h" />
-    <ClInclude Include="cpp&amp;h\solider.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
     <ClInclude Include="cpp&amp;h\spherecollision.h" />
+    <ClInclude Include="cpp&amp;h\stand.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />
     <ClInclude Include="cpp&amp;h\texture_manager.h" />
     <ClInclude Include="cpp&amp;h\title.h" />
-    <ClInclude Include="cpp&amp;h\title_select.h" />
     <ClInclude Include="cpp&amp;h\tutorial.h" />
     <ClInclude Include="cpp&amp;h\ui.h" />
     <ClInclude Include="cpp&amp;h\ui_group.h" />

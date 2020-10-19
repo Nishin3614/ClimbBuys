@@ -128,13 +128,26 @@ void CScene_TWO::Draw(void)
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
+
 	// テクスチャの設定
 	pDevice->SetTexture(0, CTexture_manager::GetTexture(m_nTexId));
+
+	// Zテストを無効にする
+	pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_FALSE);
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
 	// ポリゴン描画
 	pDevice->DrawPrimitive(
 		D3DPT_TRIANGLESTRIP,
 		0,
 		2);
+
+	// Zテストを通常に戻す
+	pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_TRUE);
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
 }
 
 #ifdef _DEBUG

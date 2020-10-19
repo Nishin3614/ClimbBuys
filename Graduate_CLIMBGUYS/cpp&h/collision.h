@@ -60,16 +60,12 @@ public:
 	typedef enum
 	{
 		OBJTYPE_ACTOR = 0,			// オブジェクト_ACTOR
+		OBJTYPE_BLOCK,				// オブジェクト_ブロック
+		OBJTYPE_FIELDBLOCK,			// オブジェクト_フィールドブロック
+		OBJTYPE_ATTACK,				// オブジェクト_攻撃
 		OBJTYPE_PLAYER,				// オブジェクト_プレイヤー
 		OBJTYPE_ENEMY,				// オブジェクト_敵
-		OBJTYPE_FISH,				// オブジェクト_魚
-		OBJTYPE_PLAYER_BALLOON,		// オブジェクト_プレイヤーバルーン
-		OBJTYPE_ENEMY_BALLOON,		// オブジェクト_敵バルーン
-		OBJTYPE_ATTACK,				// オブジェクト_攻撃
-		OBJTYPE_ITEM,				// オブジェクト_アイテム
-		OBJTYPE_APPEFISH1,			// オブジェクト_魚出現ポイント1
-		OBJTYPE_APPEFISH2,			// オブジェクト_魚出現ポイント2
-		OBJTYPE_APPEFISH3,			// オブジェクト_魚出現ポイント3
+		OBJTYPE_DAMAGEFLOOR,		// オブジェクト_ダメージ床
 		OBJTYPE_MAX					// オブジェクト_最大数
 	} OBJTYPE;
 	/* 関数 */
@@ -208,6 +204,13 @@ public:
 		CColumnShape * const pColumnShapeA,	// 円柱A
 		CColumnShape * const pColumnShapeB	// 円柱B
 	);
+#ifdef _DEBUG
+	// 当たり判定の可視状態を取得
+	static bool &GetDispCollision(void) { return m_bDispCollision; };
+	// 当たり判定の可視状態を設定
+	static void SetDispCollision(bool const & bDispCollision) { m_bDispCollision = bDispCollision; };
+#endif
+
 protected:
 
 private:
@@ -221,7 +224,8 @@ private:
 
 
 #ifdef _DEBUG
-	static int nCollisionTime;
+	static int nCollisionTime;				// 当たり判定カウント
+	static bool m_bDispCollision;			// 当たり判定の可視状態
 #endif
 };
 

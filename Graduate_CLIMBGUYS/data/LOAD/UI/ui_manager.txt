@@ -1,1 +1,2 @@
-data/LOAD/UI/title_ui_name.txt
+data/LOAD/UI/Title.txt
+data/LOAD/UI/Result.txt

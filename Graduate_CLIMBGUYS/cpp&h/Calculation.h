@@ -39,6 +39,10 @@
 #define D3DXCOLOR_CA(col,alpha)	D3DXCOLOR(col,col,col,alpha)
 // ファイル読み込み最大行数
 #define FILELINE_ERROW (1048576)
+// 画面のサイズ
+#define SCREEN_SIZE				(D3DXVECTOR2(SCREEN_WIDTH, SCREEN_HEIGHT))
+// 画面中央の座標
+#define SCREEN_CENTER_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f , SCREEN_HEIGHT * 0.5f ,0.0f))
 
 /* テキスト用 */
 // 改行

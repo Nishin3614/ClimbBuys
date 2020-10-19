@@ -42,7 +42,6 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
 	m_nCntState = 0;				// ステートカウント
 	m_bDieFlag = false;				// 死亡フラグ
-	m_bLanding = false;				// 着地しているかのフラグ
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -212,7 +211,6 @@ void CPlayer::MyMove(void)
 	// 試験的キーボードジャンプ
 	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
 	{
-		m_bLanding = true;	// 地面から離れている
 		move.y += PLAYER_JUMP_POWER;
 		SetJumpAble(false);
 	}
@@ -254,7 +252,6 @@ void CPlayer::MyMove(void)
 		// 試験的ジャンプ ( のちに中身変わる予定 多分 )
 		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
 		{
-			m_bLanding = true;	// 地面から離れている
 			move.y += PLAYER_JUMP_POWER;
 			SetJumpAble(false);
 		}
@@ -282,6 +279,19 @@ void CPlayer::MyMove(void)
 			}
 		}
 	}
+
+	// ジャンプしているときの慣性
+	if (!GetJumpAble())
+	{
+		move.x += ( -m_move.x) * 1.6f;
+		move.z += ( -m_move.z) * 1.6f;
+	}
+	else
+	{
+		move.x += (-m_move.x) * 0.7f;
+		move.z += (-m_move.z) * 0.7f;
+	}
+
 	if (vec.x < 0)
 	{
 		vec.x *= -1;

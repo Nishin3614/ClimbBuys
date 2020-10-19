@@ -161,6 +161,7 @@
     <ClCompile Include="cpp&amp;h\3Dparticle.cpp" />
     <ClCompile Include="cpp&amp;h\baseblock.cpp" />
     <ClCompile Include="cpp&amp;h\basemode.cpp" />
+    <ClCompile Include="cpp&amp;h\bg.cpp" />
     <ClCompile Include="cpp&amp;h\Calculation.cpp" />
     <ClCompile Include="cpp&amp;h\camera.cpp" />
     <ClCompile Include="cpp&amp;h\character.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="cpp&amp;h\3Dparticle.h" />
     <ClInclude Include="cpp&amp;h\baseblock.h" />
     <ClInclude Include="cpp&amp;h\basemode.h" />
+    <ClInclude Include="cpp&amp;h\bg.h" />
     <ClInclude Include="cpp&amp;h\Calculation.h" />
     <ClInclude Include="cpp&amp;h\camera.h" />
     <ClInclude Include="cpp&amp;h\character.h" />

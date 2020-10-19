@@ -35,6 +35,7 @@ public:
 	typedef enum
 	{
 		LAYER_WORLD = 0,
+		LAYER_BG,
 		LAYER_3DOBJECT,
 		LAYER_3DSHADOW,
 		LAYER_SELECTCHARACTER,

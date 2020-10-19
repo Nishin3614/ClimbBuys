@@ -270,6 +270,9 @@
     <ClCompile Include="cpp&amp;h\stand.cpp">
       <Filter>Map</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\bg.cpp">
+      <Filter>Texture_UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -481,6 +484,9 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\stand.h">
       <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\bg.h">
+      <Filter>Texture_UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,6 +15,7 @@
 #include "renderer.h"
 #include "XInputPad.h"
 #include "keyboard.h"
+#include <random>
 
 // ----------------------------------------------------------------------------------------------------
 // 静的メンバ変数の初期化
@@ -1167,6 +1168,51 @@ D3DXVECTOR3 CCalculation::RandomVector3(float Max)
 	//Value.z = Random(Max);
 
 	return Value;
+}
+
+// ----------------------------------------------------------------------------------------------------
+// 範囲の中からランダムに値を求める
+// ----------------------------------------------------------------------------------------------------
+uint64_t CCalculation::GetRandomRange(uint64_t min_value, uint64_t max_value)
+{
+	// メルセンヌ・ツイスター法による擬似乱数生成器を、
+	// ハードウェア乱数をシードにして初期化
+	std::random_device seed_gen;
+	std::mt19937 engine(seed_gen());
+
+	// 乱数生成器
+	static std::mt19937_64 mt64(seed_gen());
+
+	// [min_val, max_val] の一様分布整数 (int) の分布生成器
+	std::uniform_int_distribution<uint64_t> get_rand_uni_int(min_value, max_value);
+
+	// 乱数を生成
+	return get_rand_uni_int(mt64);
+}
+
+// ----------------------------------------------------------------------------------------------------
+// ランダムにカラーを求める
+// α値は1.0f固定
+// ----------------------------------------------------------------------------------------------------
+D3DXCOLOR CCalculation::GetRandomColor(D3DXCOLOR &col)
+{
+	for (int nCol = 0; nCol < 3; nCol++)
+	{
+		if (nCol == 0)
+		{
+			col.r = (0.1f * GetRandomRange(1, 10));
+		}
+		else if (nCol == 1)
+		{
+			col.g = (0.1f * GetRandomRange(1, 10));
+		}
+		else if (nCol == 2)
+		{
+			col.b = (0.1f * GetRandomRange(1, 10));
+		}
+	}
+
+	return col;
 }
 
 //------------------------------------------------------------------------------

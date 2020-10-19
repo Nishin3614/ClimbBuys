@@ -132,6 +132,8 @@ CFieldblock * CFieldblock::Create(
 	pFieldblock->SetPos(pos);			// 位置
 	pFieldblock->SetModelId(nModelId);	// モデル番号
 	pFieldblock->SetGrid(grid);			// 行列高さの番号
+	pFieldblock->SetModelColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
 	// 初期化処理
 	pFieldblock->Init();
 	// 生成したオブジェクトを返す

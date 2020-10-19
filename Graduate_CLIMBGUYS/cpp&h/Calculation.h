@@ -556,7 +556,7 @@ public:
 		D3DXVECTOR3 & pOut_Vec_A,		// 球Aの反射後の速度ベクトル
 		D3DXVECTOR3 & pOut_Vec_B		// 球Bの反射後の速度ベクトル
 	);
-
+	
 	// メッセージ発生
 	static void Messanger(
 		const char * cMessa,	// メッセージ内容
@@ -602,6 +602,10 @@ public:
 	static float Random(float fInputValue);
 	// ランダムなvector3型で値を返す
 	static D3DXVECTOR3 RandomVector3(float Max);
+	// 範囲の中からランダムに値を求める
+	static uint64_t GetRandomRange(uint64_t min_value, uint64_t max_value);
+	// ランダムにカラーを求める
+	static D3DXCOLOR GetRandomColor(D3DXCOLOR &col);
 	// 回転を360度以内にする計算
 	static void CalcRotation(float &fRot);
 	// 回転を360度以内にする計算

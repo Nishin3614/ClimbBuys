@@ -45,6 +45,7 @@ void CConnect_fieldblock::Init()
 	grid.nLine = m_vpLoad[m_stage].nFeed - 1;		// 行
 	grid.nColumn = -(m_vpLoad[m_stage].nFeed - 1);	// 列
 	grid.nHeight = 0;								// 高さ
+
 	// フィールドループ
 	for (size_t nCntField = 0; nCntField < m_vpLoad[m_stage].Dvec_pFileLoad.size(); nCntField++)
 	{

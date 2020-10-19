@@ -20,8 +20,9 @@
 // 前方宣言
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CCollision;	// 当たり判定クラス
-class CScene_THREE;	// シーン3Dクラス
+class CCollision;		// 当たり判定クラス
+class CScene_THREE;		// シーン3Dクラス
+class CStencilshadow;	// ステンシルシャドウクラス
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -59,18 +60,6 @@ public:
 		D3DXVECTOR3			vtxMaxMaterials;			// モデル情報の位置の最大値
 		D3DXVECTOR3			size;						// サイズ
 	} MODEL_LOAD;
-	// 列挙体定義
-	typedef enum
-	{
-		LOADTYPE_ADD = 0,
-		LOADTYPE_POS_X,
-		LOADTYPE_POS_Y,
-		LOADTYPE_POS_Z,
-		LOADTYPE_ROT_X,
-		LOADTYPE_ROT_Y,
-		LOADTYPE_ROT_Z,
-		LOADTYPE_MAX
-	} LOADTYPE;
 
 	/* 関数 */
 	// コンストラクタ
@@ -167,36 +156,39 @@ public:
 	static HRESULT UnLoadModel(void);
 	// 設定
 	// 位置設定
-	void SetPos(D3DXVECTOR3 const &pos) { m_pos = pos; };
+	void SetPos(D3DXVECTOR3 const &pos)			{ m_pos = pos; };
 	// 回転設定
-	void SetRot(D3DXVECTOR3 const &rot) { m_rot = rot; };
+	void SetRot(D3DXVECTOR3 const &rot)			{ m_rot = rot; };
 	// サイズ設定
-	void SetSize(D3DXVECTOR3 const &size) { m_size = size; };
+	void SetSize(D3DXVECTOR3 const &size)		{ m_size = size; };
 	// モデル番号設定
-	void SetModelId(int const &nModelId) { m_nModelId = nModelId; };
+	void SetModelId(int const &nModelId)		{ m_nModelId = nModelId; };
 	// シャドウマッピング設定
-	void SetShadowMap(bool const &bShadow) { m_bShadowMap = bShadow; };
+	void SetShadowMap(bool const &bShadow)		{ m_bShadowMap = bShadow; };
 	// 親の行列設定
-	void SetParentMtx(D3DXMATRIX * ParentMax) { m_pParentMtx = ParentMax; };
+	void SetParentMtx(D3DXMATRIX * ParentMax)	{ m_pParentMtx = ParentMax; };
 	// モデルのα値設定
-	void SetModelAlpha(float fModelAlpha) { m_fModelAlpha = fModelAlpha; };
+	void SetModelAlpha(float fModelAlpha)		{ m_fModelAlpha = fModelAlpha; };
+	// ステンシルシャドウ設定
+	void SetStencilshadow(bool const &bStencilshadow);
 	// 当たり判定設定
 	//	nShapeType	: 0:矩形、1:球、2:円柱
-	//	obj			: オブジェクトタイプ
+	//	Obj			: オブジェクトタイプ
 	//	bPush		: 押し出し処理
 	//	pParent		: 親情報
+	//	Offset_pos	: オフセット位置
 	void SetCollision(
 		int const &nShapeType,
-		int const &obj,
+		int const &Obj,
 		bool const &bPush = false,
 		bool const &bOpponent = false,
 		CScene * pParent = NULL,
-		D3DXVECTOR3 const &offset_pos = D3DVECTOR3_ZERO
+		D3DXVECTOR3 const &Offset_pos = D3DVECTOR3_ZERO
 	);									// 当たり判定設定
 	// モデルカラー情報の設定
 	//	col	: カラー
 	void SetModelColor(
-		D3DXCOLOR const &col	// カラー
+		D3DXCOLOR const &Col	// カラー
 	);
 	// 取得
 	// モデル情報取得
@@ -210,32 +202,31 @@ public:
 	// 行列取得
 	D3DXMATRIX &GetMatrix(void) { return m_mtxWorld; };
 	// 当たり判定状態取得
-	bool const GetbCollision(void);												// 当たり判定状態
+	bool const GetbCollision(void);
 	// 当たり判定の情報を取得
 	CCollision * GetCollision(void);
 	// モデル情報の取得
 	static MODEL_LOAD * GetModelLoad(int const &nModelId);
-	// スクリプトの読み込み
-	static void LoadScrept(char* add);
 protected:
 private:
 	/* 関数 */
 	// モデル設定
 	static void ModelSetting(MODEL_LOAD * pModel_load);
 	/* 変数 */
-	static std::vector<std::unique_ptr<MODEL_LOAD>> m_pModelLoad;	// モデル情報の読み込み用
-	D3DXVECTOR3		m_pos;											// 位置情報
-	D3DXVECTOR3		m_rot;											// 回転情報
-	D3DXVECTOR3		m_size;											// サイズ情報
-	D3DXMATRIX		*m_pParentMtx;									// 親マトリックス
-	D3DXMATRIX		m_mtxWorld;										// ワールドマトリックス
-	int				m_nModelId;										// モデル番号
-	bool			m_bShadowMap;									// シャドウマッピングにするかしないか
-	float			m_fShadowAlpha;									// 影のα値
-	float			m_fModelAlpha;									// モデルのアルファ値
-	D3DXCOLOR *		m_pModelCol;									// モデルカラー情報
-	CScene_THREE *	m_pShadow;										// まる影
-	CCollision		*m_Collision;									// 当たり判定
+	static std::vector<std::unique_ptr<MODEL_LOAD>> m_pModelLoad;		// モデル情報の読み込み用
+	D3DXVECTOR3										m_pos;				// 位置情報
+	D3DXVECTOR3										m_rot;				// 回転情報
+	D3DXVECTOR3										m_size;				// サイズ情報
+	D3DXMATRIX										*m_pParentMtx;		// 親マトリックス
+	D3DXMATRIX										m_mtxWorld;			// ワールドマトリックス
+	int												m_nModelId;			// モデル番号
+	bool											m_bShadowMap;		// シャドウマッピングにするかしないか
+	float											m_fShadowAlpha;		// 影のα値
+	float											m_fModelAlpha;		// モデルのアルファ値
+	D3DXCOLOR										* m_pModelCol;		// モデルカラー情報
+	CScene_THREE									* m_pShadow;		// まる影
+	CCollision										* m_Collision;		// 当たり判定
+	CStencilshadow									* m_pStencilshadow;	// ステンシルシャドウ
 };
 
 #endif

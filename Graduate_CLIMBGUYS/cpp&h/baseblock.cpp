@@ -44,6 +44,8 @@ void CBaseblock::Init()
 {
 	// シーンXの初期化処理
 	CScene_X::Init();
+	// ステンシルシャドウの設定
+	CScene_X::SetStencilshadow(true);
 	if (m_type == TYPE_FIELD)
 	{
 		// 当たり判定の設定

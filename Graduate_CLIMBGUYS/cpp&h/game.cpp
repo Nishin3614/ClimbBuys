@@ -26,6 +26,7 @@
 #include "connectblock.h"
 #include "connect_fieldblock.h"
 #include "damagefloor.h"
+#include "bg.h"
 /* ポーズ */
 //#include "pause.h"
 
@@ -70,7 +71,10 @@ void CGame::Init(void)
 	/* 作成 */
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
+	// 試験的背景の生成
+	//CBg::Create();
 
+	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 	// プレイヤーの生成	試験的

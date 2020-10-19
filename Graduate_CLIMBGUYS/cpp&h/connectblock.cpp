@@ -27,6 +27,10 @@ CConnectblock::CConnectblock() : CScene::CScene()
 {
 	m_pos = D3DVECTOR3_ZERO;
 	m_move = D3DVECTOR3_ZERO;
+	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// ÉâÉìÉ_ÉÄÇ…êFèÓïÒÇê›íË
+	CCalculation::GetRandomColor(m_col);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,6 +51,11 @@ void CConnectblock::Init()
 	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 700.0f, 0.0f), 2));
 	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(-100.0f, 500.0f, 0.0f), 2));
 	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(-200.0f, 500.0f, 0.0f), 2));
+
+	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
+	{
+		m_vec_pBaseBlock[nCntBlock]->SetModelColor(m_col);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

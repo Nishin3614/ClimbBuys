@@ -5,6 +5,15 @@
 //
 // ------------------------------------------
 #include "tutorial.h"
+#include "manager.h"
+#include "keyboard.h"
+#include "camera.h"
+#include "sound.h"
+#include "scene.h"
+#include "collision.h"
+
+/* 描画 */
+#include "fade.h"
 #include "character.h"
 #include "3Deffect.h"
 #include "floor.h"
@@ -15,16 +24,7 @@
 #include "player.h"
 #include "ui_group.h"
 #include "3Dmap.h"
-#include "camera.h"
-#include "sound.h"
-#include "scene.h"
-#include "manager.h"
-#include "keyboard.h"
-
-/* 描画 */
-#include "fade.h"
-
-
+#include "stand.h"
 
 // ------------------------------------------
 //
@@ -59,6 +59,19 @@ void CTutorial::Init(void)
 {
 	// モード初期化
 	CBaseMode::Init();
+
+	// 床の生成
+	CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,-1);
+
+	// 足場の生成
+	CStand::CreateStand_Tutorial();
+
+	// プレイヤーの生成
+	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	// プレイヤーの生成	試験的
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(0.0, 300.0f, 0.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
 }
 
 // ------------------------------------------
@@ -88,6 +101,7 @@ void CTutorial::Update(void)
 
 
 #endif // _DEBUG
+	CCollision::CollisionDetection();
 
 	// モード更新
 	CBaseMode::Update();

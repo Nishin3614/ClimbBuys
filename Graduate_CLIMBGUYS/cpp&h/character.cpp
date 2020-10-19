@@ -371,8 +371,8 @@ void CCharacter::Move(void)
 	// ˆÊ’uî•ñXV
 	m_pos += m_move;
 	// ’ïR—Í
-	m_move.x *= m_sStatus[m_character].fMaxInertia;
-	m_move.z *= m_sStatus[m_character].fMaxInertia;
+	//m_move.x *= m_sStatus[m_character].fMaxInertia;
+	//m_move.z *= m_sStatus[m_character].fMaxInertia;
 	// ãŒÀˆ—
 	Limit();
 

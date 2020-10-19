@@ -27,13 +27,15 @@ class CStand : public CScene_X
 {
 public:
 	/* 列挙型 */
-	// ベースブロック
+
+	// ブロックの種類
 	typedef enum
 	{
-		TYPE_BLOCK_S = 0,	// チュートリアルで使うブロックS
-		TYPE_BLOCK_M,		// チュートリアルで使うブロックM
-		TYPE_BLOCK_L,		// チュートリアルで使うブロックL
-		TYPE_MAX,			// タイプ全体数
+		TYPE_BLOCK_NORMAL = 0,	// ただの足場ブロック
+		TYPE_BLOCK_MAP1,		// マップ1に移動するための足場ブロック
+		TYPE_BLOCK_MAP2,		// マップ2に移動するための足場ブロック
+		TYPE_BLOCK_MAP3,		// マップ3に移動するための足場ブロック
+		TYPE_MAX,				// タイプ全体数
 	} TYPE;
 
 	/* 構造体 */
@@ -91,6 +93,12 @@ public:
 	void SetFall(bool const & bFall) { m_bFall = bFall; };
 	// 落ちる状態取得
 	bool & GetFall(void) { return m_bFall; };
+
+	// ステージ決定設定
+	static void SetDeterminationCnt(int nCnt) { m_nDeterminationCnt = nCnt; };
+	// ステージ決定取得
+	static int &GetDeterminationCnt(void) { return m_nDeterminationCnt; };
+
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
@@ -102,6 +110,8 @@ private:
 	/* 関数 */
 
 	/* 変数 */
+	static int		m_nDeterminationCnt;	// ステージ決定までのカウント
+
 	TYPE	m_type;		// ベースブロック
 	bool	m_bFall;	// 落ちる状態
 };

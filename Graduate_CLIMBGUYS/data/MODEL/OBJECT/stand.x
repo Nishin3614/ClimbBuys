@@ -172,10 +172,13 @@ Mesh {
   0,
   0;;
   Material {
-   1.000000;1.000000;1.000000;1.000000;;
-   0.000000;
+   0.800000;0.800000;0.800000;1.000000;;
+   5.000000;
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
+   TextureFilename {
+    "C:\\Users\\game317\\Desktop\\ClimbBuys\\Graduate_CLIMBGUYS\\data\\TEXTURE\\UI\\Tutorial\\wood.jpg";
+   }
   }
  }
  MeshNormals {

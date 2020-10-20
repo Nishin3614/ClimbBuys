@@ -58,5 +58,6 @@ public:
 //#endif // _DEBUG
 protected:
 private:
+	int	m_nDeterminationCnt;
 };
 #endif

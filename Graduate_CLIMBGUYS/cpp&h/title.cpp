@@ -56,7 +56,7 @@ void CTitle::Init(void)
 	CBaseMode::Init();
 
 	// タイトルUIの生成
-	//CUi::LoadCreate(CUi::UITYPE_TILTE);
+	CUi::LoadCreate(CUi::UITYPE_TILTE);
 
 	// ブロックの生成
 	CBaseblock::CreateInBulkBlock();

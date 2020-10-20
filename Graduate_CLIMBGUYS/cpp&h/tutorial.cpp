@@ -25,6 +25,7 @@
 #include "ui_group.h"
 #include "3Dmap.h"
 #include "stand.h"
+#include "debugproc.h"
 
 // ------------------------------------------
 //
@@ -43,6 +44,8 @@
 // ------------------------------------------
 CTutorial::CTutorial()
 {
+	// ステージ決定カウントを設定
+	m_nDeterminationCnt = 120;
 }
 
 // ------------------------------------------
@@ -61,7 +64,7 @@ void CTutorial::Init(void)
 	CBaseMode::Init();
 
 	// 床の生成
-	CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,-1);
+	CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
 
 	// 足場の生成
 	CStand::CreateStand_Tutorial();
@@ -99,8 +102,28 @@ void CTutorial::Update(void)
 		}
 	}
 
-
+	CDebugproc::Print("チュートリアルカウント < %d\n" ,m_nDeterminationCnt);
 #endif // _DEBUG
+
+	// カウントが0以下になったらゲームに移動
+	if (m_nDeterminationCnt <= 0)
+	{
+		m_nDeterminationCnt = 0;
+		// フェード状態が何も起こっていない状態なら
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		{
+			CManager::GetFade()->SetFade(CManager::MODE_GAME);
+		}
+	}
+
+	if (CStand::GetDetermination() && m_nDeterminationCnt >= 0)
+	{
+		m_nDeterminationCnt--;
+	}
+	else
+	{
+		m_nDeterminationCnt = 120;
+	}
 
 	// モード更新
 	CBaseMode::Update();

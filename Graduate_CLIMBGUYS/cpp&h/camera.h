@@ -119,6 +119,8 @@ protected:
 private:
 	/* 関数 */
 	void Update_Play(void);						// プレイ時のカメラ
+	// 初期時のカメラ設定
+	void InitCamera(void);
 	/* 変数 */
 	static	LOAD	m_load[TYPE_MAX];			// 情報保存
 	D3DXVECTOR3		m_posV;						// 視点

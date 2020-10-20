@@ -170,7 +170,7 @@ public:
 	// モデルのα値設定
 	void SetModelAlpha(float fModelAlpha)		{ m_fModelAlpha = fModelAlpha; };
 	// ステンシルシャドウ設定
-	void SetStencilshadow(bool const &bStencilshadow);
+	void SetStencilshadow(void);
 	// 当たり判定設定
 	//	nShapeType	: 0:矩形、1:球、2:円柱
 	//	Obj			: オブジェクトタイプ

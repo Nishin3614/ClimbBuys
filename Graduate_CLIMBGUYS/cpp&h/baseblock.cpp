@@ -45,7 +45,7 @@ void CBaseblock::Init()
 	// シーンXの初期化処理
 	CScene_X::Init();
 	// ステンシルシャドウの設定
-	CScene_X::SetStencilshadow(true);
+	CScene_X::SetStencilshadow();
 	if (m_type == TYPE_FIELD)
 	{
 		// 当たり判定の設定
@@ -334,17 +334,8 @@ void CBaseblock::CreateInBulkBlock()
 	{
 		// 変数宣言
 		CBaseblock * pBaseblock;		// シーン2Dクラス
-										// メモリの生成(初め->基本クラス,後->派生クラス)
-		pBaseblock = new CBaseblock();
-		// 設定
-		// シーン管理設定
-		pBaseblock->ManageSetting(LAYER_3DOBJECT);				// レイヤーの番号
-
-		pBaseblock->SetModelId(2);								// モデルのid
-
-		pBaseblock->SetPos(BlockPos[nBlockCnt]);				// 位置
+		pBaseblock = Create(BlockPos[nBlockCnt], 2);
 		pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
-		pBaseblock->Init();										// 初期化処理
 	}
 }
 

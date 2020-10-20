@@ -48,6 +48,7 @@ public:
 protected:
 private:
 	/* ŠÖ” */
+	void ComparisonHeight();							// ‚‚³‚ğ”äŠr
 	/* •Ï” */
 };
 #endif

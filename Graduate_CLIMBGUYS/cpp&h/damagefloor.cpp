@@ -72,24 +72,8 @@ void CDamageFloor::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::Update(void)
 {
-	//通常アイテムの総数分
-	for (size_t nCnt = 0; nCnt < 2; nCnt++)
-	{
-		CPlayer *pPlayer = (CPlayer*)CScene::GetScene(LAYER_CHARACTER, nCnt);
-		if (pPlayer != nullptr)
-		{
-			//
-			if (this->GetPos().y >= pPlayer->GetPos().y)
-			{
-				pPlayer->SetDie(true);
-			}
-			pPlayer = nullptr;
-		}
-	}
-
-
-
-
+	// 高さを比較
+	ComparisonHeight();
 
 	CScene_THREE::Update();
 }
@@ -137,4 +121,26 @@ HRESULT CDamageFloor::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::UnLoad(void)
 {
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 高さを比較
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CDamageFloor::ComparisonHeight()
+{
+	//通常アイテムの総数分
+	for (size_t nCnt = 0; nCnt < 2; nCnt++)
+	{
+		// プレイヤーのポインタ取得
+		CPlayer *pPlayer = (CPlayer*)CScene::GetScene(LAYER_CHARACTER, nCnt);
+		if (pPlayer != nullptr)
+		{
+			//高さを比較してプレイヤーが床より下に落ちたら死亡フラグをtrue
+			if (this->GetPos().y >= pPlayer->GetPos().y)
+			{
+				pPlayer->SetDie(true);
+			}
+			pPlayer = nullptr;
+		}
+	}
 }

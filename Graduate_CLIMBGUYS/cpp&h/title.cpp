@@ -82,12 +82,12 @@ void CTitle::Update(void)
 	// モード更新
 	CBaseMode::Update();
 	// ゲーム遷移
-	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN))
+	if (CCalculation::PressAnyButton())
 	{
 		// フェード状態が何も起こっていない状態なら
 		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			CManager::SetMode(CManager::MODE_TUTORIAL);
+			CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
 		}
 	}
 }

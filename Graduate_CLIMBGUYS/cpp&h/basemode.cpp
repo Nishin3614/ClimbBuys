@@ -136,30 +136,34 @@ void CBaseMode::Debug(void)
 	// Ctrl押しながら
 	if (key->GetKeyboardPress(DIK_LCONTROL))
 	{
-		// 現在のモード再始動
-		if (key->GetKeyboardTrigger(DIK_NUMPAD0))
+		// フェード状態が何も起こっていない状態なら
+		//if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			CManager::SetMode(CManager::GetMode());
-		}
-		//タイトル
-		if (key->GetKeyboardTrigger(DIK_NUMPAD1))
-		{
-			CManager::SetMode(CManager::MODE_TITLE);
-		}
-		//チュートリアル
-		if (key->GetKeyboardTrigger(DIK_NUMPAD2))
-		{
-			CManager::SetMode(CManager::MODE_TUTORIAL);
-		}
-		// ゲーム
-		if (key->GetKeyboardTrigger(DIK_NUMPAD3))
-		{
-			CManager::SetMode(CManager::MODE_GAME);
-		}
-		// リザルト
-		if (key->GetKeyboardTrigger(DIK_NUMPAD4))
-		{
-			CManager::SetMode(CManager::MODE_RESULT);
+			// 現在のモード再始動
+			if (key->GetKeyboardTrigger(DIK_NUMPAD0))
+			{
+				CManager::GetFade()->SetFade(CManager::GetMode());
+			}
+			//タイトル
+			if (key->GetKeyboardTrigger(DIK_NUMPAD1))
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_TITLE);
+			}
+			//チュートリアル
+			if (key->GetKeyboardTrigger(DIK_NUMPAD2))
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
+			}
+			// ゲーム
+			if (key->GetKeyboardTrigger(DIK_NUMPAD3))
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_GAME);
+			}
+			// リザルト
+			if (key->GetKeyboardTrigger(DIK_NUMPAD4))
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+			}
 		}
 	}
 }

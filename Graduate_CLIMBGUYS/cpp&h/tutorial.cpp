@@ -11,6 +11,7 @@
 #include "sound.h"
 #include "scene.h"
 #include "collision.h"
+#include "XInputPad.h"
 
 /* 描画 */
 #include "fade.h"
@@ -92,13 +93,20 @@ void CTutorial::Uninit(void)
 void CTutorial::Update(void)
 {
 #ifdef _DEBUG
-	// ゲーム遷移
-	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN))
+	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
-		// フェード状態が何も起こっていない状態なら
-		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		InpudPad[nCnt] = CManager::GetPad((PLAYER_TAG)nCnt);
+
+		// ゲーム遷移
+		if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN) || InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_START, 1))
 		{
-			CManager::GetFade()->SetFade(CManager::MODE_GAME);
+			// フェード状態が何も起こっていない状態なら
+			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_GAME);
+			}
 		}
 	}
 

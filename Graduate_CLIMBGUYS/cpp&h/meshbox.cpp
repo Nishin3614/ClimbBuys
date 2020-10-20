@@ -142,8 +142,9 @@ void CMeshBox::Draw()
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
 		//テクスチャの設定
-		//pDevice->SetTexture(0, CTexture::GetTexture(CTexture::TEX_TYPE::TEX_NONE));
+		pDevice->SetTexture(0, CTexture_manager::GetTexture(5));
 
+		// 裏面カリング
 		CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLBACK);
 
 		// ポリゴンの描画
@@ -154,11 +155,11 @@ void CMeshBox::Draw()
 			0,		//頂点の読み取りを開始する位置
 			16);	//ポリゴンの枚数
 
-					// カリングしない
+		// カリングしない
 		CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNULL);
 
 		//Zテスト通常
-		CManager::GetRenderer()->SetType(CRenderer::TYPE_ZBUFFOFF);
+		CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_DEFAULT);
 
 		//通常合成
 		CManager::GetRenderer()->SetType(CRenderer::TYPE_NORMALMIX);
@@ -193,6 +194,8 @@ CMeshBox *CMeshBox::Create(D3DXVECTOR3 const &pos, D3DXVECTOR3 const &onesize, C
 		pMesh->m_Type = type;
 		// 初期化
 		pMesh->Init();
+		// シーン管理設定
+		pMesh->ManageSetting(LAYER_3DOBJECT);
 		//頂点生成
 		pMesh->MakeVertex();
 		// 座標の設定

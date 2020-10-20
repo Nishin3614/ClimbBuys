@@ -62,10 +62,18 @@ public:
 		TYPE_ZBUFFON,
 		// Zバッファオフ
 		TYPE_ZBUFFOFF,
+		// Zテスト通常
+		TYPE_ZTEST_DEFAULT,
+		// Zテスト無効
+		TYPE_ZTEST_OFF,
 		// 3Dエフェクト用オン
 		TYPE_3DEFFECT_ON,
 		// 3Dエフェクト用オフ
 		TYPE_3DEFFECT_OFF,
+		// フォグON
+		TYPE_FOG_ON,
+		// フォグOFF
+		TYPE_FOG_OFF,
 		TYPE_MAX
 	} TYPE;
 

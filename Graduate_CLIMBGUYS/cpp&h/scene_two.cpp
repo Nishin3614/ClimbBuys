@@ -133,10 +133,8 @@ void CScene_TWO::Draw(void)
 	pDevice->SetTexture(0, CTexture_manager::GetTexture(m_nTexId));
 
 	// Zテストを無効にする
-	pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_FALSE);
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-
+	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_OFF);
+	
 	// ポリゴン描画
 	pDevice->DrawPrimitive(
 		D3DPT_TRIANGLESTRIP,
@@ -144,10 +142,7 @@ void CScene_TWO::Draw(void)
 		2);
 
 	// Zテストを通常に戻す
-	pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_TRUE);
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-
+	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_DEFAULT);
 }
 
 #ifdef _DEBUG

@@ -132,9 +132,9 @@ private:
 	// 頂点座標の生成
 	void MakeVertex(LPDIRECT3DDEVICE9 pDevice);
 	// 円柱の設定
-	void SetCylinder(void);
+	void SetCylinder(LPDIRECT3DDEVICE9 pDevice);
 	// 矩形の設定
-	void SetRect(void);
+	void SetRect(LPDIRECT3DDEVICE9 pDevice);
 	/* 変数 */
 	static int CStencilshadow::m_nTexId[TYPE_MAX];	// テクスチャーID
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;				// 頂点バッファへのポインタ

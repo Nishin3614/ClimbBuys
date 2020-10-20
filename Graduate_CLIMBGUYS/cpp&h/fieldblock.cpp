@@ -116,9 +116,8 @@ void CFieldblock::UnLoad(void)
 //	layer		: レイヤー
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CFieldblock * CFieldblock::Create(
-	D3DXVECTOR3			const & pos,		// 位置
 	int					const & nModelId,	// モデル番号
-	CBaseblock::GRID	const & grid,		// 行列高さの番号
+	CBaseblock::GRID	const & Grid,		// 行列高さの番号
 	CScene::LAYER		const & layer		// レイヤー
 )
 {
@@ -129,9 +128,10 @@ CFieldblock * CFieldblock::Create(
 	// 設定
 	// シーン管理設定
 	pFieldblock->ManageSetting(layer);
-	pFieldblock->SetPos(pos);			// 位置
+	pFieldblock->SetPos(				// 位置
+		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
 	pFieldblock->SetModelId(nModelId);	// モデル番号
-	pFieldblock->SetGrid(grid);			// 行列高さの番号
+	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	pFieldblock->SetModelColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	// 初期化処理
@@ -146,19 +146,19 @@ CFieldblock * CFieldblock::Create(
 //	nModelId	: モデル番号
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CFieldblock * CFieldblock::Create_Self(
-	D3DXVECTOR3		const & pos,		// 位置
 	int				const & nModelId,	// モデル番号
-	CBaseblock::GRID	const & grid	// 行列高さの番号
+	CBaseblock::GRID	const & Grid	// 行列高さの番号
 )
 {
 	// 変数宣言
 	CFieldblock * pFieldblock;		// シーン2Dクラス
-									// メモリの生成(初め->基本クラス,後->派生クラス)
+	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pFieldblock = new CFieldblock;
 	// 設定
-	pFieldblock->SetPos(pos);			// 位置
+	pFieldblock->SetPos(				// 位置
+		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
 	pFieldblock->SetModelId(nModelId);	// モデル番号
-	pFieldblock->SetGrid(grid);			// 行列高さの番号
+	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	// 初期化処理
 	pFieldblock->Init();
 	// 生成したオブジェクトを返す
@@ -172,17 +172,17 @@ CFieldblock * CFieldblock::Create_Self(
 //	nModelId	: モデル番号
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CFieldblock> CFieldblock::Creat_Unique(
-	D3DXVECTOR3		const & pos,		// 位置
 	int				const & nModelId,	// モデル番号
-	CBaseblock::GRID	const & grid	// 行列高さの番号
+	CBaseblock::GRID	const & Grid	// 行列高さの番号
 )
 {
 	// 変数宣言
 	std::unique_ptr<CFieldblock> pFieldblock(new CFieldblock);		// シーン2Dクラス
 	// 設定
-	pFieldblock->SetPos(pos);			// 位置
+	pFieldblock->SetPos(					// 位置
+		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
 	pFieldblock->SetModelId(nModelId);	// モデル番号
-	pFieldblock->SetGrid(grid);			// 行列高さの番号
+	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	// 初期化処理
 	pFieldblock->Init();
 	// 生成したオブジェクトを返す

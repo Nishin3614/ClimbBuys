@@ -142,8 +142,8 @@ void CNormalblock::UnLoad(void)
 //	layer		: レイヤー
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CNormalblock * CNormalblock::Create(
-	D3DXVECTOR3		const & pos,		// 位置
 	int				const & nModelId,	// モデル番号
+	GRID			const & Grid,		// 行列高さ番号
 	CScene::LAYER	const & layer		// レイヤー
 )
 {
@@ -154,12 +154,15 @@ CNormalblock * CNormalblock::Create(
 	// 設定
 	// シーン管理設定
 	pNormalblock->ManageSetting(layer);
-	pNormalblock->SetPos(pos);			// 位置
-	pNormalblock->SetModelId(nModelId);	// 位置
+	pNormalblock->SetGrid(Grid);			// 行列高さ
+	pNormalblock->SetPos(					// 位置
+		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+	pNormalblock->SetModelId(nModelId);		// モデル番号
 	// 初期化処理
 	pNormalblock->Init();
 	// 生成したオブジェクトを返す
 	return pNormalblock;
+	D3DXVECTOR3;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -168,8 +171,8 @@ CNormalblock * CNormalblock::Create(
 //	nModelId	: モデル番号
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CNormalblock * CNormalblock::Create_Self(
-	D3DXVECTOR3		const & pos,									// 位置
-	int				const & nModelId								// モデル番号
+	int				const & nModelId,								// モデル番号
+	GRID			const & Grid									// 行列高さ番号
 )
 {
 	// 変数宣言
@@ -177,8 +180,10 @@ CNormalblock * CNormalblock::Create_Self(
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pNormalblock = new CNormalblock;
 	// 設定
-	pNormalblock->SetPos(pos);			// 位置
-	pNormalblock->SetModelId(nModelId);	// 位置
+	pNormalblock->SetGrid(Grid);			// 行列高さ
+	pNormalblock->SetPos(					// 位置
+		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+	pNormalblock->SetModelId(nModelId);		// モデル番号
 	// 初期化処理
 	pNormalblock->Init();
 	// 生成したオブジェクトを返す
@@ -192,15 +197,17 @@ CNormalblock * CNormalblock::Create_Self(
 //	nModelId	: モデル番号
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
-	D3DXVECTOR3		const & pos,									// 位置
-	int				const & nModelId								// モデル番号
+	int				const & nModelId,								// モデル番号
+	GRID			const & Grid									// 行列高さ番号
 )
 {
 	// 変数宣言
 	std::unique_ptr<CNormalblock> pNormalblock(new CNormalblock);		// シーン2Dクラス
 	// 設定
-	pNormalblock->SetPos(pos);			// 位置
-	pNormalblock->SetModelId(nModelId);	// 位置
+	pNormalblock->SetGrid(Grid);			// 行列高さ
+	pNormalblock->SetPos(					// 位置
+		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+	pNormalblock->SetModelId(nModelId);		// モデル番号
 	// 初期化処理
 	pNormalblock->Init();
 	// 生成したオブジェクトを返す

@@ -82,23 +82,22 @@ void CStencilshadow::Init(void)
 		CManager::GetRenderer()->GetDevice();
 	D3DXVECTOR3 VecA, VecB;					// ベクトル
 	D3DXVECTOR3 Cross[2000];				// 外積
-	// ブロック描画の原点の初期設定
-	m_OriginBlock = D3DXVECTOR3(
-		m_size.x * -0.5f * m_nBlock_Width,
-		0.0f,
-		m_size.z * 0.5f * m_nBlock_Depth);
-	// 総頂点数・インデックス・ポリゴンの初期設定(計算)
-	m_nNumberVertex =
-		(m_nBlock_Depth + 1) * (m_nBlock_Width + 1);
-	m_nNumIndex =
-		(m_nBlock_Width + 1) * 2 * m_nBlock_Depth +
-		2 * (m_nBlock_Depth - 1);
-	m_nNumPolygon =
-		m_nBlock_Depth * m_nBlock_Width * 2 +
-		4 * (m_nBlock_Depth - 1);
-
 	// 頂点座標の生成
-	MakeVertex(pDevice);
+	// MakeVertex(pDevice);
+	//
+	switch (m_type)
+	{
+		// 円柱
+	case TYPE_CYLINDER:
+		SetCylinder(pDevice);
+		break;
+		// 矩形
+	case TYPE_RECT:
+		SetRect(pDevice);
+		break;
+	default:
+		break;
+	}
 	m_pSceneTwo = std::move(CScene_TWO::Creat_Unique(
 		CScene_TWO::OFFSET_TYPE_CENTER,
 		{ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f },
@@ -132,6 +131,7 @@ void CStencilshadow::Uninit(void)
 // ----------------------------------------
 void CStencilshadow::Update(void)
 {
+	/*
 	// 変数宣言
 	VERTEX_3D *pVtx;	// 頂点情報へのポイント
 	int nCountDirect;
@@ -169,6 +169,7 @@ void CStencilshadow::Update(void)
 	{
 		m_pSceneTwo->Update();
 	}
+	*/
 }
 
 // ----------------------------------------
@@ -216,6 +217,35 @@ void CStencilshadow::Draw(void)
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D);
+
+
+
+
+	/*
+	CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLBACK);
+
+	// ポリゴンの描画
+	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
+		0,
+		0,
+		8,		//使用する頂点数 三角ポリゴンの頂点
+		0,		//頂点の読み取りを開始する位置
+		16);	//ポリゴンの枚数
+
+				// カリングしない
+	CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNULL);
+
+	//Zテスト通常
+	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZBUFFOFF);
+
+	//通常合成
+	CManager::GetRenderer()->SetType(CRenderer::TYPE_NORMALMIX);
+
+	//ライティングON
+	CManager::GetRenderer()->SetType(CRenderer::TYPE_RIGHTINGON);
+	*/
+
+
 	// Zバッファの書き込みを無効に
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, false);
 	// ステンシルバッファを有効にする
@@ -628,10 +658,317 @@ void CStencilshadow::MakeVertex(LPDIRECT3DDEVICE9 pDevice)
 	pCross = NULL;
 }
 
-void CStencilshadow::SetCylinder(void)
+// ----------------------------------------
+// 円柱の設定
+// ----------------------------------------
+void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 {
+	// 変数宣言
+	VERTEX_3D *pVtx;			// 頂点情報へのポイント
+	WORD * pIdx;				// インデックスデータへのポインタを取得
+	D3DXVECTOR3 VecA, VecB;		// ベクトル
+	int nCountDirect;			// 縦のカウント
+	int nCountWidth;			// 横のカウント
+	int nCntBlock = 0;
+	float fAngle;				// yの角度
+	float fRadian;				// yのラジアン値
+	D3DXVECTOR3 *pCross;		// ポリゴンの外積
+	pCross =					// メモリ確保
+		new D3DXVECTOR3[m_nBlock_Width * m_nBlock_Depth * 2];
+
+	// ブロック描画の原点の初期設定
+	m_OriginBlock = D3DXVECTOR3(
+		m_size.x * -0.5f * m_nBlock_Width,
+		0.0f,
+		m_size.z * 0.5f * m_nBlock_Depth);
+	// 総頂点数・インデックス・ポリゴンの初期設定(計算)
+	m_nNumberVertex =
+		(m_nBlock_Depth + 1) * (m_nBlock_Width + 1);
+	m_nNumIndex =
+		(m_nBlock_Width + 1) * 2 * m_nBlock_Depth +
+		2 * (m_nBlock_Depth - 1);
+	m_nNumPolygon =
+		m_nBlock_Depth * m_nBlock_Width * 2 +
+		4 * (m_nBlock_Depth - 1);
+
+	// 角度の計算
+	fAngle = D3DX_PI * 2 / m_nBlock_Width;
+
+	// 頂点バッファの生成
+	pDevice->CreateVertexBuffer(
+		sizeof(VERTEX_3D) * m_nNumberVertex,
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_3D,
+		D3DPOOL_MANAGED,
+		&m_pVtxBuff,
+		NULL);
+
+	// インデックスバッファの生成
+	pDevice->CreateIndexBuffer(sizeof(WORD) *
+		m_nNumIndex,
+		D3DUSAGE_WRITEONLY,
+		D3DFMT_INDEX16,
+		D3DPOOL_MANAGED,
+		&m_pIndex,
+		NULL);
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタ
+	m_pVtxBuff->Lock(
+		0,
+		0,
+		(void **)&pVtx,
+		0);
+
+	//頂点設定 //
+	//行ループ
+	for (nCountDirect = 0; nCountDirect < m_nBlock_Depth + 1; nCountDirect++)
+	{
+		// 列ループ
+		for (nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
+		{
+			// ラジアン値
+			fRadian = fAngle * nCountWidth;
+			fRadian = CCalculation::Rot_One_Limit(fRadian);
+			// 頂点座標の設定
+			pVtx[0].pos =
+				D3DXVECTOR3(
+				(sinf(fRadian) * m_size.x),
+					m_size.y * nCountDirect,
+					(cosf(fRadian) * m_size.z));
+			// 法線ベクトルの設定
+			//pVtx[0].nor = pVtx[0].pos;
+			//D3DXVec3Normalize(&pVtx[0].nor, &pVtx[0].nor);
+
+			// カラーの設定
+			pVtx[0].col = m_col;
+
+			// テクスチャーの設定
+			pVtx[0].tex = D3DXVECTOR2(
+				1.0f / m_nBlock_Width * nCountWidth,
+				1.0f / m_nBlock_Depth * (m_nBlock_Depth - nCountDirect)
+			);
+
+			// ポイント合わせ
+			pVtx++;
+		}
+	}
+	pVtx -= m_nNumberVertex;
+	// ポリゴンごとの法線の設定
+	for (int nCntDepth = 0; nCntDepth < m_nBlock_Depth; nCntDepth++, nCntBlock++)
+	{
+		for (int nCntWidth = 0; nCntWidth < m_nBlock_Width; nCntWidth++, nCntBlock++)
+		{
+			// ベクトル
+			VecA = pVtx[nCntBlock + m_nBlock_Width + 2].pos - pVtx[nCntBlock].pos;
+			VecB = pVtx[nCntBlock + m_nBlock_Width + 1].pos - pVtx[nCntBlock].pos;
+			// 外積計算
+			pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] = CCalculation::Cross_product(VecA, VecB);
+			// 正規化
+			D3DXVec3Normalize(&pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2], &pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2]);
+			// ベクトル
+			VecA = pVtx[nCntBlock + 1].pos - pVtx[nCntBlock].pos;
+			VecB = pVtx[nCntBlock + m_nBlock_Width + 2].pos - pVtx[nCntBlock].pos;
+			// 外積計算
+			pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1] = CCalculation::Cross_product(VecA, VecB);
+			// 正規化
+			D3DXVec3Normalize(&pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1], &pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1]);
+			// 左上
+			pVtx[nCntBlock].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] + pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
+			// 右上
+			pVtx[nCntBlock + 1].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
+			// 左下
+			pVtx[nCntBlock + m_nBlock_Width + 1].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2];
+			// 右下
+			pVtx[nCntBlock + m_nBlock_Width + 2].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] + pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
+		}
+	}
+	nCntBlock = 0;
+	// 頂点法線の設定
+	for (int nCntDepth = 0; nCntDepth < m_nBlock_Depth + 1; nCntDepth++, nCntBlock++)
+	{
+		for (int nCntWidth = 0; nCntWidth < m_nBlock_Width + 1; nCntWidth++, nCntBlock++)
+		{
+			// 最初
+			if (nCntDepth == 0 && nCntWidth == 0)
+			{
+				pVtx[0].nor /= 2;
+			}
+			// 最後
+			else if (nCntDepth == m_nBlock_Depth && nCntWidth == m_nBlock_Width)
+			{
+				pVtx[0].nor /= 2;
+			}
+			// 1行の列の最後
+			else if (nCntDepth == 0 && nCntWidth == m_nBlock_Width)
+			{
+			}
+			// 最後行の列の最初
+			else if (nCntDepth == m_nBlock_Depth && nCntWidth == 0)
+			{
+			}
+			// 最初の行または最後の行
+			else if (nCntDepth == 0 || nCntDepth == m_nBlock_Depth)
+			{
+				pVtx[0].nor /= 3;
+			}
+			// 最初の列または最後の列
+			else if (nCntWidth == 0 || nCntWidth == m_nBlock_Width)
+			{
+				pVtx[0].nor /= 3;
+			}
+			// それ以外
+			else
+			{
+				pVtx[0].nor /= 6;
+			}
+			pVtx++;
+		}
+	}
+
+	// アンロック
+	m_pVtxBuff->Unlock();
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタ
+	m_pIndex->Lock(0, 0, (void **)&pIdx, 0);
+
+	// 縦ブロック個数
+	for (nCountDirect = 0; nCountDirect < m_nBlock_Depth; nCountDirect++)
+	{
+		// ２回目のループ以降
+		if (nCountDirect >= 1)
+		{
+			// 縮退ポリゴン分の頂点追加
+			pIdx[0] = nCountDirect * (m_nBlock_Width + 1) + m_nBlock_Width + 1;
+
+			// インデックスのポイント合わせ
+			pIdx++;
+		}
+
+		// 横ブロックの頂点数
+		for (nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
+		{
+			// 描画順番のインデックス
+			pIdx[0] = nCountDirect * (m_nBlock_Width + 1) + nCountWidth + m_nBlock_Width + 1;
+			pIdx[1] = nCountDirect * (m_nBlock_Width + 1) + nCountWidth;
+
+			// インデックスのポイント合わせ
+			pIdx += 2;
+		}
+
+		// 縮退ポリゴンを作る必要がある場合
+		if (nCountDirect < m_nBlock_Depth - 1)
+		{
+			// 縮退ポリゴン分の頂点追加
+			pIdx[0] = nCountDirect * (m_nBlock_Width + 1) + m_nBlock_Width;
+			// インデックスのポイント合わせ
+			pIdx++;
+		}
+	}
+
+	// アンロック
+	m_pIndex->Unlock();
+	delete[] pCross;
+	pCross = NULL;
 }
 
-void CStencilshadow::SetRect(void)
+void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 {
+	//頂点情報へのポインタ
+	VERTEX_3D *pVtx;
+	//インデックスデータへのポインタ
+	WORD * pIdx;
+
+	// 総頂点数・インデックス・ポリゴンの初期設定(計算)
+	m_nNumberVertex = 8;
+	m_nNumIndex = 18;
+	m_nNumPolygon = 16;
+
+	// 頂点バッファの生成
+	pDevice->CreateVertexBuffer(
+		sizeof(VERTEX_3D) * m_nNumberVertex,
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_3D,
+		D3DPOOL_MANAGED,
+		&m_pVtxBuff,
+		NULL);
+
+	// インデックスバッファの生成
+	pDevice->CreateIndexBuffer(sizeof(WORD) *
+		m_nNumIndex,
+		D3DUSAGE_WRITEONLY,
+		D3DFMT_INDEX16,
+		D3DPOOL_MANAGED,
+		&m_pIndex,
+		NULL);
+
+	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点の合計 = 8
+	pVtx[0].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	-m_size.z * 0.5f);
+	pVtx[1].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	-m_size.z * 0.5f);
+	pVtx[2].pos = D3DXVECTOR3(m_size.x * 0.5f,	-m_size.y * 0.5f,	-m_size.z * 0.5f);
+	pVtx[3].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f,	-m_size.z * 0.5f);
+	pVtx[4].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	m_size.z * 0.5f);
+	pVtx[5].pos = D3DXVECTOR3(m_size.x * 0.5f,	-m_size.y * 0.5f,	m_size.z * 0.5f);
+	pVtx[6].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	m_size.z * 0.5f);
+	pVtx[7].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f,	m_size.z * 0.5f);
+
+	//頂点の合計 = 8
+	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[4].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[5].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[6].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[7].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+
+	// 頂点の合計 = 8
+	pVtx[0].col = m_col;
+	pVtx[1].col = m_col;
+	pVtx[2].col = m_col;
+	pVtx[3].col = m_col;
+	pVtx[4].col = m_col;
+	pVtx[5].col = m_col;
+	pVtx[6].col = m_col;
+	pVtx[7].col = m_col;
+
+	pVtx[0].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[1].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[2].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[3].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[4].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[5].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[6].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[7].tex = D3DXVECTOR2(1.0f, 0.0f);
+
+	//頂点データをアンロック
+	m_pVtxBuff->Unlock();
+
+	//インデックスバッファのロックし、インデックスデータへのポインタを取得
+	m_pIndex->Lock(0, 0, (void**)&pIdx, 0);
+
+	//インデックス設定
+	pIdx[0] = 7;
+	pIdx[1] = 6;
+	pIdx[2] = 5;
+	pIdx[3] = 4;
+	pIdx[4] = 2;
+	pIdx[5] = 1;
+	pIdx[6] = 3;
+	pIdx[7] = 0;
+	pIdx[8] = 0;
+	pIdx[9] = 1;
+	pIdx[10] = 1;
+	pIdx[11] = 4;
+	pIdx[12] = 0;
+	pIdx[13] = 6;
+	pIdx[14] = 3;
+	pIdx[15] = 7;
+	pIdx[16] = 2;
+	pIdx[17] = 5;
+
+	//インデックスのバッファのアンロック
+	m_pIndex->Unlock();
 }

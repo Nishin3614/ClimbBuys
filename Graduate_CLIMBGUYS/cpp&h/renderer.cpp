@@ -395,6 +395,17 @@ void CRenderer::SetType(
 		//Zバッファ　有効
 		m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_FALSE);
 		break;
+	case TYPE_ZTEST_DEFAULT:
+		//Zテスト 通常
+		m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+		m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_TRUE);
+		m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+		break;
+	case TYPE_ZTEST_OFF:
+		//Zテスト 無効
+		m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+		m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_FALSE);
+		break;
 	case TYPE_3DEFFECT_ON:
 		// ライティングモード無効
 		m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
@@ -412,6 +423,14 @@ void CRenderer::SetType(
 		m_pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 		// レンダーステート(通常ブレンド処理)
 		m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		break;
+		//フォグON
+	case TYPE_FOG_ON:
+		m_pDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
+		break;
+		//フォグOFF
+	case TYPE_FOG_OFF:
+		m_pDevice->SetRenderState(D3DRS_FOGENABLE, FALSE);
 		break;
 	default:
 		break;

@@ -74,7 +74,6 @@ void CGame::Init(void)
 	C3DEffect::Create();
 	// 試験的背景の生成
 	CBg::Create();
-
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -89,7 +88,6 @@ void CGame::Init(void)
 
 	// ダメージ床の生成
 	CDamageFloor::Create();
-
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),

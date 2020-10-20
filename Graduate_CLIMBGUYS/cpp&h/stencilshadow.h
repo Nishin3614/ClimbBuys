@@ -39,18 +39,25 @@ public:
 	/* 列挙型 */
 	typedef enum
 	{
-		TYPE_NORMAL,
-		TYPE_WAVE,
-		TYPE_MAX
+		TYPE_CYLINDER = 0,	// 円柱
+		TYPE_RECT,			// 矩形
+		TYPE_MAX			// 最大数
 	} TYPE;
 	/* 関数 */
+	// コンストラクタ
 	CStencilshadow();
+	// デストラクタ
 	~CStencilshadow();
+	// 初期化処理
 	void Init(void);
+	// 終了処理
 	void Uninit(void);
+	// 更新処理
 	void Update(void);
+	// 描画処理
 	void Draw(void);
 #ifdef _DEBUG
+	// デバッグ処理
 	void Debug(void);
 #endif // _DEBUG
 	// 当たった後の処理
@@ -95,9 +102,9 @@ public:
 	static CStencilshadow * Create(
 		D3DXVECTOR3 const &pos,							// 位置
 		D3DXVECTOR3 const &size,						// サイズ
+		TYPE const &type = TYPE_CYLINDER,				// タイプ
 		int const &nWidth = 10,							// 横数
 		int const &nDepth = 5,							// 縦数
-		TYPE const &type = TYPE_NORMAL,					// タイプ
 		D3DXCOLOR	const &col = D3DXCOLOR_INI,			// カラー
 		D3DXVECTOR3 const &rot = D3DVECTOR3_ZERO		// 回転
 	);
@@ -105,9 +112,9 @@ public:
 	static CStencilshadow * Create_Self(
 		D3DXVECTOR3 const &pos,							// 位置
 		D3DXVECTOR3 const &size,						// サイズ
+		TYPE const &type = TYPE_CYLINDER,				// タイプ
 		int const &nWidth = 10,							// 横数
 		int const &nDepth = 5,							// 縦数
-		TYPE const &type = TYPE_NORMAL,					// タイプ
 		D3DXCOLOR	const &col = D3DXCOLOR_INI,			// カラー
 		D3DXVECTOR3 const &rot = D3DVECTOR3_ZERO		// 回転
 	);
@@ -122,25 +129,30 @@ protected:
 
 private:
 	/* 関数 */
-	void MakeVertex(LPDIRECT3DDEVICE9 pDevice);	// 頂点座標の生成
+	// 頂点座標の生成
+	void MakeVertex(LPDIRECT3DDEVICE9 pDevice);
+	// 円柱の設定
+	void SetCylinder(void);
+	// 矩形の設定
+	void SetRect(void);
 	/* 変数 */
 	static int CStencilshadow::m_nTexId[TYPE_MAX];	// テクスチャーID
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;			// 頂点バッファへのポインタ
-	LPDIRECT3DINDEXBUFFER9	m_pIndex;			// インデックスバッファのポインタ
-	D3DXVECTOR3 m_OriginBlock;					// 初期配置
-	D3DXMATRIX  m_mtxWorld;						// ワールドマトリックス
-	D3DXVECTOR3 m_pos;							// 位置
-	D3DXVECTOR3 m_size;							// サイズ
-	D3DXVECTOR3 m_rot;							// 角度
-	D3DXCOLOR	m_col;							// 色
-	int		m_nNumberVertex;					// 総頂点数
-	int		m_nNumIndex;						// 総インデックス
-	int		m_nNumPolygon;						// 総ポリゴン
-	int		m_nBlock_Depth;						// 縦ブロック数
-	int		m_nBlock_Width;						// 横ブロック数
-	bool	m_bUse;								// 使用
-	TYPE	m_type;								// タイプ
-	std::unique_ptr<CScene_TWO> m_pSceneTwo;						// 2Dポリゴン
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;				// 頂点バッファへのポインタ
+	LPDIRECT3DINDEXBUFFER9	m_pIndex;				// インデックスバッファのポインタ
+	D3DXVECTOR3 m_OriginBlock;						// 初期配置
+	D3DXMATRIX  m_mtxWorld;							// ワールドマトリックス
+	D3DXVECTOR3 m_pos;								// 位置
+	D3DXVECTOR3 m_size;								// サイズ
+	D3DXVECTOR3 m_rot;								// 角度
+	D3DXCOLOR	m_col;								// 色
+	int		m_nNumberVertex;						// 総頂点数
+	int		m_nNumIndex;							// 総インデックス
+	int		m_nNumPolygon;							// 総ポリゴン
+	int		m_nBlock_Depth;							// 縦ブロック数
+	int		m_nBlock_Width;							// 横ブロック数
+	bool	m_bUse;									// 使用
+	TYPE	m_type;									// タイプ
+	std::unique_ptr<CScene_TWO> m_pSceneTwo;		// 2Dポリゴン
 };
 
 #endif

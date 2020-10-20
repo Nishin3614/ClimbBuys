@@ -137,7 +137,7 @@ void CBaseMode::Debug(void)
 	if (key->GetKeyboardPress(DIK_LCONTROL))
 	{
 		// フェード状態が何も起こっていない状態なら
-		//if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
 			// 現在のモード再始動
 			if (key->GetKeyboardTrigger(DIK_NUMPAD0))

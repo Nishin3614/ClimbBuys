@@ -566,7 +566,7 @@ void CScene_X::ModelSetting(MODEL_LOAD * pModel_load)
 void CScene_X::SetStencilshadow(bool const & bStencilshadow)
 {
 	// ステンシルシャドウの生成
-	m_pStencilshadow = CStencilshadow::Create(m_pos, D3DXVECTOR3(10.0f, 10000.0f, 10.0f));
+	m_pStencilshadow = CStencilshadow::Create(m_pos, D3DXVECTOR3(50.0f, 10000.0f, 50.0f));
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

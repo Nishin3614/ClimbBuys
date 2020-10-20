@@ -61,7 +61,7 @@ CStencilshadow::CStencilshadow() : CScene()
 	m_nBlock_Width = 1;
 	m_nBlock_Depth = 1;
 	m_bUse = false;
-	m_type = TYPE_NORMAL;
+	m_type = TYPE_CYLINDER;
 	m_pSceneTwo = NULL;
 }
 
@@ -318,9 +318,9 @@ void CStencilshadow::UnLoad(void)
 CStencilshadow * CStencilshadow::Create(
 	D3DXVECTOR3 const &pos,		// 位置
 	D3DXVECTOR3 const &size,	// サイズ
+	TYPE const &type,			// タイプ
 	int const &nWidth,			// 横数
 	int const &nDepth,			// 縦数
-	TYPE const &type,			// タイプ
 	D3DXCOLOR	const &col,		// カラー
 	D3DXVECTOR3 const &rot		// 回転
 )
@@ -359,9 +359,9 @@ CStencilshadow * CStencilshadow::Create(
 CStencilshadow * CStencilshadow::Create_Self(
 	D3DXVECTOR3 const &pos,		// 位置
 	D3DXVECTOR3 const &size,	// サイズ
+	TYPE const &type,			// タイプ
 	int const &nWidth,			// 横数
 	int const &nDepth,			// 縦数
-	TYPE const &type,			// タイプ
 	D3DXCOLOR	const &col,		// カラー
 	D3DXVECTOR3 const &rot		// 回転
 )
@@ -626,4 +626,12 @@ void CStencilshadow::MakeVertex(LPDIRECT3DDEVICE9 pDevice)
 	m_pIndex->Unlock();
 	delete[] pCross;
 	pCross = NULL;
+}
+
+void CStencilshadow::SetCylinder(void)
+{
+}
+
+void CStencilshadow::SetRect(void)
+{
 }

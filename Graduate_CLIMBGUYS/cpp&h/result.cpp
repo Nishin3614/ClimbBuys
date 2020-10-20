@@ -69,12 +69,12 @@ void CResult::Update(void)
 	CBaseMode::Update();
 
 	// タイトル遷移
-	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN))
+	if (CCalculation::PressAnyButton())
 	{
 		// フェード状態が何も起こっていない状態なら
 		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 		{
-			CManager::SetMode(CManager::MODE_TITLE);
+			CManager::GetFade()->SetFade(CManager::MODE_TITLE);
 		}
 	}
 }

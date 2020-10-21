@@ -220,23 +220,22 @@ void CStencilshadow::Draw(void)
 
 
 
-
 	/*
-	CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLBACK);
+	//CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLBACK);
 
 	// ポリゴンの描画
 	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
 		0,
 		0,
-		8,		//使用する頂点数 三角ポリゴンの頂点
+		m_nNumberVertex,		//使用する頂点数 三角ポリゴンの頂点
 		0,		//頂点の読み取りを開始する位置
-		16);	//ポリゴンの枚数
+		m_nNumPolygon);	//ポリゴンの枚数
 
 				// カリングしない
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNULL);
 
 	//Zテスト通常
-	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZBUFFOFF);
+	//CManager::GetRenderer()->SetType(CRenderer::TYPE_ZBUFFOFF);
 
 	//通常合成
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_NORMALMIX);
@@ -244,6 +243,7 @@ void CStencilshadow::Draw(void)
 	//ライティングON
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_RIGHTINGON);
 	*/
+
 
 
 	// Zバッファの書き込みを無効に
@@ -783,48 +783,6 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 		}
 	}
 	nCntBlock = 0;
-	// 頂点法線の設定
-	for (int nCntDepth = 0; nCntDepth < m_nBlock_Depth + 1; nCntDepth++, nCntBlock++)
-	{
-		for (int nCntWidth = 0; nCntWidth < m_nBlock_Width + 1; nCntWidth++, nCntBlock++)
-		{
-			// 最初
-			if (nCntDepth == 0 && nCntWidth == 0)
-			{
-				pVtx[0].nor /= 2;
-			}
-			// 最後
-			else if (nCntDepth == m_nBlock_Depth && nCntWidth == m_nBlock_Width)
-			{
-				pVtx[0].nor /= 2;
-			}
-			// 1行の列の最後
-			else if (nCntDepth == 0 && nCntWidth == m_nBlock_Width)
-			{
-			}
-			// 最後行の列の最初
-			else if (nCntDepth == m_nBlock_Depth && nCntWidth == 0)
-			{
-			}
-			// 最初の行または最後の行
-			else if (nCntDepth == 0 || nCntDepth == m_nBlock_Depth)
-			{
-				pVtx[0].nor /= 3;
-			}
-			// 最初の列または最後の列
-			else if (nCntWidth == 0 || nCntWidth == m_nBlock_Width)
-			{
-				pVtx[0].nor /= 3;
-			}
-			// それ以外
-			else
-			{
-				pVtx[0].nor /= 6;
-			}
-			pVtx++;
-		}
-	}
-
 	// アンロック
 	m_pVtxBuff->Unlock();
 
@@ -871,6 +829,9 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 	pCross = NULL;
 }
 
+// ----------------------------------------
+// 矩形の設定
+// ----------------------------------------
 void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 {
 	//頂点情報へのポインタ
@@ -879,9 +840,9 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	WORD * pIdx;
 
 	// 総頂点数・インデックス・ポリゴンの初期設定(計算)
-	m_nNumberVertex = 8;
-	m_nNumIndex = 18;
-	m_nNumPolygon = 16;
+	m_nNumberVertex = 10;
+	m_nNumIndex = 10;
+	m_nNumPolygon = 8;
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer(
@@ -905,14 +866,18 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点の合計 = 8
-	pVtx[0].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	-m_size.z * 0.5f);
-	pVtx[1].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	-m_size.z * 0.5f);
-	pVtx[2].pos = D3DXVECTOR3(m_size.x * 0.5f,	-m_size.y * 0.5f,	-m_size.z * 0.5f);
-	pVtx[3].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f,	-m_size.z * 0.5f);
-	pVtx[4].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	m_size.z * 0.5f);
-	pVtx[5].pos = D3DXVECTOR3(m_size.x * 0.5f,	-m_size.y * 0.5f,	m_size.z * 0.5f);
-	pVtx[6].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	m_size.z * 0.5f);
-	pVtx[7].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f,	m_size.z * 0.5f);
+	pVtx[0].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	m_size.z * 0.5f);
+	pVtx[1].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	m_size.z * 0.5f);
+	pVtx[2].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	-m_size.z * 0.5f);
+	pVtx[3].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	-m_size.z * 0.5f);
+	pVtx[4].pos = D3DXVECTOR3(-m_size.x * 0.5f,	m_size.y * 0.5f,	m_size.z * 0.5f);
+
+
+	pVtx[5].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f, m_size.z * 0.5f);
+	pVtx[6].pos = D3DXVECTOR3(m_size.x * 0.5f, -m_size.y * 0.5f, m_size.z * 0.5f);
+	pVtx[7].pos = D3DXVECTOR3(m_size.x * 0.5f, -m_size.y * 0.5f, -m_size.z * 0.5f);
+	pVtx[8].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f, -m_size.z * 0.5f);
+	pVtx[9].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f, m_size.z * 0.5f);
 
 	//頂点の合計 = 8
 	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
@@ -949,26 +914,16 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	//インデックスバッファのロックし、インデックスデータへのポインタを取得
 	m_pIndex->Lock(0, 0, (void**)&pIdx, 0);
 
-	//インデックス設定
-	pIdx[0] = 7;
-	pIdx[1] = 6;
-	pIdx[2] = 5;
-	pIdx[3] = 4;
-	pIdx[4] = 2;
-	pIdx[5] = 1;
-	pIdx[6] = 3;
-	pIdx[7] = 0;
-	pIdx[8] = 0;
-	pIdx[9] = 1;
-	pIdx[10] = 1;
-	pIdx[11] = 4;
-	pIdx[12] = 0;
-	pIdx[13] = 6;
-	pIdx[14] = 3;
-	pIdx[15] = 7;
-	pIdx[16] = 2;
-	pIdx[17] = 5;
+	// 横ブロックの頂点数
+	for (int nCntIndex = 0; nCntIndex < 4 + 1; nCntIndex++)
+	{
+		// 描画順番のインデックス
+		pIdx[0] = nCntIndex + 4 + 1;
+		pIdx[1] = nCntIndex;
 
+		// インデックスのポイント合わせ
+		pIdx += 2;
+	}
 	//インデックスのバッファのアンロック
 	m_pIndex->Unlock();
 }

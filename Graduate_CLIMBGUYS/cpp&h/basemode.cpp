@@ -13,6 +13,7 @@
 #include "renderer.h"
 #include "manager.h"
 #include "collision.h"
+#include "stencilshadow.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -132,7 +133,11 @@ void CBaseMode::Debug(void)
 	{
 		CCollision::SetDispCollision(!CCollision::GetDispCollision());
 	}
-
+	// ƒXƒeƒ“ƒVƒ‹•`‰æó‘Ô‚ÌÝ’è
+	if (key->GetKeyboardTrigger(DIK_F6))
+	{
+		CStencilshadow::SetStencil(!CStencilshadow::GetStencil());
+	}
 	// Ctrl‰Ÿ‚µ‚È‚ª‚ç
 	if (key->GetKeyboardPress(DIK_LCONTROL))
 	{

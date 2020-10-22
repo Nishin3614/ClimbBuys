@@ -148,7 +148,6 @@ void CScene_X::Update(void)
 	{
 		// 位置取得
 		D3DXVECTOR3 pos = m_pos;
-		pos.y = -200.0f;
 		// ステンシルシャドウの位置設定
 		m_pStencilshadow->SetPos(pos);
 	}
@@ -573,7 +572,7 @@ void CScene_X::SetStencilshadow(
 	// ステンシルシャドウの生成
 	m_pStencilshadow = CStencilshadow::Create(
 		m_pos,
-		D3DXVECTOR3(50.0f, 10000.0f, 50.0f),
+		Size,
 		(CStencilshadow::TYPE)nType
 	);
 }

@@ -29,8 +29,22 @@
 class CTexture_manager
 {
 public:
+	/* 列挙型 */
+	// テクスチャータイプ
+	typedef enum
+	{
+		TYPE_TESTFLOOR = 0,	// テスト用の床
+		TYPE_RESULT_LOG,	// リザルトのロゴ
+		TYPE_ANIBUTTON_LOG,	// AniButtonロゴ
+		TYPE_BG,			// ゲームの背景
+		TYPE_TUTORIALBOARD,	// チュートリアルの看板
+		TYPE_NONE,			// 背景なし
+		TYPE_MAX			// 最大数
+	} TYPE;
 	/* 関数 */
+	// コンストラクタ
 	CTexture_manager();
+	// デストラクタ
 	~CTexture_manager();
 	// 開放
 	static void UnLoad(void);

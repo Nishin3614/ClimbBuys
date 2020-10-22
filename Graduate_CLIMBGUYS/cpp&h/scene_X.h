@@ -38,6 +38,18 @@ class CStencilshadow;	// ステンシルシャドウクラス
 class CScene_X : public CScene
 {
 public:
+	/* 列挙型 */
+	// モデルタイプ
+	typedef enum
+	{
+		TYPE_NORMAL = 0,		// 適当なモデル
+		TYPE_CUBY,				// カービィー
+		TYPE_BLOCK,				// ブロック
+		TYPE_PLAYER00_ASTOLFO,	// プレイヤー00アストルフォ
+		TYPE_PLAYER01_TANJIRO,	// プレイヤー01たんじろう
+		TYPE_MAX				// 最大数
+	} TYPE;
+	
 	/* 構造体 */
 	// モデル情報
 	typedef struct MODEL_LOAD

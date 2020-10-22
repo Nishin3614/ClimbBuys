@@ -345,6 +345,28 @@ void CPlayer::StatusMotion(void)
 		SetMotion(MOTIONTYPE_NEUTRAL);
 	}
 	*/
+	
+	//// 試験的オブジェクトウィンドウ
+	//ImGui::Begin(u8"Player状態", nullptr, ImGuiWindowFlags_MenuBar);
+
+	// Tab
+	//if (ImGui::BeginTabBar("asd"))
+	//{
+	//	if (ImGui::BeginTabItem("かきくけこ"))
+	//	{
+	//		ImGui::Separator();
+	//		ImGui::EndTabItem();
+	//	}
+	//	if (ImGui::BeginTabItem("さしすせそ"))
+	//	{
+	//		ImGui::Separator();
+	//		ImGui::EndTabItem();
+	//	}
+	//	// TabEnd
+	//	ImGui::EndTabBar();
+	//}
+	//// End
+	//ImGui::End();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

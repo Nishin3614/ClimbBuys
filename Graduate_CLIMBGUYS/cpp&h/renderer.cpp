@@ -528,6 +528,11 @@ void CRenderer::ImGui_SetUp(HWND hWnd)
 	io.MousePos;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableSetMousePos;     // Enable Keyboard Controls
 	io.FontAllowUserScaling = true;
+	ImFontConfig config;
+	config.MergeMode = true;
+	io.Fonts->AddFontDefault();
+	io.Fonts->AddFontFromFileTTF("C:\\WINDOWS\\Fonts\\MEIRYO.TTC", 18.0f, &config, glyphRangesJapanese);
+
 	// 背景色の設定
 	ImGui::StyleColorsDark();
 	// プラットフォームに合わせたセットアップ

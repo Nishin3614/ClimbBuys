@@ -19,6 +19,7 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+int	CConnectblock::m_nCntTime = 0;				// カウントタイム
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
@@ -83,20 +84,20 @@ void CConnectblock::Update(void)
 void CConnectblock::SetBlockShape(void)
 {
 	// 形
+	CBaseblock::GRID BaseGrid = CBaseblock::GRID(0, 0, 0);
 	switch (m_Shape)
 	{
 		// 矩形
 	case SHAPE_RECT:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0, 7, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0, 8, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1,7,0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1,8,0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0,7,1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0,8,1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1, 7, 1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1, 8, 1)));
-		break;
-	default:
+		CBaseblock::GRID BaseGrid = CBaseblock::GRID(-3 + rand() % 6, 7, -3 + rand() % 6);
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 1)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1)));
 		break;
 	}
 }
@@ -215,24 +216,18 @@ std::unique_ptr<CConnectblock> CConnectblock::Creat_Unique(
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 作成(シーン管理)
-//	pos	: 位置
+// 更新_ブロック生成
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CConnectblock * CConnectblock::Create_Field(
-	FIELDTYPE const & fieldtype,
-	CScene::LAYER const & layer
-)
+void CConnectblock::Update_CreateBlock(void)
 {
-
-	switch (fieldtype)
+	// 5秒間に1回落ちてくる
+	if (m_nCntTime % DERAY_TIME(5) == 0)
 	{
-	case FIELDTYPE_RECT:
-
-		break;
-	default:
-		break;
+		// 結合されたブロックの生成
+		Create(D3DVECTOR3_ZERO, CConnectblock::SHAPE_RECT);
 	}
-	return nullptr;
+	// カウントタイムアップ
+	m_nCntTime++;
 }
 
 #ifdef _DEBUG

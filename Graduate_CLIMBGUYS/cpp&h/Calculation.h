@@ -560,7 +560,7 @@ public:
 		D3DXVECTOR3 & pOut_Vec_A,		// 球Aの反射後の速度ベクトル
 		D3DXVECTOR3 & pOut_Vec_B		// 球Bの反射後の速度ベクトル
 	);
-	
+
 	// メッセージ発生
 	static void Messanger(
 		const char * cMessa,	// メッセージ内容

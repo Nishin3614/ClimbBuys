@@ -87,11 +87,30 @@ void CNormalblock::Scene_MyCollision(
 		// シーン情報がNULLなら
 		// ->関数を抜ける
 		if (pScene == NULL) return;
+		if (!CBaseblock::GetFall()) return;
 		// シーン情報の代入
 		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
 		// シーン情報
 		if (!pBaseBlock->GetFall())
 		{
+			// 変数宣言
+			CBaseblock::GRID grid = CBaseblock::GetGrid();	// 行列高
+			int nHeight = CBaseblock::GetHeight(			// 高さ
+				grid.nColumn + BASEBLOCK_MINUSTOPLUS,
+				grid.nLine + BASEBLOCK_MINUSTOPLUS) + 1;
+			// 高さを行列高に代入
+			grid.nHeight = nHeight;
+			// 高さの設定
+			CBaseblock::SetHeight(
+				grid.nColumn + BASEBLOCK_MINUSTOPLUS,
+				grid.nLine + BASEBLOCK_MINUSTOPLUS,
+				grid.nHeight
+			);
+			// 現在の行列高の設定
+			CBaseblock::SetGrid(grid);
+			// 位置設定
+			CBaseblock::SetPos((D3DXVECTOR3)grid);
+			// 落ちている状態設定
 			CBaseblock::SetFall(false);
 		}
 	}
@@ -109,11 +128,30 @@ void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene
 		// シーン情報がNULLなら
 		// ->関数を抜ける
 		if (pScene == NULL) return;
+		if (!CBaseblock::GetFall()) return;
 		// シーン情報の代入
 		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
 		// シーン情報
 		if (!pBaseBlock->GetFall())
 		{
+			// 変数宣言
+			CBaseblock::GRID grid = CBaseblock::GetGrid();	// 行列高
+			int nHeight = CBaseblock::GetHeight(			// 高さ
+				grid.nColumn + BASEBLOCK_MINUSTOPLUS,
+				grid.nLine + BASEBLOCK_MINUSTOPLUS) + 1;
+			// 高さを行列高に代入
+			grid.nHeight = nHeight;
+			// 高さの設定
+			CBaseblock::SetHeight(
+				grid.nColumn + BASEBLOCK_MINUSTOPLUS,
+				grid.nLine + BASEBLOCK_MINUSTOPLUS,
+				grid.nHeight
+			);
+			// 現在の行列高の設定
+			CBaseblock::SetGrid(grid);
+			// 位置設定
+			CBaseblock::SetPos((D3DXVECTOR3)grid);
+			// 落ちている状態設定
 			CBaseblock::SetFall(false);
 		}
 	}
@@ -221,6 +259,7 @@ std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CNormalblock::Debug(void)
 {
+	/*
 	// 落ちる状態でなければ
 	// 関数を抜ける
 	if (CBaseblock::GetFall())
@@ -232,7 +271,7 @@ void CNormalblock::Debug(void)
 		CDebugproc::Print("NormalBlock::Fall = false\n");
 	}
 	CDebugproc::Print("NormalBlock::Pos(%.2f,%.2f,%.2f)\n",CScene_X::GetPos().x, CScene_X::GetPos().y, CScene_X::GetPos().z);
-
+	*/
 }
 #endif // _DEBUG
 

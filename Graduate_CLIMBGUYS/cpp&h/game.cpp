@@ -81,8 +81,6 @@ void CGame::Init(void)
 	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1,D3DXVECTOR3(0.0,300.0f,0.0f));
 	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
 
-	// 結合されたブロックの生成
-	CConnectblock::Create(D3DVECTOR3_ZERO,CConnectblock::SHAPE_RECT);
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CConnect_fieldblock::STAGE_1);
 
@@ -122,6 +120,8 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
+	// 結合されたブロックの更新ブロック生成
+	CConnectblock::Update_CreateBlock();
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)

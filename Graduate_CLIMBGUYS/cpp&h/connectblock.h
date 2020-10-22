@@ -121,13 +121,8 @@ public:
 		SHAPE			const & shape									// 形情報
 	);
 
-	/* フィールド用のブロック生成 */
-	// 作成(シーン管理)
-	//	layer		: レイヤー
-	static CConnectblock * Create_Field(
-		FIELDTYPE		const & fieldtype = FIELDTYPE_RECT,				// フィールドタイプ
-		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT			// レイヤー
-	);
+	// 更新_ブロック生成
+	static void Update_CreateBlock(void);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
@@ -145,6 +140,8 @@ private:
 	D3DXVECTOR3								m_move;					// 移動
 	D3DXCOLOR								m_col;					// まとまりの色情報
 	SHAPE									m_Shape;				// 形
+	static int								m_nCntTime;				// カウントタイム
+
 };
 
 #endif

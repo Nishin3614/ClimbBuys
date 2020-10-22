@@ -133,6 +133,8 @@ CFieldblock * CFieldblock::Create(
 	pFieldblock->SetModelId(nModelId);	// モデル番号
 	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	pFieldblock->SetModelColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	// 現在のブロックの高さを設定
+	CBaseblock::SetHeight(Grid.nColumn + BASEBLOCK_MINUSTOPLUS, Grid.nLine + BASEBLOCK_MINUSTOPLUS, Grid.nHeight);
 
 	// 初期化処理
 	pFieldblock->Init();

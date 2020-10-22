@@ -82,24 +82,24 @@ public:
 	//	nModelId	: モデル番号
 	//	layer		: レイヤー
 	static CNormalblock * Create(
-		D3DXVECTOR3		const & pos,								// 位置
 		int				const & nModelId,							// モデル番号
+		GRID			const & Grid,								// 行列高さ番号
 		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT		// レイヤー
 	);
 	// 作成(個人管理)
 	//	pos			: 位置
 	//	nModelId	: モデル番号
 	static CNormalblock * Create_Self(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId								// モデル番号
+		int				const & nModelId,								// モデル番号
+		GRID			const & Grid									// 行列高さ番号
 		);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
 	//	pos			: 位置
 	//	nModelId	: モデル番号
 	static std::unique_ptr<CNormalblock> Creat_Unique(
-		D3DXVECTOR3		const & pos,									// 位置
-		int				const & nModelId								// モデル番号
+		int				const & nModelId,								// モデル番号
+		GRID			const & Grid									// 行列高さ番号
 	);
 #ifdef _DEBUG
 	// デバッグ処理

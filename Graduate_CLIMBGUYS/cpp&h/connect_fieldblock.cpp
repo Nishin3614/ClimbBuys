@@ -54,7 +54,7 @@ void CConnect_fieldblock::Init()
 		{
 			if (!m_vpLoad[m_stage].Dvec_pFileLoad[nCntField][nCntBlock].bUse) continue;
 			m_Dvec_pFieldBlock.emplace_back(
-				CFieldblock::Create(D3DXVECTOR3(grid.nColumn * 100.0f, 0.0f, grid.nLine * 100.0f), 2, grid));
+				CFieldblock::Create(2, grid));
 			// —ñƒ_ƒEƒ“
 			grid.nColumn++;
 		}

@@ -28,7 +28,7 @@ CConnectblock::CConnectblock() : CScene::CScene()
 	m_pos = D3DVECTOR3_ZERO;
 	m_move = D3DVECTOR3_ZERO;
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
+	m_Shape = SHAPE_RECT;
 	// ランダムに色情報を設定
 	CCalculation::GetRandomColor(m_col);
 }
@@ -45,12 +45,8 @@ CConnectblock::~CConnectblock()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::Init()
 {
-	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 500.0f, 0.0f), 2));
-	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 600.0f, 0.0f), 2));
-	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 800.0f, 0.0f), 2));
-	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(0.0f, 700.0f, 0.0f), 2));
-	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(-100.0f, 500.0f, 0.0f), 2));
-	m_vec_pBaseBlock.emplace_back(CNormalblock::Create(D3DXVECTOR3(-200.0f, 500.0f, 0.0f), 2));
+	// ブロック設定
+	SetBlockShape();
 
 	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
 	{
@@ -79,6 +75,30 @@ void CConnectblock::Uninit(void)
 void CConnectblock::Update(void)
 {
 
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnectblock::SetBlockShape(void)
+{
+	// 形
+	switch (m_Shape)
+	{
+		// 矩形
+	case SHAPE_RECT:
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0, 7, 0)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0, 8, 0)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1,7,0)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1,8,0)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0,7,1)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(0,8,1)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1, 7, 1)));
+		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, CBaseblock::GRID(1, 8, 1)));
+		break;
+	default:
+		break;
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

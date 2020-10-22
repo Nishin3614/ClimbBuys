@@ -38,6 +38,18 @@ class CStencilshadow;	// ステンシルシャドウクラス
 class CScene_X : public CScene
 {
 public:
+	/* 列挙型 */
+	// モデルタイプ
+	typedef enum
+	{
+		TYPE_NORMAL = 0,		// 適当なモデル
+		TYPE_CUBY,				// カービィー
+		TYPE_BLOCK,				// ブロック
+		TYPE_PLAYER00_ASTOLFO,	// プレイヤー00アストルフォ
+		TYPE_PLAYER01_TANJIRO,	// プレイヤー01たんじろう
+		TYPE_MAX				// 最大数
+	} TYPE;
+	
 	/* 構造体 */
 	// モデル情報
 	typedef struct MODEL_LOAD
@@ -170,7 +182,12 @@ public:
 	// モデルのα値設定
 	void SetModelAlpha(float fModelAlpha)		{ m_fModelAlpha = fModelAlpha; };
 	// ステンシルシャドウ設定
-	void SetStencilshadow(void);
+	//	Size	: サイズ
+	//	Type	: タイプ
+	void SetStencilshadow(
+		D3DXVECTOR3 const & Size,			// サイズ
+		int const & nType	// タイプ
+	);
 	// 当たり判定設定
 	//	nShapeType	: 0:矩形、1:球、2:円柱
 	//	Obj			: オブジェクトタイプ

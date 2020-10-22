@@ -7,6 +7,7 @@
 #include "baseblock.h"
 #include "collision.h"
 #include "debugproc.h"
+#include "stencilshadow.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -45,7 +46,10 @@ void CBaseblock::Init()
 	// シーンXの初期化処理
 	CScene_X::Init();
 	// ステンシルシャドウの設定
-	CScene_X::SetStencilshadow();
+	CScene_X::SetStencilshadow(
+		D3DXVECTOR3(BASEBLOCK_RANGE,BASEBLOCK_XYZTOPOS(100),BASEBLOCK_RANGE),
+		CStencilshadow::TYPE_RECT
+	);
 	if (m_type == TYPE_FIELD)
 	{
 		// 当たり判定の設定

@@ -5,14 +5,16 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "stand.h"
-#include "collision.h"
+#include "rectcollision.h"
 #include "signboard.h"
+#include "player.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#define STAND_TARANSITION_SIZE	(200.0f)	// 遷移範囲のサイズ
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -44,7 +46,16 @@ void CStand::Init()
 	CScene_X::Init();
 	// 当たり判定の設定
 	CScene_X::SetCollision(CShape::SHAPETYPE_RECT, CCollision::OBJTYPE_BLOCK, false, true, NULL, D3DXVECTOR3(0.0, 50.0f, 0.0));
-}
+	//CRectCollision::Create(
+	//	CScene_X::GetSize(),
+	//	D3DXVECTOR3(0.0f,1000.0f,0.0f),
+	//	CCollision::OBJTYPE_BLOCK,
+	//	this,
+	//	NULL,
+	//	false,
+	//	false
+	//);
+}	//
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 終了処理
@@ -182,7 +193,7 @@ void CStand::CreateStand_Tutorial()
 		pStand->ManageSetting(LAYER_3DOBJECT);				// レイヤーの番号
 		pStand->SetModelId(3);								// モデルのid
 		pStand->SetPos(StandPos[nBlockCnt]);				// 位置
-		pStand->SetType(TYPE_BLOCK_MAP1);					// タイプ
+		pStand->SetType(TYPE(TYPE_BLOCK_MAP1 + nBlockCnt));	// タイプ
 		pStand->Init();										// 初期化処理
 
 		// 看板
@@ -204,9 +215,19 @@ void CStand::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 	// ->関数を抜ける
 	if (pScene == NULL) return;
 
-	if (m_type != TYPE_BLOCK_NORMAL)
+	// オブジェクトタイプがプレイヤーなら
+	if (nObjType == CCollision::OBJTYPE_PLAYER)
 	{
-		m_bDetermination = true;
+		// 通常ブロック以外なら
+		if (m_type != TYPE_BLOCK_NORMAL)
+		{
+			CPlayer *pPlayer = (CPlayer *)pScene;
+			// プレイヤータグがプレイヤー1なら
+			if (pPlayer->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+			{
+				m_bDetermination = true;
+			}
+		}
 	}
 }
 
@@ -217,7 +238,16 @@ void CStand::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CStand::Scene_NoOpponentCollision(int const & nObjType, CScene * pScene)
 {
-	m_bDetermination = false;
+	// オブジェクトタイプがプレイヤーなら
+	if (nObjType == CCollision::OBJTYPE_PLAYER)
+	{
+		CPlayer *pPlayer = (CPlayer *)pScene;
+		// プレイヤータグがプレイヤー1なら
+		if (pPlayer->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+		{
+			m_bDetermination = false;
+		}
+	}
 }
 
 

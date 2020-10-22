@@ -42,6 +42,11 @@ int CStencilshadow::m_nTexId[TYPE_MAX] =
 	0,
 };
 
+#ifdef _DEBUG
+bool	CStencilshadow::m_bStencil = true;								// ステンシル描画するかしないか
+#endif // _DEBUG
+
+
 // ----------------------------------------
 // コンストラクタ処理
 // ----------------------------------------
@@ -218,105 +223,110 @@ void CStencilshadow::Draw(void)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
-
-
-	/*
-	//CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLBACK);
-
-	// ポリゴンの描画
-	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
-		0,
-		0,
-		m_nNumberVertex,		//使用する頂点数 三角ポリゴンの頂点
-		0,		//頂点の読み取りを開始する位置
-		m_nNumPolygon);	//ポリゴンの枚数
-
-				// カリングしない
-	CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNULL);
-
-	//Zテスト通常
-	//CManager::GetRenderer()->SetType(CRenderer::TYPE_ZBUFFOFF);
-
-	//通常合成
-	CManager::GetRenderer()->SetType(CRenderer::TYPE_NORMALMIX);
-
-	//ライティングON
-	CManager::GetRenderer()->SetType(CRenderer::TYPE_RIGHTINGON);
-	*/
-
-
-
-	// Zバッファの書き込みを無効に
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, false);
-	// ステンシルバッファを有効にする
-	pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
-	// カラー描画を無効にする
-	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
-	// ステンシル対象を設定
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
-	// ステンシルテスト、Zテスト両方とも合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_ZERO);
-	// ステンシルテスト合格、Zテスト不合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCR);
-	// ステンシルテスト不合格、Zテスト不合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_ZERO);
-	// 裏面カリング(元のカリング)
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-	// ポリゴンの描画
-	pDevice->DrawIndexedPrimitive(
-		D3DPT_TRIANGLESTRIP,
-		0,
-		0,
-		m_nNumberVertex,
-		0,
-		m_nNumPolygon);
-	// ステンシル参照値の設定
-	pDevice->SetRenderState(D3DRS_STENCILREF, 1);
-	// ステンシル対象を設定
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
-	// ステンシルテスト、Zテスト両方とも合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INCR);
-	// ステンシルテスト合格、Zテスト不合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_ZERO);
-	// ステンシルテスト不合格、Zテスト不合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_ZERO);
-	// 時計カリング(元のカリング)
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	// ポリゴンの描画
-	pDevice->DrawIndexedPrimitive(
-		D3DPT_TRIANGLESTRIP,
-		0,
-		0,
-		m_nNumberVertex,
-		0,
-		m_nNumPolygon);
-	// カラー描画を有効にする
-	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
-	// ステンシル参照値の設定
-	pDevice->SetRenderState(D3DRS_STENCILREF, 2);
-	// ステンシル対象を設定
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
-	// ステンシルテスト、Zテスト両方とも合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
-	// ステンシルテスト合格、Zテスト不合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
-	// ステンシルテスト不合格、Zテスト不合格の場合の判定
-	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
-	// 反時計カリング(元のカリング)
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	// 2Dポリゴンの描画
-	if (m_pSceneTwo != NULL)
+#ifdef _DEBUG
+	// ステンシル描画がfalseなら
+	// ->通常描画
+	if (!m_bStencil)
 	{
-		m_pSceneTwo->Draw();
+		CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNORMAL);
+
+		// ポリゴンの描画
+		pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP,		//プリミティブの種類
+			0,
+			0,
+			m_nNumberVertex,		//使用する頂点数 三角ポリゴンの頂点
+			0,		//頂点の読み取りを開始する位置
+			m_nNumPolygon);	//ポリゴンの枚数
+
+					// カリングしない
+		CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNORMAL);
+
+		//Zテスト通常
+		//CManager::GetRenderer()->SetType(CRenderer::TYPE_ZBUFFOFF);
+
+		//通常合成
+		CManager::GetRenderer()->SetType(CRenderer::TYPE_NORMALMIX);
+
+		//ライティングON
+		CManager::GetRenderer()->SetType(CRenderer::TYPE_RIGHTINGON);
 	}
-	// ステンシルバッファを無効にする
-	pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
-	// 反時計カリング(元のカリング)
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	// カラー描画を有効にする
-	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
-	// Zを有効にする
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	// それ以外なら
+	// ->ステンシル描画する
+	else
+#endif // _DEBUG
+	{
+		// Zバッファの書き込みを無効に
+		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, false);
+		// ステンシルバッファを有効にする
+		pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
+		// カラー描画を無効にする
+		pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
+		// ステンシル対象を設定
+		pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+		// ステンシルテスト、Zテスト両方とも合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_ZERO);
+		// ステンシルテスト合格、Zテスト不合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCR);
+		// ステンシルテスト不合格、Zテスト不合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_ZERO);
+		// 裏面カリング(元のカリング)
+		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+		// ポリゴンの描画
+		pDevice->DrawIndexedPrimitive(
+			D3DPT_TRIANGLESTRIP,
+			0,
+			0,
+			m_nNumberVertex,
+			0,
+			m_nNumPolygon);
+		// ステンシル参照値の設定
+		pDevice->SetRenderState(D3DRS_STENCILREF, 1);
+		// ステンシル対象を設定
+		pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
+		// ステンシルテスト、Zテスト両方とも合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INCR);
+		// ステンシルテスト合格、Zテスト不合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_ZERO);
+		// ステンシルテスト不合格、Zテスト不合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_ZERO);
+		// 時計カリング(元のカリング)
+		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		// ポリゴンの描画
+		pDevice->DrawIndexedPrimitive(
+			D3DPT_TRIANGLESTRIP,
+			0,
+			0,
+			m_nNumberVertex,
+			0,
+			m_nNumPolygon);
+		// カラー描画を有効にする
+		pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
+		// ステンシル参照値の設定
+		pDevice->SetRenderState(D3DRS_STENCILREF, 2);
+		// ステンシル対象を設定
+		pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
+		// ステンシルテスト、Zテスト両方とも合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
+		// ステンシルテスト合格、Zテスト不合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+		// ステンシルテスト不合格、Zテスト不合格の場合の判定
+		pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+		// 反時計カリング(元のカリング)
+		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		// 2Dポリゴンの描画
+		if (m_pSceneTwo != NULL)
+		{
+			m_pSceneTwo->Draw();
+		}
+		// ステンシルバッファを無効にする
+		pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
+		// 反時計カリング(元のカリング)
+		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		// カラー描画を有効にする
+		pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
+		// Zを有効にする
+		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	}
 }
 
 #ifdef _DEBUG
@@ -461,204 +471,6 @@ void CStencilshadow::SetUse(bool const bUse)
 }
 
 // ----------------------------------------
-// 頂点座標の生成
-// ----------------------------------------
-void CStencilshadow::MakeVertex(LPDIRECT3DDEVICE9 pDevice)
-{
-	// 変数宣言
-	VERTEX_3D *pVtx;			// 頂点情報へのポイント
-	WORD * pIdx;				// インデックスデータへのポインタを取得
-	D3DXVECTOR3 VecA, VecB;		// ベクトル
-	int nCountDirect;			// 縦のカウント
-	int nCountWidth;			// 横のカウント
-	int nCntBlock = 0;
-	float fAngle;				// yの角度
-	float fRadian;				// yのラジアン値
-	D3DXVECTOR3 *pCross;		// ポリゴンの外積
-	pCross =					// メモリ確保
-		new D3DXVECTOR3[m_nBlock_Width * m_nBlock_Depth * 2];
-
-	// 角度の計算
-	fAngle = D3DX_PI * 2 / m_nBlock_Width;
-
-	// 頂点バッファの生成
-	pDevice->CreateVertexBuffer(
-		sizeof(VERTEX_3D) * m_nNumberVertex,
-		D3DUSAGE_WRITEONLY,
-		FVF_VERTEX_3D,
-		D3DPOOL_MANAGED,
-		&m_pVtxBuff,
-		NULL);
-
-	// インデックスバッファの生成
-	pDevice->CreateIndexBuffer(sizeof(WORD) *
-		m_nNumIndex,
-		D3DUSAGE_WRITEONLY,
-		D3DFMT_INDEX16,
-		D3DPOOL_MANAGED,
-		&m_pIndex,
-		NULL);
-
-	// 頂点データの範囲をロックし、頂点バッファへのポインタ
-	m_pVtxBuff->Lock(
-		0,
-		0,
-		(void **)&pVtx,
-		0);
-
-	//頂点設定 //
-	//行ループ
-	for (nCountDirect = 0; nCountDirect < m_nBlock_Depth + 1; nCountDirect++)
-	{
-		// 列ループ
-		for (nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
-		{
-			// ラジアン値
-			fRadian = fAngle * nCountWidth;
-			fRadian = CCalculation::Rot_One_Limit(fRadian);
-			// 頂点座標の設定
-			pVtx[0].pos =
-				D3DXVECTOR3(
-					(sinf(fRadian) * m_size.x),
-					m_size.y * nCountDirect,
-					(cosf(fRadian) * m_size.z));
-			// 法線ベクトルの設定
-			//pVtx[0].nor = pVtx[0].pos;
-			//D3DXVec3Normalize(&pVtx[0].nor, &pVtx[0].nor);
-
-			// カラーの設定
-			pVtx[0].col = m_col;
-
-			// テクスチャーの設定
-			pVtx[0].tex = D3DXVECTOR2(
-				1.0f / m_nBlock_Width * nCountWidth,
-				1.0f / m_nBlock_Depth * (m_nBlock_Depth - nCountDirect)
-			);
-
-			// ポイント合わせ
-			pVtx++;
-		}
-	}
-	pVtx -= m_nNumberVertex;
-	// ポリゴンごとの法線の設定
-	for (int nCntDepth = 0; nCntDepth < m_nBlock_Depth; nCntDepth++, nCntBlock++)
-	{
-		for (int nCntWidth = 0; nCntWidth < m_nBlock_Width; nCntWidth++, nCntBlock++)
-		{
-			// ベクトル
-			VecA = pVtx[nCntBlock + m_nBlock_Width + 2].pos - pVtx[nCntBlock].pos;
-			VecB = pVtx[nCntBlock + m_nBlock_Width + 1].pos - pVtx[nCntBlock].pos;
-			// 外積計算
-			pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] = CCalculation::Cross_product(VecA, VecB);
-			// 正規化
-			D3DXVec3Normalize(&pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2], &pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2]);
-			// ベクトル
-			VecA = pVtx[nCntBlock + 1].pos - pVtx[nCntBlock].pos;
-			VecB = pVtx[nCntBlock + m_nBlock_Width + 2].pos - pVtx[nCntBlock].pos;
-			// 外積計算
-			pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1] = CCalculation::Cross_product(VecA, VecB);
-			// 正規化
-			D3DXVec3Normalize(&pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1], &pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1]);
-			// 左上
-			pVtx[nCntBlock].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] + pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
-			// 右上
-			pVtx[nCntBlock + 1].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
-			// 左下
-			pVtx[nCntBlock + m_nBlock_Width + 1].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2];
-			// 右下
-			pVtx[nCntBlock + m_nBlock_Width + 2].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] + pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
-		}
-	}
-	nCntBlock = 0;
-	// 頂点法線の設定
-	for (int nCntDepth = 0; nCntDepth < m_nBlock_Depth + 1; nCntDepth++, nCntBlock++)
-	{
-		for (int nCntWidth = 0; nCntWidth < m_nBlock_Width + 1; nCntWidth++, nCntBlock++)
-		{
-			// 最初
-			if (nCntDepth == 0 && nCntWidth == 0)
-			{
-				pVtx[0].nor /= 2;
-			}
-			// 最後
-			else if (nCntDepth == m_nBlock_Depth && nCntWidth == m_nBlock_Width)
-			{
-				pVtx[0].nor /= 2;
-			}
-			// 1行の列の最後
-			else if (nCntDepth == 0 && nCntWidth == m_nBlock_Width)
-			{
-			}
-			// 最後行の列の最初
-			else if (nCntDepth == m_nBlock_Depth && nCntWidth == 0)
-			{
-			}
-			// 最初の行または最後の行
-			else if (nCntDepth == 0 || nCntDepth == m_nBlock_Depth)
-			{
-				pVtx[0].nor /= 3;
-			}
-			// 最初の列または最後の列
-			else if (nCntWidth == 0 || nCntWidth == m_nBlock_Width)
-			{
-				pVtx[0].nor /= 3;
-			}
-			// それ以外
-			else
-			{
-				pVtx[0].nor /= 6;
-			}
-			pVtx++;
-		}
-	}
-
-	// アンロック
-	m_pVtxBuff->Unlock();
-
-	// 頂点データの範囲をロックし、頂点バッファへのポインタ
-	m_pIndex->Lock(0, 0, (void **)&pIdx, 0);
-
-	// 縦ブロック個数
-	for (nCountDirect = 0; nCountDirect < m_nBlock_Depth; nCountDirect++)
-	{
-		// ２回目のループ以降
-		if (nCountDirect >= 1)
-		{
-			// 縮退ポリゴン分の頂点追加
-			pIdx[0] = nCountDirect * (m_nBlock_Width + 1) + m_nBlock_Width + 1;
-
-			// インデックスのポイント合わせ
-			pIdx++;
-		}
-
-		// 横ブロックの頂点数
-		for (nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
-		{
-			// 描画順番のインデックス
-			pIdx[0] = nCountDirect * (m_nBlock_Width + 1) + nCountWidth + m_nBlock_Width + 1;
-			pIdx[1] = nCountDirect * (m_nBlock_Width + 1) + nCountWidth;
-
-			// インデックスのポイント合わせ
-			pIdx += 2;
-		}
-
-		// 縮退ポリゴンを作る必要がある場合
-		if (nCountDirect < m_nBlock_Depth - 1)
-		{
-			// 縮退ポリゴン分の頂点追加
-			pIdx[0] = nCountDirect * (m_nBlock_Width + 1) + m_nBlock_Width;
-			// インデックスのポイント合わせ
-			pIdx++;
-		}
-	}
-
-	// アンロック
-	m_pIndex->Unlock();
-	delete[] pCross;
-	pCross = NULL;
-}
-
-// ----------------------------------------
 // 円柱の設定
 // ----------------------------------------
 void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
@@ -669,7 +481,6 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 	D3DXVECTOR3 VecA, VecB;		// ベクトル
 	int nCountDirect;			// 縦のカウント
 	int nCountWidth;			// 横のカウント
-	int nCntBlock = 0;
 	float fAngle;				// yの角度
 	float fRadian;				// yのラジアン値
 	D3DXVECTOR3 *pCross;		// ポリゴンの外積
@@ -736,53 +547,21 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 					m_size.y * nCountDirect,
 					(cosf(fRadian) * m_size.z));
 			// 法線ベクトルの設定
-			//pVtx[0].nor = pVtx[0].pos;
-			//D3DXVec3Normalize(&pVtx[0].nor, &pVtx[0].nor);
+			pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 			// カラーの設定
 			pVtx[0].col = m_col;
 
 			// テクスチャーの設定
 			pVtx[0].tex = D3DXVECTOR2(
-				1.0f / m_nBlock_Width * nCountWidth,
-				1.0f / m_nBlock_Depth * (m_nBlock_Depth - nCountDirect)
+				1.0f,
+				1.0f
 			);
 
 			// ポイント合わせ
 			pVtx++;
 		}
 	}
-	pVtx -= m_nNumberVertex;
-	// ポリゴンごとの法線の設定
-	for (int nCntDepth = 0; nCntDepth < m_nBlock_Depth; nCntDepth++, nCntBlock++)
-	{
-		for (int nCntWidth = 0; nCntWidth < m_nBlock_Width; nCntWidth++, nCntBlock++)
-		{
-			// ベクトル
-			VecA = pVtx[nCntBlock + m_nBlock_Width + 2].pos - pVtx[nCntBlock].pos;
-			VecB = pVtx[nCntBlock + m_nBlock_Width + 1].pos - pVtx[nCntBlock].pos;
-			// 外積計算
-			pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] = CCalculation::Cross_product(VecA, VecB);
-			// 正規化
-			D3DXVec3Normalize(&pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2], &pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2]);
-			// ベクトル
-			VecA = pVtx[nCntBlock + 1].pos - pVtx[nCntBlock].pos;
-			VecB = pVtx[nCntBlock + m_nBlock_Width + 2].pos - pVtx[nCntBlock].pos;
-			// 外積計算
-			pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1] = CCalculation::Cross_product(VecA, VecB);
-			// 正規化
-			D3DXVec3Normalize(&pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1], &pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1]);
-			// 左上
-			pVtx[nCntBlock].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] + pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
-			// 右上
-			pVtx[nCntBlock + 1].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
-			// 左下
-			pVtx[nCntBlock + m_nBlock_Width + 1].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2];
-			// 右下
-			pVtx[nCntBlock + m_nBlock_Width + 2].nor += pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2] + pCross[nCntWidth * 2 + nCntDepth * m_nBlock_Width * 2 + 1];
-		}
-	}
-	nCntBlock = 0;
 	// アンロック
 	m_pVtxBuff->Unlock();
 
@@ -866,18 +645,19 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点の合計 = 8
-	pVtx[0].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	m_size.z * 0.5f);
-	pVtx[1].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	m_size.z * 0.5f);
-	pVtx[2].pos = D3DXVECTOR3(m_size.x * 0.5f,	m_size.y * 0.5f,	-m_size.z * 0.5f);
-	pVtx[3].pos = D3DXVECTOR3(-m_size.x * 0.5f, m_size.y * 0.5f,	-m_size.z * 0.5f);
-	pVtx[4].pos = D3DXVECTOR3(-m_size.x * 0.5f,	m_size.y * 0.5f,	m_size.z * 0.5f);
+	pVtx[0].pos = D3DXVECTOR3(-m_size.x * 0.5f,	-m_size.y,	m_size.z * 0.5f);
+	pVtx[1].pos = D3DXVECTOR3(m_size.x * 0.5f,	-m_size.y,	m_size.z * 0.5f);
+	pVtx[2].pos = D3DXVECTOR3(m_size.x * 0.5f,	-m_size.y,	-m_size.z * 0.5f);
+	pVtx[3].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y,	-m_size.z * 0.5f);
+	pVtx[4].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y,	m_size.z * 0.5f);
+
+	pVtx[5].pos = D3DXVECTOR3(-m_size.x * 0.5f, 0.0f,	m_size.z * 0.5f);
+	pVtx[6].pos = D3DXVECTOR3(m_size.x * 0.5f,	0.0f,	m_size.z * 0.5f);
+	pVtx[7].pos = D3DXVECTOR3(m_size.x * 0.5f,	0.0f,	-m_size.z * 0.5f);
+	pVtx[8].pos = D3DXVECTOR3(-m_size.x * 0.5f, 0.0f,	-m_size.z * 0.5f);
+	pVtx[9].pos = D3DXVECTOR3(-m_size.x * 0.5f,	0.0f,	m_size.z * 0.5f);
 
 
-	pVtx[5].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f, m_size.z * 0.5f);
-	pVtx[6].pos = D3DXVECTOR3(m_size.x * 0.5f, -m_size.y * 0.5f, m_size.z * 0.5f);
-	pVtx[7].pos = D3DXVECTOR3(m_size.x * 0.5f, -m_size.y * 0.5f, -m_size.z * 0.5f);
-	pVtx[8].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f, -m_size.z * 0.5f);
-	pVtx[9].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y * 0.5f, m_size.z * 0.5f);
 
 	//頂点の合計 = 8
 	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
@@ -888,6 +668,8 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	pVtx[5].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	pVtx[6].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	pVtx[7].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[8].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	pVtx[9].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 	// 頂点の合計 = 8
 	pVtx[0].col = m_col;
@@ -898,6 +680,8 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	pVtx[5].col = m_col;
 	pVtx[6].col = m_col;
 	pVtx[7].col = m_col;
+	pVtx[8].col = m_col;
+	pVtx[9].col = m_col;
 
 	pVtx[0].tex = D3DXVECTOR2(1.0f, 1.0f);
 	pVtx[1].tex = D3DXVECTOR2(0.0f, 1.0f);
@@ -907,6 +691,8 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	pVtx[5].tex = D3DXVECTOR2(0.0f, 0.0f);
 	pVtx[6].tex = D3DXVECTOR2(1.0f, 1.0f);
 	pVtx[7].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[8].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[9].tex = D3DXVECTOR2(1.0f, 0.0f);
 
 	//頂点データをアンロック
 	m_pVtxBuff->Unlock();

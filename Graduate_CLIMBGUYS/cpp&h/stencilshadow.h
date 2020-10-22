@@ -26,7 +26,7 @@
 // 前方宣言
 //
 // ----------------------------------------
-class CScene_TWO;
+class CScene_TWO;	// シーン2Dクラス
 
 // ------------------------------------------
 //
@@ -59,6 +59,10 @@ public:
 #ifdef _DEBUG
 	// デバッグ処理
 	void Debug(void);
+	// ステンシル描画状態の設定
+	static void SetStencil(bool const &bStencil) { m_bStencil = bStencil; };
+	// ステンシル描画状態の取得
+	static bool & GetStencil(void) { return m_bStencil; };
 #endif // _DEBUG
 	// 当たった後の処理
 	//	nObjType	: オブジェクトタイプ
@@ -104,7 +108,7 @@ public:
 		D3DXVECTOR3 const &size,						// サイズ
 		TYPE const &type = TYPE_CYLINDER,				// タイプ
 		int const &nWidth = 10,							// 横数
-		int const &nDepth = 5,							// 縦数
+		int const &nDepth = 1,							// 縦数
 		D3DXCOLOR	const &col = D3DXCOLOR_INI,			// カラー
 		D3DXVECTOR3 const &rot = D3DVECTOR3_ZERO		// 回転
 	);
@@ -119,18 +123,21 @@ public:
 		D3DXVECTOR3 const &rot = D3DVECTOR3_ZERO		// 回転
 	);
 	// 取得
-	bool GetUse(void);						// 使用状態
+	// 使用状態
+	bool GetUse(void);
 	// 設定
-	void SetPos(D3DXVECTOR3 const &pos);	// 位置
-	void SetRot(D3DXVECTOR3 const &rot);	// 回転
-	void SetCol(D3DXCOLOR const &col);		// 色
-	void SetUse(bool const bUse);					// 使用状態
+	// 位置設定
+	void SetPos(D3DXVECTOR3 const &pos);
+	// 回転設定
+	void SetRot(D3DXVECTOR3 const &rot);
+	// 色設定
+	void SetCol(D3DXCOLOR const &col);
+	// 仕様設定
+	void SetUse(bool const bUse);
 protected:
 
 private:
 	/* 関数 */
-	// 頂点座標の生成
-	void MakeVertex(LPDIRECT3DDEVICE9 pDevice);
 	// 円柱の設定
 	void SetCylinder(LPDIRECT3DDEVICE9 pDevice);
 	// 矩形の設定
@@ -153,6 +160,9 @@ private:
 	bool	m_bUse;									// 使用
 	TYPE	m_type;									// タイプ
 	std::unique_ptr<CScene_TWO> m_pSceneTwo;		// 2Dポリゴン
+#ifdef _DEBUG
+	static bool	m_bStencil;							// ステンシル描画するかしないか
+#endif // _DEBUG
 };
 
 #endif

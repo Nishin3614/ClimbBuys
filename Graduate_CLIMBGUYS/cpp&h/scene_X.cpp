@@ -112,8 +112,8 @@ void CScene_X::Uninit(void)
 	// 当たり判定情報の開放
 	if (m_Collision != NULL)
 	{
-		m_Collision->CompulsionScene();
-		m_Collision->Release();
+		//m_Collision->CompulsionScene();
+		//m_Collision->Release();
 		m_Collision = NULL;
 	}
 	// モデルカラー情報がNULLなら
@@ -157,8 +157,6 @@ void CScene_X::Update(void)
 	{
 		// 位置情報の更新(行列渡し)
 		m_Collision->GetShape()->PassMatrix(m_mtxWorld);
-		// 更新
-		m_Collision->Update();
 		return;
 	}
 }

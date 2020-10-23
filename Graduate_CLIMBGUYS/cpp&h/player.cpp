@@ -23,7 +23,7 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define PLAYER_GRAVITY (0.1f)
+#define PLAYER_GRAVITY			(0.1f)
 #define PLAYER_UPMOVELIMIT		(30.0f)	// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
 #define PLAYER_JUMP_POWER		(18.0f)	// プレイヤーのジャンプ力
@@ -345,7 +345,7 @@ void CPlayer::StatusMotion(void)
 		SetMotion(MOTIONTYPE_NEUTRAL);
 	}
 	*/
-	
+
 	//// 試験的オブジェクトウィンドウ
 	//ImGui::Begin(u8"Player状態", nullptr, ImGuiWindowFlags_MenuBar);
 
@@ -409,6 +409,10 @@ void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 	// 当たったオブジェクトがブロックだったらジャンプを可能にする
 	if (nObjType == CCollision::OBJTYPE_BLOCK)
 	{
+		// 変数宣言
+		CScene_X * pSceneX = (CScene_X *)pScene;
+		pSceneX->GetCollision();
+		this->GetCollision()->GetShape();
 		SetJumpAble(true);
 	}
 	// 当たったオブジェクトがダメージ床だったら死亡フラグをtrueにする

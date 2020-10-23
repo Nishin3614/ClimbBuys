@@ -381,6 +381,26 @@ void CCharacter::Move(void)
 	if (m_pCharacterCollision != NULL)
 	{
 		m_pCharacterCollision->GetShape()->PassPos(m_pos);
+
+#ifdef _DEBUG
+		/*
+		CRectShape * pRectShape = (CRectShape *)m_pCharacterCollision->GetShape();
+
+		// テスト用
+		D3DXVECTOR3 Max = pRectShape->GetMax();
+		D3DXVECTOR3 MaxOld = pRectShape->GetMaxOld();
+		D3DXVECTOR3 Min = pRectShape->GetMin();
+		D3DXVECTOR3 MinOld = pRectShape->GetMinOld();
+		CDebugproc::Print("キャラクターの当たり判定の最大値(%.3f,%.3f,%.3f)\n",
+			Max.x, Max.y, Max.z);
+		CDebugproc::Print("キャラクターの当たり判定の前回の最大値(%.3f,%.3f,%.3f)\n",
+			MaxOld.x, MaxOld.y, MaxOld.z);
+		CDebugproc::Print("キャラクターの当たり判定の最小値(%.3f,%.3f,%.3f)\n",
+			Min.x, Min.y, Min.z);
+		CDebugproc::Print("キャラクターの当たり判定の前回の最小値(%.3f,%.3f,%.3f)\n",
+			MinOld.x, MinOld.y, MinOld.z);
+			*/
+#endif // _DEBUG
 	}
 }
 

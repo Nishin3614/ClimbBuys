@@ -31,8 +31,14 @@ public:
 	// 形情報
 	typedef enum
 	{
-		SHAPE_RECT = 0,
-		SHAPE_MAX
+		SHAPE_RECT = 0,	// 矩形
+		SHAPE_I,		// Iブロック
+		SHAPE_J,		// Jブロック
+		SHAPE_L,		// Lブロック
+		SHAPE_S,		// Sブロック
+		SHAPE_T,		// Tブロック
+		SHAPE_Z,		// Zブロック
+		SHAPE_MAX		// 最大数
 	} SHAPE;
 	// フィールドタイプ情報
 	typedef enum

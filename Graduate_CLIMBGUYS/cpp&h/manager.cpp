@@ -276,6 +276,8 @@ void CManager::SetMode(MODE const &mode)
 	{
 		// ベースモードの終了処理
 		m_BaseMode->Uninit();
+		delete m_BaseMode;
+		m_BaseMode = NULL;
 	}
 	// 前のモード終了
 	switch (m_mode)

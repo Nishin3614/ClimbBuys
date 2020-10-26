@@ -78,6 +78,14 @@ public:
 			variable.nHeight = nHeight + Source;
 			return variable;
 		}
+		// 行列高さの+=のオペレーション
+		GRID & operator += (GRID const & Grid)
+		{
+			nColumn += Grid.nColumn;
+			nLine += Grid.nLine;
+			nHeight += Grid.nHeight;
+			return *this;
+		}
 		// 行列高さから位置を定めたオペレーション
 		operator D3DXVECTOR3 ()
 		{

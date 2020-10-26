@@ -19,7 +19,6 @@
 #include "3Dparticle.h"
 
 
-#include "baseblock.h"
 #include "stand.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -88,134 +87,10 @@ void CPlayer::Update(void)
 	StatusMotion();
 	// キャラクター更新
 	CCharacter::Update();
+	// 限界地点
 	CCharacter::Limit();
-
-
-
-
-	CScene_X * pScene_X;
-	COLLISIONDIRECTION Direct;
-	// 素材ループ
-	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
-	{
-		pScene_X = NULL;
-		// ベースブロック情報の代入
-		pScene_X = (CScene_X *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
-		// NULLなら
-		// ->関数を抜ける
-		if (pScene_X == NULL)
-		{
-			continue;
-		}
-		// 当たり判定
-		Direct = pScene_X->PushCollision(
-			CCharacter::GetObj(),
-			&CCharacter::GetPos(),
-			&CCharacter::GetPosOld(),
-			&CCharacter::GetMove(),
-			&D3DXVECTOR3(50.0f, 50.0f, 50.0f),
-			D3DXVECTOR3(0.0f, 25.0f, 0.0f)
-		);
-		// 前
-		if (Direct == COLLISIONDIRECTION::FRONT)
-		{
-			// 足場オブジェクトなら
-			if (pScene_X->GetObj() == CScene::OBJ_STAND)
-			{
-				// プレイヤータグが1プレイヤーなら
-				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-				{
-					CStand * pStand = (CStand *)pScene_X;
-					pStand->SetDetermination(false);
-				}
-			}
-		}
-		// 後
-		else if (Direct == COLLISIONDIRECTION::BACK)
-		{
-			// 足場オブジェクトなら
-			if (pScene_X->GetObj() == CScene::OBJ_STAND)
-			{
-				// プレイヤータグが1プレイヤーなら
-				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-				{
-					CStand * pStand = (CStand *)pScene_X;
-					pStand->SetDetermination(false);
-				}
-			}
-		}
-		// 左
-		else if (Direct == COLLISIONDIRECTION::LEFT)
-		{
-			// 足場オブジェクトなら
-			if (pScene_X->GetObj() == CScene::OBJ_STAND)
-			{
-				// プレイヤータグが1プレイヤーなら
-				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-				{
-					CStand * pStand = (CStand *)pScene_X;
-					pStand->SetDetermination(false);
-				}
-			}
-		}
-		// 右
-		else if (Direct == COLLISIONDIRECTION::RIGHT)
-		{
-			// 足場オブジェクトなら
-			if (pScene_X->GetObj() == CScene::OBJ_STAND)
-			{
-				// プレイヤータグが1プレイヤーなら
-				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-				{
-					CStand * pStand = (CStand *)pScene_X;
-					pStand->SetDetermination(false);
-				}
-			}
-		}
-		// 上
-		else if (Direct == COLLISIONDIRECTION::UP)
-		{
-			// ジャンプ可能設定
-			SetJumpAble(true);
-			// 足場オブジェクトなら
-			if (pScene_X->GetObj() == CScene::OBJ_STAND)
-			{
-				// プレイヤータグが1プレイヤーなら
-				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-				{
-					CStand * pStand = (CStand *)pScene_X;
-					pStand->SetDetermination(true);
-				}
-			}
-		}
-		// 下
-		else if (Direct == COLLISIONDIRECTION::DOWN)
-		{
-			// 足場オブジェクトなら
-			if (pScene_X->GetObj() == CScene::OBJ_STAND)
-			{
-				// プレイヤータグが1プレイヤーなら
-				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-				{
-					CStand * pStand = (CStand *)pScene_X;
-					pStand->SetDetermination(false);
-				}
-			}
-		}
-		else
-		{
-			// 足場オブジェクトなら
-			if (pScene_X->GetObj() == CScene::OBJ_STAND)
-			{
-				// プレイヤータグが1プレイヤーなら
-				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-				{
-					CStand * pStand = (CStand *)pScene_X;
-					pStand->SetDetermination(false);
-				}
-			}
-		}
-	}
+	// 当たり判定の処理
+	Collision();
 
 
 
@@ -412,6 +287,7 @@ void CPlayer::MyMove(void)
 				move.z -= 100.0f;
 				break;
 			}
+			CCharacter::SetDash(true);
 		}
 	}
 
@@ -502,6 +378,131 @@ void CPlayer::StatusMotion(void)
 	//}
 	//// End
 	//ImGui::End();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 足場判定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::StandJudg(
+	CScene_X * pScene_X,
+	bool const & bJudg
+)
+{
+	// 足場オブジェクトなら
+	if (pScene_X->GetObj() == CScene::OBJ_STAND)
+	{
+		// プレイヤータグが1プレイヤーなら
+		if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+		{
+			CStand * pStand = (CStand *)pScene_X;
+			pStand->SetDetermination(bJudg);
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 当たり判定の処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::Collision(void)
+{
+	// 変数宣言
+	CScene_X * pScene_X;		// シーンX情報
+	COLLISIONDIRECTION Direct;	// 当たり判定の方向
+	// ブロックループ
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
+	{
+		// NULL代入
+		pScene_X = NULL;
+		// 情報取得
+		pScene_X = (CScene_X *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
+		// NULLなら
+		// ->関数を抜ける
+		if (pScene_X == NULL)
+		{
+			continue;
+		}
+		// 当たり判定
+		Direct = pScene_X->PushCollision(
+			CCharacter::GetObj(),
+			&CCharacter::GetPos(),
+			&CCharacter::GetPosOld(),
+			&CCharacter::GetMove(),
+			&D3DXVECTOR3(50.0f, 50.0f, 50.0f),
+			D3DXVECTOR3(0.0f, 25.0f, 0.0f)
+		);
+		// ブロックの判定
+		// 前
+		if (Direct == COLLISIONDIRECTION::FRONT)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(0, 0, -1));
+		}
+		// 後
+		else if (Direct == COLLISIONDIRECTION::BACK)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(0, 0, 1));
+		}
+		// 左
+		else if (Direct == COLLISIONDIRECTION::LEFT)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(1, 0, 0));
+		}
+		// 右
+		else if (Direct == COLLISIONDIRECTION::RIGHT)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(-1, 0, 0));
+		}
+		// 上
+		else if (Direct == COLLISIONDIRECTION::UP)
+		{
+			// ジャンプ可能設定
+			SetJumpAble(true);
+			// 足場判定
+			StandJudg(pScene_X, true);
+		}
+		// 下
+		else if (Direct == COLLISIONDIRECTION::DOWN)
+		{
+
+		}
+		else
+		{
+			// 足場判定
+			StandJudg(pScene_X, false);
+		}
+	}
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの押し出し処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PushBlock(
+	CScene_X * pScene_X,			// シーンX情報
+	CBaseblock::GRID const & Grid	// 方向
+)
+{
+	// 足場オブジェクトなら
+	if (pScene_X->GetObj() == CScene::OBJ_BLOCK)
+	{
+		if (!CCharacter::GetDash()) return;
+		// 変数宣言
+		CBaseblock * pBlock = (CBaseblock *)pScene_X;	// ベースブロックの情報
+		CBaseblock::GRID MyGrid = pBlock->GetGrid();
+		MyGrid = pBlock->GetGrid();
+		MyGrid += Grid;
+		int nHeight = CBaseblock::GetHeight(MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS, MyGrid.nLine + BASEBLOCK_MINUSTOPLUS);
+		if (MyGrid.nHeight <= CBaseblock::GetHeight(MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS, MyGrid.nLine + BASEBLOCK_MINUSTOPLUS))
+		{
+			return;
+		}
+		// ブロックの高さ情報を更新
+		CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(BASEBLOCK_MINUSTOPLUS,-1, BASEBLOCK_MINUSTOPLUS));
+		pBlock->SetGrid(MyGrid);
+		// 位置設定
+		pBlock->SetPos((D3DXVECTOR3)MyGrid);
+		// ブロックの高さ情報を更新
+		CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(BASEBLOCK_MINUSTOPLUS, 0, BASEBLOCK_MINUSTOPLUS));
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

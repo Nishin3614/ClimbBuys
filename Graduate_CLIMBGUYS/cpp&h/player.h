@@ -126,5 +126,7 @@ private:
 
 	CXInputPad		*m_pPad;						// パッドのポインタ
 	bool			m_bDieFlag;						// 死亡フラグ
+	bool			m_bDashFlag;					// ダッシュフラグ
+	int				m_nCntDashTime;					// ダッシュ中の切り替えカウント
 };
 #endif

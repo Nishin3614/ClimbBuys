@@ -17,7 +17,7 @@
 #include "ui_group.h"
 #include "meshdome.h"
 #include "3Dparticle.h"
-
+#include "debugproc.h"
 
 #include "stand.h"
 
@@ -31,6 +31,7 @@
 #define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
 #define PLAYER_JUMP_POWER		(18.0f)	// プレイヤーのジャンプ力
 #define PLAYER_MOVE				(3.0f)	// プレイヤーの移動速度
+#define DASH_TIME_MAX			(30)	// ダッシュしている時間
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -43,8 +44,10 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
-	m_nCntState = 0;				// ステートカウント
-	m_bDieFlag = false;				// 死亡フラグ
+	m_nCntState			= 0;				// ステートカウント
+	m_bDieFlag			= false;			// 死亡フラグ
+	m_bDashFlag			= false;			// ダッシュフラグ
+	m_nCntDashTime		= 0;				// ダッシュ中の切り替えカウント
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 }
 
@@ -114,6 +117,20 @@ void CPlayer::MyAction(void)
 {
 	// 自キャラの移動処理
 	MyMove();
+
+	// 試験的ダッシュの切り替え
+	if (m_bDashFlag)
+	{
+		m_nCntDashTime++;
+
+		if (m_nCntDashTime > DASH_TIME_MAX)
+		{
+			// 初期化
+			m_nCntDashTime	= 0;
+			m_bDashFlag		= false;
+		}
+	}
+	CDebugproc::Print("\nPlayerダッシュ %d\n", m_bDashFlag);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -237,57 +254,64 @@ void CPlayer::MyMove(void)
 		// ゲームパッドのスティック情報を取得
 		m_pPad->GetStickLeft(&fValueH, &fValueV);
 
-		// プレイヤー移動
-		// ゲームパッド移動
-		if (fValueH != 0 || fValueV != 0)
+		// ダッシュしていないとき
+		if (!m_bDashFlag)
 		{
-			// 角度の計算
-			fAngle = atan2f((float)fValueH, (float)fValueV);
 
-			if (fAngle > D3DX_PI)
+			// プレイヤー移動
+			// ゲームパッド移動
+			if (fValueH != 0 || fValueV != 0)
 			{
-				fAngle -= D3DX_PI * 2;
+				// 角度の計算
+				fAngle = atan2f((float)fValueH, (float)fValueV);
+
+				if (fAngle > D3DX_PI)
+				{
+					fAngle -= D3DX_PI * 2;
+				}
+				else if (fAngle < -D3DX_PI)
+				{
+					fAngle += D3DX_PI * 2;
+				}
+				rot.y = fAngle + fRot;
+				vec = D3DXVECTOR3(sinf(fAngle + fRot), 0.0f, cosf(fAngle + fRot));
+				// スティックの角度によってプレイヤー移動
+				move.x -= sinf(fAngle + fRot) * (fMove);
+				move.z -= cosf(fAngle + fRot) * (fMove);
 			}
-			else if (fAngle < -D3DX_PI)
+
+			// 試験的ジャンプ ( のちに中身変わる予定 多分 )
+			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
 			{
-				fAngle += D3DX_PI * 2;
+				move.y += PLAYER_JUMP_POWER;
+				SetJumpAble(false);
 			}
-			rot.y = fAngle + fRot;
-			vec = D3DXVECTOR3(sinf(fAngle + fRot), 0.0f, cosf(fAngle + fRot));
-			// スティックの角度によってプレイヤー移動
-			move.x -= sinf(fAngle + fRot) * (fMove);
-			move.z -= cosf(fAngle + fRot) * (fMove);
-		}
 
-		// 試験的ジャンプ ( のちに中身変わる予定 多分 )
-		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
-		{
-			move.y += PLAYER_JUMP_POWER;
-			SetJumpAble(false);
-		}
-
-		// 試験的タックル ( のちに中身変わる予定 多分 )
-		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
-		{
-			switch (CCalculation::CheckPadStick())
+			// 試験的タックル ( のちに中身変わる予定 多分 )
+			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 			{
-			case DIRECTION::LEFT:
-				move.x -= 100.0f;
-				break;
+				m_bDashFlag = true;
 
-			case DIRECTION::RIGHT:
-				move.x += 100.0f;
-				break;
+				switch (CCalculation::CheckPadStick())
+				{
+				case DIRECTION::LEFT:
+					move.x -= 100.0f;
+					break;
 
-			case DIRECTION::UP:
-				move.z += 100.0f;
-				break;
+				case DIRECTION::RIGHT:
+					move.x += 100.0f;
+					break;
 
-			case DIRECTION::DOWN:
-				move.z -= 100.0f;
-				break;
+				case DIRECTION::UP:
+					move.z += 100.0f;
+					break;
+
+				case DIRECTION::DOWN:
+					move.z -= 100.0f;
+					break;
+				}
+				CCharacter::SetDash(true);
 			}
-			CCharacter::SetDash(true);
 		}
 	}
 

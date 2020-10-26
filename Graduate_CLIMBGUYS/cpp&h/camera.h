@@ -45,6 +45,16 @@ public:
 		float fHeight;		// 注視点と視点の高さ
 		int nType;			// タイプ
 	} LOAD;
+	// 360度回転
+	typedef struct TURN
+	{
+		int		nSpin;					// 回る回数
+		int		nCntSpin;				// 回った回数
+		int		nOneTime;				// 一周回転にかかる時間
+		int		nCntTime;				// タイムカウント
+		float	fTrunRot;				// 回転量
+		bool	bSpin;					// 回転状態
+	} TURN;
 	/* 関数 */
 	// コンストラクタ
 	CCamera();
@@ -114,12 +124,20 @@ public:
 	);
 	// カメラの視点取得
 	D3DXVECTOR3 &GetPosV(void) { return m_posV; };
-	//
 protected:
 
 private:
 	/* 関数 */
 	void Update_Play(void);						// プレイ時のカメラ
+	// チュートリアル初期化処理
+	void Init_Tutorial(void);
+	// タイトル初期化処理
+	void Init_Title(void);
+	// チュートリアル更新処理
+	void Update_Tutorial(void);
+	// タイトル更新処理
+	void Update_Title(void);
+
 	// 初期時のカメラ設定
 	void InitCamera(void);
 	/* 変数 */
@@ -147,6 +165,7 @@ private:
 	float			m_fLength;					// 視点と注視点の距離
 	float			m_fIntertia;				// 慣性の比率
 	bool			m_bSet;						// カメラ設定
+	TURN			m_Turn;						// 360°回転
 };
 
 #endif

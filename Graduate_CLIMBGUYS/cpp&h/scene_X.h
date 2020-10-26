@@ -49,7 +49,7 @@ public:
 		TYPE_PLAYER01_TANJIRO,	// プレイヤー01たんじろう
 		TYPE_MAX				// 最大数
 	} TYPE;
-	
+
 	/* 構造体 */
 	// モデル情報
 	typedef struct MODEL_LOAD
@@ -166,6 +166,34 @@ public:
 	static HRESULT LoadModel(void);
 	// モデル情報の開放
 	static HRESULT UnLoadModel(void);
+
+	// 押し出し当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos		: 位置
+	//	posOld	: 前回の位置
+	//	move	: 移動量
+	//	size	: サイズ
+	COLLISIONDIRECTION PushCollision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * move,								// 移動量
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
+	// 当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos			: 位置
+	//	size		: サイズ
+	//	OffsetPos	: オフセット位置
+	COLLISIONDIRECTION Collision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
+
 	// 設定
 	// 位置設定
 	void SetPos(D3DXVECTOR3 const &pos)			{ m_pos = pos; };
@@ -209,7 +237,7 @@ public:
 	);
 	// 取得
 	// モデル情報取得
-	CScene_X::MODEL_LOAD * GetModel(int const & nModelId);
+	CScene_X::MODEL_LOAD * GetModel(void);
 	// 位置取得
 	D3DXVECTOR3 &GetPos(void) { return m_pos; };
 	// 回転取得

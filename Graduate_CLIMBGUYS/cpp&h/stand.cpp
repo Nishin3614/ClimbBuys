@@ -29,6 +29,7 @@ CStand::CStand() : CScene_X::CScene_X()
 {
 	m_type = TYPE_BLOCK_NORMAL;	// タイプ
 	m_bFall = false;		// 落ちる状態
+	CScene::SetObj(CScene::OBJ::OBJ_STAND);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +46,7 @@ void CStand::Init()
 {
 	CScene_X::Init();
 	// 当たり判定の設定
-	CScene_X::SetCollision(CShape::SHAPETYPE_RECT, CCollision::OBJTYPE_BLOCK, false, true, NULL, D3DXVECTOR3(0.0, 50.0f, 0.0));
+	//CScene_X::SetCollision(CShape::SHAPETYPE_RECT, CCollision::OBJTYPE_BLOCK, false, true, NULL, D3DXVECTOR3(0.0, 50.0f, 0.0));
 	//CRectCollision::Create(
 	//	CScene_X::GetSize(),
 	//	D3DXVECTOR3(0.0f,1000.0f,0.0f),
@@ -118,7 +119,7 @@ CStand * CStand::Create(
 	pStand->ManageSetting(layer);
 	pStand->SetPos(pos);			// 位置
 	pStand->SetModelId(nModelId);	// 位置
-									// 初期化処理
+	// 初期化処理
 	pStand->Init();
 	// 生成したオブジェクトを返す
 	return pStand;
@@ -190,7 +191,7 @@ void CStand::CreateStand_Tutorial()
 		pStand = new CStand();
 		// 設定
 		// シーン管理設定
-		pStand->ManageSetting(LAYER_3DOBJECT);				// レイヤーの番号
+		pStand->ManageSetting(LAYER_3DBLOCK);				// レイヤーの番号
 		pStand->SetModelId(3);								// モデルのid
 		pStand->SetPos(StandPos[nBlockCnt]);				// 位置
 		pStand->SetType(TYPE(TYPE_BLOCK_MAP1 + nBlockCnt));	// タイプ

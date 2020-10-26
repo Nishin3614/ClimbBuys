@@ -31,6 +31,7 @@ CBaseblock::CBaseblock() : CScene_X::CScene_X()
 {
 	m_type = TYPE_NORMAL;	// タイプ
 	m_bFall = false;		// 落ちる状態
+	CScene::SetObj(CScene::OBJ::OBJ_BLOCK);	// オブジェクトタイプの設定
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,10 +49,11 @@ void CBaseblock::Init()
 	// シーンXの初期化処理
 	CScene_X::Init();
 	// ステンシルシャドウの設定
-	//CScene_X::SetStencilshadow(
-	//	D3DXVECTOR3(BASEBLOCK_RANGE,BASEBLOCK_XYZTOPOS(100),BASEBLOCK_RANGE),
-	//	CStencilshadow::TYPE_RECT
-	//);
+	CScene_X::SetStencilshadow(
+		D3DXVECTOR3(BASEBLOCK_RANGE,BASEBLOCK_XYZTOPOS(100),BASEBLOCK_RANGE),
+		CStencilshadow::TYPE_RECT
+	);
+	/*
 	if (m_type == TYPE_FIELD)
 	{
 		// 当たり判定の設定
@@ -62,6 +64,7 @@ void CBaseblock::Init()
 		// 当たり判定の設定
 		CScene_X::SetCollision(CShape::SHAPETYPE_RECT, CCollision::OBJTYPE_BLOCK, false, true, NULL, D3DXVECTOR3(0.0, 50.0f, 0.0));
 	}
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -77,10 +80,45 @@ void CBaseblock::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Update(void)
 {
+	// 前回の位置を代入
+	m_posOld = CScene_X::GetPos();
+
 	// シーンX更新処理
 	CScene_X::Update();
 	// 落ちる処理
 	Update_Fall();
+
+
+
+
+	COLLISIONDIRECTION Direct;
+
+	if (!this->GetFall()) return;
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
+	{
+		// 情報取得
+		CBaseblock * pBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
+		// pBlockがNULLなら
+		// ->ループスキップ
+		if (pBlock == NULL ||
+			pBlock == this) continue;
+		else if (pBlock->m_grid.nColumn != this->m_grid.nColumn ||
+			pBlock->m_grid.nLine != this->m_grid.nLine) continue;
+
+		// 当たり判定
+		Direct = Collision(
+			CScene::OBJ_BLOCK,
+			&pBlock->GetPos(),
+			&pBlock->GetPosOld(),
+			&pBlock->GetModel()->size,
+			D3DXVECTOR3(0.0f, pBlock->GetModel()->size.y, 0.0f)
+		);
+
+		if (Direct != COLLISIONDIRECTION::NONE)
+		{
+			HitCollision(Direct, CScene::OBJ_BLOCK, pBlock);
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

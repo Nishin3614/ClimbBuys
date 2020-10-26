@@ -37,6 +37,8 @@ public:
 		LAYER_WORLD = 0,
 		LAYER_BG,
 		LAYER_3DOBJECT,
+		LAYER_3DSTAND,
+		LAYER_3DBLOCK,
 		LAYER_3DSHADOW,
 		LAYER_SELECTCHARACTER,
 		LAYER_CHARACTER,
@@ -53,6 +55,16 @@ public:
 		LAYER_RANK,
 		LAYER_MAX
 	} LAYER;
+	// オブジェクトタイプ
+	typedef enum
+	{
+		OBJ_NONE = 0,	// オブジェクトタイプが設定されていない
+		OBJ_PLAYER,		// プレイヤー
+		OBJ_BLOCK,		// ブロック
+		OBJ_STAND,		// 足場
+		OBJ_MAX			// 最大数
+	} OBJ;
+
 	/* 関数 */
 	CScene();
 	virtual ~CScene();
@@ -152,22 +164,27 @@ public:
 	{
 		return m_bDraw;
 	};
+	// オブジェクトタイプの設定
+	void SetObj(OBJ const & Obj) { m_Obj = Obj; };
+	// オブジェクトタイプの取得
+	OBJ & GetObj(void) { return m_Obj; };
 	// オブジェクトの開放準備
 	void Release(void);													// オブジェクトの破棄
 protected:
 
 private:
 	/* 関数 */
-	static void DeadFragAll(void);				// 死亡フラグが立ったものをリリース
+	static void DeadFragAll(void);						// 死亡フラグが立ったものをリリース
 	/* 変数 */
 	static std::vector<CScene*> m_pScene[LAYER_MAX];	// シーン管理用変数
-	static bool	m_sta_bStop;							// 更新を止める
-	static bool m_b1FUpdateFlag;						// 画面停止中に1Fだけ更新するフラグ
-	static int m_nMaxStop;								// 最大静止時間
-	static int m_nCntStop;								// 静止時間
-	bool m_bDeadFrag;									// フラグ
-	bool m_bStop;										// 更新を止めるか止めないか
-	bool m_bDraw;										// 描画状態
+	static bool					m_sta_bStop;			// 更新を止める
+	static bool					m_b1FUpdateFlag;		// 画面停止中に1Fだけ更新するフラグ
+	static int					m_nMaxStop;				// 最大静止時間
+	static int					m_nCntStop;				// 静止時間
+	bool						m_bDeadFrag;			// フラグ
+	bool						m_bStop;				// 更新を止めるか止めないか
+	bool						m_bDraw;				// 描画状態
+	OBJ							m_Obj;					// オブジェクトタイプ
 };
 
 #endif

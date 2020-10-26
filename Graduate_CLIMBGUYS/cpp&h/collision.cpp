@@ -484,13 +484,19 @@ bool CCollision::RectAndRect(
 	else if (min_A.z > max_B.z) bCollision = false;
 	else if (max_A.z < min_B.z) bCollision = false;
 	else bCollision = true;
+	// 押し出し処理をさせない
+	if (!(pRectShapeA->m_bPush &&		// !矩形Aの押し出しり処理がtrueであり
+		pRectShapeB->m_bOpponentPush))	// !矩形Bの相手を押し出す状態がtrueなら
+	{
+		// 接触しているときはtrueを返す
+		return bCollision;
+	}
 	// ポインター位置情報がNULLではないなら
 	// ->位置情報に代入
 	if (pRectShapeA->Get_PPos() != NULL)
 	{
 		pos_A = pRectShapeA->Get_PPos();
 	}
-	// 接触していないときはfalseを返す
 	if (max_A.y > min_B.y &&
 		min_A.y < max_B.y)
 	{
@@ -498,20 +504,27 @@ bool CCollision::RectAndRect(
 		if (max_A.z > min_B.z&&
 			min_A.z < max_B.z)
 		{
+			if (max_A.x > min_B.x)
+			{
+				printf("おけ");
+			}
+			if (maxOld_A.x < min_B.x)
+			{
+				printf("おけ");
+			}
 			// 当たり判定(左)
 			if (max_A.x > min_B.x &&
-				maxOld_A.x <= min_B.x)
+				maxOld_A.x < min_B.x)
 			{
 				// 過去の位置情報AがNULLではないなら ||
 				// 押し出し処理がありなら
 				// ->押し出し処理
-				if (pos_A != NULL ||
-					pRectShapeA->m_bPush &&
-					pRectShapeB->m_bOpponentPush
-					)
+				if (pos_A != NULL)
 				{
 					// 素材状の左に
 					pos_A->x = min_B.x - pRectShapeA->GetSize().x * 0.6f;
+					// 位置情報更新
+					pRectShapeA->PassPos(D3DVECTOR3_ZERO);
 				}
 			}
 
@@ -522,13 +535,12 @@ bool CCollision::RectAndRect(
 				// 過去の位置情報AがNULLではないなら ||
 				// 押し出し処理がありなら
 				// ->押し出し処理
-				if (pos_A != NULL ||
-					pRectShapeA->m_bPush &&
-					pRectShapeB->m_bOpponentPush
-					)
+				if (pos_A != NULL)
 				{
 					// 素材状の左に
 					pos_A->x = max_B.x + pRectShapeA->GetSize().x * 0.6f;
+					// 位置情報更新
+					pRectShapeA->PassPos(D3DVECTOR3_ZERO);
 				}
 			}
 		}
@@ -543,13 +555,12 @@ bool CCollision::RectAndRect(
 				// 過去の位置情報AがNULLではないなら ||
 				// 押し出し処理がありなら
 				// ->押し出し処理
-				if (pos_A != NULL ||
-					pRectShapeA->m_bPush &&
-					pRectShapeB->m_bOpponentPush
-					)
+				if (pos_A != NULL)
 				{
 					// 素材状の左に
 					pos_A->z = min_B.z - pRectShapeA->GetSize().z * 0.6f;
+					// 位置情報更新
+					pRectShapeA->PassPos(D3DVECTOR3_ZERO);
 				}
 			}
 
@@ -560,14 +571,13 @@ bool CCollision::RectAndRect(
 				// 過去の位置情報AがNULLではないなら ||
 				// 押し出し処理がありなら
 				// ->押し出し処理
-				if (pos_A != NULL ||
-					pRectShapeA->m_bPush &&
-					pRectShapeB->m_bOpponentPush
-					)
+				if (pos_A != NULL)
 				{
 					// 素材状の左に
 					pos_A->z = max_B.z +
 						pRectShapeA->GetSize().z * 0.6f;
+					// 位置情報更新
+					pRectShapeA->PassPos(D3DVECTOR3_ZERO);
 				}
 			}
 
@@ -588,13 +598,12 @@ bool CCollision::RectAndRect(
 				// 過去の位置情報AがNULLではないなら ||
 				// 押し出し処理がありなら
 				// ->押し出し処理
-				if (pos_A != NULL ||
-					pRectShapeA->m_bPush &&
-					pRectShapeB->m_bOpponentPush
-					)
+				if (pos_A != NULL)
 				{
 					// 素材状の左に
 					pos_A->y = min_B.y - pRectShapeA->GetSize().y;
+					// 位置情報更新
+					pRectShapeA->PassPos(D3DVECTOR3_ZERO);
 				}
 			}
 
@@ -605,21 +614,16 @@ bool CCollision::RectAndRect(
 				// 過去の位置情報AがNULLではないなら ||
 				// 押し出し処理がありなら
 				// ->押し出し処理
-				if (pos_A != NULL ||
-					pRectShapeA->m_bPush)
+				if (pos_A != NULL)
 				{
 					// 素材状の左に
 					pos_A->y = max_B.y + 0.1f;
+					// 位置情報更新
+					pRectShapeA->PassPos(D3DVECTOR3_ZERO);
 				}
 			}
 
 		}
-	}
-	// 当たっていたら更新
-	if (bCollision)
-	{
-		// 位置情報更新
-		pRectShapeA->PassPos(D3DVECTOR3_ZERO);
 	}
 	// 接触しているときはtrueを返す
 	return bCollision;

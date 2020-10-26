@@ -17,7 +17,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define BASEBLOCK_RANGE			(50.0f)				// ブロックの範囲
 #define BASEBLOCK_XYZTOPOS(X)	(BASEBLOCK_RANGE * X)	// 行列高さからの位置
-#define BASEBLOCK_MINUSTOPLUS	(3)						// 行列をプラスに
+#define BASEBLOCK_MINUSTOPLUS	(4)						// 行列をプラスに
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -78,6 +78,14 @@ public:
 			variable.nHeight = nHeight + Source;
 			return variable;
 		}
+		// 行列高さの+=のオペレーション
+		GRID & operator += (GRID const & Grid)
+		{
+			nColumn += Grid.nColumn;
+			nLine += Grid.nLine;
+			nHeight += Grid.nHeight;
+			return *this;
+		}
 		// 行列高さから位置を定めたオペレーション
 		operator D3DXVECTOR3 ()
 		{
@@ -104,6 +112,15 @@ public:
 	virtual void Update(void);
 	// 描画処理
 	virtual void Draw(void);
+
+	// 当たった後の判定
+	//	Obj		: オブジェタイプ
+	//	pScene	: シーン情報
+	virtual void HitCollision(
+		COLLISIONDIRECTION const &Direct,	// 前後左右上下
+		CScene::OBJ const & Obj,			// オブジェタイプ
+		CScene * pScene = NULL				// シーン情報
+	) {};
 
 	// 当たった後の処理
 	//	nObjType	: オブジェクトタイプ
@@ -146,6 +163,8 @@ public:
 	GRID & GetGrid(void)				{ return m_grid; };
 	// 盤面情報設定
 	void SetGrid(GRID const &grid)		{ m_grid = grid; };
+	// 前回の位置取得
+	D3DXVECTOR3 & GetPosOld(void)		{ return m_posOld; };
 
 	// ベースブロック全ソースの読み込み
 	static HRESULT Load(void);
@@ -158,7 +177,7 @@ public:
 	static CBaseblock * Create(
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId,								// モデル番号
-		CScene::LAYER	const & layer = CScene::LAYER_UI				// レイヤー
+		CScene::LAYER	const & layer = CScene::LAYER_3DBLOCK				// レイヤー
 	);
 	// 作成(個人管理)
 	//	pos			: 位置
@@ -219,9 +238,10 @@ private:
 	// 落ちる更新処理
 	void Update_Fall(void);
 	/* 変数 */
-	TYPE	m_type;		// ベースブロック
-	GRID	m_grid;		// 盤面情報
-	bool	m_bFall;	// 落ちる状態
+	D3DXVECTOR3 m_posOld;	// 前回の位置
+	TYPE	m_type;			// ベースブロック
+	GRID	m_grid;			// 盤面情報
+	bool	m_bFall;		// 落ちる状態
 
 	// 試験用
 	static int m_anHeight[10][10];

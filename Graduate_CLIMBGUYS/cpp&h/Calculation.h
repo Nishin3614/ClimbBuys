@@ -94,6 +94,18 @@ enum class DIRECTION
 	DOWN,
 };
 
+// 当たり判定の向き
+enum class COLLISIONDIRECTION
+{
+	NONE,	// なし
+	FRONT,	// 前
+	BACK,	// 後
+	LEFT,	// 左
+	RIGHT,	// 右
+	UP,		// 上
+	DOWN	// 下
+};
+
 // タグ
 enum class PLAYER_TAG
 {

@@ -11,7 +11,9 @@
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "RectCollision.h"
-#include "debugcollision.h"
+#ifdef _DEBUG
+#include "meshbox.h"
+#endif // _DEBUG
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -45,8 +47,13 @@ CRectCollision::CRectCollision() : CCollision::CCollision()
 void CRectCollision::Init(void)
 {
 #ifdef _DEBUG
-	// 矩形のデバッグ表示
-	//CDebugcollision::Create_Rect(m_pRectShape->Get_PPos(),m_pRectShape->GetSize());
+	// メッシュスフィアが生成されていたら
+	if (m_pDebugMeshBox != NULL)
+	{
+		// あたり判定可視化の開放
+		m_pDebugMeshBox->Release();
+		m_pDebugMeshBox = NULL;
+	}
 #endif // _DEBUG
 }
 
@@ -57,6 +64,10 @@ void CRectCollision::Uninit(void)
 {
 	// 矩形情報の開放
 	m_pRectShape.reset();
+#ifdef _DEBUG
+	// 当たり判定の可視状態設定
+	m_pDebugMeshBox->SetDisp(CCollision::GetDispCollision());
+#endif // _DEBUG
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -65,6 +76,14 @@ void CRectCollision::Uninit(void)
 void CRectCollision::Update(void)
 {
 	m_pRectShape->PassPos(D3DVECTOR3_ZERO);
+	// メッシュスフィアが生成されていたら
+	if (m_pDebugMeshBox != NULL)
+	{
+		// メッシュスフィアの位置設定
+		m_pDebugMeshBox->SetPos(
+			m_pRectShape->m_DestPos
+		);
+	}
 }
 
 #ifdef _DEBUG
@@ -94,6 +113,12 @@ void CRectCollision::Debug(void)
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CRectCollision::Collision_Visible_Set(void)
 {
+	// メッシュスフィア
+	m_pDebugMeshBox = CMeshBox::Create(
+		m_pRectShape->m_DestPos,
+		m_pRectShape->GetSize(),
+		CMeshBox::TYPE_CENTER
+	);
 }
 #endif // _DEBUG
 

@@ -48,11 +48,12 @@ void CConnectblock::Init()
 {
 	// ブロック設定
 	SetBlockShape();
-
+	/*
 	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
 	{
 		m_vec_pBaseBlock[nCntBlock]->SetModelColor(m_col);
 	}
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +61,7 @@ void CConnectblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::Uninit(void)
 {
+	/*
 	// NULL代入
 	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
 	{
@@ -68,6 +70,7 @@ void CConnectblock::Uninit(void)
 	// ベースブロック情報の格納情報開放
 	m_vec_pBaseBlock.clear();
 	m_vec_pBaseBlock.shrink_to_fit();
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,20 +87,61 @@ void CConnectblock::Update(void)
 void CConnectblock::SetBlockShape(void)
 {
 	// 形
-	CBaseblock::GRID BaseGrid = CBaseblock::GRID(0, 0, 0);
+	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-4 + rand() % 8, 10, -4 + rand() % 8);
 	switch (m_Shape)
 	{
 		// 矩形
 	case SHAPE_RECT:
-		CBaseblock::GRID BaseGrid = CBaseblock::GRID(-3 + rand() % 6, 7, -3 + rand() % 6);
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 1));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1));
+		break;
+		// Iブロック
+	case SHAPE_I:
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 3, 0));
+		break;
+		// Jブロック
+	case SHAPE_J:
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0));
+		break;
+		// Lブロック
+	case SHAPE_L:
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0));
+		break;
+		// Sブロック
+	case SHAPE_S:
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0));
+		break;
+		// Tブロック
+	case SHAPE_T:
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0));
+		break;
+		// Zブロック
+	case SHAPE_Z:
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0));
 		break;
 	}
 }
@@ -168,6 +212,7 @@ CConnectblock * CConnectblock::Create(
 	// シーン管理設定
 	pConnectblock->ManageSetting(layer);
 	pConnectblock->m_pos = pos;				// 位置
+	pConnectblock->m_Shape = shape;
 	// 初期化処理
 	pConnectblock->Init();
 	// 生成したオブジェクトを返す
@@ -224,7 +269,7 @@ void CConnectblock::Update_CreateBlock(void)
 	if (m_nCntTime % DERAY_TIME(5) == 0)
 	{
 		// 結合されたブロックの生成
-		Create(D3DVECTOR3_ZERO, CConnectblock::SHAPE_RECT);
+		Create(D3DVECTOR3_ZERO, (SHAPE)(rand() % SHAPE_MAX));
 	}
 	// カウントタイムアップ
 	m_nCntTime++;

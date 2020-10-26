@@ -127,12 +127,16 @@ public:
 	// 設定 //
 	// 位置
 	void SetPos(D3DXVECTOR3 const &pos)						{ m_pos = pos; };
+	// 前回の位置
+	void SetPosOld(D3DXVECTOR3 const &Posold)				{ m_posold = Posold; };
 	// 移動量
 	void SetMove(D3DXVECTOR3 const &move)					{ m_move = move; };
 	// 回転
 	void SetRot(D3DXVECTOR3 const &rot)						{ m_rot = rot; };
 	// ジャンプできるかどうかのフラグの設定
 	void SetJumpAble(bool const &jump)						{ m_bJumpable = jump; };
+	// ダッシュしているかどうかのフラグの設定
+	void SetDash(bool const &Dash)							{ m_bDash = Dash; };
 	//  死亡しているかどうかのフラグの設定
 	void SetDie(bool const &die)							{ m_bDie = die; };
 
@@ -141,12 +145,16 @@ public:
 	// 取得 //
 	// 位置
 	D3DXVECTOR3 &GetPos(void)								{ return m_pos; };
+	// 前回の位置取得
+	D3DXVECTOR3 &GetPosOld(void)							{ return m_posold; };
 	// 移動量
 	D3DXVECTOR3 &GetMove(void)								{ return m_move; };
 	// 回転
 	D3DXVECTOR3 &GetRot(void)								{ return m_rot; };
 	// ジャンプできるかどうかのフラグの取得
 	bool		&GetJumpAble(void)							{ return m_bJumpable; };
+	// ダッシュしているかどうかのフラグの取得
+	bool		&GetDash(void)								{ return m_bDash; };
 	// 死亡しているかどうかのフラグの取得
 	bool		&GetDie(void)								{ return m_bDie; };
 	// 親と子の回転量
@@ -205,7 +213,7 @@ protected:
 	// 強制モーション設定
 	void ComplusionSetMotion(int const nMotiontype);
 	// 重力
-	void FagGravity(void);						// 重力
+	void FagGravity(void);
 	// 透明度の設定
 	static void SetAlpha(float fAlpha)				{ m_fAlpha = fAlpha; }
 	// 設定 //
@@ -266,6 +274,7 @@ private:
 	int											m_nMotionFrame;					// 一つのモーションのカウント
 	float										m_fLength;						// 攻撃の当たり範囲
 	bool										m_bJumpable;					// ジャンプ可能かどうか
+	bool										m_bDash;						// ダッシュ状態
 	bool										m_bDie;							// 死亡フラグ
 	D3DXVECTOR3									m_Directvector;					// 方向のベクトル
 	CCollision									* m_pCharacterCollision;		// キャラクターの当たり判定

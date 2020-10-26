@@ -62,6 +62,7 @@ C3DMap::~C3DMap()
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void C3DMap::Debug(void)
 {
+	/*
 	ImGui::Begin("3DMap::Collision");
 	for (int nCntCollision = 0; nCntCollision < (signed)m_vec_Collision[MAP_STAGE_1].size(); nCntCollision++)
 	{
@@ -74,6 +75,7 @@ void C3DMap::Debug(void)
 		}
 	}
 	ImGui::End();
+	*/
 }
 #endif // _DEBUG
 
@@ -887,9 +889,9 @@ void C3DMap::UnLoad(void)
 	m_vec_wall.clear();
 	m_vec_wall.shrink_to_fit();
 	// 当たり判定の各形状情報の開放
-	for (int nCntMap = 0; nCntMap < (signed)m_vec_Collision.size(); nCntMap++)
+	for (size_t nCntMap = 0; nCntMap < (signed)m_vec_Collision.size(); nCntMap++)
 	{
-		for (int nCntCollision = 0; nCntCollision < (signed)m_vec_Collision[nCntMap].size(); nCntCollision++)
+		for (size_t nCntCollision = 0; nCntCollision < (signed)m_vec_Collision[nCntMap].size(); nCntCollision++)
 		{
 			// 矩形情報のNULLチェック
 			if (m_vec_Collision[nCntMap][nCntCollision].uni_Rect != NULL)
@@ -912,8 +914,9 @@ void C3DMap::UnLoad(void)
 				m_vec_Collision[nCntMap][nCntCollision].uni_Column.reset();
 				m_vec_Collision[nCntMap][nCntCollision].uni_Column = NULL;
 			}
-
 		}
+		m_vec_Collision[nCntMap].clear();
+		m_vec_Collision[nCntMap].shrink_to_fit();
 	}
 	// 当たり判定情報の開放
 	m_vec_Collision.clear();

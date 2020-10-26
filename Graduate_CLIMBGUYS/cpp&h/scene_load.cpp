@@ -133,11 +133,13 @@ void CScene_load::LoadAll(void)
 	{
 		CCalculation::Messanger("円形シャドウ読み取り失敗");
 	}
+	/*
 	// 3Dマップ
 	if (!C3DMap::Load() == S_OK)
 	{
 		CCalculation::Messanger("3Dマップ読み取り失敗");
 	}
+	*/
 	// 結合されたフィールドブロック
 	if (!CConnect_fieldblock::Load() == S_OK)
 	{
@@ -177,7 +179,7 @@ void CScene_load::UnLoadAll(void)
 	// フェード
 	CFade::UnLoad();
 	// 3Dマップ
-	C3DMap::UnLoad();
+	//C3DMap::UnLoad();
 	// 結合されたフィールドブロック
 	CConnect_fieldblock::UnLoad();
 	// シーンX

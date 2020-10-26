@@ -45,16 +45,22 @@ void CConnect_fieldblock::Init()
 	grid.nLine = m_vpLoad[m_stage].nFeed - 1;		// 行
 	grid.nColumn = -(m_vpLoad[m_stage].nFeed - 1);	// 列
 	grid.nHeight = 0;								// 高さ
-
 	// フィールドループ
 	for (size_t nCntField = 0; nCntField < m_vpLoad[m_stage].Dvec_pFileLoad.size(); nCntField++)
 	{
 		// ブロックのループ
 		for (size_t nCntBlock = 0; nCntBlock < m_vpLoad[m_stage].Dvec_pFileLoad[nCntField].size(); nCntBlock++)
 		{
-			if (!m_vpLoad[m_stage].Dvec_pFileLoad[nCntField][nCntBlock].bUse) continue;
-			m_Dvec_pFieldBlock.emplace_back(
-				CFieldblock::Create(2, grid));
+			// 使用状態ではないなら
+			// ->ループスキップ
+			if (!m_vpLoad[m_stage].Dvec_pFileLoad[nCntField][nCntBlock].bUse)
+			{
+				// 列ダウン
+				grid.nColumn++;
+				continue;
+			}
+			// フィールドブロックの生成
+			CFieldblock::Create(2, grid);
 			// 列ダウン
 			grid.nColumn++;
 		}
@@ -70,6 +76,7 @@ void CConnect_fieldblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnect_fieldblock::Uninit(void)
 {
+	/*
 	// フィールドループ
 	for (size_t nCntBlock = 0; nCntBlock < m_Dvec_pFieldBlock.size(); nCntBlock++)
 	{
@@ -77,6 +84,7 @@ void CConnect_fieldblock::Uninit(void)
 	}
 	m_Dvec_pFieldBlock.clear();
 	m_Dvec_pFieldBlock.shrink_to_fit();
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

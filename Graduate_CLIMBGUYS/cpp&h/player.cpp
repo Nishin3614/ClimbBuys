@@ -17,17 +17,21 @@
 #include "ui_group.h"
 #include "meshdome.h"
 #include "3Dparticle.h"
+#include "debugproc.h"
+
+#include "stand.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define PLAYER_GRAVITY (0.1f)
+#define PLAYER_GRAVITY			(0.1f)
 #define PLAYER_UPMOVELIMIT		(30.0f)	// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
 #define PLAYER_JUMP_POWER		(18.0f)	// プレイヤーのジャンプ力
 #define PLAYER_MOVE				(3.0f)	// プレイヤーの移動速度
+#define DASH_TIME_MAX			(30)	// ダッシュしている時間
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -40,8 +44,11 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
-	m_nCntState = 0;				// ステートカウント
-	m_bDieFlag = false;				// 死亡フラグ
+	m_nCntState			= 0;				// ステートカウント
+	m_bDieFlag			= false;			// 死亡フラグ
+	m_bDashFlag			= false;			// ダッシュフラグ
+	m_nCntDashTime		= 0;				// ダッシュ中の切り替えカウント
+	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,17 +88,23 @@ void CPlayer::Update(void)
 	MyAction();
 	// モーション設定処理
 	StatusMotion();
-
 	// キャラクター更新
 	CCharacter::Update();
+	// 限界地点
 	CCharacter::Limit();
+	// 当たり判定の処理
+	Collision();
+
+
+
+
 
 	// 死亡判定が出たらリザルトに遷移する
 	if (GetDie())
 	{
 		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)
 		{
-			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+			//CManager::GetFade()->SetFade(CManager::MODE_RESULT);
 		}
 	}
 
@@ -104,6 +117,20 @@ void CPlayer::MyAction(void)
 {
 	// 自キャラの移動処理
 	MyMove();
+
+	// 試験的ダッシュの切り替え
+	if (m_bDashFlag)
+	{
+		m_nCntDashTime++;
+
+		if (m_nCntDashTime > DASH_TIME_MAX)
+		{
+			// 初期化
+			m_nCntDashTime	= 0;
+			m_bDashFlag		= false;
+		}
+	}
+	CDebugproc::Print("\nPlayerダッシュ %d\n", m_bDashFlag);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -227,55 +254,63 @@ void CPlayer::MyMove(void)
 		// ゲームパッドのスティック情報を取得
 		m_pPad->GetStickLeft(&fValueH, &fValueV);
 
-		// プレイヤー移動
-		// ゲームパッド移動
-		if (fValueH != 0 || fValueV != 0)
+		// ダッシュしていないとき
+		if (!m_bDashFlag)
 		{
-			// 角度の計算
-			fAngle = atan2f((float)fValueH, (float)fValueV);
 
-			if (fAngle > D3DX_PI)
+			// プレイヤー移動
+			// ゲームパッド移動
+			if (fValueH != 0 || fValueV != 0)
 			{
-				fAngle -= D3DX_PI * 2;
+				// 角度の計算
+				fAngle = atan2f((float)fValueH, (float)fValueV);
+
+				if (fAngle > D3DX_PI)
+				{
+					fAngle -= D3DX_PI * 2;
+				}
+				else if (fAngle < -D3DX_PI)
+				{
+					fAngle += D3DX_PI * 2;
+				}
+				rot.y = fAngle + fRot;
+				vec = D3DXVECTOR3(sinf(fAngle + fRot), 0.0f, cosf(fAngle + fRot));
+				// スティックの角度によってプレイヤー移動
+				move.x -= sinf(fAngle + fRot) * (fMove);
+				move.z -= cosf(fAngle + fRot) * (fMove);
 			}
-			else if (fAngle < -D3DX_PI)
+
+			// 試験的ジャンプ ( のちに中身変わる予定 多分 )
+			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
 			{
-				fAngle += D3DX_PI * 2;
+				move.y += PLAYER_JUMP_POWER;
+				SetJumpAble(false);
 			}
-			rot.y = fAngle + fRot;
-			vec = D3DXVECTOR3(sinf(fAngle + fRot), 0.0f, cosf(fAngle + fRot));
-			// スティックの角度によってプレイヤー移動
-			move.x -= sinf(fAngle + fRot) * (fMove);
-			move.z -= cosf(fAngle + fRot) * (fMove);
-		}
 
-		// 試験的ジャンプ ( のちに中身変わる予定 多分 )
-		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
-		{
-			move.y += PLAYER_JUMP_POWER;
-			SetJumpAble(false);
-		}
-
-		// 試験的タックル ( のちに中身変わる予定 多分 )
-		if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
-		{
-			switch (CCalculation::CheckPadStick())
+			// 試験的タックル ( のちに中身変わる予定 多分 )
+			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 			{
-			case DIRECTION::LEFT:
-				move.x -= 100.0f;
-				break;
+				m_bDashFlag = true;
 
-			case DIRECTION::RIGHT:
-				move.x += 100.0f;
-				break;
+				switch (CCalculation::CheckPadStick())
+				{
+				case DIRECTION::LEFT:
+					move.x -= 100.0f;
+					break;
 
-			case DIRECTION::UP:
-				move.z += 100.0f;
-				break;
+				case DIRECTION::RIGHT:
+					move.x += 100.0f;
+					break;
 
-			case DIRECTION::DOWN:
-				move.z -= 100.0f;
-				break;
+				case DIRECTION::UP:
+					move.z += 100.0f;
+					break;
+
+				case DIRECTION::DOWN:
+					move.z -= 100.0f;
+					break;
+				}
+				CCharacter::SetDash(true);
 			}
 		}
 	}
@@ -345,7 +380,7 @@ void CPlayer::StatusMotion(void)
 		SetMotion(MOTIONTYPE_NEUTRAL);
 	}
 	*/
-	
+
 	//// 試験的オブジェクトウィンドウ
 	//ImGui::Begin(u8"Player状態", nullptr, ImGuiWindowFlags_MenuBar);
 
@@ -367,6 +402,131 @@ void CPlayer::StatusMotion(void)
 	//}
 	//// End
 	//ImGui::End();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 足場判定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::StandJudg(
+	CScene_X * pScene_X,
+	bool const & bJudg
+)
+{
+	// 足場オブジェクトなら
+	if (pScene_X->GetObj() == CScene::OBJ_STAND)
+	{
+		// プレイヤータグが1プレイヤーなら
+		if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+		{
+			CStand * pStand = (CStand *)pScene_X;
+			pStand->SetDetermination(bJudg);
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 当たり判定の処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::Collision(void)
+{
+	// 変数宣言
+	CScene_X * pScene_X;		// シーンX情報
+	COLLISIONDIRECTION Direct;	// 当たり判定の方向
+	// ブロックループ
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
+	{
+		// NULL代入
+		pScene_X = NULL;
+		// 情報取得
+		pScene_X = (CScene_X *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
+		// NULLなら
+		// ->関数を抜ける
+		if (pScene_X == NULL)
+		{
+			continue;
+		}
+		// 当たり判定
+		Direct = pScene_X->PushCollision(
+			CCharacter::GetObj(),
+			&CCharacter::GetPos(),
+			&CCharacter::GetPosOld(),
+			&CCharacter::GetMove(),
+			&D3DXVECTOR3(50.0f, 50.0f, 50.0f),
+			D3DXVECTOR3(0.0f, 25.0f, 0.0f)
+		);
+		// ブロックの判定
+		// 前
+		if (Direct == COLLISIONDIRECTION::FRONT)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(0, 0, -1));
+		}
+		// 後
+		else if (Direct == COLLISIONDIRECTION::BACK)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(0, 0, 1));
+		}
+		// 左
+		else if (Direct == COLLISIONDIRECTION::LEFT)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(1, 0, 0));
+		}
+		// 右
+		else if (Direct == COLLISIONDIRECTION::RIGHT)
+		{
+			PushBlock(pScene_X, CBaseblock::GRID(-1, 0, 0));
+		}
+		// 上
+		else if (Direct == COLLISIONDIRECTION::UP)
+		{
+			// ジャンプ可能設定
+			SetJumpAble(true);
+			// 足場判定
+			StandJudg(pScene_X, true);
+		}
+		// 下
+		else if (Direct == COLLISIONDIRECTION::DOWN)
+		{
+
+		}
+		else
+		{
+			// 足場判定
+			StandJudg(pScene_X, false);
+		}
+	}
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの押し出し処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PushBlock(
+	CScene_X * pScene_X,			// シーンX情報
+	CBaseblock::GRID const & Grid	// 方向
+)
+{
+	// 足場オブジェクトなら
+	if (pScene_X->GetObj() == CScene::OBJ_BLOCK)
+	{
+		if (!CCharacter::GetDash()) return;
+		// 変数宣言
+		CBaseblock * pBlock = (CBaseblock *)pScene_X;	// ベースブロックの情報
+		CBaseblock::GRID MyGrid = pBlock->GetGrid();
+		MyGrid = pBlock->GetGrid();
+		MyGrid += Grid;
+		int nHeight = CBaseblock::GetHeight(MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS, MyGrid.nLine + BASEBLOCK_MINUSTOPLUS);
+		if (MyGrid.nHeight <= CBaseblock::GetHeight(MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS, MyGrid.nLine + BASEBLOCK_MINUSTOPLUS))
+		{
+			return;
+		}
+		// ブロックの高さ情報を更新
+		CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(BASEBLOCK_MINUSTOPLUS,-1, BASEBLOCK_MINUSTOPLUS));
+		pBlock->SetGrid(MyGrid);
+		// 位置設定
+		pBlock->SetPos((D3DXVECTOR3)MyGrid);
+		// ブロックの高さ情報を更新
+		CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(BASEBLOCK_MINUSTOPLUS, 0, BASEBLOCK_MINUSTOPLUS));
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -409,6 +569,10 @@ void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 	// 当たったオブジェクトがブロックだったらジャンプを可能にする
 	if (nObjType == CCollision::OBJTYPE_BLOCK)
 	{
+		// 変数宣言
+		CScene_X * pSceneX = (CScene_X *)pScene;
+		pSceneX->GetCollision();
+		this->GetCollision()->GetShape();
 		SetJumpAble(true);
 	}
 	// 当たったオブジェクトがダメージ床だったら死亡フラグをtrueにする

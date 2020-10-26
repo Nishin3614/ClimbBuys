@@ -166,6 +166,59 @@ void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 当たった後の判定
+//	Obj		: オブジェタイプ
+//	pScene	: シーン情報
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CNormalblock::HitCollision(
+	COLLISIONDIRECTION const &Direct,	// 前後左右上下
+	CScene::OBJ const & Obj,			// オブジェタイプ
+	CScene * pScene						// シーン情報
+)
+{
+	// オブジェタイプがブロックなら
+	if (CScene::OBJ_BLOCK == Obj)
+	{
+		if (Direct == COLLISIONDIRECTION::DOWN)
+		{
+			// シーン情報がNULLなら
+			// ->関数を抜ける
+			if (pScene == NULL) return;
+			if (!CBaseblock::GetFall()) return;
+			// シーン情報の代入
+			CBaseblock * pBaseBlock = (CBaseblock *)pScene;
+			// 相手の落ちる状態がtrueなら
+			// ->関数を抜ける
+			if (pBaseBlock->GetFall()) return;
+			// 変数宣言
+			CBaseblock::GRID MyGrid = CBaseblock::GetGrid();	// 自分の行列高
+			CBaseblock::GRID OppGrid = pBaseBlock->GetGrid();	// 相手の行列高
+																// 同じ行列ではないなら
+																// ->関数を抜ける
+			if (!(MyGrid.nColumn == OppGrid.nColumn &&
+				MyGrid.nLine == OppGrid.nLine)) return;
+			int nHeight = CBaseblock::GetHeight(			// 高さ
+				MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
+				MyGrid.nLine + BASEBLOCK_MINUSTOPLUS) + 1;
+			// 高さを行列高に代入
+			MyGrid.nHeight = nHeight;
+			// 高さの設定
+			CBaseblock::SetHeight(
+				MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
+				MyGrid.nLine + BASEBLOCK_MINUSTOPLUS,
+				MyGrid.nHeight
+			);
+			// 現在の行列高の設定
+			CBaseblock::SetGrid(MyGrid);
+			// 位置設定
+			CBaseblock::SetPos((D3DXVECTOR3)MyGrid);
+			// 落ちている状態設定
+			CBaseblock::SetFall(false);
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 普通ブロック全ソースの読み込み
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT CNormalblock::Load(void)

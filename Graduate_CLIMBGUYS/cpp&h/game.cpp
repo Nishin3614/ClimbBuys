@@ -28,6 +28,11 @@
 #include "damagefloor.h"
 #include "bg.h"
 #include "XInputPad.h"
+
+
+#include "normalblock.h"
+#include "fieldblock.h"
+
 /* ポーズ */
 //#include "pause.h"
 
@@ -83,7 +88,6 @@ void CGame::Init(void)
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CConnect_fieldblock::STAGE_1);
-
 	// ダメージ床の生成
 	CDamageFloor::Create();
 	/*
@@ -120,6 +124,7 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
+
 	// 結合されたブロックの更新ブロック生成
 	CConnectblock::Update_CreateBlock();
 	/*

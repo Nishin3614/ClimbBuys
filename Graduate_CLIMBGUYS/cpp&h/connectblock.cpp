@@ -48,11 +48,12 @@ void CConnectblock::Init()
 {
 	// ブロック設定
 	SetBlockShape();
-
+	/*
 	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
 	{
 		m_vec_pBaseBlock[nCntBlock]->SetModelColor(m_col);
 	}
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +61,7 @@ void CConnectblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::Uninit(void)
 {
+	/*
 	// NULL代入
 	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
 	{
@@ -68,6 +70,7 @@ void CConnectblock::Uninit(void)
 	// ベースブロック情報の格納情報開放
 	m_vec_pBaseBlock.clear();
 	m_vec_pBaseBlock.shrink_to_fit();
+	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -89,56 +92,56 @@ void CConnectblock::SetBlockShape(void)
 	{
 		// 矩形
 	case SHAPE_RECT:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 1)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 1));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1));
 		break;
 		// Iブロック
 	case SHAPE_I:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 3, 0)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 3, 0));
 		break;
 		// Jブロック
 	case SHAPE_J:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0));
 		break;
 		// Lブロック
 	case SHAPE_L:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0));
 		break;
 		// Sブロック
 	case SHAPE_S:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0));
 		break;
 		// Tブロック
 	case SHAPE_T:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0));
 		break;
 		// Zブロック
 	case SHAPE_Z:
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0)));
-		m_vec_pBaseBlock.emplace_back(CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0)));
+		CNormalblock::Create(2, BaseGrid);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0));
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0));
 		break;
 	}
 }

@@ -73,6 +73,15 @@ public:
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
 
+	// 当たった後の判定
+	//	Obj		: オブジェタイプ
+	//	pScene	: シーン情報
+	void HitCollision(
+		COLLISIONDIRECTION const &Direct,	// 前後左右上下
+		CScene::OBJ const & Obj,			// オブジェタイプ
+		CScene * pScene = NULL				// シーン情報
+	);
+
 	// 普通ブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// 普通ブロック全ソースの開放
@@ -84,7 +93,7 @@ public:
 	static CNormalblock * Create(
 		int				const & nModelId,							// モデル番号
 		GRID			const & Grid,								// 行列高さ番号
-		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT		// レイヤー
+		CScene::LAYER	const & layer = CScene::LAYER_3DBLOCK		// レイヤー
 	);
 	// 作成(個人管理)
 	//	pos			: 位置

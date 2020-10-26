@@ -127,6 +127,8 @@ public:
 	// 設定 //
 	// 位置
 	void SetPos(D3DXVECTOR3 const &pos)						{ m_pos = pos; };
+	// 前回の位置
+	void SetPosOld(D3DXVECTOR3 const &Posold)				{ m_posold = Posold; };
 	// 移動量
 	void SetMove(D3DXVECTOR3 const &move)					{ m_move = move; };
 	// 回転
@@ -141,6 +143,8 @@ public:
 	// 取得 //
 	// 位置
 	D3DXVECTOR3 &GetPos(void)								{ return m_pos; };
+	// 前回の位置取得
+	D3DXVECTOR3 &GetPosOld(void)							{ return m_posold; };
 	// 移動量
 	D3DXVECTOR3 &GetMove(void)								{ return m_move; };
 	// 回転

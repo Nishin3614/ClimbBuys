@@ -837,6 +837,7 @@ void C3DParticle::Unload(void)
 	// パーティクル情報の開放
 	for (int nCntParticle = 0; nCntParticle < C3DParticle::PARTICLE_ID_MAX; nCntParticle++)
 	{
+		if (m_ParticleOffset[nCntParticle] == NULL)continue;
 		delete m_ParticleOffset[nCntParticle];
 		m_ParticleOffset[nCntParticle] = NULL;
 	}

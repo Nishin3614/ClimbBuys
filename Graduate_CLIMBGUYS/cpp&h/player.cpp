@@ -18,6 +18,10 @@
 #include "meshdome.h"
 #include "3Dparticle.h"
 
+
+#include "baseblock.h"
+#include "stand.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
@@ -42,6 +46,7 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
 	m_nCntState = 0;				// ステートカウント
 	m_bDieFlag = false;				// 死亡フラグ
+	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,17 +86,147 @@ void CPlayer::Update(void)
 	MyAction();
 	// モーション設定処理
 	StatusMotion();
-
 	// キャラクター更新
 	CCharacter::Update();
 	CCharacter::Limit();
+
+
+
+
+	CScene_X * pScene_X;
+	COLLISIONDIRECTION Direct;
+	// 素材ループ
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
+	{
+		pScene_X = NULL;
+		// ベースブロック情報の代入
+		pScene_X = (CScene_X *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
+		// NULLなら
+		// ->関数を抜ける
+		if (pScene_X == NULL)
+		{
+			continue;
+		}
+		// 当たり判定
+		Direct = pScene_X->PushCollision(
+			CCharacter::GetObj(),
+			&CCharacter::GetPos(),
+			&CCharacter::GetPosOld(),
+			&CCharacter::GetMove(),
+			&D3DXVECTOR3(50.0f, 50.0f, 50.0f),
+			D3DXVECTOR3(0.0f, 25.0f, 0.0f)
+		);
+		// 前
+		if (Direct == COLLISIONDIRECTION::FRONT)
+		{
+			// 足場オブジェクトなら
+			if (pScene_X->GetObj() == CScene::OBJ_STAND)
+			{
+				// プレイヤータグが1プレイヤーなら
+				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+				{
+					CStand * pStand = (CStand *)pScene_X;
+					pStand->SetDetermination(false);
+				}
+			}
+		}
+		// 後
+		else if (Direct == COLLISIONDIRECTION::BACK)
+		{
+			// 足場オブジェクトなら
+			if (pScene_X->GetObj() == CScene::OBJ_STAND)
+			{
+				// プレイヤータグが1プレイヤーなら
+				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+				{
+					CStand * pStand = (CStand *)pScene_X;
+					pStand->SetDetermination(false);
+				}
+			}
+		}
+		// 左
+		else if (Direct == COLLISIONDIRECTION::LEFT)
+		{
+			// 足場オブジェクトなら
+			if (pScene_X->GetObj() == CScene::OBJ_STAND)
+			{
+				// プレイヤータグが1プレイヤーなら
+				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+				{
+					CStand * pStand = (CStand *)pScene_X;
+					pStand->SetDetermination(false);
+				}
+			}
+		}
+		// 右
+		else if (Direct == COLLISIONDIRECTION::RIGHT)
+		{
+			// 足場オブジェクトなら
+			if (pScene_X->GetObj() == CScene::OBJ_STAND)
+			{
+				// プレイヤータグが1プレイヤーなら
+				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+				{
+					CStand * pStand = (CStand *)pScene_X;
+					pStand->SetDetermination(false);
+				}
+			}
+		}
+		// 上
+		else if (Direct == COLLISIONDIRECTION::UP)
+		{
+			// ジャンプ可能設定
+			SetJumpAble(true);
+			// 足場オブジェクトなら
+			if (pScene_X->GetObj() == CScene::OBJ_STAND)
+			{
+				// プレイヤータグが1プレイヤーなら
+				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+				{
+					CStand * pStand = (CStand *)pScene_X;
+					pStand->SetDetermination(true);
+				}
+			}
+		}
+		// 下
+		else if (Direct == COLLISIONDIRECTION::DOWN)
+		{
+			// 足場オブジェクトなら
+			if (pScene_X->GetObj() == CScene::OBJ_STAND)
+			{
+				// プレイヤータグが1プレイヤーなら
+				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+				{
+					CStand * pStand = (CStand *)pScene_X;
+					pStand->SetDetermination(false);
+				}
+			}
+		}
+		else
+		{
+			// 足場オブジェクトなら
+			if (pScene_X->GetObj() == CScene::OBJ_STAND)
+			{
+				// プレイヤータグが1プレイヤーなら
+				if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+				{
+					CStand * pStand = (CStand *)pScene_X;
+					pStand->SetDetermination(false);
+				}
+			}
+		}
+	}
+
+
+
+
 
 	// 死亡判定が出たらリザルトに遷移する
 	if (GetDie())
 	{
 		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)
 		{
-			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+			//CManager::GetFade()->SetFade(CManager::MODE_RESULT);
 		}
 	}
 

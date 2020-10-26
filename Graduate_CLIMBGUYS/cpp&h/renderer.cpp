@@ -158,10 +158,10 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 // ------------------------------------------
 void CRenderer::Uninit(void)
 {
-	// 読み込んだものを破棄する処理
-	CScene_load::UnLoadAll();
 	// シーン親子のリリース処理
 	CScene::ReleaseAll();
+	// 読み込んだものを破棄する処理
+	CScene_load::UnLoadAll();
 	// カメラの生成
 	if (m_pCamera != NULL)
 	{

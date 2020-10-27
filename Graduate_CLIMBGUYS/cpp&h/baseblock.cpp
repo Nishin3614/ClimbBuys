@@ -49,10 +49,10 @@ void CBaseblock::Init()
 	// シーンXの初期化処理
 	CScene_X::Init();
 	// ステンシルシャドウの設定
-	CScene_X::SetStencilshadow(
-		D3DXVECTOR3(BASEBLOCK_RANGE,BASEBLOCK_XYZTOPOS(100),BASEBLOCK_RANGE),
-		CStencilshadow::TYPE_RECT
-	);
+	//CScene_X::SetStencilshadow(
+	//	D3DXVECTOR3(BASEBLOCK_RANGE,BASEBLOCK_XYZTOPOS(100),BASEBLOCK_RANGE),
+	//	CStencilshadow::TYPE_RECT
+	//);
 	/*
 	if (m_type == TYPE_FIELD)
 	{

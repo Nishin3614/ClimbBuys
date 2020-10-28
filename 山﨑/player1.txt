@@ -1,0 +1,98 @@
+#==============================================================================
+#
+# 『モーションビューワ』スクリプトファイル [motion.txt]
+# Author : TAKERU YAMAZAKI
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#------------------------------------------------------------------------------
+# モデル数
+#------------------------------------------------------------------------------
+NUM_MODEL = 9
+
+#------------------------------------------------------------------------------
+# モデルファイル名
+#------------------------------------------------------------------------------
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/00_Waist.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/01_Body.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/02_Head.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/03_RightHand.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/04_LeftHand.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/05_RightThigh.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/06_RightLeg.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/07_LeftThigh.x
+MODEL_FILENAME = data/MODEL/ClimbGuys/player01/08_LeftLeg.x
+
+#------------------------------------------------------------------------------
+# キャラクター情報
+#------------------------------------------------------------------------------
+CHARACTERSET
+	NUM_PARTS = 9
+
+	PARTSSET
+		INDEX = 0
+		PARENT = -1
+		POS = 0.0 30.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 1
+		PARENT = 0
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 2
+		PARENT = 1
+		POS = 0.0 5.2 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 3
+		PARENT = 1
+		POS = -7.0 1.5 -1.05
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 4
+		PARENT = 1
+		POS = 7.0 1.5 -1.05
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 5
+		PARENT = 0
+		POS = -2.8 -2.2 -0.8
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 6
+		PARENT = 5
+		POS = -0.35 -3.8 0.9
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 7
+		PARENT = 0
+		POS = 2.8 -2.2 -0.8
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 8
+		PARENT = 7
+		POS = 0.35 -3.8 0.9
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+END_CHARACTERSET
+
+END_SCRIPT		# この行は絶対消さないこと！

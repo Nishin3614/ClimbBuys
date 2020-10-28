@@ -57,7 +57,7 @@ public:
 		TYPE_PLAYER00_THIGH_RIGHT,		// プレイヤー00 右腿
 		TYPE_PLAYER00_LEG_RIGHT,		// プレイヤー00 右足
 		TYPE_PLAYER00_THIGH_LEFT,		// プレイヤー00 左腿
-		TYPE_PLAYER01_LEG_LEFT,			// プレイヤー00 左足
+		TYPE_PLAYER00_LEG_LEFT,			// プレイヤー00 左足
 		TYPE_PLAYER01_WAIST,			// プレイヤー01 腰
 		TYPE_PLAYER01_BODY,				// プレイヤー01 胴体
 		TYPE_PLAYER01_HEAD,				// プレイヤー01 頭

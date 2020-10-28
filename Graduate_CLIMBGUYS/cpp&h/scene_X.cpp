@@ -416,7 +416,7 @@ HRESULT CScene_X::LoadModel(void)
 					&pModelLoad->pMesh) == S_OK
 					)
 				{
-					std::string sNum = std::to_string(nCntLine);
+					std::string sNum = std::to_string(nCntLine) + vsvec_Contens[nCntLine][nCntItem].c_str();
 					CCalculation::Messanger(sNum.c_str());
 					break;
 				}

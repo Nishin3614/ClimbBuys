@@ -8,6 +8,7 @@
 #include "collision.h"
 #include "debugproc.h"
 #include "stencilshadow.h"
+#include "game.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -22,7 +23,10 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 試験用
-int CBaseblock::m_anHeight[10][10] = {};
+int CBaseblock::m_anHeight[20][20] = {};		// 1つ1つの行列の高さ
+
+float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
+std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
@@ -169,10 +173,285 @@ void CBaseblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 押し出し当たり判定
+//	pos		: 位置
+//	posOld	: 前回の位置
+//	move	: 移動量
+//	size	: サイズ
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COLLISIONDIRECTION CBaseblock::PushCollision(
+	CScene::OBJ const & Obj,		// オブジェタイプ
+	D3DXVECTOR3 * pos,				// 位置
+	D3DXVECTOR3 * posOld,			// 前回の位置
+	D3DXVECTOR3 * move,				// 移動量
+	D3DXVECTOR3 * size,				// サイズ
+	D3DXVECTOR3 const & OffsetPos	// オフセット位置
+)
+{
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+
+																// 変数宣言
+	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
+	// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+
+				// 素材状の左に
+				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
+
+				// 移動量の初期化
+				move->y = 0.0f;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+
+				// 素材状の左に
+				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+
+				// 移動量の初期化
+				move->y = 0.0f;
+			}
+			// 当たり判定(下)
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+		}
+	}
+	// 素材のY範囲
+	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+		pos->y + OffsetPos.y - size->y * 0.5f <= BlockPos.y + m_fSizeRange)
+	{
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+				// 素材状の左に
+				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
+				// 移動量の初期化
+				move->x = 0.0f;
+			}
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+
+				// 素材状の左に
+				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
+
+				// 移動量の初期化
+				move->x = 0.0f;
+			}
+			// 当たり判定(左)
+			else if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
+		}
+
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(手前)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+
+				// 素材状の左に
+				pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
+
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+
+				// 素材状の左に
+				pos->z =
+					BlockPos.z + m_fSizeRange * 0.5f +
+					size->z * 0.5f + 0.1f - OffsetPos.z;
+
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+			// 当たり判定(手前)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+			}
+		}
+	}
+
+	return Direct;
+}
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 当たり判定
+//	pos			: 位置
+//	size		: サイズ
+//	OffsetPos	: オフセット位置
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COLLISIONDIRECTION CBaseblock::Collision(
+	CScene::OBJ const & Obj,		// オブジェタイプ
+	D3DXVECTOR3 * pos,				// 位置
+	D3DXVECTOR3 * posOld,			// 前回の位置
+	D3DXVECTOR3 * size,				// サイズ
+	D3DXVECTOR3 const & OffsetPos	// オフセット位置
+)
+{
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
+	// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y >= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y < BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+		}
+	}
+	// 素材のY範囲
+	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+		pos->y + OffsetPos.y - size->y * 0.5f <= BlockPos.y + m_fSizeRange)
+	{
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->z * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x + size->z * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->z * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x - size->z * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
+		}
+
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(手前)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+			}
+		}
+	}
+
+
+
+
+	/// やること
+	// シーン情報をどうやって持っていくか
+	// ヒット後の状態はどうなっているか
+	// 処理速度はどうなっているのか
+	return Direct;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ベースブロック全ソースの読み込み
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT CBaseblock::Load(void)
 {
+	m_fSizeRange = 50.0f;
 	return S_OK;
 }
 
@@ -181,7 +460,9 @@ HRESULT CBaseblock::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::UnLoad(void)
 {
-
+	// フェードの値の開放
+	m_nFeedValue.clear();
+	m_nFeedValue.shrink_to_fit();
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -381,6 +662,129 @@ void CBaseblock::CreateInBulkBlock()
 		pBaseblock = Create(BlockPos[nBlockCnt], 2);
 		pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
 	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 行列高さベースブロックの情報取得
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CBaseblock * CBaseblock::GetBaseBlock(GRID & Grid)
+{
+	// 変数宣言
+	CBaseblock * pBlock = NULL;	// ブロック情報
+	// ブロック情報をループ
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
+	{
+		// 情報取得
+		pBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);	// ブロック
+		// ブロック情報がNULLなら
+		// ->ループスキップ
+		if (pBlock == NULL) continue;
+		// 行列高が同じなら
+		// ->ブロック情報を返す
+		if (pBlock->GetGrid() == Grid) return pBlock;
+	}
+	// NULLを返す
+	return NULL;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 指定した行列の全ての落ちる状態をfalseに関数
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::FallBlock_Grid(GRID & Grid)
+{
+	// 高さカウント
+	for (int nCntHeight = 0; nCntHeight <= CBaseblock::GetHeight(Grid.nColumn + m_nFeedValue[CGame::GetStage()], Grid.nLine + m_nFeedValue[CGame::GetStage()]); nCntHeight++)
+	{
+		// 変数宣言
+		GRID HeightGrid = Grid + GRID(0, nCntHeight, 0);	// 高さを足した行列
+		HeightGrid.nHeight++;
+		CBaseblock * pBlock = NULL;							// ブロック情報
+		// 行列高さベースブロックの情報取得
+		pBlock = CBaseblock::GetBaseBlock(HeightGrid);
+		// ブロック情報がNULLなら
+		// ->ループスキップ
+		if (pBlock == NULL) continue;
+		// 落ちる状態をfalseに
+		pBlock->SetFall(true);
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// フェードの値取得
+//	nStage	: ステージ番号
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+int CBaseblock::GetFeedValue(
+	int const & nStage	// フェードの値
+)
+{
+	// 指定したステージ数が読み込まれたステージ数以上の場合
+	// ->-1を返す
+	if (nStage >= (signed)m_nFeedValue.size())
+	{
+		CCalculation::Messanger("CBaseblock::GetFeedValue関数->ステージ数が読み込まれたステージ数を上回った。");
+		return -1;
+	}
+	return m_nFeedValue[nStage];
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 現在積み重なっているブロックの高さを取得
+//	nColumn	: 列
+//	nLine	: 行
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+int CBaseblock::GetHeight(
+	int const & nColumn,
+	int const & nLine
+)
+{
+	// 行列が0未満なら
+	// ->関数を抜ける
+	if (nColumn < 0 || nLine < 0)
+	{
+		CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
+		return -1;
+	}
+	return m_anHeight[nColumn][nLine];
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 現在積み重なっているブロックの高さを設定
+//	nColumn	: 列
+//	nLine	: 行
+//	nHeight	: 高さ
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::SetHeight(
+	int const & nColumn,
+	int const & nLine,
+	int const & nHeight
+)
+{
+	// 行列が0未満なら
+	// ->関数を抜ける
+	if (nColumn < 0 || nLine < 0)
+	{
+		CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
+		return;
+	}
+	m_anHeight[nColumn][nLine] = nHeight;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 現在積み重なっているブロックの高さを設定
+//	Grid	: 列
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::SetHeight(
+	GRID const & Grid
+)
+{
+	// 行列が0未満なら
+	// ->関数を抜ける
+	if (Grid.nColumn < 0 || Grid.nLine < 0)
+	{
+		CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
+		return;
+	}
+	m_anHeight[Grid.nColumn][Grid.nLine] = Grid.nHeight;
 }
 
 #ifdef _DEBUG

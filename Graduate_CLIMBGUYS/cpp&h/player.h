@@ -100,6 +100,10 @@ public:
 	static HRESULT Load(void);
 	// リソースの開放処理
 	static void UnLoad(void);
+	// ダッシュしているかどうかのフラグの設定
+	void SetDashFlag(bool const &bDashFlag) { m_bDashFlag = bDashFlag; };
+	// ダッシュしているかどうかのフラグの取得
+	bool		&GetDashFlag(void) { return m_bDashFlag; };
 protected:
 private:
 	/* 構造体 */

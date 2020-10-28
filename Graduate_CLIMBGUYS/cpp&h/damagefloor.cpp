@@ -129,7 +129,7 @@ void CDamageFloor::UnLoad(void)
 void CDamageFloor::ComparisonHeight()
 {
 	//通常アイテムの総数分
-	for (size_t nCnt = 0; nCnt < 2; nCnt++)
+	for (int nCnt = 0; nCnt < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCnt++)
 	{
 		// プレイヤーのポインタ取得
 		CPlayer *pPlayer = (CPlayer*)CScene::GetScene(LAYER_CHARACTER, nCnt);

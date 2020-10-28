@@ -5,6 +5,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "fieldblock.h"
+#include "game.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -129,12 +130,12 @@ CFieldblock * CFieldblock::Create(
 	// シーン管理設定
 	pFieldblock->ManageSetting(layer);
 	pFieldblock->SetPos(				// 位置
-		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
 	pFieldblock->SetModelId(nModelId);	// モデル番号
 	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	pFieldblock->SetModelColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	// 現在のブロックの高さを設定
-	CBaseblock::SetHeight(Grid.nColumn + BASEBLOCK_MINUSTOPLUS, Grid.nLine + BASEBLOCK_MINUSTOPLUS, Grid.nHeight);
+	CBaseblock::SetHeight(Grid.nColumn + m_nFeedValue[CGame::GetStage()], Grid.nLine + m_nFeedValue[CGame::GetStage()], Grid.nHeight);
 
 	// 初期化処理
 	pFieldblock->Init();
@@ -158,7 +159,7 @@ CFieldblock * CFieldblock::Create_Self(
 	pFieldblock = new CFieldblock;
 	// 設定
 	pFieldblock->SetPos(				// 位置
-		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
 	pFieldblock->SetModelId(nModelId);	// モデル番号
 	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	// 初期化処理
@@ -182,7 +183,7 @@ std::unique_ptr<CFieldblock> CFieldblock::Creat_Unique(
 	std::unique_ptr<CFieldblock> pFieldblock(new CFieldblock);		// シーン2Dクラス
 	// 設定
 	pFieldblock->SetPos(					// 位置
-		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
 	pFieldblock->SetModelId(nModelId);	// モデル番号
 	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	// 初期化処理

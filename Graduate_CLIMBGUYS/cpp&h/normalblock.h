@@ -89,26 +89,32 @@ public:
 	// 作成(シーン管理)
 	//	pos			: 位置
 	//	nModelId	: モデル番号
+	//	pCol		: 色情報
 	//	layer		: レイヤー
 	static CNormalblock * Create(
 		int				const & nModelId,							// モデル番号
 		GRID			const & Grid,								// 行列高さ番号
+		D3DXCOLOR		* pCol,										// 色情報
 		CScene::LAYER	const & layer = CScene::LAYER_3DBLOCK		// レイヤー
 	);
 	// 作成(個人管理)
 	//	pos			: 位置
 	//	nModelId	: モデル番号
+	//	pCol		: 色情報
 	static CNormalblock * Create_Self(
 		int				const & nModelId,								// モデル番号
-		GRID			const & Grid									// 行列高さ番号
+		GRID			const & Grid,									// 行列高さ番号
+		D3DXCOLOR		* pCol											// 色情報
 		);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
 	//	pos			: 位置
 	//	nModelId	: モデル番号
+	//	pCol		: 色情報
 	static std::unique_ptr<CNormalblock> Creat_Unique(
 		int				const & nModelId,								// モデル番号
-		GRID			const & Grid									// 行列高さ番号
+		GRID			const & Grid,									// 行列高さ番号
+		D3DXCOLOR		* pCol											// 色情報
 	);
 #ifdef _DEBUG
 	// デバッグ処理

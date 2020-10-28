@@ -86,6 +86,7 @@ void CPlayer::Update(void)
 {
 	// 自キャラの行動処理
 	MyAction();
+
 	// モーション設定処理
 	StatusMotion();
 	// キャラクター更新
@@ -98,13 +99,14 @@ void CPlayer::Update(void)
 
 
 
-
 	// 死亡判定が出たらリザルトに遷移する
 	if (GetDie())
 	{
+		// 死亡関数
+		Die();
 		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)
 		{
-			//CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
 		}
 	}
 
@@ -310,7 +312,6 @@ void CPlayer::MyMove(void)
 					move.z -= 100.0f;
 					break;
 				}
-				CCharacter::SetDash(true);
 			}
 		}
 	}
@@ -432,6 +433,8 @@ void CPlayer::Collision(void)
 	// 変数宣言
 	CScene_X * pScene_X;		// シーンX情報
 	COLLISIONDIRECTION Direct;	// 当たり判定の方向
+	bool bOn = false;			// 上の当たり判定
+	bool bUnder = false;		// 下の当たり判定
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{
@@ -451,7 +454,7 @@ void CPlayer::Collision(void)
 			&CCharacter::GetPos(),
 			&CCharacter::GetPosOld(),
 			&CCharacter::GetMove(),
-			&D3DXVECTOR3(50.0f, 50.0f, 50.0f),
+			&D3DXVECTOR3(25.0f, 50.0f, 25.0f),
 			D3DXVECTOR3(0.0f, 25.0f, 0.0f)
 		);
 		// ブロックの判定
@@ -482,11 +485,14 @@ void CPlayer::Collision(void)
 			SetJumpAble(true);
 			// 足場判定
 			StandJudg(pScene_X, true);
+			// プレイヤーが下のブロックに当たっている
+			bOn ^= true;
 		}
 		// 下
 		else if (Direct == COLLISIONDIRECTION::DOWN)
 		{
-
+			// プレイヤーがしたブロックに当たっている
+  			bUnder ^= true;
 		}
 		else
 		{
@@ -494,7 +500,12 @@ void CPlayer::Collision(void)
 			StandJudg(pScene_X, false);
 		}
 	}
-
+	// 上も下もブロックに当たっていたら
+	if (bOn && bUnder)
+	{
+		// プレイヤーは死ぬ
+		Die();
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -508,24 +519,33 @@ void CPlayer::PushBlock(
 	// 足場オブジェクトなら
 	if (pScene_X->GetObj() == CScene::OBJ_BLOCK)
 	{
-		if (!CCharacter::GetDash()) return;
+		if (!CPlayer::GetDashFlag()) return;
 		// 変数宣言
-		CBaseblock * pBlock = (CBaseblock *)pScene_X;	// ベースブロックの情報
-		CBaseblock::GRID MyGrid = pBlock->GetGrid();
-		MyGrid = pBlock->GetGrid();
+		CBaseblock * pBlock = (CBaseblock *)pScene_X;					// ベースブロックの情報
+		CBaseblock::GRID MyGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
+		int nHeight;													// 高さ
+		int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());	// フェードの値
+		// 行列高さの方向を押し出しブロックの行列高さに加算
 		MyGrid += Grid;
-		int nHeight = CBaseblock::GetHeight(MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS, MyGrid.nLine + BASEBLOCK_MINUSTOPLUS);
-		if (MyGrid.nHeight <= CBaseblock::GetHeight(MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS, MyGrid.nLine + BASEBLOCK_MINUSTOPLUS))
+		// その行列の積み重なっている高さを取得
+		nHeight = CBaseblock::GetHeight(MyGrid.nColumn + nFeedValue, MyGrid.nLine + nFeedValue);
+		if (MyGrid.nHeight <= CBaseblock::GetHeight(MyGrid.nColumn + nFeedValue, MyGrid.nLine + nFeedValue))
 		{
 			return;
 		}
-		// ブロックの高さ情報を更新
-		CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(BASEBLOCK_MINUSTOPLUS,-1, BASEBLOCK_MINUSTOPLUS));
+		CBaseblock::GRID FallGrid = pBlock->GetGrid();	// 行列高
+		// 押す前のブロックの上にあったブロックを落とさせる
+		CBaseblock::FallBlock_Grid(FallGrid);
+		// 押したブロックの現在までいた行列の高さ情報を更新
+		CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(nFeedValue,-1, nFeedValue));
+		// 動いた後の行列高を設定
 		pBlock->SetGrid(MyGrid);
-		// 位置設定
-		pBlock->SetPos((D3DXVECTOR3)MyGrid);
-		// ブロックの高さ情報を更新
-		CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(BASEBLOCK_MINUSTOPLUS, 0, BASEBLOCK_MINUSTOPLUS));
+		// 動いた後の位置設定
+		pBlock->SetPos(MyGrid.GetPos(CBaseblock::GetSizeRange()));
+		// 落ちる処理
+		pBlock->SetFall(true);
+		// 押したブロックの動いた後の行列の高さ情報を更新
+		//CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(nFeedValue, 0, nFeedValue));
 	}
 }
 

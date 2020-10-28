@@ -7,6 +7,7 @@
 #include "normalblock.h"
 #include "collision.h"
 #include "debugproc.h"
+#include "game.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -88,6 +89,7 @@ void CNormalblock::Scene_MyCollision(
 		// ->関数を抜ける
 		if (pScene == NULL) return;
 		if (!CBaseblock::GetFall()) return;
+		// 変数宣言
 		// シーン情報の代入
 		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
 		// 相手の落ちる状態がtrueなら
@@ -100,21 +102,23 @@ void CNormalblock::Scene_MyCollision(
 		// ->関数を抜ける
 		if (!(MyGrid.nColumn == OppGrid.nColumn &&
 			MyGrid.nLine == OppGrid.nLine)) return;
-		int nHeight = CBaseblock::GetHeight(			// 高さ
-			MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
-			MyGrid.nLine + BASEBLOCK_MINUSTOPLUS) + 1;
+		// 変数宣言
+		int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フェードの値
+		int nHeight = CBaseblock::GetHeight(				// 高さ
+			MyGrid.nColumn + nFeedValue,
+			MyGrid.nLine + nFeedValue) + 1;
 		// 高さを行列高に代入
 		MyGrid.nHeight = nHeight;
 		// 高さの設定
 		CBaseblock::SetHeight(
-			MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
-			MyGrid.nLine + BASEBLOCK_MINUSTOPLUS,
+			MyGrid.nColumn + nFeedValue,
+			MyGrid.nLine + nFeedValue,
 			MyGrid.nHeight
 		);
 		// 現在の行列高の設定
 		CBaseblock::SetGrid(MyGrid);
 		// 位置設定
-		CBaseblock::SetPos((D3DXVECTOR3)MyGrid);
+		CBaseblock::SetPos(MyGrid.GetPos(m_fSizeRange));
 		// 落ちている状態設定
 		CBaseblock::SetFall(false);
 	}
@@ -145,21 +149,23 @@ void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene
 															// ->関数を抜ける
 		if (!(MyGrid.nColumn == OppGrid.nColumn &&
 			MyGrid.nLine == OppGrid.nLine)) return;
-		int nHeight = CBaseblock::GetHeight(			// 高さ
-			MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
-			MyGrid.nLine + BASEBLOCK_MINUSTOPLUS) + 1;
+		// 変数宣言
+		int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フェードの値
+		int nHeight = CBaseblock::GetHeight(				// 高さ
+			MyGrid.nColumn + nFeedValue,
+			MyGrid.nLine + nFeedValue) + 1;
 		// 高さを行列高に代入
 		MyGrid.nHeight = nHeight;
 		// 高さの設定
 		CBaseblock::SetHeight(
-			MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
-			MyGrid.nLine + BASEBLOCK_MINUSTOPLUS,
+			MyGrid.nColumn + nFeedValue,
+			MyGrid.nLine + nFeedValue,
 			MyGrid.nHeight
 		);
 		// 現在の行列高の設定
 		CBaseblock::SetGrid(MyGrid);
 		// 位置設定
-		CBaseblock::SetPos((D3DXVECTOR3)MyGrid);
+		CBaseblock::SetPos(MyGrid.GetPos(m_fSizeRange));
 		// 落ちている状態設定
 		CBaseblock::SetFall(false);
 	}
@@ -197,21 +203,23 @@ void CNormalblock::HitCollision(
 																// ->関数を抜ける
 			if (!(MyGrid.nColumn == OppGrid.nColumn &&
 				MyGrid.nLine == OppGrid.nLine)) return;
+			// 変数宣言
+			int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フェードの値
 			int nHeight = CBaseblock::GetHeight(			// 高さ
-				MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
-				MyGrid.nLine + BASEBLOCK_MINUSTOPLUS) + 1;
+				MyGrid.nColumn + nFeedValue,
+				MyGrid.nLine + nFeedValue) + 1;
 			// 高さを行列高に代入
 			MyGrid.nHeight = nHeight;
 			// 高さの設定
 			CBaseblock::SetHeight(
-				MyGrid.nColumn + BASEBLOCK_MINUSTOPLUS,
-				MyGrid.nLine + BASEBLOCK_MINUSTOPLUS,
+				MyGrid.nColumn + nFeedValue,
+				MyGrid.nLine + nFeedValue,
 				MyGrid.nHeight
 			);
 			// 現在の行列高の設定
 			CBaseblock::SetGrid(MyGrid);
 			// 位置設定
-			CBaseblock::SetPos((D3DXVECTOR3)MyGrid);
+			CBaseblock::SetPos(MyGrid.GetPos(m_fSizeRange));
 			// 落ちている状態設定
 			CBaseblock::SetFall(false);
 		}
@@ -238,11 +246,13 @@ void CNormalblock::UnLoad(void)
 // 作成(シーン管理)
 //	pos			: 位置
 //	nModelId	: モデル番号
+//	pCol		: 色情報
 //	layer		: レイヤー
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CNormalblock * CNormalblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
+	D3DXCOLOR		* pCol,				// 色
 	CScene::LAYER	const & layer		// レイヤー
 )
 {
@@ -255,8 +265,14 @@ CNormalblock * CNormalblock::Create(
 	pNormalblock->ManageSetting(layer);
 	pNormalblock->SetGrid(Grid);			// 行列高さ
 	pNormalblock->SetPos(					// 位置
-		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
 	pNormalblock->SetModelId(nModelId);		// モデル番号
+	// 色がNULLではないなら
+	if (pCol != NULL)
+	{
+		// モデルの色を変える
+		pNormalblock->SetModelColor(*pCol);
+	}
 	// 初期化処理
 	pNormalblock->Init();
 	// 生成したオブジェクトを返す
@@ -268,10 +284,12 @@ CNormalblock * CNormalblock::Create(
 // 作成(個人管理)
 //	pos			: 位置
 //	nModelId	: モデル番号
+//	pCol		: 色情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CNormalblock * CNormalblock::Create_Self(
 	int				const & nModelId,								// モデル番号
-	GRID			const & Grid									// 行列高さ番号
+	GRID			const & Grid,									// 行列高さ番号
+	D3DXCOLOR		* pCol											// 色
 )
 {
 	// 変数宣言
@@ -281,8 +299,15 @@ CNormalblock * CNormalblock::Create_Self(
 	// 設定
 	pNormalblock->SetGrid(Grid);			// 行列高さ
 	pNormalblock->SetPos(					// 位置
-		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
 	pNormalblock->SetModelId(nModelId);		// モデル番号
+	// 色がNULLではないなら
+	if (pCol != NULL)
+	{
+		// モデルの色を変える
+		pNormalblock->SetModelColor(*pCol);
+	}
+
 	// 初期化処理
 	pNormalblock->Init();
 	// 生成したオブジェクトを返す
@@ -294,10 +319,12 @@ CNormalblock * CNormalblock::Create_Self(
 // ※戻り値はstd::moveで受け取る
 //	pos			: 位置
 //	nModelId	: モデル番号
+//	pCol		: 色情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
 	int				const & nModelId,								// モデル番号
-	GRID			const & Grid									// 行列高さ番号
+	GRID			const & Grid,									// 行列高さ番号
+	D3DXCOLOR		* pCol											// 色
 )
 {
 	// 変数宣言
@@ -305,8 +332,14 @@ std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
 	// 設定
 	pNormalblock->SetGrid(Grid);			// 行列高さ
 	pNormalblock->SetPos(					// 位置
-		D3DXVECTOR3(Grid.nColumn * BASEBLOCK_RANGE, Grid.nHeight * BASEBLOCK_RANGE, Grid.nLine * BASEBLOCK_RANGE));
+		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
 	pNormalblock->SetModelId(nModelId);		// モデル番号
+	// 色がNULLではないなら
+	if (pCol != NULL)
+	{
+		// モデルの色を変える
+		pNormalblock->SetModelColor(*pCol);
+	}
 	// 初期化処理
 	pNormalblock->Init();
 	// 生成したオブジェクトを返す

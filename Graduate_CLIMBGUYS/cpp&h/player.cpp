@@ -102,6 +102,7 @@ void CPlayer::Update(void)
 	// 死亡判定が出たらリザルトに遷移する
 	if (GetDie())
 	{
+		// 死亡関数
 		Die();
 		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)
 		{
@@ -541,8 +542,10 @@ void CPlayer::PushBlock(
 		pBlock->SetGrid(MyGrid);
 		// 動いた後の位置設定
 		pBlock->SetPos(MyGrid.GetPos(CBaseblock::GetSizeRange()));
+		// 落ちる処理
+		pBlock->SetFall(true);
 		// 押したブロックの動いた後の行列の高さ情報を更新
-		CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(nFeedValue, 0, nFeedValue));
+		//CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(nFeedValue, 0, nFeedValue));
 	}
 }
 

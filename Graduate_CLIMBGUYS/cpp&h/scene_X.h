@@ -173,26 +173,30 @@ public:
 	//	posOld	: 前回の位置
 	//	move	: 移動量
 	//	size	: サイズ
-	COLLISIONDIRECTION PushCollision(
+	virtual COLLISIONDIRECTION PushCollision(
 		CScene::OBJ const & Obj,						// オブジェタイプ
 		D3DXVECTOR3 * pos,								// 位置
 		D3DXVECTOR3 * posOld,							// 前回の位置
 		D3DXVECTOR3 * move,								// 移動量
 		D3DXVECTOR3 * size,								// サイズ
 		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
-	);
+	) {
+		return COLLISIONDIRECTION::NONE;
+	};
 	// 当たり判定
 	//	Obj		: オブジェタイプ
 	//	pos			: 位置
 	//	size		: サイズ
 	//	OffsetPos	: オフセット位置
-	COLLISIONDIRECTION Collision(
+	virtual COLLISIONDIRECTION Collision(
 		CScene::OBJ const & Obj,						// オブジェタイプ
 		D3DXVECTOR3 * pos,								// 位置
 		D3DXVECTOR3 * posOld,							// 前回の位置
 		D3DXVECTOR3 * size,								// サイズ
 		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
-	);
+	) {
+		return COLLISIONDIRECTION::NONE;
+	};
 
 	// 設定
 	// 位置設定

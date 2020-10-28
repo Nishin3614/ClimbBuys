@@ -53,6 +53,33 @@ public:
 	void Update(void);
 	// 描画処理
 	void Draw(void);
+	// 押し出し当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos		: 位置
+	//	posOld	: 前回の位置
+	//	move	: 移動量
+	//	size	: サイズ
+	COLLISIONDIRECTION PushCollision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * move,								// 移動量
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
+	// 当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos			: 位置
+	//	size		: サイズ
+	//	OffsetPos	: オフセット位置
+	COLLISIONDIRECTION Collision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
+
 
 	// ベースブロック
 	void SetType(TYPE const type) { m_type = type; };

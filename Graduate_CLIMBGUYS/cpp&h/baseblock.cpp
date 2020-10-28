@@ -173,11 +173,285 @@ void CBaseblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 押し出し当たり判定
+//	pos		: 位置
+//	posOld	: 前回の位置
+//	move	: 移動量
+//	size	: サイズ
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COLLISIONDIRECTION CBaseblock::PushCollision(
+	CScene::OBJ const & Obj,		// オブジェタイプ
+	D3DXVECTOR3 * pos,				// 位置
+	D3DXVECTOR3 * posOld,			// 前回の位置
+	D3DXVECTOR3 * move,				// 移動量
+	D3DXVECTOR3 * size,				// サイズ
+	D3DXVECTOR3 const & OffsetPos	// オフセット位置
+)
+{
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+
+																// 変数宣言
+	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
+	// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+
+				// 素材状の左に
+				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
+
+				// 移動量の初期化
+				move->y = 0.0f;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+
+				// 素材状の左に
+				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+
+				// 移動量の初期化
+				move->y = 0.0f;
+			}
+			// 当たり判定(下)
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+		}
+	}
+	// 素材のY範囲
+	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+		pos->y + OffsetPos.y - size->y * 0.5f <= BlockPos.y + m_fSizeRange)
+	{
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+				// 素材状の左に
+				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
+				// 移動量の初期化
+				move->x = 0.0f;
+			}
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+
+				// 素材状の左に
+				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
+
+				// 移動量の初期化
+				move->x = 0.0f;
+			}
+			// 当たり判定(左)
+			else if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
+		}
+
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(手前)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+
+				// 素材状の左に
+				pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
+
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+
+				// 素材状の左に
+				pos->z =
+					BlockPos.z + m_fSizeRange * 0.5f +
+					size->z * 0.5f + 0.1f - OffsetPos.z;
+
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+			// 当たり判定(手前)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+			}
+		}
+	}
+
+	return Direct;
+}
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 当たり判定
+//	pos			: 位置
+//	size		: サイズ
+//	OffsetPos	: オフセット位置
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COLLISIONDIRECTION CBaseblock::Collision(
+	CScene::OBJ const & Obj,		// オブジェタイプ
+	D3DXVECTOR3 * pos,				// 位置
+	D3DXVECTOR3 * posOld,			// 前回の位置
+	D3DXVECTOR3 * size,				// サイズ
+	D3DXVECTOR3 const & OffsetPos	// オフセット位置
+)
+{
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
+	// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y >= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y < BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+		}
+	}
+	// 素材のY範囲
+	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+		pos->y + OffsetPos.y - size->y * 0.5f <= BlockPos.y + m_fSizeRange)
+	{
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->z * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x + size->z * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->z * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x - size->z * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
+		}
+
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(手前)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+			}
+		}
+	}
+
+
+
+
+	/// やること
+	// シーン情報をどうやって持っていくか
+	// ヒット後の状態はどうなっているか
+	// 処理速度はどうなっているのか
+	return Direct;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ベースブロック全ソースの読み込み
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT CBaseblock::Load(void)
 {
-	m_fSizeRange = CScene_X::GetModelLoad(CScene_X::TYPE_BLOCK)->size.x;
+	m_fSizeRange = 50.0f;
 	return S_OK;
 }
 

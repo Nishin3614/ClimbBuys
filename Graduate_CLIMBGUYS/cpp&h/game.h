@@ -52,7 +52,13 @@ public:
 		STATE_PAUSE,		// ポーズ状態
 		STATE_MAX			// 最大数
 	} STATE;
-
+	// ステージ
+	typedef enum
+	{
+		STAGE_1 = 0,	// ステージ1
+		STAGE_2,		// ステージ2
+		STAGE_MAX		// 最大ステージ数
+	} STAGE;
 
 	/* 関数 */
 	// コンストラクタ
@@ -69,6 +75,10 @@ public:
 	void Draw(void);
 	// 生成処理
 	static CGame * Create(void);
+	// ステージの設定
+	static void SetStage(STAGE const & Stage) { m_Stage = Stage; };
+	// ステージの取得
+	static STAGE GetStage(void) { return m_Stage; };
 #ifdef _DEBUG
 	void Debug(void);
 #endif // _DEBUG
@@ -81,6 +91,7 @@ private:
 	// ポーズの状態
 	void PauseState(void);
 	/* 変数 */
-	CPause * m_pause;					// ポーズ
+	CPause *		m_pause;	// ポーズ
+	static STAGE	m_Stage;	// ステージ
 };
 #endif

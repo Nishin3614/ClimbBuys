@@ -15,9 +15,11 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define BASEBLOCK_RANGE			(50.0f)				// ブロックの範囲
-#define BASEBLOCK_XYZTOPOS(X)	(BASEBLOCK_RANGE * X)	// 行列高さからの位置
-#define BASEBLOCK_MINUSTOPLUS	(4)						// 行列をプラスに
+//#define BASEBLOCK_MINUSTOPLUS	(4)						// 行列をプラスに
+// やること
+// 行列のフィード値を格闘
+
+//#define BASEBLOCK_RANGE			(50.0f)				// ブロックの範囲
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -59,7 +61,7 @@ public:
 			nHeight = Height;
 		}
 		// 行列高さの足し算のオペレーション
-		GRID operator + (CONST GRID& Source) const
+		GRID operator + (GRID const & Source) const
 		{
 			// 値を渡す変数
 			GRID variable;
@@ -69,7 +71,7 @@ public:
 			return variable;
 		}
 		// 行列高さの掛け算のオペレーション
-		GRID operator * (CONST int& Source) const
+		GRID operator * (int const & Source) const
 		{
 			// 値を渡す変数
 			GRID variable;
@@ -86,13 +88,17 @@ public:
 			nHeight += Grid.nHeight;
 			return *this;
 		}
-		// 行列高さから位置を定めたオペレーション
-		operator D3DXVECTOR3 ()
+		// 行列高さの+=のオペレーション
+		bool operator == (GRID & Grid)
+		{
+			return Grid.nColumn == nColumn && Grid.nLine == nLine && Grid.nHeight == nHeight;
+		}
+		D3DXVECTOR3 GetPos(float const & fRange)
 		{
 			D3DXVECTOR3 pos;
-			pos.x = nColumn * BASEBLOCK_RANGE;
-			pos.z = nLine * BASEBLOCK_RANGE;
-			pos.y = nHeight * BASEBLOCK_RANGE;
+			pos.x = nColumn * fRange;
+			pos.z = nLine * fRange;
+			pos.y = nHeight * fRange;
 			return pos;
 		}
 		int nColumn;	// 列
@@ -196,7 +202,24 @@ public:
 	);
 	// タイトル用 ブロックを一斉に生成
 	static void CreateInBulkBlock();
-
+	// 行列高さが一致するブロックを取得する関数
+	static CBaseblock * GetBaseBlock(GRID & Grid);
+	// 指定した行列の全ての落ちる状態をfalseに関数
+	static void FallBlock_Grid(GRID & Grid);
+	// サイズ範囲設定
+	static void SetSizeRange(float const &fSizeRange) { m_fSizeRange = fSizeRange; };
+	// サイズ範囲取得
+	static float & GetSizeRange(void) { return m_fSizeRange; };
+	// フェードの値設定
+	//	nFeedValue	: フェードの値
+	static void SetFeedValue(
+		int const & nFeedValud	// フェードの値
+	) { m_nFeedValue.emplace_back(nFeedValud); };
+	// フェードの値取得
+	//	nStage	: ステージ番号
+	static int GetFeedValue(
+		int const & nStage	// フェードの値
+	);
 	// ブロックの位置計算
 	//static D3DXVECTOR3 CaluBlockPos(GRID const & Grid)
 	//{ return D3DXVECTOR3() }
@@ -208,7 +231,7 @@ public:
 	static int GetHeight(
 		int const & nColumn,
 		int const & nLine
-	) { return m_anHeight[nColumn][nLine]; };
+	);
 	// 現在積み重なっているブロックの高さを設定
 	//	nColumn	: 列
 	//	nLine	: 行
@@ -217,34 +240,36 @@ public:
 		int const & nColumn,
 		int const & nLine,
 		int const & nHeight
-	) { m_anHeight[nColumn][nLine] = nHeight; };
+	);
 	// 現在積み重なっているブロックの高さを設定
 	//	Grid	: 列
 	static void SetHeight(
 		GRID const & Grid
-	) {
-		m_anHeight[Grid.nColumn][Grid.nLine] = Grid.nHeight;
-	};
+	);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
 #endif // _DEBUG
+	/* 変数宣言 */
+
 protected:
 	/* 関数 */
 	//D3DXVECTOR3 & GetGridToGrid(GRID const & Grid) {}
 	// 設定 //
+	/* 変数宣言 */
+	static float			m_fSizeRange;	// サイズ範囲
+	static std::vector<int>	m_nFeedValue;	// フェードの値
 private:
 	/* 関数 */
 	// 落ちる更新処理
 	void Update_Fall(void);
 	/* 変数 */
-	D3DXVECTOR3 m_posOld;	// 前回の位置
-	TYPE	m_type;			// ベースブロック
-	GRID	m_grid;			// 盤面情報
-	bool	m_bFall;		// 落ちる状態
-
+	D3DXVECTOR3		m_posOld;		// 前回の位置
+	TYPE			m_type;			// ベースブロック
+	GRID			m_grid;			// 盤面情報
+	bool			m_bFall;		// 落ちる状態
 	// 試験用
-	static int m_anHeight[10][10];
+	static int m_anHeight[20][20];
 };
 
 #endif

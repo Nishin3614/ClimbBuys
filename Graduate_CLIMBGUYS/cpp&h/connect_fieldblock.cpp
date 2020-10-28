@@ -41,19 +41,20 @@ CConnect_fieldblock::~CConnect_fieldblock()
 void CConnect_fieldblock::Init()
 {
 	// 変数宣言
-	CBaseblock::GRID grid;							// 行列高さの番号
-	grid.nLine = m_vpLoad[m_stage].nFeed - 1;		// 行
-	grid.nColumn = -(m_vpLoad[m_stage].nFeed - 1);	// 列
+	CBaseblock::GRID grid;						// 行列高さの番号
+	CGame::STAGE Stage = CGame::GetStage();		// ステージ
+	grid.nLine = m_vpLoad[Stage].nFeed;		// 行
+	grid.nColumn = -(m_vpLoad[Stage].nFeed);	// 列
 	grid.nHeight = 0;								// 高さ
 	// フィールドループ
-	for (size_t nCntField = 0; nCntField < m_vpLoad[m_stage].Dvec_pFileLoad.size(); nCntField++)
+	for (size_t nCntField = 0; nCntField < m_vpLoad[Stage].Dvec_pFileLoad.size(); nCntField++)
 	{
 		// ブロックのループ
-		for (size_t nCntBlock = 0; nCntBlock < m_vpLoad[m_stage].Dvec_pFileLoad[nCntField].size(); nCntBlock++)
+		for (size_t nCntBlock = 0; nCntBlock < m_vpLoad[Stage].Dvec_pFileLoad[nCntField].size(); nCntBlock++)
 		{
 			// 使用状態ではないなら
 			// ->ループスキップ
-			if (!m_vpLoad[m_stage].Dvec_pFileLoad[nCntField][nCntBlock].bUse)
+			if (!m_vpLoad[Stage].Dvec_pFileLoad[nCntField][nCntBlock].bUse)
 			{
 				// 列ダウン
 				grid.nColumn++;
@@ -67,7 +68,7 @@ void CConnect_fieldblock::Init()
 		// 行アップ
 		grid.nLine--;
 		// 列初期化
-		grid.nColumn = -(m_vpLoad[m_stage].nFeed - 1);
+		grid.nColumn = -(m_vpLoad[Stage].nFeed);
 	}
 }
 
@@ -160,7 +161,9 @@ HRESULT CConnect_fieldblock::Load(void)
 			{
 				LOAD load;
 				load.Dvec_pFileLoad = vvpFileLoad;
-				load.nFeed = ((signed)vvpFileLoad.size() + 1) / 2;
+				load.nFeed = ((signed)vvpFileLoad.size() - 1) / 2;
+				// フェードの値の設定
+				CBaseblock::SetFeedValue(load.nFeed);
 				// 読み込んだフィードブロックの情報を格納
 				m_vpLoad.emplace_back(load);
 				std::vector<std::vector<FIELDINFO>>().swap(vvpFileLoad);
@@ -220,7 +223,7 @@ void CConnect_fieldblock::UnLoad(void)
 //	layer		: レイヤー
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CConnect_fieldblock * CConnect_fieldblock::Create(
-	STAGE			const & stage,									// ステージ情報
+	CGame::STAGE			const & stage,									// ステージ情報
 	CScene::LAYER	const & layer									// レイヤー
 )
 {
@@ -231,8 +234,6 @@ CConnect_fieldblock * CConnect_fieldblock::Create(
 	// 設定
 	// シーン管理設定
 	pConnect_fieldblock->ManageSetting(layer);
-	// 設定
-	pConnect_fieldblock->m_stage = stage;	// ステージ
 	// 初期化処理
 	pConnect_fieldblock->Init();
 	// 生成したオブジェクトを返す
@@ -244,15 +245,13 @@ CConnect_fieldblock * CConnect_fieldblock::Create(
 //	stage		: ステージ情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CConnect_fieldblock * CConnect_fieldblock::Create_Self(
-	STAGE	const & stage									// ステージ情報
+	CGame::STAGE	const & stage									// ステージ情報
 )
 {
 	// 変数宣言
 	CConnect_fieldblock * pConnect_fieldblock;		// 結合フィールドブロック
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pConnect_fieldblock = new CConnect_fieldblock;
-	// 設定
-	pConnect_fieldblock->m_stage = stage;	// ステージ
 	// 初期化処理
 	pConnect_fieldblock->Init();
 	// 生成したオブジェクトを返す
@@ -265,13 +264,11 @@ CConnect_fieldblock * CConnect_fieldblock::Create_Self(
 //	stage		: ステージ情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 std::unique_ptr<CConnect_fieldblock> CConnect_fieldblock::Creat_Unique(
-	STAGE	const & stage									// ステージ情報
+	CGame::STAGE	const & stage									// ステージ情報
 )
 {
 	// 変数宣言
 	std::unique_ptr<CConnect_fieldblock> pConnect_fieldblock(new CConnect_fieldblock);		// 結合フィールドブロック
-	// 設定
-	pConnect_fieldblock->m_stage = stage;	// ステージ
 	// 初期化処理
 	pConnect_fieldblock->Init();
 	// 生成したオブジェクトを返す

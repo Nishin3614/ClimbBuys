@@ -218,6 +218,21 @@ COLLISIONDIRECTION CScene_X::PushCollision(
 				// 移動量の初期化
 				move->y = 0.0f;
 			}
+			// 当たり判定(下)
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + BlockSize.y&&
+				pos->y + OffsetPos.y - size->y > BlockPos.y + BlockSize.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
 		}
 	}
 	// 素材のY範囲
@@ -256,6 +271,21 @@ COLLISIONDIRECTION CScene_X::PushCollision(
 				// 移動量の初期化
 				move->x = 0.0f;
 			}
+			// 当たり判定(左)
+			else if (pos->x + OffsetPos.x + size->z * 0.5f > BlockPos.x - BlockSize.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->z * 0.5f <= BlockPos.x - BlockSize.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->z * 0.5f < BlockPos.x + BlockSize.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->z * 0.5f >= BlockPos.x + BlockSize.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
 		}
 
 		// 素材のX範囲
@@ -290,6 +320,20 @@ COLLISIONDIRECTION CScene_X::PushCollision(
 
 				// 移動量の初期化
 				move->z = 0.0f;
+			}
+			// 当たり判定(手前)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - BlockSize.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z - BlockSize.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + BlockSize.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z + BlockSize.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
 			}
 		}
 	}
@@ -944,7 +988,7 @@ CScene_X::MODEL_LOAD * CScene_X::GetModelLoad(int const & nModelId)
 {
 	// プレイヤー(雷)番号がサイズ以上なら
 	// ->関数を抜ける
-	if ((signed)m_pModelLoad.size() >= nModelId)
+	if ((signed)m_pModelLoad.size() <= nModelId)
 	{
 		return m_pModelLoad[0].get();
 	}

@@ -135,8 +135,6 @@ public:
 	void SetRot(D3DXVECTOR3 const &rot)						{ m_rot = rot; };
 	// ジャンプできるかどうかのフラグの設定
 	void SetJumpAble(bool const &jump)						{ m_bJumpable = jump; };
-	// ダッシュしているかどうかのフラグの設定
-	void SetDash(bool const &Dash)							{ m_bDash = Dash; };
 	//  死亡しているかどうかのフラグの設定
 	void SetDie(bool const &die)							{ m_bDie = die; };
 
@@ -153,8 +151,6 @@ public:
 	D3DXVECTOR3 &GetRot(void)								{ return m_rot; };
 	// ジャンプできるかどうかのフラグの取得
 	bool		&GetJumpAble(void)							{ return m_bJumpable; };
-	// ダッシュしているかどうかのフラグの取得
-	bool		&GetDash(void)								{ return m_bDash; };
 	// 死亡しているかどうかのフラグの取得
 	bool		&GetDie(void)								{ return m_bDie; };
 	// 親と子の回転量
@@ -274,7 +270,6 @@ private:
 	int											m_nMotionFrame;					// 一つのモーションのカウント
 	float										m_fLength;						// 攻撃の当たり範囲
 	bool										m_bJumpable;					// ジャンプ可能かどうか
-	bool										m_bDash;						// ダッシュ状態
 	bool										m_bDie;							// 死亡フラグ
 	D3DXVECTOR3									m_Directvector;					// 方向のベクトル
 	CCollision									* m_pCharacterCollision;		// キャラクターの当たり判定

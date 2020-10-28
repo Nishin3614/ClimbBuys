@@ -11,6 +11,7 @@
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "scene.h"
+#include "game.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -28,12 +29,7 @@ class CConnect_fieldblock : public CScene
 {
 public:
 	/* 列挙型 */
-	// ステージ
-	typedef enum
-	{
-		STAGE_1 = 0,
-		STAGE_MAX
-	} STAGE;
+
 	/* 構造体 */
 	// 読み込み情報
 	typedef struct
@@ -107,19 +103,19 @@ public:
 	//	stage		: ステージ情報
 	//	layer		: レイヤー
 	static CConnect_fieldblock * Create(
-		STAGE			const & stage,									// ステージ情報
+		CGame::STAGE			const & stage,									// ステージ情報
 		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT			// レイヤー
 	);
 	// 作成(個人管理)
 	//	stage		: ステージ情報
 	static CConnect_fieldblock * Create_Self(
-		STAGE			const & stage									// ステージ情報
+		CGame::STAGE			const & stage									// ステージ情報
 		);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
 	//	stage		: ステージ情報
 	static std::unique_ptr<CConnect_fieldblock> Creat_Unique(
-		STAGE			const & stage									// ステージ情報
+		CGame::STAGE			const & stage									// ステージ情報
 	);
 #ifdef _DEBUG
 	// デバッグ処理
@@ -135,7 +131,6 @@ private:
 	/* 変数 */
 	static std::vector<LOAD>					m_vpLoad;			// ファイルの読み込み情報
 	std::vector<CBaseblock *>					m_Dvec_pFieldBlock;	// フィールドブロック情報
-	STAGE										m_stage;			// ステージ
 	int											m_nMaxField;		// フィールドの最大数
 };
 

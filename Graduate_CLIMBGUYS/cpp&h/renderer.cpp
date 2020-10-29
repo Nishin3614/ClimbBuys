@@ -14,6 +14,7 @@
 #include "light.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "connectblock.h"
 
 // テスト
 #include "3Dmap.h"
@@ -574,6 +575,8 @@ void CRenderer::UpdateImGui(void)
 	m_pCamera->Debug();
 	// ライトの情報の設定
 	m_pLight->Debug();
+	// 結合ブロックの静的なデバッグ処理
+	CConnectblock::StaticDebug();
 	// ライト情報の設定
 	CDebugproc::Print("マウス位置(%.1f,%.1f)\n", (float)CManager::GetMouse()->GetX(), (float)CManager::GetMouse()->GetY());
 	CDebugproc::Print("ImGuiのマウス位置(%.1f,%.1f)\n",ImGui::GetMousePos().x,ImGui::GetMousePos().y);

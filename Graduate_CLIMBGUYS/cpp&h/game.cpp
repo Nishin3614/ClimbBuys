@@ -89,6 +89,8 @@ void CGame::Init(void)
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);
+	// 結合されたブロックの更新ブロック生成
+	CConnectblock::TestCreate();
 	// ダメージ床の生成
 	CDamageFloor::Create();
 	/*
@@ -153,7 +155,7 @@ void CGame::Update(void)
 			// フェード状態が何も起こっていない状態なら
 			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 			{
-				CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+				//CManager::GetFade()->SetFade(CManager::MODE_RESULT);
 			}
 		}
 	}

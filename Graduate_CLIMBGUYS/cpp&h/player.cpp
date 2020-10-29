@@ -665,39 +665,48 @@ void CPlayer::PushBlock(
 )
 {
 	// 足場オブジェクトなら
-	if (pScene_X->GetObj() == CScene::OBJ_BLOCK)
+	// ->関数を抜ける
+	if (pScene_X->GetObj() != CScene::OBJ_BLOCK) return;
+	// プレイヤーがダッシュ時以外なら
+	// ->関数を抜ける
+	if (!CPlayer::GetDashFlag()) return;
+
+	// 変数宣言
+	CBaseblock * pBlock = (CBaseblock *)pScene_X;					// ベースブロックの情報
+
+	// 落ちている状態なら
+	if (pBlock->GetFall() ||
+		pBlock->GetType() == CBaseblock::TYPE_FIELD) return;
+	CBaseblock::GRID MyGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
+	int nHeight;													// 高さ
+	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());	// フェードの値
+	// 行列高さの方向を押し出しブロックの行列高さに加算
+	MyGrid += Grid;
+	// その行列の積み重なっている高さを取得
+	nHeight = CBaseblock::GetHeight(MyGrid.nColumn + nFeedValue, MyGrid.nLine + nFeedValue);
+	if (MyGrid.nHeight <= CBaseblock::GetHeight(MyGrid.nColumn + nFeedValue, MyGrid.nLine + nFeedValue))
 	{
-		if (!CPlayer::GetDashFlag()) return;
-		// 変数宣言
-		CBaseblock * pBlock = (CBaseblock *)pScene_X;					// ベースブロックの情報
-		// 落ちている状態なら
-		if (pBlock->GetFall()) return;
-		CBaseblock::GRID MyGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
-		int nHeight;													// 高さ
-		int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());	// フェードの値
-		// 行列高さの方向を押し出しブロックの行列高さに加算
-		MyGrid += Grid;
-		// その行列の積み重なっている高さを取得
-		nHeight = CBaseblock::GetHeight(MyGrid.nColumn + nFeedValue, MyGrid.nLine + nFeedValue);
-		if (MyGrid.nHeight <= CBaseblock::GetHeight(MyGrid.nColumn + nFeedValue, MyGrid.nLine + nFeedValue))
-		{
-			return;
-		}
-		CBaseblock::GRID FallGrid = pBlock->GetGrid();	// 行列高
-		// 押す前のブロックの上にあったブロックを落とさせる
-		CBaseblock::FallBlock_Grid(FallGrid);
-		// 押したブロックの現在までいた行列の高さ情報を更新
-		CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(nFeedValue,-1, nFeedValue));
-		// 動いた後の行列高を設定
-		pBlock->SetGrid(MyGrid);
-		// 動いた後の位置設定
-		pBlock->SetPos(MyGrid.GetPos(CBaseblock::GetSizeRange()));
-		PushAfter_Collision(pBlock, Grid);
-		// 落ちる処理
-		pBlock->SetFall(true);
-		// 押したブロックの動いた後の行列の高さ情報を更新
-		//CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(nFeedValue, 0, nFeedValue));
+		return;
 	}
+
+	// 変数宣言
+	CBaseblock::GRID FallGrid = pBlock->GetGrid();	// 行列高
+	CBaseblock::GRID PlayerGrid = pBlock->GetGrid() - Grid;
+	// 押す前のブロックの上にあったブロックを落とさせる
+	CBaseblock::FallBlock_Grid(FallGrid);
+	// 押したブロックの現在までいた行列の高さ情報を更新
+	CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(nFeedValue,-1, nFeedValue));
+
+	// 動いた後の行列高を設定
+	pBlock->SetGrid(MyGrid);
+	// 動いた後の位置設定
+	pBlock->SetPos(MyGrid.GetPos(CBaseblock::GetSizeRange()));
+	// 押し出した後のブロックに当たったプレイヤーの押し出し判定処理
+	PushAfter_Collision(pBlock, Grid);
+	// 落ちる処理
+	pBlock->SetFall(true);
+	// 押したブロックの動いた後の行列の高さ情報を更新
+	//CBaseblock::SetHeight(MyGrid + CBaseblock::GRID(nFeedValue, 0, nFeedValue));
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

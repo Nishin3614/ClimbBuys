@@ -22,7 +22,7 @@
 //
 // ----------------------------------------------------------------------------------------------------
 #define CLASS_NAME "WindowClass"	// ウィンドウクラス名
-#define WINDOW_NAME "BattleBalloon"	// ウィンドウ名(キャンセル表示)
+#define WINDOW_NAME "CLIMBGUYS"	// ウィンドウ名(キャンセル表示)
 #define ID_BUTTON000 (101)
 #define SCREEN_WINDOWS (true)		// スクリーンのウィンドウサイズ
 

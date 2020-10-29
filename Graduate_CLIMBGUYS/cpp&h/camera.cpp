@@ -311,6 +311,8 @@ void CCamera::Debug(void)
 			InitCamera();
 			m_Turn.bSpin = !m_Turn.bSpin;
 		}
+		// ‹æØ‚èü
+		ImGui::Separator();
 	}
 	/*
 	CDebugproc::Print("PosV(%.1f,%.1f,%.1f)\n", m_posV.x, m_posV.y, m_posV.z);

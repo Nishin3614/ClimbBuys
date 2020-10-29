@@ -26,29 +26,29 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define PLAYER_GRAVITY			(0.1f)
-#define PLAYER_UPMOVELIMIT		(30.0f)	// プレイヤーの上昇移動量制限
-#define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
-#define PLAYER_JUMP_POWER		(10.0f)	// プレイヤーのジャンプ力
-#define PLAYER_MOVE				(3.0f)	// プレイヤーの移動速度
-#define DASH_TIME_MAX			(30)	// ダッシュしている時間
-#define DASH_MOVE				(50.0f)	// ダッシュの移動量
+#define PLAYER_GRAVITY				(0.1f)		// プレイヤーの重力
+#define PLAYER_UPMOVELIMIT			(30.0f)		// プレイヤーの上昇移動量制限
+#define PLAYER_UNDERMOVELIMIT		(5.0f)		// プレイヤーの下降移動量制限
+#define DASH_TIME_MAX				(30)		// ダッシュしている時間
+#define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
+#define PLAYER_STATUS_TXT			("data/LOAD/STATUS/PlayerStatus.txt")	// プレイヤーのステータスのテキスト
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatus = {};
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
-	m_nCntState			= 0;				// ステートカウント
-	m_bDieFlag			= false;			// 死亡フラグ
-	m_bDashFlag			= false;			// ダッシュフラグ
-	m_nCntDashTime		= 0;				// ダッシュ中の切り替えカウント
+	m_nCntState			= 0;					// ステートカウント
+	m_bDieFlag			= false;				// 死亡フラグ
+	m_bDashFlag			= false;				// ダッシュフラグ
+	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 }
 
@@ -97,9 +97,6 @@ void CPlayer::Update(void)
 	// 当たり判定の処理
 	Collision();
 
-
-
-
 	// 死亡判定が出たらリザルトに遷移する
 	if (GetDie())
 	{
@@ -110,7 +107,6 @@ void CPlayer::Update(void)
 			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
 		}
 	}
-
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -163,24 +159,24 @@ void CPlayer::MyMove(void)
 		{
 			rot.y = -D3DX_PI * 0.25f + fRot;
 			vec = D3DXVECTOR3(sinf(D3DX_PI * 0.75f + fRot), 0.0f, cosf(D3DX_PI * 0.75f + fRot));
-			move.x += vec.x * 10.0f;
-			move.z += vec.z * 10.0f;
+			move.x += vec.x * m_PlayerStatus.fMove;
+			move.z += vec.z * m_PlayerStatus.fMove;
 		}
 		// 手前
 		else if (pKeyboard->GetKeyboardPress(DIK_S))
 		{
 			rot.y = -D3DX_PI * 0.75f + fRot;
 			vec = D3DXVECTOR3(sinf(D3DX_PI * 0.25f + fRot), 0.0f, cosf(D3DX_PI * 0.25f + fRot));
-			move.x += vec.x * 10.0f;
-			move.z += vec.z * 10.0f;
+			move.x += vec.x * m_PlayerStatus.fMove;
+			move.z += vec.z * m_PlayerStatus.fMove;
 		}
 		// 左
 		else
 		{
 			rot.y = -D3DX_PI * 0.5f + fRot;
 			vec = D3DXVECTOR3(sinf(D3DX_PI * 0.5f + fRot), 0.0f, cosf(D3DX_PI * 0.5f + fRot));
-			move.x += vec.x * 10.0f;
-			move.z += vec.z * 10.0f;
+			move.x += vec.x * m_PlayerStatus.fMove;
+			move.z += vec.z * m_PlayerStatus.fMove;
 		}
 	}
 	// 右
@@ -193,8 +189,8 @@ void CPlayer::MyMove(void)
 			rot.y = D3DX_PI * 0.25f + fRot;
 			vec = D3DXVECTOR3(sinf(-D3DX_PI * 0.75f + fRot), 0.0f, cosf(-D3DX_PI * 0.75f + fRot));
 
-			move.x += vec.x * 10.0f;
-			move.z += vec.z * 10.0f;
+			move.x += vec.x * m_PlayerStatus.fMove;
+			move.z += vec.z * m_PlayerStatus.fMove;
 		}
 		// 手前
 		else if (pKeyboard->GetKeyboardPress(DIK_S))
@@ -203,8 +199,8 @@ void CPlayer::MyMove(void)
 			vec = D3DXVECTOR3(sinf(-D3DX_PI * 0.25f + fRot), 0.0f, cosf(-D3DX_PI * 0.25f + fRot));
 
 
-			move.x += vec.x * 10.0f;
-			move.z += vec.z * 10.0f;
+			move.x += vec.x * m_PlayerStatus.fMove;
+			move.z += vec.z * m_PlayerStatus.fMove;
 		}
 		// 右
 		else
@@ -212,8 +208,8 @@ void CPlayer::MyMove(void)
 			rot.y = D3DX_PI * 0.5f + fRot;
 			vec = D3DXVECTOR3(sinf(-D3DX_PI * 0.5f + fRot), 0.0f, cosf(-D3DX_PI * 0.5f + fRot));
 
-			move.x += vec.x * 10.0f;
-			move.z += vec.z * 10.0f;
+			move.x += vec.x * m_PlayerStatus.fMove;
+			move.z += vec.z * m_PlayerStatus.fMove;
 		}
 	}
 	// 奥に行く
@@ -221,16 +217,16 @@ void CPlayer::MyMove(void)
 	{
 		rot.y = D3DX_PI * 0.0f + fRot;
 		vec = D3DXVECTOR3(sinf(-D3DX_PI * 1.0f + fRot), 0.0f, cosf(-D3DX_PI * 1.0f + fRot));
-		move.x += vec.x * 10.0f;
-		move.z += vec.z * 10.0f;
+		move.x += vec.x * m_PlayerStatus.fMove;
+		move.z += vec.z * m_PlayerStatus.fMove;
 	}
 	// 手前に行く
 	else if (pKeyboard->GetKeyboardPress(DIK_S))
 	{
 		rot.y = D3DX_PI * 1.0f + fRot;
 		vec = D3DXVECTOR3(sinf(D3DX_PI * 0.0f + fRot), 0.0f, cosf(D3DX_PI * 0.0f + fRot));
-		move.x += vec.x * 10.0f;
-		move.z += vec.z * 10.0f;
+		move.x += vec.x * m_PlayerStatus.fMove;
+		move.z += vec.z * m_PlayerStatus.fMove;
 	}
 	// それ以外
 	else
@@ -241,14 +237,13 @@ void CPlayer::MyMove(void)
 	// 試験的キーボードジャンプ
 	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
 	{
-		move.y += PLAYER_JUMP_POWER;
+		move.y += m_PlayerStatus.fJump;
 		SetJumpAble(false);
 	}
 
 	/* ゲームパッド */
 	// パッド用 //
 	float fValueH, fValueV;		// ゲームパッドのスティック情報の取得用
-	float fMove = PLAYER_MOVE;	// 移動速度
 	float fAngle;				// スティック角度の計算用変数
 	fAngle = 0.0f;				// 角度
 
@@ -279,31 +274,35 @@ void CPlayer::MyMove(void)
 				rot.y = fAngle + fRot;
 				vec = D3DXVECTOR3(sinf(fAngle + fRot), 0.0f, cosf(fAngle + fRot));
 				// スティックの角度によってプレイヤー移動
-				move.x -= sinf(fAngle + fRot) * (fMove);
-				move.z -= cosf(fAngle + fRot) * (fMove);
+				move.x -= sinf(fAngle + fRot) * (m_PlayerStatus.fMove);
+				move.z -= cosf(fAngle + fRot) * (m_PlayerStatus.fMove);
 			}
 
 			// 試験的ジャンプ ( のちに中身変わる予定 多分 )
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
 			{
-				move.y += PLAYER_JUMP_POWER;
+				move.y += m_PlayerStatus.fJump;
 				SetJumpAble(false);
 			}
 
-			// 試験的タックル ( のちに中身変わる予定 多分 )
-			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
+			// スティックをある程度傾けたとき
+			if (fabs(fValueH / STICK_MAX_RANGE) > DASH_ENABLE_STICK_RANGE || fabs(fValueV / STICK_MAX_RANGE) > DASH_ENABLE_STICK_RANGE)
 			{
-				m_bDashFlag = true;
-
-				switch (CCalculation::CheckPadStick())
+				// 試験的タックル ( のちに中身変わる予定 多分 )
+				if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 				{
-				case DIRECTION::LEFT:
-				case DIRECTION::RIGHT:
-				case DIRECTION::UP:
-				case DIRECTION::DOWN:
-					move.x -= vec.x * DASH_MOVE;
-					move.z -= vec.z * DASH_MOVE;
-					break;
+					m_bDashFlag = true;
+
+					switch (CCalculation::CheckPadStick())
+					{
+					case DIRECTION::LEFT:
+					case DIRECTION::RIGHT:
+					case DIRECTION::UP:
+					case DIRECTION::DOWN:
+						move.x -= vec.x * m_PlayerStatus.fDash;
+						move.z -= vec.z * m_PlayerStatus.fDash;
+						break;
+					}
 				}
 			}
 		}
@@ -312,13 +311,13 @@ void CPlayer::MyMove(void)
 	// ジャンプしているときの慣性
 	if (!GetJumpAble())
 	{
-		move.x += ( -m_move.x) * 1.6f;
-		move.z += ( -m_move.z) * 1.6f;
+		move.x += ( -m_move.x) * m_PlayerStatus.fJumpInertia;
+		move.z += ( -m_move.z) * m_PlayerStatus.fJumpInertia;
 	}
 	else
 	{
-		move.x += (-m_move.x) * 0.7f;
-		move.z += (-m_move.z) * 0.7f;
+		move.x += (-m_move.x) * m_PlayerStatus.fNormalInertia;
+		move.z += (-m_move.z) * m_PlayerStatus.fNormalInertia;
 	}
 
 	if (vec.x < 0)
@@ -374,28 +373,6 @@ void CPlayer::StatusMotion(void)
 		SetMotion(MOTIONTYPE_NEUTRAL);
 	}
 	*/
-
-	//// 試験的オブジェクトウィンドウ
-	//ImGui::Begin(u8"Player状態", nullptr, ImGuiWindowFlags_MenuBar);
-
-	// Tab
-	//if (ImGui::BeginTabBar("asd"))
-	//{
-	//	if (ImGui::BeginTabItem("かきくけこ"))
-	//	{
-	//		ImGui::Separator();
-	//		ImGui::EndTabItem();
-	//	}
-	//	if (ImGui::BeginTabItem("さしすせそ"))
-	//	{
-	//		ImGui::Separator();
-	//		ImGui::EndTabItem();
-	//	}
-	//	// TabEnd
-	//	ImGui::EndTabBar();
-	//}
-	//// End
-	//ImGui::End();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -540,6 +517,136 @@ void CPlayer::PushAfter_Collision(
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// プレイヤーのステータスのロード
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PlayerStatusLoad(void)
+{
+	// ファイルポイント
+	FILE *pFile = nullptr;
+
+	char cReadText[128];			// 文字として読み取る
+	char cHeadText[128];			// 比較用
+	char cDie[128];					// 不要な文字
+
+	// ファイルを開く
+	pFile = fopen(PLAYER_STATUS_TXT, "r");
+
+	// 開いているとき
+	if (pFile)
+	{
+		// SCRIPTが来るまでループ
+		while (strcmp(cHeadText, "SCRIPT") != 0)
+		{
+			fgets(cReadText, sizeof(cReadText), pFile); // 一文読み込み
+			sscanf(cReadText, "%s", &cHeadText);		// 比較用テキストに文字を代入
+		}
+
+		// SCRIPTが来たら
+		if (strcmp(cHeadText, "SCRIPT") == 0)
+		{
+			// END_SCRIPTが来るまでループ
+			while (strcmp(cHeadText, "END_SCRIPT") != 0)
+			{
+				fgets(cReadText, sizeof(cReadText), pFile);
+				sscanf(cReadText, "%s", &cHeadText);
+
+				// STATUS_SETが来たら
+				if (strcmp(cHeadText, "STATUS_SET") == 0)
+				{
+					// END_STATUS_SETが来るまでループ
+					while (strcmp(cHeadText, "END_STATUS_SET") != 0)
+					{
+						fgets(cReadText, sizeof(cReadText), pFile);
+						sscanf(cReadText, "%s", &cHeadText);
+
+						// Moveが来たら
+						if (strcmp(cHeadText, "Move") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fMove);
+						}
+						// Jumpが来たら
+						else if (strcmp(cHeadText, "Jump") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fJump);
+						}
+						// Dashが来たら
+						else if (strcmp(cHeadText, "Dash") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fDash);
+						}
+						// NormalInertiaが来たら
+						else if (strcmp(cHeadText, "NormalInertia") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fNormalInertia);
+						}
+						// JumpInertiaが来たら
+						else if (strcmp(cHeadText, "JumpInertia") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fJumpInertia);
+						}
+						else if (strcmp(cHeadText, "END_BULLETSET") == 0)
+						{
+						}
+					}
+				}
+			}
+		}
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{
+		// 読み込み失敗時の警告表示
+		MessageBox(NULL, "プレイヤーのステータス読み込み失敗", PLAYER_STATUS_TXT, MB_ICONWARNING);
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// プレイヤーのステータスのセーブ
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PlayerStatusSave(void)
+{
+	// ファイルポイント
+	FILE	*pFile = nullptr;
+
+	// ファイルを開く
+	pFile = fopen(PLAYER_STATUS_TXT, "w");
+
+	// 開いているとき
+	if (pFile)
+	{
+		fprintf(pFile, COMMENT02);
+		fprintf(pFile, "// プレイヤーのステータス\n");
+		fprintf(pFile, COMMENT02);
+
+		fprintf(pFile, "SCRIPT\n");
+		fprintf(pFile, NEWLINE);
+
+		// セーブするモデルの情報
+		fprintf(pFile, "STATUS_SET\n");
+		fprintf(pFile, "	Move			= %.3f\n", m_PlayerStatus.fMove);
+		fprintf(pFile, "	Jump			= %.3f\n", m_PlayerStatus.fJump);
+		fprintf(pFile, "	Dash			= %.3f\n", m_PlayerStatus.fDash);
+		fprintf(pFile, "	NormalInertia	= %.3f\n", m_PlayerStatus.fNormalInertia);
+		fprintf(pFile, "	JumpInertia		= %.3f\n", m_PlayerStatus.fJumpInertia);
+		fprintf(pFile, "END_STATUS_SET\n\n");
+
+		fprintf(pFile, "END_SCRIPT\n");
+
+		// ファイルを閉じる
+		fclose(pFile);
+
+		// 読み込み成功時の結果表示
+		MessageBox(NULL, "セーブしました", PLAYER_STATUS_TXT, MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		// 読み込み失敗時の警告表示
+		MessageBox(NULL, "読み込み失敗", PLAYER_STATUS_TXT, MB_ICONWARNING);
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ブロックの押し出し処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::PushBlock(
@@ -676,6 +783,32 @@ void CPlayer::Scene_NoOpponentCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Debug(void)
 {
+	// プレイヤー1人だけ通す(ステータスが共通のため)
+	if (GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+	{
+		if (ImGui::CollapsingHeader(u8"プレイヤーのステータス"))
+		{
+			// 移動量
+			ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
+			// ジャンプ力
+			ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0, 1.0f, 50.0f);						/* 10.0f */
+			// ダッシュの移動量
+			ImGui::DragFloat(u8"ダッシュの移動量", &m_PlayerStatus.fDash, 1.0f, 1.0f, 100.0f);				/* 30.0f */
+			// 通常時の慣性
+			ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
+			// ジャンプ時の慣性
+			ImGui::DragFloat(u8"ジャンプ時の慣性", &m_PlayerStatus.fJumpInertia, 0.01f, 0.01f, 10.0f);		/* 1.6f */
+
+			// セーブボタン
+			if (ImGui::Button("Save"))
+			{
+				// プレイヤーのステータスのセーブ
+				PlayerStatusSave();
+			}
+			// 区切り線
+			ImGui::Separator();
+		}
+	}
 }
 #endif // _DEBUG
 
@@ -708,6 +841,8 @@ CPlayer * CPlayer::Create(PLAYER_TAG tag,
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT CPlayer::Load(void)
 {
+	// プレイヤーのステータスのロード
+	PlayerStatusLoad();
 	return S_OK;
 }
 

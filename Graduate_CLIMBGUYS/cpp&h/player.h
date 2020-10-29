@@ -39,6 +39,16 @@ public:
 	{
 		MOTIONTYPE_MAX = CCharacter::MOTIONTYPE_MAX
 	} MOTIONTYPE;
+	// ----- プレイヤーのステータス ----- //
+	typedef struct
+	{
+		float				fMove;				// 移動量
+		float				fJump;				// ジャンプ力
+		float				fDash;				// ダッシュの移動量
+		float				fNormalInertia;		// 通常時の慣性
+		float				fJumpInertia;		// ジャンプ時の慣性
+	}PLAYER_STATUS;
+
 	/* 関数 */
 	// コンストラクタ
 	CPlayer(CCharacter::CHARACTER const &character);
@@ -131,11 +141,16 @@ private:
 		CBaseblock * pBaseBlock,
 		CBaseblock::GRID Grid
 		);
-	/* 変数 */
+	// プレイヤーのステータスのロード
+	static void PlayerStatusLoad(void);
+	// プレイヤーのステータスのセーブ
+	void PlayerStatusSave(void);
 
-	CXInputPad		*m_pPad;						// パッドのポインタ
-	bool			m_bDieFlag;						// 死亡フラグ
-	bool			m_bDashFlag;					// ダッシュフラグ
-	int				m_nCntDashTime;					// ダッシュ中の切り替えカウント
+	/* 変数 */
+	CXInputPad				*m_pPad;						// パッドのポインタ
+	bool					m_bDieFlag;						// 死亡フラグ
+	bool					m_bDashFlag;					// ダッシュフラグ
+	int						m_nCntDashTime;					// ダッシュ中の切り替えカウント
+	static PLAYER_STATUS	m_PlayerStatus;					// プレイヤーのステータス
 };
 #endif

@@ -454,8 +454,8 @@ void CPlayer::Collision(void)
 			&CCharacter::GetPos(),
 			&CCharacter::GetPosOld(),
 			&CCharacter::GetMove(),
-			&D3DXVECTOR3(25.0f, 50.0f, 25.0f),
-			D3DXVECTOR3(0.0f, 25.0f, 0.0f)
+			&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
+			D3DXVECTOR3(0.0f, 20.0f, 0.0f)
 		);
 		// ブロックの判定
 		// 前
@@ -509,6 +509,44 @@ void CPlayer::Collision(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 押し出した後のブロックに当たったプレイヤーの押し出し判定処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PushAfter_Collision(
+	CBaseblock * pBaseBlock,	// ベースブロック情報
+	CBaseblock::GRID Grid		// 行列高情報
+)
+{
+	// 変数宣言
+	CPlayer * pPlayer = NULL;	// プレイヤー
+	// キャラクターループ
+	for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
+	{
+		// 情報取得
+		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);	// プレイヤー情報
+		// 取得プレイヤーの情報がNULLなら ||
+		// 取得プレイヤーと同じ情報なら
+		// ->ループスキップ
+		if (pPlayer == NULL || pPlayer == this) continue;
+		// 方向
+		COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;
+		// 当たった後の方向を取得
+		Direct = pBaseBlock->Collision(
+			pPlayer->GetObj(), &pPlayer->GetPos(), &pPlayer->GetPosOld(),
+			&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
+			D3DXVECTOR3(0.0f, 20.0f, 0.0f)
+		);
+		// 取得したプレイヤーがブロックに当たっていれば
+		if (Direct != COLLISIONDIRECTION::NONE)
+		{
+			// 変数宣言
+			CBaseblock::GRID PlayerGrid = Grid + pBaseBlock->GetGrid();	// プレイヤーの行列高
+			// プレイヤーの位置設定
+			pPlayer->SetPos(PlayerGrid.GetPos(CBaseblock::GetSizeRange()));
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ブロックの押し出し処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::PushBlock(
@@ -522,6 +560,8 @@ void CPlayer::PushBlock(
 		if (!CPlayer::GetDashFlag()) return;
 		// 変数宣言
 		CBaseblock * pBlock = (CBaseblock *)pScene_X;					// ベースブロックの情報
+		// 落ちている状態なら
+		if (pBlock->GetFall()) return;
 		CBaseblock::GRID MyGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
 		int nHeight;													// 高さ
 		int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());	// フェードの値
@@ -542,6 +582,7 @@ void CPlayer::PushBlock(
 		pBlock->SetGrid(MyGrid);
 		// 動いた後の位置設定
 		pBlock->SetPos(MyGrid.GetPos(CBaseblock::GetSizeRange()));
+		PushAfter_Collision(pBlock, Grid);
 		// 落ちる処理
 		pBlock->SetFall(true);
 		// 押したブロックの動いた後の行列の高さ情報を更新

@@ -190,61 +190,71 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 {
 	// •Ï”éŒ¾
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// ‚Ç‚±‚Ì“–‚½‚è”»’è‚©
-
+	bool bPush = false;
 																// •Ï”éŒ¾
 	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
-	// ‘fÞ‚ÌZ”ÍˆÍ
-	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
-		pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+	CBaseblock::GRID MyGrid = this->GetGrid();					// s—ñ‚
+	CGame::STAGE Stage = CGame::GetStage();						// ƒXƒe[ƒW
+	if (this->GetGrid().nHeight >= CBaseblock::GetHeight(this->GetGrid().nColumn + m_nFeedValue[Stage], this->GetGrid().nLine + m_nFeedValue[Stage]))
 	{
-		// ‘fÞ‚ÌX”ÍˆÍ
-		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		// ‘fÞ‚ÌZ”ÍˆÍ
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
 		{
-			// “–‚½‚è”»’è(‰º)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+			// ‘fÞ‚ÌX”ÍˆÍ
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
 			{
-				// ‚ß‚èž‚ñ‚Å‚¢‚é
-				Direct = COLLISIONDIRECTION::DOWN;
+				// “–‚½‚è”»’è(‰º)
+				if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+					posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+				{
+					// ‚ß‚èž‚ñ‚Å‚¢‚é
+					Direct = COLLISIONDIRECTION::DOWN;
 
-				// ‘fÞó‚Ì¶‚É
-				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
+					// ‘fÞó‚Ì¶‚É
+					pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
 
-				// ˆÚ“®—Ê‚Ì‰Šú‰»
-				move->y = 0.0f;
-			}
+					// ˆÚ“®—Ê‚Ì‰Šú‰»
+					move->y = 0.0f;
+					// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
+					bPush = true;
+				}
 
-			// “–‚½‚è”»’è(ã)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
-			{
-				// ‚ß‚èž‚ñ‚Å‚¢‚é
-				Direct = COLLISIONDIRECTION::UP;
+				// “–‚½‚è”»’è(ã)
+				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange + 0.1f&&
+					posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange + 0.1f)
+				{
+					// ‚ß‚èž‚ñ‚Å‚¢‚é
+					Direct = COLLISIONDIRECTION::UP;
+					// ‘fÞó‚Ì¶‚É
+					pos->y = BlockPos.y + m_fSizeRange + 0.1f + size->y * 0.5f - OffsetPos.y;
+					// ˆÚ“®—Ê‚Ì‰Šú‰»
+					move->y = 0.0f;
+					// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
+					bPush = true;
 
-				// ‘fÞó‚Ì¶‚É
-				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+				}
+				// “–‚½‚è”»’è(‰º)
+				else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+					pos->y + OffsetPos.y <= BlockPos.y)
+				{
+					// ‚ß‚èž‚ñ‚Å‚¢‚é
+					Direct = COLLISIONDIRECTION::DOWN;
+				}
 
-				// ˆÚ“®—Ê‚Ì‰Šú‰»
-				move->y = 0.0f;
-			}
-			// “–‚½‚è”»’è(‰º)
-			else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-				pos->y + OffsetPos.y <= BlockPos.y)
-			{
-				// ‚ß‚èž‚ñ‚Å‚¢‚é
-				Direct = COLLISIONDIRECTION::DOWN;
-			}
-
-			// “–‚½‚è”»’è(ã)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-				pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
-			{
-				// ‚ß‚èž‚ñ‚Å‚¢‚é
-				Direct = COLLISIONDIRECTION::UP;
+				// “–‚½‚è”»’è(ã)
+				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+					pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+				{
+					// ‚ß‚èž‚ñ‚Å‚¢‚é
+					Direct = COLLISIONDIRECTION::UP;
+				}
 			}
 		}
 	}
+	// “–‚½‚Á‚½•ûŒü‚Éî•ñ‚ª“ü‚Á‚Ä‚¢‚é‚È‚ç
+	//if (bPush) return Direct;
 	// ‘fÞ‚ÌY”ÍˆÍ
 	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
 		pos->y + OffsetPos.y - size->y * 0.5f <= BlockPos.y + m_fSizeRange)
@@ -254,28 +264,32 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
 		{
 			// “–‚½‚è”»’è(¶)
-			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f - 0.1f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f - 0.1f)
 			{
 				// ‚ß‚èž‚ñ‚Å‚¢‚é
 				Direct = COLLISIONDIRECTION::LEFT;
 				// ‘fÞó‚Ì¶‚É
-				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
+				pos->x = BlockPos.x - m_fSizeRange * 0.5f - 0.1f - size->x * 0.5f - OffsetPos.x;
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->x = 0.0f;
+				// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
+				bPush = true;
 			}
 			// “–‚½‚è”»’è(‰E)
-			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
-				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f + 0.1f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f + 0.1f)
 			{
 				// ‚ß‚èž‚ñ‚Å‚¢‚é
 				Direct = COLLISIONDIRECTION::RIGHT;
 
 				// ‘fÞó‚Ì¶‚É
-				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
+				pos->x = BlockPos.x + m_fSizeRange * 0.5f + 0.1f + size->x * 0.5f - OffsetPos.x;
 
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->x = 0.0f;
+				// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
+				bPush = true;
 			}
 			// “–‚½‚è”»’è(¶)
 			else if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
@@ -293,7 +307,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				Direct = COLLISIONDIRECTION::RIGHT;
 			}
 		}
-
+		// “–‚½‚Á‚½•ûŒü‚Éî•ñ‚ª“ü‚Á‚Ä‚¢‚é‚È‚ç
+		//if (bPush) return Direct;
 		// ‘fÞ‚ÌX”ÍˆÍ
 		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
 			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
@@ -322,7 +337,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				// ‘fÞó‚Ì¶‚É
 				pos->z =
 					BlockPos.z + m_fSizeRange * 0.5f +
-					size->z * 0.5f + 0.1f - OffsetPos.z;
+					size->z * 0.5f - OffsetPos.z;
 
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->z = 0.0f;

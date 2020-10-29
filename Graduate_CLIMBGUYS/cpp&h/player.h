@@ -126,6 +126,11 @@ private:
 	);
 	// 当たり判定処理
 	void Collision(void);
+	// 押し出した後のプレイヤーの当たり判定
+	void PushAfter_Collision(
+		CBaseblock * pBaseBlock,
+		CBaseblock::GRID Grid
+		);
 	/* 変数 */
 
 	CXInputPad		*m_pPad;						// パッドのポインタ

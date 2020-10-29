@@ -145,6 +145,8 @@ private:
 	static void PlayerStatusLoad(void);
 	// プレイヤーのステータスのセーブ
 	void PlayerStatusSave(void);
+	// プレイヤーのステータスの初期値のロード
+	void PlayerStatusInitLoad(void);
 
 	/* 変数 */
 	CXInputPad				*m_pPad;						// パッドのポインタ
@@ -152,5 +154,6 @@ private:
 	bool					m_bDashFlag;					// ダッシュフラグ
 	int						m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS	m_PlayerStatus;					// プレイヤーのステータス
+	PLAYER_STATUS			m_PlayerStatusInit;				// プレイヤーの初期ステータス
 };
 #endif

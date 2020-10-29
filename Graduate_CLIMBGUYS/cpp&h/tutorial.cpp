@@ -68,9 +68,6 @@ void CTutorial::Init(void)
 	// è∞ÇÃê∂ê¨
 	CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
 
-	// ë´èÍÇÃê∂ê¨
-	//CStand::CreateStand_Tutorial();
-
 	// ÉvÉåÉCÉÑÅ[ÇÃê∂ê¨
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 

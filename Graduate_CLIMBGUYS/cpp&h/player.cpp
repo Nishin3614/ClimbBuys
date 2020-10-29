@@ -29,9 +29,10 @@
 #define PLAYER_GRAVITY			(0.1f)
 #define PLAYER_UPMOVELIMIT		(30.0f)	// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT	(5.0f)	// プレイヤーの下降移動量制限
-#define PLAYER_JUMP_POWER		(18.0f)	// プレイヤーのジャンプ力
+#define PLAYER_JUMP_POWER		(10.0f)	// プレイヤーのジャンプ力
 #define PLAYER_MOVE				(3.0f)	// プレイヤーの移動速度
 #define DASH_TIME_MAX			(30)	// ダッシュしている時間
+#define DASH_MOVE				(50.0f)	// ダッシュの移動量
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -297,19 +298,11 @@ void CPlayer::MyMove(void)
 				switch (CCalculation::CheckPadStick())
 				{
 				case DIRECTION::LEFT:
-					move.x -= 100.0f;
-					break;
-
 				case DIRECTION::RIGHT:
-					move.x += 100.0f;
-					break;
-
 				case DIRECTION::UP:
-					move.z += 100.0f;
-					break;
-
 				case DIRECTION::DOWN:
-					move.z -= 100.0f;
+					move.x -= vec.x * DASH_MOVE;
+					move.z -= vec.z * DASH_MOVE;
 					break;
 				}
 			}

@@ -263,6 +263,27 @@ std::unique_ptr<CConnectblock> CConnectblock::Creat_Unique(
 	return pConnectblock;
 }
 
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// テスト作成(シーン管理)
+//	pos			: 位置
+//	layer		: レイヤー
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnectblock::TestCreate(void)
+{
+	// 変数宣言
+	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());
+	D3DXCOLOR Col = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+	// 形
+	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue + rand() % (nFeedValue * 2), 5, -nFeedValue + rand() % (nFeedValue * 2));
+	CNormalblock::Create(2, BaseGrid, &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1), &Col);
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 更新_ブロック生成
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -285,6 +306,23 @@ void CConnectblock::Update_CreateBlock(void)
 void CConnectblock::Debug(void)
 {
 
+}
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 静的なデバッグ表示
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnectblock::StaticDebug(void)
+{
+	if (ImGui::Begin("Block"))
+	{
+		// 変数宣言
+		static int nBlockGrid[3];	// ブロック行列高
+		ImGui::InputInt3("BlockGrid", nBlockGrid);
+		if (ImGui::Button("CreateBlock"))
+		{
+			CNormalblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		}
+		ImGui::End();
+	}
 }
 #endif // _DEBUG
 

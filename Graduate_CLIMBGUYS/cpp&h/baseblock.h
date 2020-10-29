@@ -70,6 +70,16 @@ public:
 			variable.nHeight = nHeight + Source.nHeight;
 			return variable;
 		}
+		// 行列高さの引き算のオペレーション
+		GRID operator - (GRID const & Source) const
+		{
+			// 値を渡す変数
+			GRID variable;
+			variable.nColumn = nColumn - Source.nColumn;
+			variable.nLine = nLine - Source.nLine;
+			variable.nHeight = nHeight - Source.nHeight;
+			return variable;
+		}
 		// 行列高さの掛け算のオペレーション
 		GRID operator * (int const & Source) const
 		{

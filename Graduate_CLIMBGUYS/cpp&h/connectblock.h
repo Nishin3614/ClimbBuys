@@ -126,12 +126,18 @@ public:
 		D3DXVECTOR3		const & pos,									// 位置
 		SHAPE			const & shape									// 形情報
 	);
+	// 作成(シーン管理)
+	//	pos			: 位置
+	//	shape		: 形情報
+	//	layer		: レイヤー
+	static void TestCreate(void);
 
 	// 更新_ブロック生成
 	static void Update_CreateBlock(void);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
+	static void StaticDebug(void);
 #endif // _DEBUG
 protected:
 	/* 関数 */

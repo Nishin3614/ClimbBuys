@@ -46,6 +46,18 @@ public:
 		COLLISIONTYPE_PUSH,
 		COLLISIONTYPE_MAX
 	} COLLISIONTYPE;
+	// 当たり判定
+	typedef enum
+	{
+		DIESTATE_UP		= 0b000001,	// 上
+		DIESTATE_UNDER	= 0b000010,	// 下
+		DIESTATE_LEFT	= 0b000100,	// 左
+		DIESTATE_RIGHT	= 0b001000,	// 右
+		DIESTATE_FRONT	= 0b010000,	// 前
+		DIESTATE_BACK	= 0b100000,	// 後ろ
+		DIESTATE_MAX
+	} DIESTATE;
+
 	// ----- プレイヤーのステータス ----- //
 	typedef struct
 	{
@@ -173,6 +185,8 @@ private:
 	);
 	// 当たり判定処理
 	void Collision(void);
+	// 足場ブロックとの判定
+	void StandCollision(void);
 	// ブロックとの当たり判定
 	void BlockCollision(void);
 	// キャラクター同士の当たり判定

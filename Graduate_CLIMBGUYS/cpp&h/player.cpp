@@ -84,15 +84,15 @@ void CPlayer::Init(void)
 		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
 		{
 			// メッシュボックスの生成
-			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos, D3DXVECTOR3(20.0f, 40.0f, 20.0f), CMeshBox::COLLISION_TYPE::TYPE_CENTER);
+			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos + m_PlayerStatus.PlayerOffSet, m_PlayerStatus.PlayerSize, CMeshBox::COLLISION_TYPE::TYPE_CENTER);
 			// 薄青色に
 			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 		}
 		// 当たり判定のタイプが押し出しなら
-		if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
+		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
 			// メッシュボックスの生成
-			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos, D3DXVECTOR3(30.0f, 10.0f, 30.0f), CMeshBox::COLLISION_TYPE::TYPE_CENTER);
+			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos + m_PlayerStatus.PushOffSet, m_PlayerStatus.PushSize, CMeshBox::COLLISION_TYPE::TYPE_CENTER);
 			// 薄青色に
 			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
 		}
@@ -138,7 +138,24 @@ void CPlayer::Update(void)
 	{
 		// NULLチェック
 		if (pCollisionBox[nCntCollision] == NULL) continue;
-		//pCollisionBox[nCntCollision]->SetPos();
+		// 当たり判定のタイプがキャラクターなら
+		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
+		{
+			// 位置設定
+			pCollisionBox[nCntCollision]->SetPos(m_pos + m_PlayerStatus.PlayerOffSet);
+			// サイズ設定
+			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PlayerSize);
+		}
+		// 当たり判定のタイプが押し出しなら
+		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
+		{
+			// 位置設定
+			pCollisionBox[nCntCollision]->SetPos(m_pos + m_PlayerStatus.PushOffSet);
+			// サイズ設定
+			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PushSize);
+		}
+		// 頂点座標の設定
+		pCollisionBox[nCntCollision]->SetVtxPos();
 	}
 #endif // _DEBUG
 
@@ -449,6 +466,78 @@ void CPlayer::Collision(void)
 	CharacterCollision();
 	// ブロックの当たり判定
 	BlockCollision();
+	// 足場の当たり判定
+	StandCollision();
+}
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 足場ブロックとの判定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::StandCollision(void)
+{
+	// 変数宣言
+	CStand * pStand;									// シーンX情報
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
+	bool bOn = false;										// 上の当たり判定
+	bool bUnder = false;									// 下の当たり判定
+															// ブロックループ
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DSTAND); nCntBlock++)
+	{
+		// 当たり判定の初期化
+		Direct = COLLISIONDIRECTION::NONE;
+		// NULL代入
+		pStand = NULL;
+		// 情報取得
+		pStand = (CStand *)CScene::GetScene(CScene::LAYER_3DSTAND, nCntBlock);
+		// NULLなら
+		// ->関数を抜ける
+		if (pStand == NULL)
+		{
+			continue;
+		}
+		/*
+		// ダッシュ状態なら
+		if (m_bDashFlag)
+		{
+			// 当たり判定
+			Direct = pStand->PushCollision(
+				CCharacter::GetObj(),
+				&CCharacter::GetPos(),
+				&CCharacter::GetPosOld(),
+				&CCharacter::GetMove(),
+				&m_PlayerStatus.PushSize,
+				m_PlayerStatus.PushOffSet
+			);
+		}
+		if (Direct == COLLISIONDIRECTION::NONE)
+		{
+		*/
+			// 当たり判定
+			Direct = pStand->PushCollision(
+				CCharacter::GetObj(),
+				&CCharacter::GetPos(),
+				&CCharacter::GetPosOld(),
+				&CCharacter::GetMove(),
+				&m_PlayerStatus.PlayerSize,
+				m_PlayerStatus.PlayerOffSet
+			);
+		//}
+		// ブロックの判定
+		// 上
+		if (Direct == COLLISIONDIRECTION::UP)
+		{
+			// ジャンプ可能設定
+			SetJumpAble(true);
+			// 足場判定
+			StandJudg(pStand, true);
+			// プレイヤーが下のブロックに当たっている
+			bOn ^= true;
+		}
+		else
+		{
+			// 足場判定
+			StandJudg(pStand, false);
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -457,22 +546,23 @@ void CPlayer::Collision(void)
 void CPlayer::BlockCollision(void)
 {
 	// 変数宣言
-	CScene_X * pScene_X;									// シーンX情報
+	CBaseblock * pBaseBlock;									// シーンX情報
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
 	bool bOn = false;										// 上の当たり判定
 	bool bUnder = false;									// 下の当たり判定
+	int nDieState = 0b000000;
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{
 		// 当たり判定の初期化
 		Direct = COLLISIONDIRECTION::NONE;
 		// NULL代入
-		pScene_X = NULL;
+		pBaseBlock = NULL;
 		// 情報取得
-		pScene_X = (CScene_X *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
+		pBaseBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
 		// NULLなら
 		// ->関数を抜ける
-		if (pScene_X == NULL)
+		if (pBaseBlock == NULL)
 		{
 			continue;
 		}
@@ -480,54 +570,58 @@ void CPlayer::BlockCollision(void)
 		if (m_bDashFlag)
 		{
 			// 当たり判定
-			Direct = pScene_X->Collision(
+			Direct = pBaseBlock->PushCollision(
 				CCharacter::GetObj(),
 				&CCharacter::GetPos(),
 				&CCharacter::GetPosOld(),
-				&D3DXVECTOR3(30.0f, 10.0f, 30.0f),
-				D3DXVECTOR3(0.0f, 20.0f, 0.0f)
+				&CCharacter::GetMove(),
+				&m_PlayerStatus.PushSize,
+				m_PlayerStatus.PushOffSet
 			);
 		}
 		if (Direct == COLLISIONDIRECTION::NONE)
 		{
 			// 当たり判定
-			Direct = pScene_X->PushCollision(
+			Direct = pBaseBlock->PushCollision(
 				CCharacter::GetObj(),
 				&CCharacter::GetPos(),
 				&CCharacter::GetPosOld(),
 				&CCharacter::GetMove(),
-				&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
-				D3DXVECTOR3(0.0f, 20.0f, 0.0f)
+				&m_PlayerStatus.PlayerSize,
+				m_PlayerStatus.PlayerOffSet
 			);
 	}
 		// ブロックの判定
 		// 前
 		if (Direct == COLLISIONDIRECTION::FRONT)
 		{
-			PushBlock(pScene_X, CBaseblock::GRID(0, 0, -1));
+			PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, -1));
+			nDieState |= DIESTATE_FRONT;
 		}
 		// 後
 		else if (Direct == COLLISIONDIRECTION::BACK)
 		{
-			PushBlock(pScene_X, CBaseblock::GRID(0, 0, 1));
+			PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, 1));
+			nDieState |= DIESTATE_BACK;
 		}
 		// 左
 		else if (Direct == COLLISIONDIRECTION::LEFT)
 		{
-			PushBlock(pScene_X, CBaseblock::GRID(1, 0, 0));
+			PushBlock(pBaseBlock, CBaseblock::GRID(1, 0, 0));
+			nDieState |= DIESTATE_LEFT;
 		}
 		// 右
 		else if (Direct == COLLISIONDIRECTION::RIGHT)
 		{
-			PushBlock(pScene_X, CBaseblock::GRID(-1, 0, 0));
+			PushBlock(pBaseBlock, CBaseblock::GRID(-1, 0, 0));
+			nDieState |= DIESTATE_RIGHT;
 		}
 		// 上
 		else if (Direct == COLLISIONDIRECTION::UP)
 		{
 			// ジャンプ可能設定
 			SetJumpAble(true);
-			// 足場判定
-			StandJudg(pScene_X, true);
+			nDieState |= DIESTATE_UP;
 			// プレイヤーが下のブロックに当たっている
 			bOn ^= true;
 		}
@@ -536,17 +630,14 @@ void CPlayer::BlockCollision(void)
 		{
 			// プレイヤーがしたブロックに当たっている
 			bUnder ^= true;
-		}
-		else
-		{
-			// 足場判定
-			StandJudg(pScene_X, false);
+			nDieState |= DIESTATE_UNDER;
 		}
 	}
-	// 上も下もブロックに当たっていたら
-	if (bOn && bUnder)
+	if (nDieState == (DIESTATE_UP + DIESTATE_UNDER) ||
+		nDieState == (DIESTATE_LEFT + DIESTATE_RIGHT) ||
+		nDieState == (DIESTATE_FRONT + DIESTATE_BACK)
+		)
 	{
-		// プレイヤーは死ぬ
 		Die();
 	}
 }
@@ -580,8 +671,8 @@ void CPlayer::CharacterCollision(void)
 			&CCharacter::GetPos(),
 			&CCharacter::GetPosOld(),
 			&CCharacter::GetMove(),
-			&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
-			D3DXVECTOR3(0.0f, 20.0f, 0.0f)
+			&m_PlayerStatus.PlayerSize,
+			m_PlayerStatus.PlayerOffSet
 		);
 	}
 	// 上も下もブロックに当たっていたら
@@ -620,6 +711,16 @@ void CPlayer::PushAfter_Collision(
 			&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
 			D3DXVECTOR3(0.0f, 20.0f, 0.0f)
 		);
+		// もし当たっていれば
+		if (Direct != COLLISIONDIRECTION::NONE)
+		{
+			// プレイヤーの行列高
+			CBaseblock::GRID PlayerGrid;
+			// プレイヤーの最新行列高
+			PlayerGrid = pBaseBlock->GetGrid() + Grid;
+			// プレイヤーの位置設定
+			pPlayer->SetPos(PlayerGrid.GetPos(CBaseblock::GetSizeRange()));
+		}
 	}
 }
 
@@ -803,7 +904,7 @@ void CPlayer::PushBlock(
 
 	// 変数宣言
 	CBaseblock * pBlock = (CBaseblock *)pScene_X;					// ベースブロックの情報
-
+	this->SetPos(this->GetPos() + D3DXVECTOR3(0.0f, 10.0f, 0.0f));
 	// 落ちている状態なら
 	if (pBlock->GetFall() ||
 		pBlock->GetType() == CBaseblock::TYPE_FIELD) return;

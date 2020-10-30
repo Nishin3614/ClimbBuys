@@ -96,7 +96,7 @@ public:
 	static CStand * Create(
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId,								// モデル番号
-		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT			// レイヤー
+		CScene::LAYER	const & layer = CScene::LAYER_3DSTAND			// レイヤー
 	);
 	// 作成(個人管理)
 	//	pos			: 位置

@@ -283,16 +283,16 @@ COLLISIONDIRECTION CStand::Collision(
 	D3DXVECTOR3 BlockSize = CScene_X::GetModel()->size;
 
 	// 素材のZ範囲
-	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - BlockSize.z * 0.5f&&
+	if (pos->z + OffsetPos.z + size->z * 0.5f >= BlockPos.z - BlockSize.z * 0.5f&&
 		pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + BlockSize.z * 0.5f)
 	{
 		// 素材のX範囲
-		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - BlockSize.x * 0.5f&&
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= BlockPos.x - BlockSize.x * 0.5f&&
 			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + BlockSize.x * 0.5f)
 		{
 			// 当たり判定(下)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-				pos->y + OffsetPos.y >= BlockPos.y)
+			if (pos->y + OffsetPos.y + size->y * 0.5f >= BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::DOWN;
@@ -352,14 +352,6 @@ COLLISIONDIRECTION CStand::Collision(
 			}
 		}
 	}
-
-
-
-
-	/// やること
-	// シーン情報をどうやって持っていくか
-	// ヒット後の状態はどうなっているか
-	// 処理速度はどうなっているのか
 	return Direct;
 }
 
@@ -472,8 +464,8 @@ void CStand::CreateStand_Tutorial()
 		pStand = new CStand();
 		// 設定
 		// シーン管理設定
-		pStand->ManageSetting(LAYER_3DBLOCK);				// レイヤーの番号
-		pStand->SetModelId(3);								// モデルのid
+		pStand->ManageSetting(LAYER_3DSTAND);				// レイヤーの番号
+		pStand->SetModelId(TYPE_STAND);								// モデルのid
 		pStand->SetPos(StandPos[nBlockCnt]);				// 位置
 		pStand->SetType(TYPE(TYPE_BLOCK_MAP1 + nBlockCnt));	// タイプ
 		pStand->Init();										// 初期化処理

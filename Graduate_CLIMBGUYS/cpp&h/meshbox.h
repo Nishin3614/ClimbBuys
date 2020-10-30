@@ -39,10 +39,10 @@ public:
 	void DebugInfo();															//デバッグ情報表記
 
 	void MakeVertex();															//頂点生成
-	void SetTexPos();															//テクスチャUV座標設定
 
 	void SetPos(D3DXVECTOR3 const& pos);										//座標設定
 	void SetCol(D3DXCOLOR const& col);											//色設定
+	void SetVtxPos();															// 頂点設定
 	void SetSize(D3DXVECTOR3 size);												//サイズ設定
 	static void SetDisp(bool disp) { m_bDisp = disp; };
 

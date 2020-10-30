@@ -164,10 +164,6 @@ void CPlayer::Update(void)
 	{
 		// éÄñSä÷êî
 		Die();
-		if (CManager::GetFade()->GetFade() == CManager::GetFade()->FADE_NONE)
-		{
-			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
-		}
 	}
 }
 
@@ -633,6 +629,7 @@ void CPlayer::BlockCollision(void)
 			nDieState |= DIESTATE_UNDER;
 		}
 	}
+	// ã≤Ç‹Ç¡ÇΩÇÁéÄÇ èàóù
 	if (nDieState == (DIESTATE_UP + DIESTATE_UNDER) ||
 		nDieState == (DIESTATE_LEFT + DIESTATE_RIGHT) ||
 		nDieState == (DIESTATE_FRONT + DIESTATE_BACK)

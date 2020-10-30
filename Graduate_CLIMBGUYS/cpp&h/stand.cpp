@@ -434,7 +434,7 @@ std::unique_ptr<CStand> CStand::Creat_Unique(
 {
 	// 変数宣言
 	std::unique_ptr<CStand> pStand(new CStand);		// シーン2Dクラス
-																// 設定
+	// 設定
 	pStand->SetPos(pos);			// 位置
 	pStand->SetModelId(nModelId);	// 位置
 										// 初期化処理
@@ -451,9 +451,9 @@ void CStand::CreateStand_Tutorial()
 	static D3DXVECTOR3 StandPos[3] = {};
 
 	// 足場
-	StandPos[0] = D3DXVECTOR3(-400, -50, 0);
-	StandPos[1] = D3DXVECTOR3(0, 0, 0);
-	StandPos[2] = D3DXVECTOR3(400, 50, 0);
+	StandPos[0] = D3DXVECTOR3(-300, 0, 0);
+	StandPos[1] = D3DXVECTOR3(0, 50, 0);
+	StandPos[2] = D3DXVECTOR3(300, 100, 0);
 
 	// チュートリアルで使用する足場ブロックの数
 	for (int nBlockCnt = 0; nBlockCnt < 3; nBlockCnt++)
@@ -465,11 +465,10 @@ void CStand::CreateStand_Tutorial()
 		// 設定
 		// シーン管理設定
 		pStand->ManageSetting(LAYER_3DSTAND);				// レイヤーの番号
-		pStand->SetModelId(TYPE_STAND);								// モデルのid
+		pStand->SetModelId(TYPE_TUTORIALBLOCK);				// モデルのid
 		pStand->SetPos(StandPos[nBlockCnt]);				// 位置
 		pStand->SetType(TYPE(TYPE_BLOCK_MAP1 + nBlockCnt));	// タイプ
 		pStand->Init();										// 初期化処理
-
 		// 看板
 		CSignboard::Create(D3DXVECTOR3(
 			StandPos[nBlockCnt].x,

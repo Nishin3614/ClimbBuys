@@ -253,7 +253,10 @@ void CManager::Update(void)
 
 	// ‰æ–Ê‘JˆÚ
 	m_fade->Update();
+#ifdef _DEBUG
 	ImGui::EndFrame();
+#endif // _DEBUG
+
 }
 
 // ----------------------------------------------------------------------------------------------------

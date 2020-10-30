@@ -54,6 +54,10 @@ public:
 		float				fDash;				// ダッシュの移動量
 		float				fNormalInertia;		// 通常時の慣性
 		float				fJumpInertia;		// ジャンプ時の慣性
+		D3DXVECTOR3			PlayerSize;			// プレイヤーサイズ
+		D3DXVECTOR3			PlayerOffSet;		// プレイヤーオフセット
+		D3DXVECTOR3			PushSize;			// 押し出し用のサイズ
+		D3DXVECTOR3			PushOffSet;			// 押し出し用のオフセット
 	}PLAYER_STATUS;
 
 	/* 関数 */
@@ -182,6 +186,8 @@ private:
 	static void PlayerStatusLoad(void);
 	// プレイヤーのステータスのセーブ
 	void PlayerStatusSave(void);
+	// プレイヤーのステータスの初期値のロード
+	void PlayerStatusInitLoad(void);
 
 	/* 変数 */
 	CXInputPad				*m_pPad;						// パッドのポインタ
@@ -194,5 +200,6 @@ private:
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
 #endif // _DEBUG
 
+	PLAYER_STATUS			m_PlayerStatusInit;				// プレイヤーの初期ステータス
 };
 #endif

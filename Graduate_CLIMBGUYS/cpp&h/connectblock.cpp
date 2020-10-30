@@ -321,8 +321,8 @@ void CConnectblock::StaticDebug(void)
 		{
 			CNormalblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 		}
-		ImGui::End();
 	}
+	ImGui::End();
 }
 #endif // _DEBUG
 

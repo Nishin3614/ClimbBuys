@@ -577,17 +577,12 @@ void CRenderer::UpdateImGui(void)
 	m_pLight->Debug();
 	// 結合ブロックの静的なデバッグ処理
 	CConnectblock::StaticDebug();
-	// ライト情報の設定
-	CDebugproc::Print("マウス位置(%.1f,%.1f)\n", (float)CManager::GetMouse()->GetX(), (float)CManager::GetMouse()->GetY());
-	CDebugproc::Print("ImGuiのマウス位置(%.1f,%.1f)\n",ImGui::GetMousePos().x,ImGui::GetMousePos().y);
-
 	// テスト 3Dマップの情報設定
 	C3DMap::Debug();
 
 
 	// ImGuiの更新終了
 	ImGui::End();
-	ImGui::EndFrame();
 	m_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
 	D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(m_clear_color.x*255.0f), (int)(m_clear_color.y*255.0f), (int)(m_clear_color.z*255.0f), (int)(m_clear_color.w*255.0f));
 }

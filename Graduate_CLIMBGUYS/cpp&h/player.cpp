@@ -585,6 +585,26 @@ void CPlayer::PlayerStatusLoad(void)
 						{
 							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fJumpInertia);
 						}
+						// PlayerSizeが来たら
+						else if (strcmp(cHeadText, "PlayerSize") == 0)
+						{
+							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PlayerSize.x, &m_PlayerStatus.PlayerSize.y, &m_PlayerStatus.PlayerSize.z);
+						}
+						// PlayerOffSetが来たら
+						else if (strcmp(cHeadText, "PlayerOffSet") == 0)
+						{
+							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PlayerOffSet.x, &m_PlayerStatus.PlayerOffSet.y, &m_PlayerStatus.PlayerOffSet.z);
+						}
+						// PushSizeが来たら
+						else if (strcmp(cHeadText, "PushSize") == 0)
+						{
+							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushSize.x, &m_PlayerStatus.PushSize.y, &m_PlayerStatus.PushSize.z);
+						}
+						// PushOffSetが来たら
+						else if (strcmp(cHeadText, "PushOffSet") == 0)
+						{
+							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushOffSet.x, &m_PlayerStatus.PushOffSet.y, &m_PlayerStatus.PushOffSet.z);
+						}
 						else if (strcmp(cHeadText, "END_BULLETSET") == 0)
 						{
 						}
@@ -625,11 +645,15 @@ void CPlayer::PlayerStatusSave(void)
 
 		// セーブするモデルの情報
 		fprintf(pFile, "STATUS_SET\n");
-		fprintf(pFile, "	Move			= %.3f\n", m_PlayerStatus.fMove);
-		fprintf(pFile, "	Jump			= %.3f\n", m_PlayerStatus.fJump);
-		fprintf(pFile, "	Dash			= %.3f\n", m_PlayerStatus.fDash);
-		fprintf(pFile, "	NormalInertia	= %.3f\n", m_PlayerStatus.fNormalInertia);
-		fprintf(pFile, "	JumpInertia		= %.3f\n", m_PlayerStatus.fJumpInertia);
+		fprintf(pFile, "	Move			= %.1f\n", m_PlayerStatus.fMove);
+		fprintf(pFile, "	Jump			= %.1f\n", m_PlayerStatus.fJump);
+		fprintf(pFile, "	Dash			= %.1f\n", m_PlayerStatus.fDash);
+		fprintf(pFile, "	NormalInertia	= %.2f\n", m_PlayerStatus.fNormalInertia);
+		fprintf(pFile, "	JumpInertia		= %.2f\n", m_PlayerStatus.fJumpInertia);
+		fprintf(pFile, "	PlayerSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerSize.x, m_PlayerStatus.PlayerSize.y, m_PlayerStatus.PlayerSize.z);
+		fprintf(pFile, "	PlayerOffSet	= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, m_PlayerStatus.PlayerOffSet.z);
+		fprintf(pFile, "	PushSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushSize.x, m_PlayerStatus.PushSize.y, m_PlayerStatus.PushSize.z);
+		fprintf(pFile, "	PushOffSet		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushOffSet.x, m_PlayerStatus.PushOffSet.y, m_PlayerStatus.PushOffSet.z);
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
 		fprintf(pFile, "END_SCRIPT\n");
@@ -805,38 +829,51 @@ void CPlayer::Debug(void)
 	// プレイヤー1人だけ通す(ステータスが共通のため)
 	if (GetPlayerTag() == PLAYER_TAG::PLAYER_1)
 	{
-		if (ImGui::CollapsingHeader(u8"プレイヤーのステータス"))
+		if (ImGui::Begin(u8"プレイヤーのステータス"))
 		{
-			// 移動量
-			ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
-			// ジャンプ力
-			ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0, 1.0f, 50.0f);						/* 10.0f */
-			// ダッシュの移動量
-			ImGui::DragFloat(u8"ダッシュの移動量", &m_PlayerStatus.fDash, 1.0f, 1.0f, 100.0f);				/* 30.0f */
-			// 通常時の慣性
-			ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
-			// ジャンプ時の慣性
-			ImGui::DragFloat(u8"ジャンプ時の慣性", &m_PlayerStatus.fJumpInertia, 0.01f, 0.01f, 10.0f);		/* 1.6f */
-
-			// セーブボタン
-			if (ImGui::Button(u8"保存"))
+			//if (ImGui::CollapsingHeader(u8"プレイヤーのステータス"))
 			{
-				// プレイヤーのステータスのセーブ
-				PlayerStatusSave();
-			}
+				// 移動量
+				ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
+				// ジャンプ力
+				ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0f, 1.0f, 50.0f);						/* 10.0f */
+				// ダッシュの移動量
+				ImGui::DragFloat(u8"ダッシュの移動量", &m_PlayerStatus.fDash, 1.0f, 1.0f, 100.0f);				/* 30.0f */
+				// 通常時の慣性
+				ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
+				// ジャンプ時の慣性
+				ImGui::DragFloat(u8"ジャンプ時の慣性", &m_PlayerStatus.fJumpInertia, 0.01f, 0.01f, 10.0f);		/* 1.6f */
+				// プレイヤーのサイズ
+				ImGui::DragFloat3(u8"プレイヤーのサイズ", m_PlayerStatus.PlayerSize, 1.0f, 0.0f, 500.0f);
+				// プレイヤーのオフセット
+				ImGui::DragFloat3(u8"プレイヤーのオフセット", m_PlayerStatus.PlayerOffSet, 1.0f, 0.0f, 500.0f);
+				// 押し出し用のサイズ
+				ImGui::DragFloat3(u8"押し出し用のサイズ", m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
+				// 押し出し用のオフセット
+				ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
 
-			// 改行キャンセル
-			ImGui::SameLine();
+				// セーブボタン
+				if (ImGui::Button(u8"保存"))
+				{
+					// プレイヤーのステータスのセーブ
+					PlayerStatusSave();
+				}
 
-			// 初期化
-			if (ImGui::Button(u8"初期化"))
-			{
-				// プレイヤーの初期ステータス代入
-				PlayerStatusInitLoad();
+				// 改行キャンセル
+				ImGui::SameLine();
+
+				// 初期化
+				if (ImGui::Button(u8"初期化"))
+				{
+					// プレイヤーの初期ステータス代入
+					PlayerStatusInitLoad();
+				}
+				// 区切り線
+				ImGui::Separator();
 			}
-			// 区切り線
-			ImGui::Separator();
 		}
+		// End
+		ImGui::End();
 	}
 }
 #endif // _DEBUG

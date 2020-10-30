@@ -27,7 +27,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+class CMeshBox;	// メッシュボックスクラス
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // クラス
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,6 +39,13 @@ public:
 	{
 		MOTIONTYPE_MAX = CCharacter::MOTIONTYPE_MAX
 	} MOTIONTYPE;
+	// 当たり判定
+	typedef enum
+	{
+		COLLISIONTYPE_CHARACTER = 0,
+		COLLISIONTYPE_PUSH,
+		COLLISIONTYPE_MAX
+	} COLLISIONTYPE;
 	// ----- プレイヤーのステータス ----- //
 	typedef struct
 	{
@@ -96,6 +103,32 @@ public:
 		int const &nObjType = 0,	// オブジェクトタイプ
 		CScene * pScene = NULL		// 相手のシーン情報
 	);
+	// 押し出し当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos		: 位置
+	//	posOld	: 前回の位置
+	//	move	: 移動量
+	//	size	: サイズ
+	COLLISIONDIRECTION PushCollision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * move,								// 移動量
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
+	// 当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos			: 位置
+	//	size		: サイズ
+	//	OffsetPos	: オフセット位置
+	COLLISIONDIRECTION Collision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
 #ifdef _DEBUG
 	void Debug(void);
 #endif // _DEBUG
@@ -136,6 +169,10 @@ private:
 	);
 	// 当たり判定処理
 	void Collision(void);
+	// ブロックとの当たり判定
+	void BlockCollision(void);
+	// キャラクター同士の当たり判定
+	void CharacterCollision(void);
 	// 押し出した後のプレイヤーの当たり判定
 	void PushAfter_Collision(
 		CBaseblock * pBaseBlock,
@@ -152,5 +189,10 @@ private:
 	bool					m_bDashFlag;					// ダッシュフラグ
 	int						m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS	m_PlayerStatus;					// プレイヤーのステータス
+
+#ifdef _DEBUG
+	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
+#endif // _DEBUG
+
 };
 #endif

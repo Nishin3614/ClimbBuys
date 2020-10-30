@@ -10,7 +10,6 @@
 #include "ui.h"
 #include "manager.h"
 #include "fade.h"
-#include "collision.h"
 #include "game.h"
 #include "XInputPad.h"
 #include "keyboard.h"
@@ -18,7 +17,7 @@
 #include "meshdome.h"
 #include "3Dparticle.h"
 #include "debugproc.h"
-
+#include "meshbox.h"
 #include "stand.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,6 +49,13 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_bDashFlag			= false;				// ダッシュフラグ
 	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
+#ifdef _DEBUG
+	// 当たり判定ボックスの初期化
+	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX;nCntCollision++)
+	{
+		pCollisionBox[nCntCollision] = NULL;
+	}
+#endif // _DEBUG
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -69,6 +75,28 @@ void CPlayer::Init(void)
 
 	// パッドのポインタ取得
 	m_pPad = CManager::CManager::GetPad(GetPlayerTag());
+#ifdef _DEBUG
+	// 当たり判定ボックスの初期化
+	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
+	{
+		// 当たり判定のタイプがキャラクターなら
+		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
+		{
+			// メッシュボックスの生成
+			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos, D3DXVECTOR3(20.0f, 40.0f, 20.0f), CMeshBox::COLLISION_TYPE::TYPE_CENTER);
+			// 薄青色に
+			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+		}
+		// 当たり判定のタイプが押し出しなら
+		if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
+		{
+			// メッシュボックスの生成
+			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos, D3DXVECTOR3(30.0f, 10.0f, 30.0f), CMeshBox::COLLISION_TYPE::TYPE_CENTER);
+			// 薄青色に
+			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+		}
+	}
+#endif // _DEBUG
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -78,6 +106,13 @@ void CPlayer::Uninit(void)
 {
 	// キャラクター終了処理
 	CCharacter::Uninit();
+#ifdef _DEBUG
+	// 当たり判定ボックスの初期化
+	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
+	{
+		pCollisionBox[nCntCollision] = NULL;
+	}
+#endif // _DEBUG
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,6 +131,15 @@ void CPlayer::Update(void)
 	CCharacter::Limit();
 	// 当たり判定の処理
 	Collision();
+#ifdef _DEBUG
+	// 当たり判定ボックスの位置の更新
+	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
+	{
+		// NULLチェック
+		if (pCollisionBox[nCntCollision] == NULL) continue;
+		//pCollisionBox[nCntCollision]->SetPos();
+	}
+#endif // _DEBUG
 
 	// 死亡判定が出たらリザルトに遷移する
 	if (GetDie())
@@ -400,14 +444,27 @@ void CPlayer::StandJudg(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Collision(void)
 {
+	// キャラクターの当たり判定
+	CharacterCollision();
+	// ブロックの当たり判定
+	BlockCollision();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの当たり判定処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::BlockCollision(void)
+{
 	// 変数宣言
-	CScene_X * pScene_X;		// シーンX情報
-	COLLISIONDIRECTION Direct;	// 当たり判定の方向
-	bool bOn = false;			// 上の当たり判定
-	bool bUnder = false;		// 下の当たり判定
+	CScene_X * pScene_X;									// シーンX情報
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
+	bool bOn = false;										// 上の当たり判定
+	bool bUnder = false;									// 下の当たり判定
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{
+		// 当たり判定の初期化
+		Direct = COLLISIONDIRECTION::NONE;
 		// NULL代入
 		pScene_X = NULL;
 		// 情報取得
@@ -418,15 +475,30 @@ void CPlayer::Collision(void)
 		{
 			continue;
 		}
-		// 当たり判定
-		Direct = pScene_X->PushCollision(
-			CCharacter::GetObj(),
-			&CCharacter::GetPos(),
-			&CCharacter::GetPosOld(),
-			&CCharacter::GetMove(),
-			&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
-			D3DXVECTOR3(0.0f, 20.0f, 0.0f)
-		);
+		// ダッシュ状態なら
+		if (m_bDashFlag)
+		{
+			// 当たり判定
+			Direct = pScene_X->Collision(
+				CCharacter::GetObj(),
+				&CCharacter::GetPos(),
+				&CCharacter::GetPosOld(),
+				&D3DXVECTOR3(30.0f, 10.0f, 30.0f),
+				D3DXVECTOR3(0.0f, 20.0f, 0.0f)
+			);
+		}
+		if (Direct == COLLISIONDIRECTION::NONE)
+		{
+			// 当たり判定
+			Direct = pScene_X->PushCollision(
+				CCharacter::GetObj(),
+				&CCharacter::GetPos(),
+				&CCharacter::GetPosOld(),
+				&CCharacter::GetMove(),
+				&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
+				D3DXVECTOR3(0.0f, 20.0f, 0.0f)
+			);
+	}
 		// ブロックの判定
 		// 前
 		if (Direct == COLLISIONDIRECTION::FRONT)
@@ -462,7 +534,7 @@ void CPlayer::Collision(void)
 		else if (Direct == COLLISIONDIRECTION::DOWN)
 		{
 			// プレイヤーがしたブロックに当たっている
-  			bUnder ^= true;
+			bUnder ^= true;
 		}
 		else
 		{
@@ -476,6 +548,48 @@ void CPlayer::Collision(void)
 		// プレイヤーは死ぬ
 		Die();
 	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// キャラクター同士の当たり判定処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::CharacterCollision(void)
+{
+	// 変数宣言
+	CCharacter * pCharacter;	// キャラクター情報
+	COLLISIONDIRECTION Direct;	// 当たり判定の方向
+	bool bOn = false;			// 上の当たり判定
+	bool bUnder = false;		// 下の当たり判定
+								// ブロックループ
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntBlock++)
+	{
+		// NULL代入
+		pCharacter = NULL;
+		// 情報取得
+		pCharacter = (CCharacter *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntBlock);
+		// NULLなら
+		// ->関数を抜ける
+		if (pCharacter == NULL)
+		{
+			continue;
+		}
+		// 当たり判定
+		Direct = pCharacter->PushCollision(
+			CCharacter::GetObj(),
+			&CCharacter::GetPos(),
+			&CCharacter::GetPosOld(),
+			&CCharacter::GetMove(),
+			&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
+			D3DXVECTOR3(0.0f, 20.0f, 0.0f)
+		);
+	}
+	// 上も下もブロックに当たっていたら
+	if (bOn && bUnder)
+	{
+		// プレイヤーは死ぬ
+		Die();
+	}
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -505,14 +619,6 @@ void CPlayer::PushAfter_Collision(
 			&D3DXVECTOR3(25.0f, 40.0f, 25.0f),
 			D3DXVECTOR3(0.0f, 20.0f, 0.0f)
 		);
-		// 取得したプレイヤーがブロックに当たっていれば
-		if (Direct != COLLISIONDIRECTION::NONE)
-		{
-			// 変数宣言
-			CBaseblock::GRID PlayerGrid = Grid + pBaseBlock->GetGrid();	// プレイヤーの行列高
-			// プレイヤーの位置設定
-			pPlayer->SetPos(PlayerGrid.GetPos(CBaseblock::GetSizeRange()));
-		}
 	}
 }
 
@@ -700,6 +806,349 @@ void CPlayer::PushBlock(
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 押し出し当たり判定
+//	pos		: 位置
+//	posOld	: 前回の位置
+//	move	: 移動量
+//	size	: サイズ
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COLLISIONDIRECTION CPlayer::PushCollision(
+	CScene::OBJ const & Obj,		// オブジェタイプ
+	D3DXVECTOR3 * pos,				// 位置
+	D3DXVECTOR3 * posOld,			// 前回の位置
+	D3DXVECTOR3 * move,				// 移動量
+	D3DXVECTOR3 * size,				// サイズ
+	D3DXVECTOR3 const & OffsetPos	// オフセット位置
+)
+{
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+	bool bPush = false;
+	// 変数宣言
+	D3DXVECTOR3 MyPos = CCharacter::GetPos();
+	CGame::STAGE Stage = CGame::GetStage();						// ステージ
+
+	D3DXVECTOR3 Kari_Size = { 25.0f,50.0f,25.0f };	// 仮サイズ
+		// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		{
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= MyPos.y - Kari_Size.y * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+
+				// 素材状の左に
+				pos->y = MyPos.y - Kari_Size.y * 0.5f - size->y * 0.5f - OffsetPos.y;
+
+				// 移動量の初期化
+				move->y = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= MyPos.y + Kari_Size.y * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+				// 素材状の左に
+				pos->y = MyPos.y + Kari_Size.y * 0.5f + size->y * 0.5f - OffsetPos.y;
+				// 移動量の初期化
+				move->y = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+
+			}
+			// 当たり判定(下)
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.z * 0.5f&&
+				pos->y + OffsetPos.y <= MyPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
+				pos->y + OffsetPos.y - size->y > MyPos.y + Kari_Size.y * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+		}
+	}
+	// 当たった方向に情報が入っているなら
+	//if (bPush) return Direct;
+	// 素材のY範囲
+	if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
+		pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f)
+	{
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+				// 素材状の左に
+				pos->x = MyPos.x - Kari_Size.x * 0.5f - size->x * 0.5f - OffsetPos.x;
+				// 移動量の初期化
+				move->x = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+
+				// 素材状の左に
+				pos->x = MyPos.x + Kari_Size.x * 0.5f + size->x * 0.5f - OffsetPos.x;
+
+				// 移動量の初期化
+				move->x = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+			// 当たり判定(左)
+			else if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
+		}
+		// 当たった方向に情報が入っているなら
+		//if (bPush) return Direct;
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		{
+			// 当たり判定(手前)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+
+				// 素材状の左に
+				pos->z = MyPos.z - Kari_Size.z * 0.5f - size->z * 0.5f - OffsetPos.z;
+
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+
+				// 素材状の左に
+				pos->z =
+					MyPos.z + Kari_Size.z * 0.5f +
+					size->z * 0.5f - OffsetPos.z;
+
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+			// 当たり判定(手前)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+			}
+		}
+	}
+
+	return Direct;
+}
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 当たり判定
+//	pos			: 位置
+//	size		: サイズ
+//	OffsetPos	: オフセット位置
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COLLISIONDIRECTION CPlayer::Collision(
+	CScene::OBJ const & Obj,		// オブジェタイプ
+	D3DXVECTOR3 * pos,				// 位置
+	D3DXVECTOR3 * posOld,			// 前回の位置
+	D3DXVECTOR3 * size,				// サイズ
+	D3DXVECTOR3 const & OffsetPos	// オフセット位置
+)
+{
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+	bool bPush = false;
+	// 変数宣言
+	D3DXVECTOR3 MyPos = CCharacter::GetPos();
+	CGame::STAGE Stage = CGame::GetStage();						// ステージ
+
+	D3DXVECTOR3 Kari_Size = { 25.0f,50.0f,25.0f };	// 仮サイズ
+													// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		{
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= MyPos.y - Kari_Size.y * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= MyPos.y + Kari_Size.y * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+				// 押し出し状態がtrue
+				bPush = true;
+
+			}
+			// 当たり判定(下)
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.z * 0.5f&&
+				pos->y + OffsetPos.y <= MyPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
+				pos->y + OffsetPos.y - size->y > MyPos.y + Kari_Size.y * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+		}
+	}
+	// 当たった方向に情報が入っているなら
+	//if (bPush) return Direct;
+	// 素材のY範囲
+	if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
+		pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f)
+	{
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+			// 当たり判定(左)
+			else if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
+		}
+		// 当たった方向に情報が入っているなら
+		//if (bPush) return Direct;
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		{
+			// 当たり判定(手前)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+
+			}
+
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+
+			}
+			// 当たり判定(手前)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+			}
+		}
+	}
+
+	return Direct;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 描画処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Draw(void)
@@ -715,6 +1164,16 @@ void CPlayer::Die(void)
 {
 	// 死亡処理
 	CCharacter::Die();
+#ifdef _DEBUG
+	// 当たり判定ボックスの開放
+	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
+	{
+		// NULLチェック
+		if (pCollisionBox[nCntCollision] == NULL) continue;
+		pCollisionBox[nCntCollision]->Release();
+		pCollisionBox[nCntCollision] = NULL;
+	}
+#endif // _DEBUG
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -735,21 +1194,6 @@ void CPlayer::Scene_MyCollision(int const & nObjType, CScene * pScene)
 {
 	// バルーンキャラクターの当たった後の処理
 	CCharacter::Scene_MyCollision(nObjType, pScene);
-
-	// 当たったオブジェクトがブロックだったらジャンプを可能にする
-	if (nObjType == CCollision::OBJTYPE_BLOCK)
-	{
-		// 変数宣言
-		CScene_X * pSceneX = (CScene_X *)pScene;
-		pSceneX->GetCollision();
-		this->GetCollision()->GetShape();
-		SetJumpAble(true);
-	}
-	// 当たったオブジェクトがダメージ床だったら死亡フラグをtrueにする
-	else if (nObjType == CCollision::OBJTYPE_DAMAGEFLOOR)
-	{
-		SetDie(true);
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

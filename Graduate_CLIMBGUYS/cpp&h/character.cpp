@@ -30,7 +30,6 @@
 #define CHARACTER_KEYMOVE (1)													// ƒL[ˆÚ“®
 #define CHARACTER_G (0.5f)														// d—Í
 #define CHARACTER_RESISTANCE (0.5f)												// ’ïR—Í
-#define CHARACTER_STATUS_FILE ("data/LOAD/STATUS/status_manager_Character.csv")	// ƒXƒe[ƒ^ƒXƒtƒ@ƒCƒ‹–¼
 #define CHARACTER_INFO_FILE ("data/LOAD/CHARACTER/CHARACTER_MANAGER.txt")		// ƒLƒƒƒ‰ƒNƒ^[ƒtƒ@ƒCƒ‹–¼
 #define CIRCLESHADOW (true)														// ‰~Œ`‚ÌƒVƒƒƒhƒE‚É‚·‚é‚©‚µ‚È‚¢‚©
 #define REFLECTION_COEFFICIENT (1)												// ”½”­ŒW”
@@ -44,10 +43,8 @@ MODEL_ALL	*CCharacter::m_modelAll[CHARACTER_MAX] = {};		// ƒLƒƒƒ‰ƒNƒ^[‘S‘Ì‚Ìî•
 CModel_info	*CCharacter::m_model_info[CHARACTER_MAX] = {};		// ƒLƒƒƒ‰ƒNƒ^[î•ñ
 std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX];		// ƒLƒƒƒ‰ƒNƒ^[”Ô†
 D3DXVECTOR3	CCharacter::m_CharacterSize[CHARACTER_MAX] = {};	// ƒLƒƒƒ‰ƒNƒ^[‚ÌƒTƒCƒY
-CCharacter::STATUS CCharacter::m_sStatus[CHARACTER_MAX] = {};	// ƒLƒƒƒ‰ƒNƒ^[‚·‚×‚Ä‚ÌƒXƒ^[ƒ^ƒXî•ñ
 int			CCharacter::m_NumParts[CHARACTER_MAX] = {};			// “®‚©‚·ƒLƒƒƒ‰ƒNƒ^[”
 int			CCharacter::m_NumModel[CHARACTER_MAX] = {};			// Å‘åƒLƒƒƒ‰ƒNƒ^[”
-int			CCharacter::m_nCameraCharacter = 0;					// ƒLƒƒƒ‰ƒNƒ^[‚É’Ç”ö‚·‚éID
 int			CCharacter::m_nAllCharacter = 0;					// oŒ»‚µ‚Ä‚¢‚éƒLƒƒƒ‰ƒNƒ^[l”
 float		CCharacter::m_fAlpha = 0.0f;						// “§–¾“x
 
@@ -65,7 +62,6 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// Œ»İ‰ñ“]—Ê
 	m_rotLast = m_rot;								// Œü‚«‚½‚¢•ûŒü
 	m_rotbetween = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ‰ñ“]‚Ì·•ª
-	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// ƒLƒƒƒ‰ƒNƒ^[‚ÌƒTƒCƒY
 	m_nMotiontypeOld = 0;							// ‘O‰ñ‚Ìƒ‚[ƒVƒ‡ƒ“ƒ^ƒCƒv
 	m_nMotiontype = 0;								// ƒ‚[ƒVƒ‡ƒ“ƒ^ƒCƒv
 	m_keyinfoCnt = 0;								// ƒL[î•ñ‚ÌƒJƒEƒ“ƒg
@@ -152,98 +148,6 @@ void CCharacter::Init()
 			(CMeshobit::TEX)m_modelAll[m_character]->v_MeshObitLoad.at(nCntObit_Basic).nTexType
 		)));
 	}
-
-	// UŒ‚“–‚½‚è”»’èİ’è
-	for (int nCntAttackCollision = 0; nCntAttackCollision < (signed)m_modelAll[m_character]->v_AttackCollision.size(); nCntAttackCollision++)
-	{
-		// •Ï”éŒ¾
-		D3DXVECTOR3 pos;
-		// “–‚½‚è”»’è‚ÌˆÊ’u‚Ìİ’è
-		D3DXVec3TransformCoord(
-			&pos,
-			&m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-			&m_pModel[m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).nParts].GetMatrix()
-		);
-		// ‹éŒ`‚Ì“–‚½‚è”»’è
-		if (m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_RectInfo)
-		{
-			// ‹éŒ`‚Ì“–‚½‚è”»’è
-			m_vec_AttackCollision.push_back(std::move(CRectCollision::Create_Self(
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_RectInfo->size,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-				CCollision::OBJTYPE_ATTACK
-			)));
-		}
-		// ‹…‚Ì“–‚½‚è”»’è
-		else if (m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_SphereInfo)
-		{
-			// ‹…‚Ì“–‚½‚è”»’è
-			m_vec_AttackCollision.push_back(std::move(CSphereCollision::Create_Self(
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_SphereInfo->fRadius,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-				CCollision::OBJTYPE_ATTACK
-			)));
-		}
-		// ‰~’Œ‚Ì“–‚½‚è”»’è
-		else if (m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_ColumnInfo)
-		{
-			// ‰~’Œ‚Ì“–‚½‚è”»’è
-			m_vec_AttackCollision.push_back(std::move(CColumnCollision::Create_Self(
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_ColumnInfo->fRadius,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_ColumnInfo->fVertical,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-				CCollision::OBJTYPE_ATTACK
-			)));
-		}
-	}
-
-	// ƒLƒƒƒ‰ƒNƒ^[“–‚½‚è”»’èİ’è
-	if (m_modelAll[m_character]->pCharacterCollision != NULL)
-	{
-		// •Ï”éŒ¾
-		CCollision::OBJTYPE objtype = CCollision::OBJTYPE_PLAYER;	// ‚ ‚½‚è”»’è‚ÌƒIƒuƒWƒFƒNƒgƒ^ƒCƒv
-		// ƒIƒuƒWƒFƒNƒgƒ^ƒCƒv‚ªNPC‚Ì
-		if (m_character == CHARACTER_NPC)
-		{
-			objtype = CCollision::OBJTYPE_ENEMY;
-		}
-		// ‚»‚êˆÈŠO
-		else
-		{
-			objtype = CCollision::OBJTYPE_PLAYER;
-		}
-		// ‹éŒ`‚Ì“–‚½‚è”»’è
-		if (m_modelAll[m_character]->pCharacterCollision->RectInfo)
-		{
-			m_pCharacterCollision = CRectCollision::Create(
-				m_modelAll[m_character]->pCharacterCollision->RectInfo->size,
-				m_modelAll[m_character]->pCharacterCollision->Offset,
-				objtype,
-				this,
-				NULL,
-				true,
-				true,
-				&m_pos,
-				&m_posold
-			);
-		}
-		// ‹…‚Ì“–‚½‚è”»’è
-		else if (m_modelAll[m_character]->pCharacterCollision->p_uni_SphereInfo)
-		{
-			m_pCharacterCollision = CSphereCollision::Create(
-				m_modelAll[m_character]->pCharacterCollision->p_uni_SphereInfo->fRadius,
-				m_modelAll[m_character]->pCharacterCollision->Offset,
-				objtype,
-				this,
-				NULL,
-				true,
-				true,
-				&m_pos,
-				&m_posold
-			);
-
-		}
-	}
 	// ƒVƒƒƒhƒEon
 	if (CIRCLESHADOW == true)
 	{
@@ -267,13 +171,6 @@ void CCharacter::Uninit(void)
 	{
 		delete[] m_pModel;
 		m_pModel = NULL;
-	}
-	// ƒLƒƒƒ‰ƒNƒ^[“–‚½‚è”»’è‚Ìƒkƒ‹ƒ`ƒFƒbƒN
-	// ->ŠJ•ú
-	if (m_pCharacterCollision != NULL)
-	{
-		m_pCharacterCollision->CompulsionScene();
-		m_pCharacterCollision = NULL;
 	}
 	// ‹OÕ‚Ìî•ñ‚ğŠJ•ú‚·‚é
 	for (int nCntMotionObit = 0; nCntMotionObit < (signed)m_vec_pMeshObit.size(); nCntMotionObit++)
@@ -370,38 +267,8 @@ void CCharacter::Move(void)
 
 	// ˆÊ’uî•ñXV
 	m_pos += m_move;
-	// ’ïR—Í
-	//m_move.x *= m_sStatus[m_character].fMaxInertia;
-	//m_move.z *= m_sStatus[m_character].fMaxInertia;
 	// ãŒÀˆ—
 	Limit();
-
-	// ƒLƒƒƒ‰ƒNƒ^[‚Ì“–‚½‚è”»’è‚ªNULL‚Å‚Í‚È‚¢‚È‚ç
-	// ->“–‚½‚è”»’è‚ÌXV
-	if (m_pCharacterCollision != NULL)
-	{
-		m_pCharacterCollision->GetShape()->PassPos(m_pos);
-
-#ifdef _DEBUG
-		/*
-		CRectShape * pRectShape = (CRectShape *)m_pCharacterCollision->GetShape();
-
-		// ƒeƒXƒg—p
-		D3DXVECTOR3 Max = pRectShape->GetMax();
-		D3DXVECTOR3 MaxOld = pRectShape->GetMaxOld();
-		D3DXVECTOR3 Min = pRectShape->GetMin();
-		D3DXVECTOR3 MinOld = pRectShape->GetMinOld();
-		CDebugproc::Print("ƒLƒƒƒ‰ƒNƒ^[‚Ì“–‚½‚è”»’è‚ÌÅ‘å’l(%.3f,%.3f,%.3f)\n",
-			Max.x, Max.y, Max.z);
-		CDebugproc::Print("ƒLƒƒƒ‰ƒNƒ^[‚Ì“–‚½‚è”»’è‚Ì‘O‰ñ‚ÌÅ‘å’l(%.3f,%.3f,%.3f)\n",
-			MaxOld.x, MaxOld.y, MaxOld.z);
-		CDebugproc::Print("ƒLƒƒƒ‰ƒNƒ^[‚Ì“–‚½‚è”»’è‚ÌÅ¬’l(%.3f,%.3f,%.3f)\n",
-			Min.x, Min.y, Min.z);
-		CDebugproc::Print("ƒLƒƒƒ‰ƒNƒ^[‚Ì“–‚½‚è”»’è‚Ì‘O‰ñ‚ÌÅ¬’l(%.3f,%.3f,%.3f)\n",
-			MinOld.x, MinOld.y, MinOld.z);
-			*/
-#endif // _DEBUG
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -671,15 +538,6 @@ void CCharacter::Die(void)
 
 	// ‘ƒLƒƒƒ‰ƒNƒ^[ƒJƒEƒ“ƒgƒ_ƒEƒ“
 	m_nAllCharacter--;
-
-	// ƒLƒƒƒ‰ƒNƒ^[“–‚½‚è”»’è‚Ìƒkƒ‹ƒ`ƒFƒbƒN
-	// ->ŠJ•ú
-	if (m_pCharacterCollision != NULL)
-	{
-		m_pCharacterCollision->CompulsionScene();
-		m_pCharacterCollision->Release();
-		m_pCharacterCollision = NULL;
-	}
 	//// ‘ƒLƒƒƒ‰ƒNƒ^[‚ªˆêl‚¾‚¯‚È‚ç
 	//// ->ƒ^ƒCƒgƒ‹‚ÖƒtƒF[ƒh
 	//if (m_nAllCharacter <= 1)
@@ -763,14 +621,6 @@ int CCharacter::GetMaxFrame(
 	}
 	// ˆê‚Â‚ÌƒL[ŠÔ‚ÌƒtƒŒ[ƒ€”
 	return m_modelAll[character]->pMotion[nMotionID]->KeyInfo[nNowKeyCnt].nFrame;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ƒJƒƒ‰’Ç”öˆ—
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-int CCharacter::GetCameraCharacter(void)
-{
-	return m_nCameraCharacter;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -872,31 +722,6 @@ D3DXMATRIX * CCharacter::GetMatrix(int const nModelID)
 	return &m_mtxWorld;
 }
 
-/*
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// “Ç‚İ‚İˆ—
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCharacter::Load(
-	CHARACTER const character,
-	int const nMaxMotion,
-	const char * file_name
-)
-{
-	// •Ï”éŒ¾
-	// ƒLƒƒƒ‰ƒNƒ^[‚Æƒ‚[ƒVƒ‡ƒ“î•ñ‚Ì¶¬
-	m_modelAll[character] = new MODEL_ALL;
-	// ƒLƒƒƒ‰ƒNƒ^[‚ÌƒeƒLƒXƒgƒf[ƒ^‚Ìæ“¾
-	CModel_info::TextLoad(
-		m_modelAll[character],					// ƒLƒƒƒ‰ƒNƒ^[î•ñ
-		m_modelId[character],					// ƒLƒƒƒ‰ƒNƒ^[ƒtƒ@ƒCƒ‹
-		nMaxMotion,								// ƒ‚[ƒVƒ‡ƒ“”
-		m_NumModel[character],					// Å‘åƒLƒƒƒ‰ƒNƒ^[”
-		m_NumParts[character],					// “®‚©‚·ƒLƒƒƒ‰ƒNƒ^[”
-		file_name								// ƒtƒ@ƒCƒ‹–¼
-	);
-}
-*/
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ƒLƒƒƒ‰ƒNƒ^[‘Sƒ\[ƒX‚Ì“Ç‚İ‚İ
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -906,8 +731,6 @@ HRESULT CCharacter::Load(void)
 	HRESULT hr;
 	// ƒLƒƒƒ‰ƒNƒ^[‚Ìî•ñ“Ç‚İ‚İ
 	hr = Load_Character();
-	// ƒXƒe[ƒ^ƒX‚Ìî•ñ“Ç‚İ‚İ
-	hr = LoadStatus();
 	return hr;
 }
 
@@ -961,50 +784,6 @@ HRESULT CCharacter::Load_Character(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ƒXƒe[ƒ^ƒXî•ñ“Ç‚İ‚İˆ—
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT CCharacter::LoadStatus(void)
-{
-	// •Ï”éŒ¾
-	std::vector<std::vector<std::string>> vsvec_Contens;	// ƒtƒ@ƒCƒ‹‚Ì’†gŠi”[—p
-	// ƒtƒ@ƒCƒ‹‚Ì’†g‚ğæ“¾‚·‚é
-	vsvec_Contens = CCalculation::FileContens(CHARACTER_STATUS_FILE, ',');
-	// s‚²‚Æ‚É‰ñ‚·
-	for (int nCntLine = 0; nCntLine < (signed)vsvec_Contens.size(); nCntLine++)
-	{
-		// ƒLƒƒƒ‰ƒNƒ^[‚ªãŒÀ‚ğ’´‚¦‚Ä‚¢‚½‚ç”²‚¯‚é
-		if (nCntLine >= CHARACTER_MAX)
-		{
-			break;
-		}
-		// €–Ú‚²‚Æ‚É‰ñ‚·
-		for (int nCntItem = 0; nCntItem < (signed)vsvec_Contens.at(nCntLine).size(); nCntItem++)
-		{
-			switch (nCntItem)
-			{
-				// ˆÚ“®—Í
-			case 0:
-				m_sStatus[nCntLine].fMaxMove = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// Šµ«—Í
-			case 1:
-				m_sStatus[nCntLine].fMaxInertia = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// ƒWƒƒƒ“ƒv—Í
-			case 2:
-				m_sStatus[nCntLine].fMaxJump = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	// std::vector‚Ì‘½d”z—ñŠJ•ú
-	std::vector<std::vector<std::string>>().swap(vsvec_Contens);
-	return S_OK;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // “Ç‚İ‚ñ‚¾î•ñ‚ğ”jŠüˆ—
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::UnLoad(void)
@@ -1032,12 +811,6 @@ void CCharacter::InitStatic(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::Debug(void)
 {
-	// ƒLƒƒƒ‰ƒNƒ^[‚Ì“–‚½‚è”»’è‚ªNULL‚Å‚Í‚È‚¢‚È‚ç
-	// ƒfƒoƒbƒOˆ—
-	if (m_pCharacterCollision != NULL)
-	{
-		m_pCharacterCollision->Debug();
-	}
 	// ˆÚ“®—Ê•\¦
 	CDebugproc::Print("ƒLƒƒƒ‰ƒNƒ^[[%d]:ˆÚ“®—Ê(%.2f,%.2f,%.2f)\n", m_character, m_move.x, m_move.y, m_move.z);
 }

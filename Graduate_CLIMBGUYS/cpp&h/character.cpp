@@ -41,7 +41,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 MODEL_ALL	*CCharacter::m_modelAll[CHARACTER_MAX] = {};		// キャラクター全体の情報
 CModel_info	*CCharacter::m_model_info[CHARACTER_MAX] = {};		// キャラクター情報
-std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX];		// キャラクター番号
+std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX] = {};		// キャラクター番号
 D3DXVECTOR3	CCharacter::m_CharacterSize[CHARACTER_MAX] = {};	// キャラクターのサイズ
 int			CCharacter::m_NumParts[CHARACTER_MAX] = {};			// 動かすキャラクター数
 int			CCharacter::m_NumModel[CHARACTER_MAX] = {};			// 最大キャラクター数

@@ -459,9 +459,9 @@ void CStand::CreateStand_Tutorial()
 	static D3DXVECTOR3 StandPos[3] = {};
 
 	// 足場
-	StandPos[0] = D3DXVECTOR3(-400, 0, 0);
-	StandPos[1] = D3DXVECTOR3(0, 150, 0);
-	StandPos[2] = D3DXVECTOR3(400, 300, 0);
+	StandPos[0] = D3DXVECTOR3(-400, -50, 0);
+	StandPos[1] = D3DXVECTOR3(0, 0, 0);
+	StandPos[2] = D3DXVECTOR3(400, 50, 0);
 
 	// チュートリアルで使用する足場ブロックの数
 	for (int nBlockCnt = 0; nBlockCnt < 3; nBlockCnt++)

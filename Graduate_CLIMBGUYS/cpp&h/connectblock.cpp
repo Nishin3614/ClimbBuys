@@ -7,6 +7,7 @@
 #include "connectblock.h"
 #include "baseblock.h"
 #include "normalblock.h"
+#include "game.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -86,8 +87,10 @@ void CConnectblock::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::SetBlockShape(void)
 {
+	// 変数宣言
+	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());
 	// 形
-	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-4 + rand() % 8, 10, -4 + rand() % 8);
+	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue + rand() % (nFeedValue * 2), 10, -nFeedValue + rand() % (nFeedValue * 2));
 	switch (m_Shape)
 	{
 		// 矩形
@@ -104,9 +107,9 @@ void CConnectblock::SetBlockShape(void)
 		// Iブロック
 	case SHAPE_I:
 		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 3, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 0, 0), &m_col);
 		break;
 		// Jブロック
 	case SHAPE_J:
@@ -118,30 +121,30 @@ void CConnectblock::SetBlockShape(void)
 		// Lブロック
 	case SHAPE_L:
 		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
 		break;
 		// Sブロック
 	case SHAPE_S:
 		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 1, 0), &m_col);
 		break;
 		// Tブロック
 	case SHAPE_T:
 		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, -1, 0), &m_col);
 		break;
 		// Zブロック
 	case SHAPE_Z:
 		CNormalblock::Create(2, BaseGrid, &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(-1, 1, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
 		break;
 	}
 }
@@ -260,6 +263,27 @@ std::unique_ptr<CConnectblock> CConnectblock::Creat_Unique(
 	return pConnectblock;
 }
 
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// テスト作成(シーン管理)
+//	pos			: 位置
+//	layer		: レイヤー
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnectblock::TestCreate(void)
+{
+	// 変数宣言
+	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());
+	D3DXCOLOR Col = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+	// 形
+	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue + rand() % (nFeedValue * 2), 5, -nFeedValue + rand() % (nFeedValue * 2));
+	CNormalblock::Create(2, BaseGrid, &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1), &Col);
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 更新_ブロック生成
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -282,6 +306,23 @@ void CConnectblock::Update_CreateBlock(void)
 void CConnectblock::Debug(void)
 {
 
+}
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 静的なデバッグ表示
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnectblock::StaticDebug(void)
+{
+	if (ImGui::Begin("Block"))
+	{
+		// 変数宣言
+		static int nBlockGrid[3];	// ブロック行列高
+		ImGui::InputInt3("BlockGrid", nBlockGrid);
+		if (ImGui::Button("CreateBlock"))
+		{
+			CNormalblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		}
+	}
+	ImGui::End();
 }
 #endif // _DEBUG
 

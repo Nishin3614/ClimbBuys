@@ -85,6 +85,7 @@ public:
 		TYPE_PLAYER03_LEG_RIGHT,		// プレイヤー03 右足
 		TYPE_PLAYER03_THIGH_LEFT,		// プレイヤー03 左腿
 		TYPE_PLAYER03_LEG_LEFT,			// プレイヤー03 左足
+		TYPE_TUTORIALBLOCK,				// チュートリアルブロック
 		TYPE_MAX						// 最大数
 	} TYPE;
 

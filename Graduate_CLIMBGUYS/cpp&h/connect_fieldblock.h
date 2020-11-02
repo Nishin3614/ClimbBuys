@@ -103,7 +103,7 @@ public:
 	//	stage		: ステージ情報
 	//	layer		: レイヤー
 	static CConnect_fieldblock * Create(
-		CGame::STAGE			const & stage,									// ステージ情報
+		CGame::STAGE	const & stage,									// ステージ情報
 		CScene::LAYER	const & layer = CScene::LAYER_3DOBJECT			// レイヤー
 	);
 	// 作成(個人管理)

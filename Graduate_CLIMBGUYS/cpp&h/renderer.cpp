@@ -14,6 +14,7 @@
 #include "light.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "connectblock.h"
 
 // テスト
 #include "3Dmap.h"
@@ -574,17 +575,14 @@ void CRenderer::UpdateImGui(void)
 	m_pCamera->Debug();
 	// ライトの情報の設定
 	m_pLight->Debug();
-	// ライト情報の設定
-	CDebugproc::Print("マウス位置(%.1f,%.1f)\n", (float)CManager::GetMouse()->GetX(), (float)CManager::GetMouse()->GetY());
-	CDebugproc::Print("ImGuiのマウス位置(%.1f,%.1f)\n",ImGui::GetMousePos().x,ImGui::GetMousePos().y);
-
+	// 結合ブロックの静的なデバッグ処理
+	CConnectblock::StaticDebug();
 	// テスト 3Dマップの情報設定
 	C3DMap::Debug();
 
 
 	// ImGuiの更新終了
 	ImGui::End();
-	ImGui::EndFrame();
 	m_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
 	D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(m_clear_color.x*255.0f), (int)(m_clear_color.y*255.0f), (int)(m_clear_color.z*255.0f), (int)(m_clear_color.w*255.0f));
 }

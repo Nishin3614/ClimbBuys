@@ -30,7 +30,6 @@
 #define CHARACTER_KEYMOVE (1)													// キー移動
 #define CHARACTER_G (0.5f)														// 重力
 #define CHARACTER_RESISTANCE (0.5f)												// 抵抗力
-#define CHARACTER_STATUS_FILE ("data/LOAD/STATUS/status_manager_Character.csv")	// ステータスファイル名
 #define CHARACTER_INFO_FILE ("data/LOAD/CHARACTER/CHARACTER_MANAGER.txt")		// キャラクターファイル名
 #define CIRCLESHADOW (true)														// 円形のシャドウにするかしないか
 #define REFLECTION_COEFFICIENT (1)												// 反発係数
@@ -42,12 +41,10 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 MODEL_ALL	*CCharacter::m_modelAll[CHARACTER_MAX] = {};		// キャラクター全体の情報
 CModel_info	*CCharacter::m_model_info[CHARACTER_MAX] = {};		// キャラクター情報
-std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX];		// キャラクター番号
+std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX] = {};		// キャラクター番号
 D3DXVECTOR3	CCharacter::m_CharacterSize[CHARACTER_MAX] = {};	// キャラクターのサイズ
-CCharacter::STATUS CCharacter::m_sStatus[CHARACTER_MAX] = {};	// キャラクターすべてのスタータス情報
 int			CCharacter::m_NumParts[CHARACTER_MAX] = {};			// 動かすキャラクター数
 int			CCharacter::m_NumModel[CHARACTER_MAX] = {};			// 最大キャラクター数
-int			CCharacter::m_nCameraCharacter = 0;					// キャラクターに追尾するID
 int			CCharacter::m_nAllCharacter = 0;					// 出現しているキャラクター人数
 float		CCharacter::m_fAlpha = 0.0f;						// 透明度
 
@@ -65,7 +62,6 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在回転量
 	m_rotLast = m_rot;								// 向きたい方向
 	m_rotbetween = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 回転の差分
-	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// キャラクターのサイズ
 	m_nMotiontypeOld = 0;							// 前回のモーションタイプ
 	m_nMotiontype = 0;								// モーションタイプ
 	m_keyinfoCnt = 0;								// キー情報のカウント
@@ -152,98 +148,6 @@ void CCharacter::Init()
 			(CMeshobit::TEX)m_modelAll[m_character]->v_MeshObitLoad.at(nCntObit_Basic).nTexType
 		)));
 	}
-
-	// 攻撃当たり判定設定
-	for (int nCntAttackCollision = 0; nCntAttackCollision < (signed)m_modelAll[m_character]->v_AttackCollision.size(); nCntAttackCollision++)
-	{
-		// 変数宣言
-		D3DXVECTOR3 pos;
-		// 当たり判定の位置の設定
-		D3DXVec3TransformCoord(
-			&pos,
-			&m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-			&m_pModel[m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).nParts].GetMatrix()
-		);
-		// 矩形の当たり判定
-		if (m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_RectInfo)
-		{
-			// 矩形の当たり判定
-			m_vec_AttackCollision.push_back(std::move(CRectCollision::Create_Self(
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_RectInfo->size,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-				CCollision::OBJTYPE_ATTACK
-			)));
-		}
-		// 球の当たり判定
-		else if (m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_SphereInfo)
-		{
-			// 球の当たり判定
-			m_vec_AttackCollision.push_back(std::move(CSphereCollision::Create_Self(
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_SphereInfo->fRadius,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-				CCollision::OBJTYPE_ATTACK
-			)));
-		}
-		// 円柱の当たり判定
-		else if (m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_ColumnInfo)
-		{
-			// 円柱の当たり判定
-			m_vec_AttackCollision.push_back(std::move(CColumnCollision::Create_Self(
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_ColumnInfo->fRadius,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).p_uni_ColumnInfo->fVertical,
-				m_modelAll[m_character]->v_AttackCollision.at(nCntAttackCollision).Offset,
-				CCollision::OBJTYPE_ATTACK
-			)));
-		}
-	}
-
-	// キャラクター当たり判定設定
-	if (m_modelAll[m_character]->pCharacterCollision != NULL)
-	{
-		// 変数宣言
-		CCollision::OBJTYPE objtype = CCollision::OBJTYPE_PLAYER;	// あたり判定のオブジェクトタイプ
-		// オブジェクトタイプがNPCの時
-		if (m_character == CHARACTER_NPC)
-		{
-			objtype = CCollision::OBJTYPE_ENEMY;
-		}
-		// それ以外
-		else
-		{
-			objtype = CCollision::OBJTYPE_PLAYER;
-		}
-		// 矩形の当たり判定
-		if (m_modelAll[m_character]->pCharacterCollision->RectInfo)
-		{
-			m_pCharacterCollision = CRectCollision::Create(
-				m_modelAll[m_character]->pCharacterCollision->RectInfo->size,
-				m_modelAll[m_character]->pCharacterCollision->Offset,
-				objtype,
-				this,
-				NULL,
-				true,
-				true,
-				&m_pos,
-				&m_posold
-			);
-		}
-		// 球の当たり判定
-		else if (m_modelAll[m_character]->pCharacterCollision->p_uni_SphereInfo)
-		{
-			m_pCharacterCollision = CSphereCollision::Create(
-				m_modelAll[m_character]->pCharacterCollision->p_uni_SphereInfo->fRadius,
-				m_modelAll[m_character]->pCharacterCollision->Offset,
-				objtype,
-				this,
-				NULL,
-				true,
-				true,
-				&m_pos,
-				&m_posold
-			);
-
-		}
-	}
 	// シャドウon
 	if (CIRCLESHADOW == true)
 	{
@@ -267,13 +171,6 @@ void CCharacter::Uninit(void)
 	{
 		delete[] m_pModel;
 		m_pModel = NULL;
-	}
-	// キャラクター当たり判定のヌルチェック
-	// ->開放
-	if (m_pCharacterCollision != NULL)
-	{
-		m_pCharacterCollision->CompulsionScene();
-		m_pCharacterCollision = NULL;
 	}
 	// 軌跡の情報を開放する
 	for (int nCntMotionObit = 0; nCntMotionObit < (signed)m_vec_pMeshObit.size(); nCntMotionObit++)
@@ -370,38 +267,8 @@ void CCharacter::Move(void)
 
 	// 位置情報更新
 	m_pos += m_move;
-	// 抵抗力
-	//m_move.x *= m_sStatus[m_character].fMaxInertia;
-	//m_move.z *= m_sStatus[m_character].fMaxInertia;
 	// 上限処理
 	Limit();
-
-	// キャラクターの当たり判定がNULLではないなら
-	// ->当たり判定の更新
-	if (m_pCharacterCollision != NULL)
-	{
-		m_pCharacterCollision->GetShape()->PassPos(m_pos);
-
-#ifdef _DEBUG
-		/*
-		CRectShape * pRectShape = (CRectShape *)m_pCharacterCollision->GetShape();
-
-		// テスト用
-		D3DXVECTOR3 Max = pRectShape->GetMax();
-		D3DXVECTOR3 MaxOld = pRectShape->GetMaxOld();
-		D3DXVECTOR3 Min = pRectShape->GetMin();
-		D3DXVECTOR3 MinOld = pRectShape->GetMinOld();
-		CDebugproc::Print("キャラクターの当たり判定の最大値(%.3f,%.3f,%.3f)\n",
-			Max.x, Max.y, Max.z);
-		CDebugproc::Print("キャラクターの当たり判定の前回の最大値(%.3f,%.3f,%.3f)\n",
-			MaxOld.x, MaxOld.y, MaxOld.z);
-		CDebugproc::Print("キャラクターの当たり判定の最小値(%.3f,%.3f,%.3f)\n",
-			Min.x, Min.y, Min.z);
-		CDebugproc::Print("キャラクターの当たり判定の前回の最小値(%.3f,%.3f,%.3f)\n",
-			MinOld.x, MinOld.y, MinOld.z);
-			*/
-#endif // _DEBUG
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -671,24 +538,15 @@ void CCharacter::Die(void)
 
 	// 総キャラクターカウントダウン
 	m_nAllCharacter--;
-
-	// キャラクター当たり判定のヌルチェック
-	// ->開放
-	if (m_pCharacterCollision != NULL)
+	// 総キャラクターが一人だけなら
+	// ->タイトルへフェード
+	if (m_nAllCharacter <= 1)
 	{
-		m_pCharacterCollision->CompulsionScene();
-		m_pCharacterCollision->Release();
-		m_pCharacterCollision = NULL;
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		{
+			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+		}
 	}
-	//// 総キャラクターが一人だけなら
-	//// ->タイトルへフェード
-	//if (m_nAllCharacter <= 1)
-	//{
-	//	if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-	//	{
-	//		CManager::GetFade()->SetFade(CManager::MODE_GAME);
-	//	}
-	//}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -763,14 +621,6 @@ int CCharacter::GetMaxFrame(
 	}
 	// 一つのキー間のフレーム数
 	return m_modelAll[character]->pMotion[nMotionID]->KeyInfo[nNowKeyCnt].nFrame;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// カメラ追尾処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-int CCharacter::GetCameraCharacter(void)
-{
-	return m_nCameraCharacter;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -872,31 +722,6 @@ D3DXMATRIX * CCharacter::GetMatrix(int const nModelID)
 	return &m_mtxWorld;
 }
 
-/*
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 読み込み処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CCharacter::Load(
-	CHARACTER const character,
-	int const nMaxMotion,
-	const char * file_name
-)
-{
-	// 変数宣言
-	// キャラクターとモーション情報の生成
-	m_modelAll[character] = new MODEL_ALL;
-	// キャラクターのテキストデータの取得
-	CModel_info::TextLoad(
-		m_modelAll[character],					// キャラクター情報
-		m_modelId[character],					// キャラクターファイル
-		nMaxMotion,								// モーション数
-		m_NumModel[character],					// 最大キャラクター数
-		m_NumParts[character],					// 動かすキャラクター数
-		file_name								// ファイル名
-	);
-}
-*/
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // キャラクター全ソースの読み込み
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -906,8 +731,6 @@ HRESULT CCharacter::Load(void)
 	HRESULT hr;
 	// キャラクターの情報読み込み
 	hr = Load_Character();
-	// ステータスの情報読み込み
-	hr = LoadStatus();
 	return hr;
 }
 
@@ -961,50 +784,6 @@ HRESULT CCharacter::Load_Character(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ステータス情報読み込み処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT CCharacter::LoadStatus(void)
-{
-	// 変数宣言
-	std::vector<std::vector<std::string>> vsvec_Contens;	// ファイルの中身格納用
-	// ファイルの中身を取得する
-	vsvec_Contens = CCalculation::FileContens(CHARACTER_STATUS_FILE, ',');
-	// 行ごとに回す
-	for (int nCntLine = 0; nCntLine < (signed)vsvec_Contens.size(); nCntLine++)
-	{
-		// キャラクターが上限を超えていたら抜ける
-		if (nCntLine >= CHARACTER_MAX)
-		{
-			break;
-		}
-		// 項目ごとに回す
-		for (int nCntItem = 0; nCntItem < (signed)vsvec_Contens.at(nCntLine).size(); nCntItem++)
-		{
-			switch (nCntItem)
-			{
-				// 移動力
-			case 0:
-				m_sStatus[nCntLine].fMaxMove = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// 慣性力
-			case 1:
-				m_sStatus[nCntLine].fMaxInertia = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-				// ジャンプ力
-			case 2:
-				m_sStatus[nCntLine].fMaxJump = stof(vsvec_Contens.at(nCntLine).at(nCntItem));
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	// std::vectorの多重配列開放
-	std::vector<std::vector<std::string>>().swap(vsvec_Contens);
-	return S_OK;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 読み込んだ情報を破棄処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::UnLoad(void)
@@ -1032,12 +811,6 @@ void CCharacter::InitStatic(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::Debug(void)
 {
-	// キャラクターの当たり判定がNULLではないなら
-	// デバッグ処理
-	if (m_pCharacterCollision != NULL)
-	{
-		m_pCharacterCollision->Debug();
-	}
 	// 移動量表示
 	CDebugproc::Print("キャラクター[%d]:移動量(%.2f,%.2f,%.2f)\n", m_character, m_move.x, m_move.y, m_move.z);
 }

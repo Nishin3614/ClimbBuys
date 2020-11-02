@@ -283,16 +283,16 @@ COLLISIONDIRECTION CStand::Collision(
 	D3DXVECTOR3 BlockSize = CScene_X::GetModel()->size;
 
 	// 素材のZ範囲
-	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - BlockSize.z * 0.5f&&
+	if (pos->z + OffsetPos.z + size->z * 0.5f >= BlockPos.z - BlockSize.z * 0.5f&&
 		pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + BlockSize.z * 0.5f)
 	{
 		// 素材のX範囲
-		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - BlockSize.x * 0.5f&&
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= BlockPos.x - BlockSize.x * 0.5f&&
 			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + BlockSize.x * 0.5f)
 		{
 			// 当たり判定(下)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-				pos->y + OffsetPos.y >= BlockPos.y)
+			if (pos->y + OffsetPos.y + size->y * 0.5f >= BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::DOWN;
@@ -352,14 +352,6 @@ COLLISIONDIRECTION CStand::Collision(
 			}
 		}
 	}
-
-
-
-
-	/// やること
-	// シーン情報をどうやって持っていくか
-	// ヒット後の状態はどうなっているか
-	// 処理速度はどうなっているのか
 	return Direct;
 }
 
@@ -442,7 +434,7 @@ std::unique_ptr<CStand> CStand::Creat_Unique(
 {
 	// 変数宣言
 	std::unique_ptr<CStand> pStand(new CStand);		// シーン2Dクラス
-																// 設定
+	// 設定
 	pStand->SetPos(pos);			// 位置
 	pStand->SetModelId(nModelId);	// 位置
 										// 初期化処理
@@ -459,9 +451,9 @@ void CStand::CreateStand_Tutorial()
 	static D3DXVECTOR3 StandPos[3] = {};
 
 	// 足場
-	StandPos[0] = D3DXVECTOR3(-400, 0, 0);
-	StandPos[1] = D3DXVECTOR3(0, 150, 0);
-	StandPos[2] = D3DXVECTOR3(400, 300, 0);
+	StandPos[0] = D3DXVECTOR3(-300, 0, 0);
+	StandPos[1] = D3DXVECTOR3(0, 50, 0);
+	StandPos[2] = D3DXVECTOR3(300, 100, 0);
 
 	// チュートリアルで使用する足場ブロックの数
 	for (int nBlockCnt = 0; nBlockCnt < 3; nBlockCnt++)
@@ -472,12 +464,11 @@ void CStand::CreateStand_Tutorial()
 		pStand = new CStand();
 		// 設定
 		// シーン管理設定
-		pStand->ManageSetting(LAYER_3DBLOCK);				// レイヤーの番号
-		pStand->SetModelId(3);								// モデルのid
+		pStand->ManageSetting(LAYER_3DSTAND);				// レイヤーの番号
+		pStand->SetModelId(TYPE_TUTORIALBLOCK);				// モデルのid
 		pStand->SetPos(StandPos[nBlockCnt]);				// 位置
 		pStand->SetType(TYPE(TYPE_BLOCK_MAP1 + nBlockCnt));	// タイプ
 		pStand->Init();										// 初期化処理
-
 		// 看板
 		CSignboard::Create(D3DXVECTOR3(
 			StandPos[nBlockCnt].x,

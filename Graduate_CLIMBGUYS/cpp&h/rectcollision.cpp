@@ -76,6 +76,8 @@ void CRectCollision::Uninit(void)
 void CRectCollision::Update(void)
 {
 	m_pRectShape->PassPos(D3DVECTOR3_ZERO);
+
+#ifdef _DEBUG
 	// メッシュスフィアが生成されていたら
 	if (m_pDebugMeshBox != NULL)
 	{
@@ -84,6 +86,7 @@ void CRectCollision::Update(void)
 			m_pRectShape->m_DestPos
 		);
 	}
+#endif // _DEBUG
 }
 
 #ifdef _DEBUG

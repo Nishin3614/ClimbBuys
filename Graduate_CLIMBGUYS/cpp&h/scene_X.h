@@ -42,12 +42,51 @@ public:
 	// モデルタイプ
 	typedef enum
 	{
-		TYPE_NORMAL = 0,		// 適当なモデル
-		TYPE_CUBY,				// カービィー
-		TYPE_BLOCK,				// ブロック
-		TYPE_PLAYER00_ASTOLFO,	// プレイヤー00アストルフォ
-		TYPE_PLAYER01_TANJIRO,	// プレイヤー01たんじろう
-		TYPE_MAX				// 最大数
+		TYPE_NONE = -1,					// NONE
+		TYPE_CASTLE,					// 城？
+		TYPE_PLAYER,					// プレイヤー？
+		TYPE_BLOCK,						// ブロック
+		TYPE_STAND,						// 足場
+		TYPE_PLAYER00_ASTOLFO,			// プレイヤー00 アストルフォ
+		TYPE_PLAYER01_TANJIRO,			// プレイヤー01 たんじろう
+		TYPE_PLAYER00_WAIST,			// プレイヤー00 腰
+		TYPE_PLAYER00_BODY,				// プレイヤー00 胴体
+		TYPE_PLAYER00_HEAD,				// プレイヤー00 頭
+		TYPE_PLAYER00_HAND_RIGHT,		// プレイヤー00 右手
+		TYPE_PLAYER00_HAND_LEFT,		// プレイヤー00 左手
+		TYPE_PLAYER00_THIGH_RIGHT,		// プレイヤー00 右腿
+		TYPE_PLAYER00_LEG_RIGHT,		// プレイヤー00 右足
+		TYPE_PLAYER00_THIGH_LEFT,		// プレイヤー00 左腿
+		TYPE_PLAYER00_LEG_LEFT,			// プレイヤー00 左足
+		TYPE_PLAYER01_WAIST,			// プレイヤー01 腰
+		TYPE_PLAYER01_BODY,				// プレイヤー01 胴体
+		TYPE_PLAYER01_HEAD,				// プレイヤー01 頭
+		TYPE_PLAYER01_HAND_RIGHT,		// プレイヤー01 右手
+		TYPE_PLAYER01_HAND_LEFT,		// プレイヤー01 左手
+		TYPE_PLAYER01_THIGH_RIGHT,		// プレイヤー01 右腿
+		TYPE_PLAYER01_LEG_RIGHT,		// プレイヤー01 右足
+		TYPE_PLAYER01_THIGH_LEFT,		// プレイヤー01 左腿
+		TYPE_PLAYER01_LEG_LEFT,			// プレイヤー01 左足
+		TYPE_PLAYER02_WAIST,			// プレイヤー02 腰
+		TYPE_PLAYER02_BODY,				// プレイヤー02 胴体
+		TYPE_PLAYER02_HEAD,				// プレイヤー02 頭
+		TYPE_PLAYER02_HAND_RIGHT,		// プレイヤー02 右手
+		TYPE_PLAYER02_HAND_LEFT,		// プレイヤー02 左手
+		TYPE_PLAYER02_THIGH_RIGHT,		// プレイヤー02 右腿
+		TYPE_PLAYER02_LEG_RIGHT,		// プレイヤー02 右足
+		TYPE_PLAYER02_THIGH_LEFT,		// プレイヤー02 左腿
+		TYPE_PLAYER02_LEG_LEFT,			// プレイヤー02 左足
+		TYPE_PLAYER03_WAIST,			// プレイヤー03 腰
+		TYPE_PLAYER03_BODY,				// プレイヤー03 胴体
+		TYPE_PLAYER03_HEAD,				// プレイヤー03 頭
+		TYPE_PLAYER03_HAND_RIGHT,		// プレイヤー03 右手
+		TYPE_PLAYER03_HAND_LEFT,		// プレイヤー03 左手
+		TYPE_PLAYER03_THIGH_RIGHT,		// プレイヤー03 右腿
+		TYPE_PLAYER03_LEG_RIGHT,		// プレイヤー03 右足
+		TYPE_PLAYER03_THIGH_LEFT,		// プレイヤー03 左腿
+		TYPE_PLAYER03_LEG_LEFT,			// プレイヤー03 左足
+		TYPE_TUTORIALBLOCK,				// チュートリアルブロック
+		TYPE_MAX						// 最大数
 	} TYPE;
 
 	/* 構造体 */
@@ -173,26 +212,30 @@ public:
 	//	posOld	: 前回の位置
 	//	move	: 移動量
 	//	size	: サイズ
-	COLLISIONDIRECTION PushCollision(
+	virtual COLLISIONDIRECTION PushCollision(
 		CScene::OBJ const & Obj,						// オブジェタイプ
 		D3DXVECTOR3 * pos,								// 位置
 		D3DXVECTOR3 * posOld,							// 前回の位置
 		D3DXVECTOR3 * move,								// 移動量
 		D3DXVECTOR3 * size,								// サイズ
 		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
-	);
+	) {
+		return COLLISIONDIRECTION::NONE;
+	};
 	// 当たり判定
 	//	Obj		: オブジェタイプ
 	//	pos			: 位置
 	//	size		: サイズ
 	//	OffsetPos	: オフセット位置
-	COLLISIONDIRECTION Collision(
+	virtual COLLISIONDIRECTION Collision(
 		CScene::OBJ const & Obj,						// オブジェタイプ
 		D3DXVECTOR3 * pos,								// 位置
 		D3DXVECTOR3 * posOld,							// 前回の位置
 		D3DXVECTOR3 * size,								// サイズ
 		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
-	);
+	) {
+		return COLLISIONDIRECTION::NONE;
+	};
 
 	// 設定
 	// 位置設定

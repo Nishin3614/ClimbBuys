@@ -143,6 +143,8 @@ void CLight::Debug(void)
 			}
 			ImGui::TreePop();
 		}
+		// 区切り線
+		ImGui::Separator();
 	}
 	// カウントライト
 	for (int nCntLight = 0; nCntLight < TYPE_MAX; nCntLight++)

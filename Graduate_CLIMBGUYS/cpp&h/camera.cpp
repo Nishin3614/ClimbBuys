@@ -311,6 +311,8 @@ void CCamera::Debug(void)
 			InitCamera();
 			m_Turn.bSpin = !m_Turn.bSpin;
 		}
+		// 区切り線
+		ImGui::Separator();
 	}
 	/*
 	CDebugproc::Print("PosV(%.1f,%.1f,%.1f)\n", m_posV.x, m_posV.y, m_posV.z);
@@ -340,92 +342,6 @@ CCamera * CCamera::Create(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT CCamera::Load(void)
 {
-	// ファイルポイント
-	FILE *pFile;
-
-	// 変数宣言
-	int	nCntObj = 0;		// シャドウマッピングカウント
-	char cRaedText[128];	// 文字として読み取り用
-	char cHeadText[128];	// 比較するよう
-	char cDie[128];			// 不必要な文字
-
-							// ファイル開
-	pFile = fopen(CAMERA_FILE, "r");
-
-	// 開けた
-	if (pFile != NULL)
-	{
-		// エンドスクリプトが来るまでループ
-		while (strcmp(cHeadText, "END") != 0)
-		{
-			// 初期化
-			cHeadText[0] = '\0';
-			fgets(cRaedText, sizeof(cRaedText), pFile);
-			sscanf(cRaedText, "%s", &cHeadText);
-			// マテリアルセット来たら
-			if (strcmp(cHeadText, "TYPE") == 0)
-			{
-				sscanf(cRaedText, "%s %d",
-					&cDie,
-					&m_load[nCntObj].nType
-				);
-				// エンドマテリアルセットが来るまでループ
-				while (strcmp(cHeadText, "END_TYPE") != 0)
-				{
-					// 初期化
-					cHeadText[0] = '\0';
-					fgets(cRaedText, sizeof(cRaedText), pFile);
-					sscanf(cRaedText, "%s", &cHeadText);
-					// 回転情報読み込み
-					if (strcmp(cHeadText, "ROT") == 0)
-					{
-						sscanf(cRaedText, "%s %s %f %f %f",
-							&cDie, &cDie,
-							&m_load[nCntObj].rot.x,
-							&m_load[nCntObj].rot.y,
-							&m_load[nCntObj].rot.z);
-					}
-					// オフセット情報読み込み
-					else if (strcmp(cHeadText, "OFFSET") == 0)
-					{
-						sscanf(cRaedText, "%s %s %f %f %f", &cDie, &cDie,
-							&m_load[nCntObj].offset.x,
-							&m_load[nCntObj].offset.y,
-							&m_load[nCntObj].offset.z
-						);
-					}
-					// 長さ情報読み込み
-					else if (strcmp(cHeadText, "LENGH") == 0)
-					{
-						sscanf(cRaedText, "%s %s %f", &cDie, &cDie,
-							&m_load[nCntObj].fLengh);
-					}
-					// 長さ情報読み込み
-					else if (strcmp(cHeadText, "HEIGHT") == 0)
-					{
-						sscanf(cRaedText, "%s %s %f", &cDie, &cDie,
-							&m_load[nCntObj].fHeight);
-					}
-				}
-				// 上限より下なら
-				if (nCntObj < TYPE_MAX)
-				{
-					// オブジェクトの更新
-					nCntObj++;
-				}
-			}
-		}
-		// ファイル閉
-		fclose(pFile);
-	}
-
-	// 開けない
-	else
-	{
-		MessageBox(NULL, "カメラの読み込みに失敗しました", "警告！", MB_ICONWARNING);
-		return E_FAIL;
-	}
-
 	return S_OK;
 }
 

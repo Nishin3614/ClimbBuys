@@ -56,22 +56,7 @@ public:
 	} CHARACTER;
 
 	/* 構造体 */
-	// ステータス情報
-	typedef struct STATUS
-	{
-		/* 関数 */
-		// 初期化
-		STATUS()
-		{
-			fMaxInertia = 0;			// 慣性力
-			fMaxJump = 0;				// ジャンプ力
-			fMaxMove = 0;				// 移動力
-		}
-		/* 変数 */
-		float		fMaxInertia;		// 慣性力
-		float		fMaxJump;			// ジャンプ力
-		float		fMaxMove;			// 移動力
-	} STATUS, *PSTATUS;
+
 	/* 関数 */
 	// コンストラクタ
 	CCharacter(CHARACTER const &character);
@@ -121,6 +106,32 @@ public:
 	D3DXVECTOR3 * Scene_GetPPosold(void) { return &m_posold; };
 	// ポインター移動量情報の取得
 	D3DXVECTOR3 * Scene_GetPMove(void) { return &m_move; };
+	// 押し出し当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos		: 位置
+	//	posOld	: 前回の位置
+	//	move	: 移動量
+	//	size	: サイズ
+	virtual COLLISIONDIRECTION PushCollision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * move,								// 移動量
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	) = 0;
+	// 当たり判定
+	//	Obj		: オブジェタイプ
+	//	pos			: 位置
+	//	size		: サイズ
+	//	OffsetPos	: オフセット位置
+	virtual COLLISIONDIRECTION Collision(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,							// 前回の位置
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	) = 0;
 	// 必要に応じた動作 //
 	// 重力
 	void AddGravity(float const &fGravity)					{ m_move.y -= fGravity; };
@@ -135,8 +146,6 @@ public:
 	void SetRot(D3DXVECTOR3 const &rot)						{ m_rot = rot; };
 	// ジャンプできるかどうかのフラグの設定
 	void SetJumpAble(bool const &jump)						{ m_bJumpable = jump; };
-	// ダッシュしているかどうかのフラグの設定
-	void SetDash(bool const &Dash)							{ m_bDash = Dash; };
 	//  死亡しているかどうかのフラグの設定
 	void SetDie(bool const &die)							{ m_bDie = die; };
 
@@ -153,8 +162,6 @@ public:
 	D3DXVECTOR3 &GetRot(void)								{ return m_rot; };
 	// ジャンプできるかどうかのフラグの取得
 	bool		&GetJumpAble(void)							{ return m_bJumpable; };
-	// ダッシュしているかどうかのフラグの取得
-	bool		&GetDash(void)								{ return m_bDash; };
 	// 死亡しているかどうかのフラグの取得
 	bool		&GetDie(void)								{ return m_bDie; };
 	// 親と子の回転量
@@ -167,11 +174,6 @@ public:
 	STATE GetState(void) const								{ return m_State; };
 	// キャラクター
 	CHARACTER	GetCharacter(void) const					{ return m_character; };
-	// ステータス(キャラクターのクラスを基底クラスに持っているクラス)
-	STATUS &GetStatus(void) { return m_sStatus[m_character]; };
-	// ステータス(キャラクター別)
-	// 引数:キャラクター番号
-	static STATUS &GetStatus(CHARACTER const &character)	{ return m_sStatus[character]; };
 	// 前方方向ベクトル取得
 	D3DXVECTOR3 GetDirectionVec(void)						{ return m_Directvector; };
 	// 床の高さ
@@ -182,14 +184,10 @@ public:
 		int nMotionID,							// モーションID
 		int nNowKeyCnt = -1						// 現在のキーカウント
 	);
-	// カメラ追尾しているID
-	static int GetCameraCharacter(void);
 	// キャラクター全ソースの読み込み
 	static HRESULT Load(void);
 	// キャラクターの情報読み込み
 	static HRESULT Load_Character(void);
-	// ステータス情報読み込み
-	static HRESULT LoadStatus(void);
 	// キャラクター全ソースの開放
 	static void UnLoad(void);
 	// キャラクターの静的変数の初期化
@@ -202,7 +200,6 @@ public:
 	virtual void  Debug(void);
 	static void AllDebug(void);
 #endif // _DEBUG
-	CCollision * GetCollision(void)					{ return m_pCharacterCollision; };
 protected:
 	/* 関数 */
 	// 設定 //
@@ -226,8 +223,6 @@ protected:
 	// モーションカメラの更新
 	void MotionCamera(void);
 	/* 変数 */
-	static int									m_nCameraCharacter;				// キャラクターに追尾するID
-	static STATUS								m_sStatus[CHARACTER_MAX];		// キャラクターすべてのスタータス情報
 	D3DXVECTOR3									m_pos;							// 位置
 	D3DXVECTOR3									m_move;							// 移動量
 	D3DXVECTOR3									m_rot;							// 現在回転量
@@ -265,7 +260,6 @@ private:
 	D3DXVECTOR3									m_posold;						// 前の位置
 	D3DXVECTOR3									m_rotLast;						// 向きたい方向
 	D3DXVECTOR3									m_rotbetween;					// 回転の差分
-	D3DXVECTOR3									m_size;							// キャラクターのサイズ
 	int											m_nMotiontype;					// モーションタイプ
 	int											m_nMotiontypeOld;				// 前回のモーションタイプ
 	int											m_nMaxMotion;					// 最大モーション数
@@ -274,11 +268,8 @@ private:
 	int											m_nMotionFrame;					// 一つのモーションのカウント
 	float										m_fLength;						// 攻撃の当たり範囲
 	bool										m_bJumpable;					// ジャンプ可能かどうか
-	bool										m_bDash;						// ダッシュ状態
 	bool										m_bDie;							// 死亡フラグ
 	D3DXVECTOR3									m_Directvector;					// 方向のベクトル
-	CCollision									* m_pCharacterCollision;		// キャラクターの当たり判定
-	std::vector<std::unique_ptr<CCollision>>	m_vec_AttackCollision;			// 攻撃当たり判定
 	std::vector<std::unique_ptr<CMeshobit>>		m_vec_pMeshObit;				// 奇跡
 	CStencilshadow								* m_pStencilshadow;				// ステンシルシャドウ
 };

@@ -232,12 +232,9 @@ typedef struct MODEL_ALL
 	MODEL_ALL()
 	{
 		pModel_offset = NULL;	// モデルのオフセット
-		pCharacterCollision = NULL;	// キャラクター当たり判定情報
 	}
 	MODEL_OFFSET			*pModel_offset;			// モデルのオフセット
 	std::vector<MOTION *>		pMotion;				// モーション
-	CHARACTERCOLLISION		*pCharacterCollision;	// キャラクター当たり判定情報
-	std::vector<ATTACKCOLLISION>	v_AttackCollision;		// 攻撃当たり判定情報
 	std::vector<MESHOBIT_BASIC>	v_MeshObitLoad;			// 軌跡の情報
 } MODEL_ALL;
 

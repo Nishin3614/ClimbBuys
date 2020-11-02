@@ -30,6 +30,8 @@
 #include "scene_X.h"
 #include "3Dmap.h"
 #include "connect_fieldblock.h"
+#include "baseblock.h"
+#include "player.h"
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
@@ -145,7 +147,16 @@ void CScene_load::LoadAll(void)
 	{
 		CCalculation::Messanger("結合されたフィールドブロック読み取り失敗");
 	}
-
+	// ベースブロックの情報
+	if (!CBaseblock::Load() == S_OK)
+	{
+		CCalculation::Messanger("ベースブロック情報読み取り失敗");
+	}
+	// プレイヤーの情報
+	if (!CPlayer::Load() == S_OK)
+	{
+		CCalculation::Messanger("プレイヤーのステータス読み取り失敗");
+	}
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -182,6 +193,10 @@ void CScene_load::UnLoadAll(void)
 	//C3DMap::UnLoad();
 	// 結合されたフィールドブロック
 	CConnect_fieldblock::UnLoad();
+	// ベースブロック
+	CBaseblock::UnLoad();
 	// シーンX
 	CScene_X::UnLoadModel();
+	// プレイヤー
+	CPlayer::UnLoad();
 }

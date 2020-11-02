@@ -198,12 +198,12 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 	if (this->GetGrid().nHeight >= CBaseblock::GetHeight(this->GetGrid().nColumn + m_nFeedValue[Stage], this->GetGrid().nLine + m_nFeedValue[Stage]))
 	{
 		// ‘fÞ‚ÌZ”ÍˆÍ
-		if (pos->z + OffsetPos.z + size->z * 0.5f >= BlockPos.z - m_fSizeRange * 0.5f&&
-			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
 		{
 			// ‘fÞ‚ÌX”ÍˆÍ
-			if (pos->x + OffsetPos.x + size->x * 0.5f >= BlockPos.x - m_fSizeRange * 0.5f&&
-				pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 			{
 				// “–‚½‚è”»’è(‰º)
 				if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
@@ -260,8 +260,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 		pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange)
 	{
 		// ‘fÞ‚ÌZ”ÍˆÍ
-		if (pos->z + OffsetPos.z + size->z * 0.5f >= BlockPos.z - m_fSizeRange * 0.5f&&
-			pos->z + OffsetPos.z - size->z * 0.5f <= BlockPos.z + m_fSizeRange * 0.5f)
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
 		{
 			// “–‚½‚è”»’è(¶)
 			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
@@ -282,10 +282,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 			{
 				// ‚ß‚èž‚ñ‚Å‚¢‚é
 				Direct = COLLISIONDIRECTION::RIGHT;
-
 				// ‘fÞó‚Ì¶‚É
 				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
-
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->x = 0.0f;
 				// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -298,7 +296,6 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				// ‚ß‚èž‚ñ‚Å‚¢‚é
 				Direct = COLLISIONDIRECTION::LEFT;
 			}
-
 			// “–‚½‚è”»’è(‰E)
 			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
 				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
@@ -310,8 +307,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 		// “–‚½‚Á‚½•ûŒü‚Éî•ñ‚ª“ü‚Á‚Ä‚¢‚é‚È‚ç
 		//if (bPush) return Direct;
 		// ‘fÞ‚ÌX”ÍˆÍ
-		if (pos->x + OffsetPos.x + size->x * 0.5f >= BlockPos.x - m_fSizeRange * 0.5f&&
-			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 		{
 			// “–‚½‚è”»’è(Žè‘O)
 			if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&

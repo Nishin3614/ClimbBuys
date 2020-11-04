@@ -577,6 +577,41 @@ void CPlayer::BlockCollision(void)
 				&m_PlayerStatus.PushSize,
 				m_PlayerStatus.PushOffSet
 			);
+			// ブロックの判定
+			// 前
+			if (Direct == COLLISIONDIRECTION::FRONT)
+			{
+				PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, -1));
+			}
+			// 後
+			else if (Direct == COLLISIONDIRECTION::BACK)
+			{
+				PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, 1));
+			}
+			// 左
+			else if (Direct == COLLISIONDIRECTION::LEFT)
+			{
+				PushBlock(pBaseBlock, CBaseblock::GRID(1, 0, 0));
+			}
+			// 右
+			else if (Direct == COLLISIONDIRECTION::RIGHT)
+			{
+				PushBlock(pBaseBlock, CBaseblock::GRID(-1, 0, 0));
+			}
+			// 上
+			else if (Direct == COLLISIONDIRECTION::UP)
+			{
+				// ジャンプ可能設定
+				SetJumpAble(true);
+				// プレイヤーが下のブロックに当たっている
+				bOn ^= true;
+			}
+			// 下
+			else if (Direct == COLLISIONDIRECTION::DOWN)
+			{
+				// プレイヤーがしたブロックに当たっている
+				bUnder ^= true;
+			}
 		}
 		if (Direct == COLLISIONDIRECTION::NONE)
 		{
@@ -589,30 +624,26 @@ void CPlayer::BlockCollision(void)
 				&m_PlayerStatus.PlayerSize,
 				m_PlayerStatus.PlayerOffSet
 			);
-	}
+		}
 		// ブロックの判定
 		// 前
 		if (Direct == COLLISIONDIRECTION::FRONT)
 		{
-			PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, -1));
 			nDieState |= DIESTATE_FRONT;
 		}
 		// 後
 		else if (Direct == COLLISIONDIRECTION::BACK)
 		{
-			PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, 1));
 			nDieState |= DIESTATE_BACK;
 		}
 		// 左
 		else if (Direct == COLLISIONDIRECTION::LEFT)
 		{
-			PushBlock(pBaseBlock, CBaseblock::GRID(1, 0, 0));
 			nDieState |= DIESTATE_LEFT;
 		}
 		// 右
 		else if (Direct == COLLISIONDIRECTION::RIGHT)
 		{
-			PushBlock(pBaseBlock, CBaseblock::GRID(-1, 0, 0));
 			nDieState |= DIESTATE_RIGHT;
 		}
 		// 上
@@ -621,20 +652,16 @@ void CPlayer::BlockCollision(void)
 			// ジャンプ可能設定
 			SetJumpAble(true);
 			nDieState |= DIESTATE_UP;
-			// プレイヤーが下のブロックに当たっている
-			bOn ^= true;
 		}
 		// 下
 		else if (Direct == COLLISIONDIRECTION::DOWN)
 		{
-			// プレイヤーがしたブロックに当たっている
-			bUnder ^= true;
 			nDieState |= DIESTATE_UNDER;
 		}
 	}
 	// 挟まったら死ぬ処理
-	if (nDieState == (DIESTATE_UP + DIESTATE_UNDER) ||
-		nDieState == (DIESTATE_LEFT + DIESTATE_RIGHT) ||
+	if (nDieState == (DIESTATE_UP + DIESTATE_UNDER)		||
+		nDieState == (DIESTATE_LEFT + DIESTATE_RIGHT)	||
 		nDieState == (DIESTATE_FRONT + DIESTATE_BACK)
 		)
 	{

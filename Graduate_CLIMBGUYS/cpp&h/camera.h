@@ -78,6 +78,8 @@ public:
 	static HRESULT Load(void);
 	// 破棄
 	static void Unload(void);
+	// 各モードのカメラの初期設定
+	void ModeCameraInit(void);
 	// カメラの情報初期化
 	void InfoInit(
 		D3DXVECTOR3 const &pos,	// 位置情報

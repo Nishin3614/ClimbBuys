@@ -33,13 +33,14 @@ public:
 	// テクスチャータイプ
 	typedef enum
 	{
-		TYPE_TESTFLOOR = 0,	// テスト用の床
-		TYPE_RESULT_LOG,	// リザルトのロゴ
-		TYPE_ANIBUTTON_LOG,	// AniButtonロゴ
-		TYPE_BG,			// ゲームの背景
-		TYPE_TUTORIALBOARD,	// チュートリアルの看板
-		TYPE_NONE,			// 背景なし
-		TYPE_MAX			// 最大数
+		TYPE_TESTFLOOR = 0,		// テスト用の床
+		TYPE_RESULT_LOG,		// リザルトのロゴ
+		TYPE_ANIBUTTON_LOG,		// AniButtonロゴ
+		TYPE_BG,				// ゲームの背景
+		TYPE_TUTORIALBOARD,		// チュートリアルの看板
+		TYPE_NONE,				// 背景なし
+		TYPE_TUTORIAL_FRAME,	// チュートリアルの枠
+		TYPE_MAX				// 最大数
 	} TYPE;
 	/* 関数 */
 	// コンストラクタ

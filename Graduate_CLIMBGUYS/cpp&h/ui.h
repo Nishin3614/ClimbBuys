@@ -42,6 +42,7 @@ public:
 	{
 		UITYPE_TILTE = 0,		// タイトルUI
 		UITYPE_RESULT,			// リザルトUI
+		UITYPE_TUTORIAL,		// チュートリアルUI
 		UITYPE_MAX
 	} UITYPE;
 	// UIの情報格納用型名

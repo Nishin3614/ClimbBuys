@@ -59,5 +59,6 @@ public:
 protected:
 private:
 	int	m_nDeterminationCnt;
+	static CPlayer *m_pPlayer[(int)PLAYER_TAG::PLAYER_MAX];		// プレイヤーのポインタ
 };
 #endif

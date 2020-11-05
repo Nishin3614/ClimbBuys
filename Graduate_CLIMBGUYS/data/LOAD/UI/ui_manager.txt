@@ -1,2 +1,3 @@
 data/LOAD/UI/Title.txt
 data/LOAD/UI/Result.txt
+data/LOAD/UI/Tutorial.txt

@@ -161,9 +161,12 @@ void CPlayer::Update(void)
 
 	// €–S”»’è‚ªo‚½‚çƒŠƒUƒ‹ƒg‚É‘JˆÚ‚·‚é
 	if (GetDie())
-	{
-		// €–SŠÖ”
-		Die();
+	{	// ƒQ[ƒ€‚Ì‚Æ‚«
+		if (CManager::GetMode() == CManager::MODE_GAME)
+		{
+			// €–SŠÖ”
+			Die();
+		}
 	}
 }
 

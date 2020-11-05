@@ -413,8 +413,8 @@ public:
 	);
 	// 内積の計算
 	static float Dot_product(
-		D3DXVECTOR3 &VecA,
-		D3DXVECTOR3 &VecB
+		D3DXVECTOR3 const & VecA,	// VectorA
+		D3DXVECTOR3 const & VecB	// VectorB
 	);
 	// 四角形の中に入っているかいないか
 	static bool SquareBottom_Judg(
@@ -502,6 +502,17 @@ public:
 	static D3DXVECTOR3 TwoLine_Inse(
 		D3DXVECTOR2 ALinear,	// 線①
 		D3DXVECTOR2 BLinear	// 線②
+	);
+	// ポリゴンと線分の当たり判定処理
+	//	PolygonVtx	: ポリゴン頂点
+	// 	PolygonNor	: ポリゴン法線
+	// 	LineBegin	: 線の始点
+	// 	LineEnd		: 線の終点
+	static bool PolygonToLineCollision(
+		D3DXVECTOR3 const & PolygonVtx,	//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const & PolygonNor,	// 	PolygonNor	: ポリゴン法線
+		D3DXVECTOR3 const & LineBegin,	// 	LineBegin	: 線の始点
+		D3DXVECTOR3 const & LineEnd		// 	LineEnd		: 線の終点
 	);
 	// 途中の計算
 	static bool TlyCollision(

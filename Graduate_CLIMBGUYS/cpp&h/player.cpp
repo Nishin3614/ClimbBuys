@@ -565,6 +565,17 @@ void CPlayer::BlockCollision(void)
 		// ダッシュ状態なら
 		if (m_bDashFlag)
 		{
+			// 方向に直線を出し
+			// 線とポリゴンで判定を取る
+			//CCalculation::PolygonToLineCollision(
+			//
+			//);
+
+
+
+
+
+
 			// 当たり判定
 			Direct = pBaseBlock->PushCollision(
 				CCharacter::GetObj(),

@@ -46,7 +46,10 @@ D3DXVECTOR3 CCalculation::Cross_product(
 // ----------------------------------------------------------------------------------------------------
 // 内積の計算
 // ----------------------------------------------------------------------------------------------------
-float CCalculation::Dot_product(D3DXVECTOR3 &VecA, D3DXVECTOR3 &VecB)
+float CCalculation::Dot_product(
+	D3DXVECTOR3 const & VecA,	// VectorA
+	D3DXVECTOR3 const & VecB	// VectorB
+)
 {
 	return (
 		VecA.x * VecB.x +
@@ -574,6 +577,51 @@ D3DXVECTOR3 CCalculation::TwoLine_Inse(D3DXVECTOR2 ALinear, D3DXVECTOR2 BLinear)
 	Insecsion.y = ALinear.x * Insecsion.x + ALinear.y;
 	// 交点を返す
 	return Insecsion;
+}
+
+// ----------------------------------------------------------------------------------------------------
+// ポリゴンと線分の当たり判定処理
+//	PolygonVtx	: ポリゴン頂点
+// 	PolygonNor	: ポリゴン法線
+// 	LineBegin	: 線の始点
+// 	LineEnd		: 線の終点
+// ----------------------------------------------------------------------------------------------------
+bool CCalculation::PolygonToLineCollision(
+	D3DXVECTOR3 const & PolygonVtx,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const & PolygonNor,	// 	PolygonNor	: ポリゴン法線
+	D3DXVECTOR3 const & LineBegin,	// 	LineBegin	: 線の始点
+	D3DXVECTOR3 const & LineEnd		// 	LineEnd		: 線の終点
+)
+{
+	// 変数宣言
+	D3DXVECTOR3
+		Vec1,	// vector1
+		Vec2;	// vector2
+	float
+		fDist1,	// 距離1
+		fDist2;	// 距離2
+	// 方向の設定
+	Vec1 = LineBegin - PolygonVtx;
+	Vec2 = LineEnd - PolygonVtx;
+	// それぞれの点の距離の設定
+	fDist1 = Dot_product(Vec1, PolygonNor);
+	fDist2 = Dot_product(Vec2, PolygonNor);
+	// 平面と線分が衝突を起こしているかどうか
+	if (fDist1 * fDist2 > 0) return false;	// 衝突していなければ関数を抜ける
+	// それぞれの距離の絶対値を算出
+	fDist1 = fabsf(fDist1);
+	fDist2 = fabsf(fDist2);
+	// 変数宣言
+	float		Ratio;	// 内分比
+	D3DXVECTOR3 Vec3;	// Vec3
+	D3DXVECTOR3 Point3;	// ポリゴンと線分の衝突点
+	// 内分比を求める
+	Ratio = fDist1 / (fDist1 - fDist2);
+	// 内分を求める
+	Vec3 = (1 - Ratio) * Vec1 + Ratio * Vec2;
+	// ポリゴンと線分の衝突点
+	Point3 = PolygonVtx + Vec3;
+	return true;
 }
 
 // ----------------------------------------------------------------------------------------------------

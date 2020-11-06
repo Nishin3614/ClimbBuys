@@ -44,7 +44,6 @@
 // 静的変数宣言
 //
 // ------------------------------------------
-CPlayer *CTutorial::m_pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 // ------------------------------------------
 // コンストラクタ
@@ -53,8 +52,6 @@ CTutorial::CTutorial()
 {
 	// ステージ決定カウントを設定
 	m_nDeterminationCnt = 120;
-	// プレイヤーのポインタ初期化
-	m_pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 }
 
 // ------------------------------------------
@@ -85,12 +82,15 @@ void CTutorial::Init(void)
 
 	//// 床の生成
 	//CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
-
-	// プレイヤーの生成	試験的
-	m_pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(0.0f, 300.0f, 0.0f));
-	m_pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
 	////// 足場の生成
 	//CStand::CreateStand_Tutorial();
+
+	// プレイヤー
+	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	// プレイヤーの生成	試験的
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(0.0, 300.0f, 0.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
 
 	// ダメージ床の生成
 	CDamageFloor::Create();
@@ -151,26 +151,6 @@ void CTutorial::Update(void)
 		m_nDeterminationCnt = 120;
 	}
 
-	// 試験的プレイヤーのリスポーン
-	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
-	{
-		// 死んだとき
-		if (m_pPlayer[nCnt]->GetDie())
-		{
-			// 死亡フラグをオフ
-			m_pPlayer[nCnt]->SetDie(false);
-			// 初期値に戻す
-			switch (nCnt)
-			{
-			case (int)PLAYER_TAG::PLAYER_1:
-				m_pPlayer[nCnt]->SetPos(D3DXVECTOR3(0.0f, 300.0f, 0.0f));
-				break;
-			case (int)PLAYER_TAG::PLAYER_2:
-				m_pPlayer[nCnt]->SetPos(D3DXVECTOR3(0.0f, 300.0f, 0.0f));
-				break;
-			}
-		}
-	}
 
 	// モード更新
 	CBaseMode::Update();

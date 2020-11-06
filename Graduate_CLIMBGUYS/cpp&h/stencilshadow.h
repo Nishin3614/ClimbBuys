@@ -146,7 +146,6 @@ private:
 	static int CStencilshadow::m_nTexId[TYPE_MAX];	// テクスチャーID
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;				// 頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9	m_pIndex;				// インデックスバッファのポインタ
-	D3DXVECTOR3 m_OriginBlock;						// 初期配置
 	D3DXMATRIX  m_mtxWorld;							// ワールドマトリックス
 	D3DXVECTOR3 m_pos;								// 位置
 	D3DXVECTOR3 m_size;								// サイズ

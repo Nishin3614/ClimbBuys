@@ -200,9 +200,8 @@ void CCharacter::Update(void)
 	{
 		// 位置取得
 		D3DXVECTOR3 pos = m_pos;
-		pos.y = -1000.0f;
 		// ステンシルシャドウの位置設定
-		m_pStencilshadow->SetPos(pos);
+		m_pStencilshadow->SetPos(m_pos);
 	}
 }
 

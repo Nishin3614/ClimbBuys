@@ -479,6 +479,7 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 	VERTEX_3D *pVtx;			// 頂点情報へのポイント
 	WORD * pIdx;				// インデックスデータへのポインタを取得
 	D3DXVECTOR3 VecA, VecB;		// ベクトル
+	float fOriginY;				// yの位置
 	int nCountDirect;			// 縦のカウント
 	int nCountWidth;			// 横のカウント
 	float fAngle;				// yの角度
@@ -488,10 +489,7 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 		new D3DXVECTOR3[m_nBlock_Width * m_nBlock_Depth * 2];
 
 	// ブロック描画の原点の初期設定
-	m_OriginBlock = D3DXVECTOR3(
-		m_size.x * -0.5f * m_nBlock_Width,
-		0.0f,
-		m_size.z * 0.5f * m_nBlock_Depth);
+	fOriginY = -m_size.y * m_nBlock_Depth;
 	// 総頂点数・インデックス・ポリゴンの初期設定(計算)
 	m_nNumberVertex =
 		(m_nBlock_Depth + 1) * (m_nBlock_Width + 1);
@@ -544,7 +542,7 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 			pVtx[0].pos =
 				D3DXVECTOR3(
 				(sinf(fRadian) * m_size.x),
-					m_size.y * nCountDirect,
+					fOriginY + m_size.y * nCountDirect,
 					(cosf(fRadian) * m_size.z));
 			// 法線ベクトルの設定
 			pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);

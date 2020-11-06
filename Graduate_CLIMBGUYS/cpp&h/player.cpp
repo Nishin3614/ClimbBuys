@@ -31,7 +31,7 @@
 #define DASH_TIME_MAX				(30)		// ダッシュしている時間
 #define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
 #define PLAYER_STATUS_TXT			("data/LOAD/STATUS/PlayerStatus.txt")	// プレイヤーのステータスのテキスト
-
+#define RESPAWN_POS					(D3DXVECTOR3(0.0f, 300.0f, 0.0f))		// リスポーン地点
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // 静的変数宣言
@@ -166,6 +166,14 @@ void CPlayer::Update(void)
 		{
 			// 死亡関数
 			Die();
+		}
+		// チュートリアルのとき
+		else if (CManager::GetMode() == CManager::MODE_TUTORIAL)
+		{
+			// 死亡判定をオフにする ( 復活 )
+			SetDie(false);
+			// リスポーン位置の設定
+			SetPos(RESPAWN_POS);
 		}
 	}
 }
@@ -568,6 +576,17 @@ void CPlayer::BlockCollision(void)
 		// ダッシュ状態なら
 		if (m_bDashFlag)
 		{
+			// 方向に直線を出し
+			// 線とポリゴンで判定を取る
+			//CCalculation::PolygonToLineCollision(
+			//
+			//);
+
+
+
+
+
+
 			// 当たり判定
 			Direct = pBaseBlock->PushCollision(
 				CCharacter::GetObj(),

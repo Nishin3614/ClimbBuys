@@ -79,6 +79,14 @@ CSound::~CSound()
 // ----------------------------------------
 HRESULT CSound::Init(HWND hWnd)
 {
+	// ミュートにしない
+	m_bMute = false;
+
+#ifdef _DEBUG
+	// デバッグ時ミュートにする
+	m_bMute = true;
+#endif // _DEBUG
+
 	// スクリプトの読み込み
 	Load();
 	// オーディオの生成
@@ -167,89 +175,93 @@ HRESULT CSound::PlaySound(
 	LABEL const &label		// ラベル
 )
 {
-	// 変数宣言
-	XAUDIO2_VOICE_STATE xa2state;
-	XAUDIO2_BUFFER buffer;
-
-	// バッファの値設定
-	memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
-	buffer.AudioBytes = m_aSizeAudio[label];
-	buffer.pAudioData = m_apDataAudio[label];
-	buffer.Flags = XAUDIO2_END_OF_STREAM;
-	buffer.LoopCount = m_vec_nLoop[label];
-
-	// BGMの場合
-	if (m_vec_SoundType[label] == SOUND_BGM)
+	// ミュートしていないとき
+	if (!m_bMute)
 	{
-		if (m_SourceBGM == NULL)
+		// 変数宣言
+		XAUDIO2_VOICE_STATE xa2state;
+		XAUDIO2_BUFFER buffer;
+
+		// バッファの値設定
+		memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
+		buffer.AudioBytes = m_aSizeAudio[label];
+		buffer.pAudioData = m_apDataAudio[label];
+		buffer.Flags = XAUDIO2_END_OF_STREAM;
+		buffer.LoopCount = m_vec_nLoop[label];
+
+		// BGMの場合
+		if (m_vec_SoundType[label] == SOUND_BGM)
 		{
-			return E_FAIL;
-		}
-		// 状態取得
-		m_SourceBGM->GetState(&xa2state);
-		// 再生中
-		if (xa2state.BuffersQueued != 0)
-		{
-			// 一時停止
-			m_SourceBGM->Stop(0);
-			// オーディオバッファの削除
-			m_SourceBGM->FlushSourceBuffers();
-		}
-		// オーディオバッファの登録
-		m_SourceBGM->SubmitSourceBuffer(&buffer);
-		//m_SourceBGM->SetVolume(10);
-		// 再生
-		m_SourceBGM->Start(0);
-	}
-	// SEの場合
-	else if(m_vec_SoundType[label] == SOUND_SE)
-	{
-		// 使われていないソースで再生する
-		for (int nCntSE = 0; nCntSE < MAX_SE; nCntSE++)
-		{
-			// ヌルだったらループスキップ
-			if (m_apSourceSE[nCntSE] == NULL)
+			if (m_SourceBGM == NULL)
 			{
-				continue;
+				return E_FAIL;
 			}
 			// 状態取得
-			m_apSourceSE[nCntSE]->GetState(&xa2state);
-			// 再生中だったらループスキップ
+			m_SourceBGM->GetState(&xa2state);
+			// 再生中
 			if (xa2state.BuffersQueued != 0)
 			{
-				continue;
+				// 一時停止
+				m_SourceBGM->Stop(0);
+				// オーディオバッファの削除
+				m_SourceBGM->FlushSourceBuffers();
 			}
 			// オーディオバッファの登録
-			m_apSourceSE[nCntSE]->SubmitSourceBuffer(&buffer);
+			m_SourceBGM->SubmitSourceBuffer(&buffer);
+			//m_SourceBGM->SetVolume(10);
 			// 再生
-			m_apSourceSE[nCntSE]->Start(0);
+			m_SourceBGM->Start(0);
+		}
+		// SEの場合
+		else if (m_vec_SoundType[label] == SOUND_SE)
+		{
+			// 使われていないソースで再生する
+			for (int nCntSE = 0; nCntSE < MAX_SE; nCntSE++)
+			{
+				// ヌルだったらループスキップ
+				if (m_apSourceSE[nCntSE] == NULL)
+				{
+					continue;
+				}
+				// 状態取得
+				m_apSourceSE[nCntSE]->GetState(&xa2state);
+				// 再生中だったらループスキップ
+				if (xa2state.BuffersQueued != 0)
+				{
+					continue;
+				}
+				// オーディオバッファの登録
+				m_apSourceSE[nCntSE]->SubmitSourceBuffer(&buffer);
+				// 再生
+				m_apSourceSE[nCntSE]->Start(0);
+				return S_OK;
+			}
+		}
+		// VOICEの場合
+		else if (m_vec_SoundType[label] == SOUND_VOICE)
+		{
+			// ヌルだったらループスキップ
+			if (m_pSoureceVOICE == NULL)
+			{
+				return E_FAIL;
+			}
+			//m_pSoureceVOICE->SetVolume()
+			// 状態取得
+			m_pSoureceVOICE->GetState(&xa2state);
+			// 再生中だったら停止する
+			if (xa2state.BuffersQueued != 0)
+			{
+				// 一時停止
+				m_pSoureceVOICE->Stop(0);
+				// オーディオバッファの削除
+				m_pSoureceVOICE->FlushSourceBuffers();
+			}
+			// オーディオバッファの登録
+			m_pSoureceVOICE->SubmitSourceBuffer(&buffer);
+			// 再生
+			m_pSoureceVOICE->Start(0);
 			return S_OK;
 		}
-	}
-	// VOICEの場合
-	else if (m_vec_SoundType[label] == SOUND_VOICE)
-	{
-		// ヌルだったらループスキップ
-		if (m_pSoureceVOICE == NULL)
-		{
-			return E_FAIL;
-		}
-		//m_pSoureceVOICE->SetVolume()
-		// 状態取得
-		m_pSoureceVOICE->GetState(&xa2state);
-		// 再生中だったら停止する
-		if (xa2state.BuffersQueued != 0)
-		{
-			// 一時停止
-			m_pSoureceVOICE->Stop(0);
-			// オーディオバッファの削除
-			m_pSoureceVOICE->FlushSourceBuffers();
-		}
-		// オーディオバッファの登録
-		m_pSoureceVOICE->SubmitSourceBuffer(&buffer);
-		// 再生
-		m_pSoureceVOICE->Start(0);
-		return S_OK;
 	}
 	return S_OK;
 }
@@ -392,7 +404,6 @@ HRESULT CSound::AudioCreate(HWND hWnd)
 		CoUninitialize();
 		return E_FAIL;
 	}
-
 	return S_OK;
 }
 

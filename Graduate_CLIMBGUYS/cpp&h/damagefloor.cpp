@@ -59,13 +59,11 @@ void CDamageFloor::Init(void)
 
 	// デバッグ時のみ赤く表示
 #ifdef _DEBUG
-	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 #endif // _DEBUG
 
 	// シーン3Dの初期化
 	CScene_THREE::Init();
-
-	SetPos(D3DXVECTOR3(0.0, -500.0f, 0.0f));
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -126,6 +124,9 @@ CDamageFloor * CDamageFloor::Create()
 	pDamageFloor->SetSize(FIELD_SIZE);
 	// 初期化処理
 	pDamageFloor->Init();
+	// テクスチャの貼り付け
+	pDamageFloor->SetTexType(CTexture_manager::TYPE_MAGMA);
+
 	// 生成したオブジェクトを返す
 	return pDamageFloor;
 }

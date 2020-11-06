@@ -40,6 +40,7 @@ public:
 		TYPE_TUTORIALBOARD,		// チュートリアルの看板
 		TYPE_NONE,				// 背景なし
 		TYPE_TUTORIAL_FRAME,	// チュートリアルの枠
+		TYPE_MAGMA,				// ダメージ床用マグマ
 		TYPE_MAX				// 最大数
 	} TYPE;
 	/* 関数 */

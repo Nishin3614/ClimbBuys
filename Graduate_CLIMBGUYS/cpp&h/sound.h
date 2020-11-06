@@ -41,7 +41,8 @@ public:
 	// ラベル
 	typedef enum
 	{
-		LABEL_BGM_TITLE = 0,	// バルーンを割った音1
+		LABEL_BGM_GAME = 0,		// ゲーム
+		LABEL_BGM_TUTORIAL,		// チュートリアル
 		LABEL_MAX,				// 最大数
 	} LABEL;
 	/* 関数 */

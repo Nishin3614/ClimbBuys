@@ -161,20 +161,9 @@ void CPlayer::Update(void)
 
 	// 死亡判定が出たらリザルトに遷移する
 	if (GetDie())
-	{	// ゲームのとき
-		if (CManager::GetMode() == CManager::MODE_GAME)
-		{
-			// 死亡関数
-			Die();
-		}
-		// チュートリアルのとき
-		else if (CManager::GetMode() == CManager::MODE_TUTORIAL)
-		{
-			// 死亡判定をオフにする ( 復活 )
-			SetDie(false);
-			// リスポーン位置の設定
-			SetPos(RESPAWN_POS);
-		}
+	{
+		// 死亡関数
+		Die();
 	}
 }
 
@@ -727,7 +716,6 @@ void CPlayer::CharacterCollision(void)
 		// プレイヤーは死ぬ
 		Die();
 	}
-
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1343,18 +1331,37 @@ void CPlayer::Draw(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Die(void)
 {
-	// 死亡処理
-	CCharacter::Die();
-#ifdef _DEBUG
-	// 当たり判定ボックスの開放
-	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
+	// パーティクル生成
+	C3DParticle::Create(
+		C3DParticle::PARTICLE_ID_UNKNOWN,
+		m_pos
+	);
+
+	// チュートリアル以外のとき死ぬ
+	if (CManager::GetMode() != CManager::MODE_TUTORIAL)
 	{
-		// NULLチェック
-		if (pCollisionBox[nCntCollision] == NULL) continue;
-		pCollisionBox[nCntCollision]->Release();
-		pCollisionBox[nCntCollision] = NULL;
-	}
+		// 死亡処理
+		CCharacter::Die();
+
+#ifdef _DEBUG
+		// 当たり判定ボックスの開放
+		for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
+		{
+			// NULLチェック
+			if (pCollisionBox[nCntCollision] == NULL) continue;
+			pCollisionBox[nCntCollision]->Release();
+			pCollisionBox[nCntCollision] = NULL;
+		}
 #endif // _DEBUG
+	}
+	// チュートリアルのときリスポーンする
+	else
+	{
+		// 死亡判定をオフにする ( 復活 )
+		SetDie(false);
+		// リスポーン位置の設定
+		SetPos(RESPAWN_POS);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

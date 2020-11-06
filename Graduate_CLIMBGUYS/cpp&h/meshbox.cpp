@@ -146,7 +146,7 @@ void CMeshBox::Draw()
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
 		//テクスチャの設定
-		pDevice->SetTexture(0, CTexture_manager::GetTexture(5));
+		pDevice->SetTexture(0, CTexture_manager::GetTexture(CTexture_manager::TYPE_NONE));
 
 		// 裏面カリング
 		CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLBACK);

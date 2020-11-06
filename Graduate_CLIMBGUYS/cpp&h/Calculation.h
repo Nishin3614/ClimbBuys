@@ -112,6 +112,8 @@ enum class PLAYER_TAG
 	NONE = -1,
 	PLAYER_1,			// プレイヤー1
 	PLAYER_2,			// プレイヤー2
+	PLAYER_3,			// プレイヤー3
+	PLAYER_4,			// プレイヤー4
 	PLAYER_MAX,			// 最大数
 };
 // タグを管理するクラス

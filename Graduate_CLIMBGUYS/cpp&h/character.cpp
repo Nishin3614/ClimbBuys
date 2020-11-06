@@ -529,11 +529,6 @@ void CCharacter::Die(void)
 		m_pStencilshadow->Release();
 		m_pStencilshadow = NULL;
 	}
-	// パーティクル生成
-	C3DParticle::Create(
-		C3DParticle::PARTICLE_ID_UNKNOWN,
-		m_pos
-	);
 
 	// 総キャラクターカウントダウン
 	m_nAllCharacter--;

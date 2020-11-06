@@ -45,10 +45,14 @@ public:
 	// İ’è //
 
 	// æ“¾ //
+	float GetDamageFloorMoveSpeed() { return m_MoveSpeed; };// °‚ÌˆÚ“®‘¬“x‚Ìæ“¾
 protected:
 private:
 	/* ŠÖ” */
 	void ComparisonHeight();							// ‚‚³‚ğ”äŠr
+	void Move();										// °‚ÌˆÚ“®
 	/* •Ï” */
+	float m_MoveSpeed;									// ˆÚ“®—Ê‚Ì‘¬‚³
+	int m_AscendUpToTime;								// °‚Ìã¸‚ªn‚Ü‚é‚Ü‚Å‚ÌŠÔ ‰¼
 };
 #endif

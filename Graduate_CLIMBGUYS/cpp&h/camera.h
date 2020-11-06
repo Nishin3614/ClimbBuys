@@ -135,10 +135,15 @@ private:
 	void Init_Tutorial(void);
 	// タイトル初期化処理
 	void Init_Title(void);
+	// ゲーム初期化処理
+	void Init_Game(void);
 	// チュートリアル更新処理
 	void Update_Tutorial(void);
 	// タイトル更新処理
 	void Update_Title(void);
+	// ゲーム更新処理
+	void Update_Game(void);
+
 
 	// 初期時のカメラ設定
 	void InitCamera(void);

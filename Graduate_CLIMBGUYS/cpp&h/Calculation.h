@@ -385,6 +385,12 @@ public:
 		D3DXVECTOR3 &posA,
 		D3DXVECTOR3 &posB
 	);
+	// 2点の距離を絶対値をで求める
+	static float Range_Absolute(
+		const float & posA,
+		const float & posB
+	);
+
 	// 間の差の計算(3D用:位置、位置)
 	static float DiffPoint(
 		D3DXVECTOR3 const & posA,

@@ -115,7 +115,7 @@ void CTutorial::Uninit(void)
 // ------------------------------------------
 void CTutorial::Update(void)
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
@@ -134,7 +134,7 @@ void CTutorial::Update(void)
 	}
 
 	CDebugproc::Print("チュートリアルカウント < %d\n" ,m_nDeterminationCnt);
-#endif // _DEBUG
+//#endif // _DEBUG
 
 	// カウントが0以下になったらゲームに移動
 	if (m_nDeterminationCnt <= 0)

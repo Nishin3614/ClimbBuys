@@ -86,6 +86,8 @@ void CGame::Init(void)
 	// プレイヤーの生成	試験的
 	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1,D3DXVECTOR3(0.0,300.0f,0.0f));
 	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(0.0, 300.0f, 100.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(100.0f, 300.0f, 100.0f));
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);

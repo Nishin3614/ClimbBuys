@@ -58,9 +58,7 @@ void CDamageFloor::Init(void)
 	m_AscendUpToTime = 3600;
 
 	// デバッグ時のみ赤く表示
-#ifdef _DEBUG
 	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-#endif // _DEBUG
 
 	// シーン3Dの初期化
 	CScene_THREE::Init();

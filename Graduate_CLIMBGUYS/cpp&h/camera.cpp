@@ -187,7 +187,7 @@ void CCamera::Init_Title(void)
 void CCamera::Init_Game(void)
 {
 	// ’‹“_ˆÊ’u
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posR = D3DXVECTOR3(0.0f, -130.0f, 140.0f);
 	m_fLength = 750.0f;
 	m_fHeight = 1000.0f;
 	// ‰ñ“]‰ñ”

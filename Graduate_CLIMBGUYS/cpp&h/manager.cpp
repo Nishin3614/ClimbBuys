@@ -283,6 +283,10 @@ void CManager::SetMode(MODE const &mode)
 		delete m_BaseMode;
 		m_BaseMode = NULL;
 	}
+
+	// 全音楽の停止
+	CManager::GetSound()->StopSound();
+
 	// 前のモード終了
 	switch (m_mode)
 	{
@@ -314,18 +318,23 @@ void CManager::SetMode(MODE const &mode)
 	case MODE_TITLE:
 		// タイトル生成
 		m_BaseMode = CTitle::Create();
+		// ゲーム音
+		CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
 		break;
 		// チュートリアル
 	case MODE_TUTORIAL:
 		// チュートリアル生成
 		m_BaseMode = CTutorial::Create();
 		// チュートリアルBGM
+		CManager::GetSound()->PlaySound(CSound::LABEL_BGM_TUTORIAL);
 		break;
 		// ゲーム
 	case MODE_GAME:
 		// ゲーム生成
 		m_BaseMode = CGame::Create();
 		// ゲームBGM
+		CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
+
 		break;
 		// リザルト
 	case MODE_RESULT:

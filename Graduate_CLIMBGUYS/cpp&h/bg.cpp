@@ -87,7 +87,7 @@ CBg *CBg::Create()
 	pBg->SetSize(SCREEN_SIZE);
 
 	// テクスチャの設定
-	pBg->BindTexture(3);
+	pBg->BindTexture(CTexture_manager::TYPE_BG);
 
 	// 色の設定
 	pBg->SetCol(D3DXCOLOR_INI);

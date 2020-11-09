@@ -19,6 +19,7 @@
 #include "debugproc.h"
 #include "meshbox.h"
 #include "stand.h"
+#include "playerUI.h"
 #include "3Dline.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +51,9 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_bDashFlag			= false;				// ダッシュフラグ
 	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
 	m_PlayerStatusInit	= m_PlayerStatus;		// プレイヤーの初期ステータス
+	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX;nCntCollision++)
@@ -79,6 +82,10 @@ void CPlayer::Init(void)
 
 	// パッドのポインタ取得
 	m_pPad = CManager::CManager::GetPad(GetPlayerTag());
+
+	// プレイヤーUIの生成
+	m_pPlayerUI = CPlayerUI::Create(GetPlayerTag());
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
@@ -113,6 +120,10 @@ void CPlayer::Uninit(void)
 {
 	// キャラクター終了処理
 	CCharacter::Uninit();
+
+	// プレイヤーUIの初期化
+	m_pPlayerUI = nullptr;
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
@@ -130,6 +141,11 @@ void CPlayer::Update(void)
 {
 	// 自キャラの行動処理
 	MyAction();
+
+	if (m_pPlayerUI)
+	{	// プレイヤーUIの位置の設定
+		m_pPlayerUI->SetPos(GetPos() + D3DXVECTOR3(0.0f, 80.0f, 0.0f));
+	}
 
 	// モーション設定処理
 	StatusMotion();
@@ -1421,6 +1437,13 @@ void CPlayer::Die(void)
 	// チュートリアル以外のとき死ぬ
 	if (CManager::GetMode() != CManager::MODE_TUTORIAL)
 	{
+		if (m_pPlayerUI)
+		{
+			// プレイヤーUIを開放
+			m_pPlayerUI->Release();
+			m_pPlayerUI = nullptr;
+		}
+
 		// 死亡処理
 		CCharacter::Die();
 

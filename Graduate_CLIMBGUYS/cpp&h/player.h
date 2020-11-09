@@ -27,7 +27,9 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CMeshBox;	// メッシュボックスクラス
+class CMeshBox;		// メッシュボックスクラス
+class CPlayerUI;	// プレイヤーUI
+
 class C3DLine;	// 3D線クラス
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -206,12 +208,13 @@ private:
 	void PlayerStatusInitLoad(void);
 
 	/* 変数 */
-	CXInputPad				*m_pPad;						// パッドのポインタ
-	bool					m_bDieFlag;						// 死亡フラグ
-	bool					m_bDashFlag;					// ダッシュフラグ
-	int						m_nCntDashTime;					// ダッシュ中の切り替えカウント
-	static PLAYER_STATUS	m_PlayerStatus;					// プレイヤーのステータス
-	PLAYER_STATUS			m_PlayerStatusInit;				// プレイヤーの初期ステータス
+	CXInputPad					*m_pPad;						// パッドのポインタ
+	bool						m_bDieFlag;						// 死亡フラグ
+	bool						m_bDashFlag;					// ダッシュフラグ
+	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
+	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
+	PLAYER_STATUS				m_PlayerStatusInit;				// プレイヤーの初期ステータス
+	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];

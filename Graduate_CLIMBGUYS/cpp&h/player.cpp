@@ -88,6 +88,7 @@ void CPlayer::Init(void)
 			// 薄青色に
 			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 		}
+		/*
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
@@ -96,6 +97,7 @@ void CPlayer::Init(void)
 			// 薄青色に
 			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
 		}
+		*/
 	}
 #endif // _DEBUG
 }
@@ -146,6 +148,7 @@ void CPlayer::Update(void)
 			// サイズ設定
 			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PlayerSize);
 		}
+		/*
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
@@ -154,6 +157,7 @@ void CPlayer::Update(void)
 			// サイズ設定
 			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PushSize);
 		}
+		*/
 		// 頂点座標の設定
 		pCollisionBox[nCntCollision]->SetVtxPos();
 	}
@@ -551,7 +555,7 @@ void CPlayer::BlockCollision(void)
 	int nDieState = 0b000000;								// 死ぬ状態
 	float fDistance = -1.0f;								// 距離
 	D3DXVECTOR3 PredictionPoint;							// 予測点
-	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize.x, 0.0f, cosf(m_rot.y) * m_PlayerStatus.PushSize.x);
+	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize, 0.0f, cosf(m_rot.y) * m_PlayerStatus.PushSize);
 	Pushblock = CBaseblock::PUSHBLOCK(NULL, -1.0f, Direct);
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)

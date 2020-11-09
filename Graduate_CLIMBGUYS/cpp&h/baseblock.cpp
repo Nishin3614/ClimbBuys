@@ -502,7 +502,37 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 		Direct = COLLISIONDIRECTION::RIGHT;
 	}
 
-	return COLLISIONDIRECTION::NONE;
+	// ‰œ‚Ìƒ|ƒŠƒSƒ“‚Ì”»’è
+	if (CCalculation::PolygonToLineCollision(
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(0.0f, 0.0f, 1.0f),
+		LineBegin,
+		LineEnd,
+		fDistance
+	))
+	{
+		Direct = COLLISIONDIRECTION::FRONT;
+	}
+
+	// Žè‘O‚Ìƒ|ƒŠƒSƒ“‚Ì”»’è
+	if (CCalculation::PolygonToLineCollision(
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(0.0f, 0.0f, -1.0f),
+		LineBegin,
+		LineEnd,
+		fDistance
+	))
+	{
+		Direct = COLLISIONDIRECTION::BACK;
+	}
+
+	return Direct;
 }
 
 

@@ -567,13 +567,26 @@ public:
 		D3DXVECTOR3 *PosB,
 		D3DXVECTOR3 *PosC
 	);
-	// 外積の当たり判定
+	// 外積の当たり判定(X)
 	//	ObjectPos	: オブジェクトの位置
 	//	PosA		: 位置A
 	//	PosB		: 位置B
 	//	PosC		: 位置C
 	//	PosD		: 位置D
-	static bool PolygonToPointIn(
+	static bool PolygonToPointIn_X(
+		D3DXVECTOR3 const & ObjectPos,	// オブジェクトの位置
+		D3DXVECTOR3 const & PosA,		// 位置A
+		D3DXVECTOR3 const & PosB,		// 位置B
+		D3DXVECTOR3 const & PosC,		// 位置C
+		D3DXVECTOR3 const & PosD		// 位置D
+	);
+	// 外積の当たり判定(Z)
+	//	ObjectPos	: オブジェクトの位置
+	//	PosA		: 位置A
+	//	PosB		: 位置B
+	//	PosC		: 位置C
+	//	PosD		: 位置D
+	static bool PolygonToPointIn_Z(
 		D3DXVECTOR3 const & ObjectPos,	// オブジェクトの位置
 		D3DXVECTOR3 const & PosA,		// 位置A
 		D3DXVECTOR3 const & PosB,		// 位置B

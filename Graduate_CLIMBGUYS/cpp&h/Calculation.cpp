@@ -635,8 +635,10 @@ bool CCalculation::PolygonToLineCollision(
 	float		Ratio;	// 内分比
 	D3DXVECTOR3 Vec3;	// Vec3
 	D3DXVECTOR3 Point3 = D3DXVECTOR3(-100.0f,-100.0f,-100.0f);	// ポリゴンと線分の衝突点
+	D3DXVECTOR3 LineVec = LineEnd - LineBegin;					// 始点から終点のベクトル
+	bool		bIn = false;									// 入っているかいないか
 	// 内分比を求める
-	Ratio = fDist1 / (fDist1 - fDist2);
+	Ratio = fabsf(fDist1) / (fabsf(fDist1) - fabsf(fDist2));
 	// 内分を求める
 	Vec3 = (1 - Ratio) * Vec1 + Ratio * Vec2;
 	// ポリゴンと線分の衝突点設定
@@ -645,25 +647,36 @@ bool CCalculation::PolygonToLineCollision(
 		Direction == COLLISIONDIRECTION::LEFT)
 	{
 		Point3.x = PolygonVtxA.x;
-		Point3.z = LineBegin.z;
+		Point3.z = LineBegin.z + (LineVec.z * Ratio);
 		Point3.y = LineBegin.y;
+
+		// ポリゴン内に点が入っていたら
+		bIn = PolygonToPointIn_X(
+			Point3,
+			PolygonVtxA,
+			PolygonVtxB,
+			PolygonVtxC,
+			PolygonVtxD
+		);
 	}
 	// 奥と手前の場合
 	else if (Direction == COLLISIONDIRECTION::FRONT ||
 		Direction == COLLISIONDIRECTION::BACK)
 	{
-		Point3.x = LineBegin.x;
+		Point3.x = LineBegin.x + (LineVec.x * Ratio);
 		Point3.z = PolygonVtxA.z;
 		Point3.y = LineBegin.y;
+		// ポリゴン内に点が入っていたら
+		bIn = PolygonToPointIn_Z(
+			Point3,
+			PolygonVtxA,
+			PolygonVtxB,
+			PolygonVtxC,
+			PolygonVtxD
+		);
 	}
 	// ポリゴン内に点が入っていたら
-	if (PolygonToPointIn(
-		Point3,
-		PolygonVtxA,
-		PolygonVtxB,
-		PolygonVtxC,
-		PolygonVtxD
-	))
+	if (bIn)
 	{
 		// 変数宣言
 		// その点とオブジェクトの距離を求める
@@ -848,14 +861,14 @@ bool CCalculation::CrossCollision(
 }
 
 // ----------------------------------------------------------------------------------------------------
-// 外積の当たり判定
+// 外積の当たり判定(X)
 //	ObjectPos	: オブジェクトの位置
 //	PosA		: 位置A
 //	PosB		: 位置B
 //	PosC		: 位置C
 //	PosD		: 位置D
 // ----------------------------------------------------------------------------------------------------
-bool CCalculation::PolygonToPointIn(
+bool CCalculation::PolygonToPointIn_X(
 	D3DXVECTOR3 const & ObjectPos,	// オブジェクトの位置
 	D3DXVECTOR3 const & PosA,		// 位置A
 	D3DXVECTOR3 const & PosB,		// 位置B
@@ -870,25 +883,69 @@ bool CCalculation::PolygonToPointIn(
 	VecCompOri = PosB - PosA;
 	VecAhe = ObjectPos - PosA;
 	D3DXVec3Cross(&Cross1, &VecCompOri, &VecAhe);
-	if (Cross1.y < 0) return false;
+	if (Cross1.x < 0) return false;
 	// 二つ目
 	VecCompOri = PosC - PosB;
 	VecAhe = ObjectPos - PosB;
 	D3DXVec3Cross(&Cross2, &VecCompOri, &VecAhe);
-	if (Cross2.y < 0) return false;
+	if (Cross2.x < 0) return false;
 	// 三つ目
 	VecCompOri = PosD - PosC;
 	VecAhe = ObjectPos - PosC;
 	D3DXVec3Cross(&Cross3, &VecCompOri, &VecAhe);
-	if (Cross3.y < 0) return false;
+	if (Cross3.x < 0) return false;
 	// 三つ目
 	VecCompOri = PosA - PosD;
 	VecAhe = ObjectPos - PosD;
 	D3DXVec3Cross(&Cross4, &VecCompOri, &VecAhe);
-	if (Cross4.y < 0) return false;
+	if (Cross4.x < 0) return false;
 	// 範囲に入っている
 	return true;
 }
+
+// ----------------------------------------------------------------------------------------------------
+// 外積の当たり判定(Z)
+//	ObjectPos	: オブジェクトの位置
+//	PosA		: 位置A
+//	PosB		: 位置B
+//	PosC		: 位置C
+//	PosD		: 位置D
+// ----------------------------------------------------------------------------------------------------
+bool CCalculation::PolygonToPointIn_Z(
+	D3DXVECTOR3 const & ObjectPos,	// オブジェクトの位置
+	D3DXVECTOR3 const & PosA,		// 位置A
+	D3DXVECTOR3 const & PosB,		// 位置B
+	D3DXVECTOR3 const & PosC,		// 位置C
+	D3DXVECTOR3 const & PosD		// 位置D
+)
+{
+	// 変数宣言
+	D3DXVECTOR3 VecCompOri, VecAhe;				// ベクトル方向
+	D3DXVECTOR3 Cross1, Cross2, Cross3, Cross4;	// 外積の計算結果
+												// 一つ目
+	VecCompOri = PosB - PosA;
+	VecAhe = ObjectPos - PosA;
+	D3DXVec3Cross(&Cross1, &VecCompOri, &VecAhe);
+	if (Cross1.z < 0) return false;
+	// 二つ目
+	VecCompOri = PosC - PosB;
+	VecAhe = ObjectPos - PosB;
+	D3DXVec3Cross(&Cross2, &VecCompOri, &VecAhe);
+	if (Cross2.z < 0) return false;
+	// 三つ目
+	VecCompOri = PosD - PosC;
+	VecAhe = ObjectPos - PosC;
+	D3DXVec3Cross(&Cross3, &VecCompOri, &VecAhe);
+	if (Cross3.z < 0) return false;
+	// 三つ目
+	VecCompOri = PosA - PosD;
+	VecAhe = ObjectPos - PosD;
+	D3DXVec3Cross(&Cross4, &VecCompOri, &VecAhe);
+	if (Cross4.z < 0) return false;
+	// 範囲に入っている
+	return true;
+}
+
 
 // ----------------------------------------------------------------------------------------------------
 // 行列から位置情報取得

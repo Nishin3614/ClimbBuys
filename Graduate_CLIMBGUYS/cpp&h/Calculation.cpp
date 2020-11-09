@@ -591,16 +591,24 @@ D3DXVECTOR3 CCalculation::TwoLine_Inse(D3DXVECTOR2 ALinear, D3DXVECTOR2 BLinear)
 
 // ----------------------------------------------------------------------------------------------------
 // ポリゴンと線分の当たり判定処理
-//	PolygonVtx	: ポリゴン頂点
+//	PolygonVtxA	: ポリゴン頂点
+//	PolygonVtxB	: ポリゴン頂点
+//	PolygonVtxC	: ポリゴン頂点
+//	PolygonVtxD	: ポリゴン頂点
 // 	PolygonNor	: ポリゴン法線
 // 	LineBegin	: 線の始点
 // 	LineEnd		: 線の終点
+//	fDistance	: 距離
 // ----------------------------------------------------------------------------------------------------
 bool CCalculation::PolygonToLineCollision(
-	D3DXVECTOR3 const & PolygonVtx,	//	PolygonVtx	: ポリゴン頂点
-	D3DXVECTOR3 const & PolygonNor,	// 	PolygonNor	: ポリゴン法線
-	D3DXVECTOR3 const & LineBegin,	// 	LineBegin	: 線の始点
-	D3DXVECTOR3 const & LineEnd		// 	LineEnd		: 線の終点
+	D3DXVECTOR3 const & PolygonVtxA,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const & PolygonVtxB,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const & PolygonVtxC,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const & PolygonVtxD,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const & PolygonNor,		// 	PolygonNor	: ポリゴン法線
+	D3DXVECTOR3 const & LineBegin,		// 	LineBegin	: 線の始点
+	D3DXVECTOR3 const & LineEnd,		// 	LineEnd		: 線の終点
+	float &				fDistance		//	fDistance	: 距離
 )
 {
 	// 変数宣言
@@ -611,8 +619,8 @@ bool CCalculation::PolygonToLineCollision(
 		fDist1,	// 距離1
 		fDist2;	// 距離2
 	// 方向の設定
-	Vec1 = LineBegin - PolygonVtx;
-	Vec2 = LineEnd - PolygonVtx;
+	Vec1 = LineBegin - PolygonVtxA;
+	Vec2 = LineEnd - PolygonVtxA;
 	// それぞれの点の距離の設定
 	fDist1 = Dot_product(Vec1, PolygonNor);
 	fDist2 = Dot_product(Vec2, PolygonNor);
@@ -629,9 +637,132 @@ bool CCalculation::PolygonToLineCollision(
 	Ratio = fDist1 / (fDist1 - fDist2);
 	// 内分を求める
 	Vec3 = (1 - Ratio) * Vec1 + Ratio * Vec2;
-	// ポリゴンと線分の衝突点
-	Point3 = PolygonVtx + Vec3;
-	return true;
+	// ポリゴン内に点が入っていたら
+	if (PolygonToPointIn(
+		PolygonVtxA + Vec3,
+		PolygonVtxA,
+		PolygonVtxB,
+		PolygonVtxC,
+		PolygonVtxD
+	))
+	{
+		// 変数宣言
+		// その点とオブジェクトの距離を求める
+		float fThisDistance = DiffPoint(PolygonVtxA + Vec3, LineBegin);
+		if (fDistance > fThisDistance ||
+			fDistance < 0)
+		{
+			fDistance = fThisDistance;
+			// ポリゴンの中に点はあるかないか
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
+// ----------------------------------------------------------------------------------------------------
+// 矩形と球の当たり判定処理
+//	RectPos				: 矩形の位置
+// 	RectOffset			: 矩形のオフセット位置
+//	RectSize			: 矩形のサイズ
+// 	pSpherePos			: 球の位置
+//	SphereOffset		: 球のオフセット位置
+// 	SphereRange			: 球の半径
+// ----------------------------------------------------------------------------------------------------
+bool CCalculation::RectAndSphere(
+	D3DXVECTOR3 const & RectPos,		//	RectPos				: 矩形の位置
+	D3DXVECTOR3 const & RectOffset,		// 	RectOffset			: 矩形のオフセット位置
+	D3DXVECTOR3 const & RectSize,		//	RectSize			: 矩形のサイズ
+	D3DXVECTOR3 *		pSpherePos,		// 	pSpherePos			: 球の位置
+	D3DXVECTOR3 const & SphereOffset,	//	SphereOffset		: 球のオフセット位置
+	float		const & SphereRange		// 	SphereRange			: 球の半径
+)
+{
+	// 変数宣言
+	D3DXVECTOR3 ClosestPoint;	// ある座標の最も近い、ボックス上の座標
+	bool bCollision = false;	// 当たっているかどうか
+	// ある座標の最も近い、ボックス上の座標
+	ClosestPoint = GetClosestpoint(*pSpherePos + SphereOffset,RectPos + RectOffset,RectSize);
+	float a = CCalculation::DiffPointSquare(*pSpherePos + SphereOffset, ClosestPoint);
+	// 当たり判定処理
+	bCollision = CCalculation::DiffPointSquare(*pSpherePos + SphereOffset, ClosestPoint) <
+		SphereRange * SphereRange;
+	// 距離が半径より短い場合true,それ以外falseを返す
+	return bCollision;
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ある座標から最も近い、ボックス上の座標を返す
+// 1:位置情報
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+D3DXVECTOR3 CCalculation::GetClosestpoint(
+	D3DXVECTOR3 const & Pos,
+	D3DXVECTOR3 const & OppPos,
+	D3DXVECTOR3	const & Size
+)
+{
+	// 変数宣言
+	D3DXVECTOR3 r_pos;	// ボックス上の座標
+	D3DXVECTOR3 Max = OppPos + Size * 0.5f;
+	D3DXVECTOR3 Min = OppPos - Size * 0.5f;
+	// ある座標がボックスの最小座標値より低い場合
+	if (Pos.x < Min.x)
+	{
+		// 最小座標値を代入
+		r_pos.x = Min.x;
+	}
+	// ある座標がボックスの最大座標値より低い場合
+	else if (Pos.x > Max.x)
+	{
+		// 最大座標値を代入
+		r_pos.x = Max.x;
+	}
+	// それ以外
+	else
+	{
+		// ある座標を代入
+		r_pos.x = Pos.x;
+	}
+
+	// ある座標がボックスの最小座標値より低い場合
+	if (Pos.y < Min.y)
+	{
+		// 最小座標値を代入
+		r_pos.y = Min.y;
+	}
+	// ある座標がボックスの最大座標値より低い場合
+	else if (Pos.y > Max.y)
+	{
+		// 最大座標値を代入
+		r_pos.y = Max.y;
+	}
+	// それ以外
+	else
+	{
+		// ある座標を代入
+		r_pos.y = Pos.y;
+	}
+
+	// ある座標がボックスの最小座標値より低い場合
+	if (Pos.z < Min.z)
+	{
+		// 最小座標値を代入
+		r_pos.z = Min.z;
+	}
+	// ある座標がボックスの最大座標値より低い場合
+	else if (Pos.z > Max.z)
+	{
+		// 最大座標値を代入
+		r_pos.z = Max.z;
+	}
+	// それ以外
+	else
+	{
+		// ある座標を代入
+		r_pos.z = Pos.z;
+	}
+	return r_pos;
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -695,6 +826,49 @@ bool CCalculation::CrossCollision(
 	}
 	// 入っていない
 	return false;
+}
+
+// ----------------------------------------------------------------------------------------------------
+// 外積の当たり判定
+//	ObjectPos	: オブジェクトの位置
+//	PosA		: 位置A
+//	PosB		: 位置B
+//	PosC		: 位置C
+//	PosD		: 位置D
+// ----------------------------------------------------------------------------------------------------
+bool CCalculation::PolygonToPointIn(
+	D3DXVECTOR3 const & ObjectPos,	// オブジェクトの位置
+	D3DXVECTOR3 const & PosA,		// 位置A
+	D3DXVECTOR3 const & PosB,		// 位置B
+	D3DXVECTOR3 const & PosC,		// 位置C
+	D3DXVECTOR3 const & PosD		// 位置D
+)
+{
+	// 変数宣言
+	D3DXVECTOR3 VecCompOri, VecAhe;				// ベクトル方向
+	D3DXVECTOR3 Cross1, Cross2, Cross3,Cross4;	// 外積の計算結果
+	// 一つ目
+	VecCompOri = PosB - PosA;
+	VecAhe = ObjectPos - PosA;
+	D3DXVec3Cross(&Cross1, &VecCompOri, &VecAhe);
+	if (Cross1 < 0) return false;
+	// 二つ目
+	VecCompOri = PosC - PosB;
+	VecAhe = ObjectPos - PosB;
+	D3DXVec3Cross(&Cross2, &VecCompOri, &VecAhe);
+	if (Cross2 < 0) return false;
+	// 三つ目
+	VecCompOri = PosD - PosC;
+	VecAhe = ObjectPos - PosC;
+	D3DXVec3Cross(&Cross3, &VecCompOri, &VecAhe);
+	if (Cross3 < 0) return false;
+	// 三つ目
+	VecCompOri = PosA - PosD;
+	VecAhe = ObjectPos - PosD;
+	D3DXVec3Cross(&Cross4, &VecCompOri, &VecAhe);
+	if (Cross4 < 0) return false;
+	// 範囲に入っている
+	return true;
 }
 
 // ----------------------------------------------------------------------------------------------------

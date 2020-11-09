@@ -544,9 +544,15 @@ void CPlayer::BlockCollision(void)
 	// 変数宣言
 	CBaseblock * pBaseBlock;									// シーンX情報
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
+	std::vector<CBaseblock::PUSHBLOCK>	v_PushBlock;		// プッシュブロック情報
+	CBaseblock::PUSHBLOCK				Pushblock;			// プッシュブロック情報
 	bool bOn = false;										// 上の当たり判定
 	bool bUnder = false;									// 下の当たり判定
-	int nDieState = 0b000000;
+	int nDieState = 0b000000;								// 死ぬ状態
+	float fDistance = -1.0f;								// 距離
+	D3DXVECTOR3 PredictionPoint;							// 予測点
+	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize.x, 0.0f, cosf(m_rot.y) * m_PlayerStatus.PushSize.x);
+	Pushblock = CBaseblock::PUSHBLOCK(NULL, -1.0f, Direct);
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{
@@ -558,21 +564,47 @@ void CPlayer::BlockCollision(void)
 		pBaseBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
 		// NULLなら
 		// ->関数を抜ける
-		if (pBaseBlock == NULL)
-		{
-			continue;
-		}
+		if (pBaseBlock == NULL) continue;
 		// ダッシュ状態なら
 		if (m_bDashFlag)
 		{
 			// 方向に直線を出し
 			// 線とポリゴンで判定を取る
-			//CCalculation::PolygonToLineCollision(
-			//
-			//);
+			Direct = pBaseBlock->PushBlock(
+				m_pos + m_PlayerStatus.PushOffSet,
+				PredictionPoint,
+				fDistance);
+			// ブロックに当たっていたら
+			if(Direct != COLLISIONDIRECTION::NONE)
+			{
+				// プッシュブロックの情報が存在するなら
+				if (Pushblock.pBlock)
+				{
+					// 距離を比較してどちらが近いか
+					if (Pushblock.fDistance > fDistance ||
+						Pushblock.fDistance < 0)
+					{
+						// 情報を代入
+						Pushblock = CBaseblock::PUSHBLOCK(pBaseBlock, fDistance, Direct);
+					}
+				}
+				else
+				{
+					Pushblock = CBaseblock::PUSHBLOCK(pBaseBlock, fDistance, Direct);
+				}
+			}
 
-
-
+			/*
+			D3DXVECTOR3 Offsetpos;
+			Offsetpos = D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, cosf(m_rot.y) * m_PlayerStatus.PlayerOffSet.z);
+			CCalculation::RectAndSphere(
+				pBaseBlock->GetPos(),
+				D3DXVECTOR3(0.0f, pBaseBlock->GetSize().y * 0.5f, 0.0f),
+				D3DXVECTOR3(pBaseBlock->GetSizeRange(), pBaseBlock->GetSizeRange(), pBaseBlock->GetSizeRange()),
+				&CCharacter::GetPos(),
+				Offsetpos,
+				m_PlayerStatus.PlayerSize.x
+			);
 
 
 
@@ -585,6 +617,7 @@ void CPlayer::BlockCollision(void)
 				&m_PlayerStatus.PushSize,
 				m_PlayerStatus.PushOffSet
 			);
+			*/
 			// ブロックの判定
 			// 前
 			if (Direct == COLLISIONDIRECTION::FRONT)
@@ -674,6 +707,34 @@ void CPlayer::BlockCollision(void)
 		)
 	{
 		Die();
+	}
+
+	// ブロックの押し出し処理
+	if (m_bDashFlag)
+	{
+		if (Pushblock.pBlock)
+		{
+			// 前
+			if (Pushblock.Direction == COLLISIONDIRECTION::FRONT)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, -1));
+			}
+			// 後
+			else if (Pushblock.Direction == COLLISIONDIRECTION::BACK)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, 1));
+			}
+			// 左
+			else if (Pushblock.Direction == COLLISIONDIRECTION::LEFT)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(1, 0, 0));
+			}
+			// 右
+			else if (Pushblock.Direction == COLLISIONDIRECTION::RIGHT)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-1, 0, 0));
+			}
+		}
 	}
 }
 

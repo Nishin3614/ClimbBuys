@@ -450,6 +450,61 @@ COLLISIONDIRECTION CBaseblock::Collision(
 	return Direct;
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの押し出し処理
+//	LineBegin	: 線の始点
+//	LineEnd		: 線の終点
+//	fDistance	: 距離
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COLLISIONDIRECTION CBaseblock::PushBlock(
+	D3DXVECTOR3 const & LineBegin,	// 	LineBegin	: 線の始点
+	D3DXVECTOR3 const & LineEnd,	// 	LineEnd		: 線の終点
+	float &				fDistance	//	fDistance	: 距離
+)
+{
+	// 仕様
+	// プレイヤーと別のオブジェクトに当たり判定
+
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
+	// 左のポリゴンの判定
+	if (CCalculation::PolygonToLineCollision(
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(-1.0f, 0.0f, 0.0f),
+		LineBegin,
+		LineEnd,
+		fDistance
+	))
+	{
+		Direct = COLLISIONDIRECTION::LEFT;
+	}
+	// やること
+	// 右、奥、手前の判定を取る
+	// 結果どうなるか試す
+
+
+	// 右のポリゴンの判定
+	if (CCalculation::PolygonToLineCollision(
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(1.0f, 0.0f, 0.0f),
+		LineBegin,
+		LineEnd,
+		fDistance
+	))
+	{
+		Direct = COLLISIONDIRECTION::RIGHT;
+	}
+
+	return COLLISIONDIRECTION::NONE;
+}
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ベースブロック全ソースの読み込み

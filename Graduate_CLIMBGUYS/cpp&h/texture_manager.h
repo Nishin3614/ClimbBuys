@@ -39,6 +39,10 @@ public:
 		TYPE_NONE,				// 背景なし
 		TYPE_TUTORIAL_FRAME,	// チュートリアルの枠
 		TYPE_MAGMA,				// ダメージ床用マグマ
+		TYPE_PLAYER_UI_01,		// プレイヤーUI_01
+		TYPE_PLAYER_UI_02,		// プレイヤーUI_02
+		TYPE_PLAYER_UI_03,		// プレイヤーUI_03
+		TYPE_PLAYER_UI_04,		// プレイヤーUI_04
 		TYPE_MAX				// 最大数
 	} TYPE;
 	/* 関数 */

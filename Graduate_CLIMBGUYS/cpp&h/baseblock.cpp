@@ -465,20 +465,21 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 {
 	// 仕様
 	// プレイヤーと別のオブジェクトに当たり判定
-
+	if (this->m_type == TYPE_FIELD) return COLLISIONDIRECTION::NONE;
 	// 変数宣言
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
 	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
 	// 左のポリゴンの判定
 	if (CCalculation::PolygonToLineCollision(
-		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
-		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
-		D3DXVECTOR3(-1.0f, 0.0f, 0.0f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(1.0f, 0.0f, 0.0f),
 		LineBegin,
 		LineEnd,
-		fDistance
+		fDistance,
+		COLLISIONDIRECTION::LEFT
 	))
 	{
 		Direct = COLLISIONDIRECTION::LEFT;
@@ -490,14 +491,15 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 
 	// 右のポリゴンの判定
 	if (CCalculation::PolygonToLineCollision(
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
-		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
-		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
-		D3DXVECTOR3(1.0f, 0.0f, 0.0f),
+		D3DXVECTOR3(-1.0f, 0.0f, 0.0f),
 		LineBegin,
 		LineEnd,
-		fDistance
+		fDistance,
+		COLLISIONDIRECTION::RIGHT
 	))
 	{
 		Direct = COLLISIONDIRECTION::RIGHT;
@@ -505,14 +507,15 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 
 	// 奥のポリゴンの判定
 	if (CCalculation::PolygonToLineCollision(
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z + m_fSizeRange * 0.5f),
-		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
-		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z + m_fSizeRange * 0.5f),
-		D3DXVECTOR3(0.0f, 0.0f, 1.0f),
+		D3DXVECTOR3(0.0f, 0.0f, -1.0f),
 		LineBegin,
 		LineEnd,
-		fDistance
+		fDistance,
+		COLLISIONDIRECTION::FRONT
 	))
 	{
 		Direct = COLLISIONDIRECTION::FRONT;
@@ -520,14 +523,15 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 
 	// 手前のポリゴンの判定
 	if (CCalculation::PolygonToLineCollision(
-		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
-		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
 		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
-		D3DXVECTOR3(0.0f, 0.0f, -1.0f),
+		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(BlockPos.x - m_fSizeRange * 0.5f, BlockPos.y, BlockPos.z - m_fSizeRange * 0.5f),
+		D3DXVECTOR3(0.0f, 0.0f, 1.0f),
 		LineBegin,
 		LineEnd,
-		fDistance
+		fDistance,
+		COLLISIONDIRECTION::BACK
 	))
 	{
 		Direct = COLLISIONDIRECTION::BACK;

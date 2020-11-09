@@ -20,6 +20,7 @@
 #include "meshbox.h"
 #include "stand.h"
 #include "playerUI.h"
+#include "3Dline.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -59,6 +60,8 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	{
 		pCollisionBox[nCntCollision] = NULL;
 	}
+	// 当たり判定線の初期化
+	pCollisionLine = NULL;
 #endif // _DEBUG
 }
 
@@ -95,17 +98,18 @@ void CPlayer::Init(void)
 			// 薄青色に
 			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 		}
-		/*
+
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
-			// メッシュボックスの生成
-			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos + m_PlayerStatus.PushOffSet, m_PlayerStatus.PushSize, CMeshBox::COLLISION_TYPE::TYPE_CENTER);
-			// 薄青色に
-			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+			// 3D線生成
+			pCollisionLine = C3DLine::Create(NULL, D3DVECTOR3_ZERO,
+				m_pos + m_PlayerStatus.PushOffSet,
+				m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize,0.0f,cosf(m_rot.y) * m_PlayerStatus.PushSize));
 		}
-		*/
+
 	}
+
 #endif // _DEBUG
 }
 
@@ -126,6 +130,7 @@ void CPlayer::Uninit(void)
 	{
 		pCollisionBox[nCntCollision] = NULL;
 	}
+	pCollisionLine = NULL;
 #endif // _DEBUG
 }
 
@@ -154,28 +159,31 @@ void CPlayer::Update(void)
 	// 当たり判定ボックスの位置の更新
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
 	{
-		// NULLチェック
-		if (pCollisionBox[nCntCollision] == NULL) continue;
 		// 当たり判定のタイプがキャラクターなら
 		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
 		{
+			// NULLチェック
+			if (pCollisionBox[nCntCollision] == NULL) continue;
 			// 位置設定
 			pCollisionBox[nCntCollision]->SetPos(m_pos + m_PlayerStatus.PlayerOffSet);
 			// サイズ設定
 			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PlayerSize);
+			// 頂点座標の設定
+			pCollisionBox[nCntCollision]->SetVtxPos();
 		}
-		/*
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
+			D3DXVECTOR3 DirectVec = CCharacter::GetDirectionVec();
+#ifdef _DEBUG
+			CDebugproc::Print("方向:(%.2f,%.2f,%.2f)\n", DirectVec.x, DirectVec.y, DirectVec.z);
+#endif // _DEBUG
+
 			// 位置設定
-			pCollisionBox[nCntCollision]->SetPos(m_pos + m_PlayerStatus.PushOffSet);
-			// サイズ設定
-			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PushSize);
+			pCollisionLine->SetPos(
+				m_pos + m_PlayerStatus.PushOffSet,
+				m_pos + m_PlayerStatus.PushOffSet - D3DXVECTOR3(CCharacter::GetDirectionVec().x * m_PlayerStatus.PushSize, 0.0f, CCharacter::GetDirectionVec().z * m_PlayerStatus.PushSize));
 		}
-		*/
-		// 頂点座標の設定
-		pCollisionBox[nCntCollision]->SetVtxPos();
 	}
 #endif // _DEBUG
 
@@ -398,6 +406,7 @@ void CPlayer::MyMove(void)
 		move.z += (-m_move.z) * m_PlayerStatus.fNormalInertia;
 	}
 
+	/*
 	if (vec.x < 0)
 	{
 		vec.x *= -1;
@@ -406,6 +415,7 @@ void CPlayer::MyMove(void)
 	{
 		vec.z *= -1;
 	}
+	*/
 	CCharacter::SetDirectionVec(vec);
 	// yの上限設定
 	if (move.y > PLAYER_UPMOVELIMIT)
@@ -561,6 +571,11 @@ void CPlayer::StandCollision(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::BlockCollision(void)
 {
+
+#ifdef _DEBUG
+	CDebugproc::Print("\n\n\nプレイヤー[%d]:位置(%.2f,%.2f,%.2f)\n", CCharacter::GetCharacter(), m_pos.x, m_pos.y, m_pos.z);
+#endif // _DEBUG
+
 	// 変数宣言
 	CBaseblock * pBaseBlock;									// シーンX情報
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
@@ -571,7 +586,7 @@ void CPlayer::BlockCollision(void)
 	int nDieState = 0b000000;								// 死ぬ状態
 	float fDistance = -1.0f;								// 距離
 	D3DXVECTOR3 PredictionPoint;							// 予測点
-	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize, 0.0f, cosf(m_rot.y) * m_PlayerStatus.PushSize);
+	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet - D3DXVECTOR3(CCharacter::GetDirectionVec().x * m_PlayerStatus.PushSize, 0.0f, CCharacter::GetDirectionVec().z * m_PlayerStatus.PushSize);
 	Pushblock = CBaseblock::PUSHBLOCK(NULL, -1.0f, Direct);
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
@@ -754,6 +769,7 @@ void CPlayer::BlockCollision(void)
 			{
 				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-1, 0, 0));
 			}
+			m_bDashFlag = false;
 		}
 	}
 }

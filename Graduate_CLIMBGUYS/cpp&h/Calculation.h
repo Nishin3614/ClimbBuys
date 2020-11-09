@@ -520,15 +520,17 @@ public:
 	// 	LineBegin	: 線の始点
 	// 	LineEnd		: 線の終点
 	//	fDistance	: 距離
+	//	Direction	: 方向
 	static bool PolygonToLineCollision(
-		D3DXVECTOR3 const & PolygonVtxA,		//	PolygonVtx	: ポリゴン頂点
-		D3DXVECTOR3 const & PolygonVtxB,		//	PolygonVtx	: ポリゴン頂点
-		D3DXVECTOR3 const & PolygonVtxC,		//	PolygonVtx	: ポリゴン頂点
-		D3DXVECTOR3 const & PolygonVtxD,		//	PolygonVtx	: ポリゴン頂点
-		D3DXVECTOR3 const & PolygonNor,			// 	PolygonNor	: ポリゴン法線
-		D3DXVECTOR3 const & LineBegin,			// 	LineBegin	: 線の始点
-		D3DXVECTOR3 const & LineEnd,			// 	LineEnd		: 線の終点
-		float &				fDistance			//	fDistance	: 距離
+		D3DXVECTOR3 const &			PolygonVtxA,	//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const &			PolygonVtxB,	//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const &			PolygonVtxC,	//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const &			PolygonVtxD,	//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const &			PolygonNor,		// 	PolygonNor	: ポリゴン法線
+		D3DXVECTOR3 const &			LineBegin,		// 	LineBegin	: 線の始点
+		D3DXVECTOR3 const &			LineEnd,		// 	LineEnd		: 線の終点
+		float &						fDistance,		//	fDistance	: 距離
+		COLLISIONDIRECTION const &	Direction		//	Direction	: 方向
 	);
 	// 矩形と球の当たり判定処理
 	//	RectPos				: 矩形の位置

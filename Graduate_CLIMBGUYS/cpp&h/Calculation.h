@@ -512,16 +512,46 @@ public:
 		D3DXVECTOR2 BLinear	// 線②
 	);
 	// ポリゴンと線分の当たり判定処理
-	//	PolygonVtx	: ポリゴン頂点
+	//	PolygonVtxA	: ポリゴン頂点
+	//	PolygonVtxB	: ポリゴン頂点
+	//	PolygonVtxC	: ポリゴン頂点
+	//	PolygonVtxD	: ポリゴン頂点
 	// 	PolygonNor	: ポリゴン法線
 	// 	LineBegin	: 線の始点
 	// 	LineEnd		: 線の終点
+	//	fDistance	: 距離
 	static bool PolygonToLineCollision(
-		D3DXVECTOR3 const & PolygonVtx,	//	PolygonVtx	: ポリゴン頂点
-		D3DXVECTOR3 const & PolygonNor,	// 	PolygonNor	: ポリゴン法線
-		D3DXVECTOR3 const & LineBegin,	// 	LineBegin	: 線の始点
-		D3DXVECTOR3 const & LineEnd		// 	LineEnd		: 線の終点
+		D3DXVECTOR3 const & PolygonVtxA,		//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const & PolygonVtxB,		//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const & PolygonVtxC,		//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const & PolygonVtxD,		//	PolygonVtx	: ポリゴン頂点
+		D3DXVECTOR3 const & PolygonNor,			// 	PolygonNor	: ポリゴン法線
+		D3DXVECTOR3 const & LineBegin,			// 	LineBegin	: 線の始点
+		D3DXVECTOR3 const & LineEnd,			// 	LineEnd		: 線の終点
+		float &				fDistance			//	fDistance	: 距離
 	);
+	// 矩形と球の当たり判定処理
+	//	RectPos				: 矩形の位置
+	// 	RectOffset			: 矩形のオフセット位置
+	//	RectSize			: 矩形のサイズ
+	// 	pSpherePos			: 球の位置
+	//	SphereOffset		: 球のオフセット位置
+	// 	SphereRange			: 球の半径
+	static bool RectAndSphere(
+		D3DXVECTOR3 const & RectPos,		//	RectPos				: 矩形の位置
+		D3DXVECTOR3 const & RectOffset,		// 	RectOffset			: 矩形のオフセット位置
+		D3DXVECTOR3 const & RectSize,		//	RectSize			: 矩形のサイズ
+		D3DXVECTOR3 *		pSpherePos,		// 	pSpherePos			: 球の位置
+		D3DXVECTOR3 const & SphereOffset,	//	SphereOffset		: 球のオフセット位置
+		float		const & SphereRange		// 	SphereRange			: 球の半径
+	);
+
+	static D3DXVECTOR3 GetClosestpoint(
+		D3DXVECTOR3 const & Pos,
+		D3DXVECTOR3 const & OppPos,
+		D3DXVECTOR3	const & Size
+	);
+
 	// 途中の計算
 	static bool TlyCollision(
 		D3DXVECTOR3 ObjectPos,
@@ -534,6 +564,19 @@ public:
 		D3DXVECTOR3 *PosA,
 		D3DXVECTOR3 *PosB,
 		D3DXVECTOR3 *PosC
+	);
+	// 外積の当たり判定
+	//	ObjectPos	: オブジェクトの位置
+	//	PosA		: 位置A
+	//	PosB		: 位置B
+	//	PosC		: 位置C
+	//	PosD		: 位置D
+	static bool PolygonToPointIn(
+		D3DXVECTOR3 const & ObjectPos,	// オブジェクトの位置
+		D3DXVECTOR3 const & PosA,		// 位置A
+		D3DXVECTOR3 const & PosB,		// 位置B
+		D3DXVECTOR3 const & PosC,		// 位置C
+		D3DXVECTOR3 const & PosD		// 位置D
 	);
 	// 行列の位置情報取得
 	// 1:位置情報,2:行列

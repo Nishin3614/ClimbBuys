@@ -115,6 +115,21 @@ public:
 		int nLine;		// 行
 		int nHeight;	// 高さ
 	} GRID;
+	// ブロック全体に対しての距離の比較とブロック情報とどっち方向なら押されたか情報
+	typedef struct PUSHBLOCK
+	{
+		PUSHBLOCK() {};
+		PUSHBLOCK(CBaseblock * pSouceBlock, float fSouceDistance, COLLISIONDIRECTION SouceDirection)
+		{
+			pBlock = pSouceBlock;
+			fDistance = fSouceDistance;
+			Direction = SouceDirection;
+		}
+		CBaseblock * pBlock;				// ブロック情報
+		float fDistance;					// 距離
+		COLLISIONDIRECTION Direction;		// 方向
+	} PUSHBLOCK;
+
 	/* 関数 */
 	// コンストラクタ
 	CBaseblock();
@@ -191,6 +206,15 @@ public:
 		D3DXVECTOR3 * posOld,							// 前回の位置
 		D3DXVECTOR3 * size,								// サイズ
 		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
+	// ブロックの押し出し処理
+	//	LineBegin	: 線の始点
+	//	LineEnd		: 線の終点
+	//	fDistance	: 距離
+	COLLISIONDIRECTION PushBlock(
+		D3DXVECTOR3 const & LineBegin,	// 	LineBegin	: 線の始点
+		D3DXVECTOR3 const & LineEnd,	// 	LineEnd		: 線の終点
+		float &				fDistance	//	fDistance	: 距離
 	);
 
 	// ベースブロック

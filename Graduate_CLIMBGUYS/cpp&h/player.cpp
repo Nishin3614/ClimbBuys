@@ -19,6 +19,7 @@
 #include "debugproc.h"
 #include "meshbox.h"
 #include "stand.h"
+#include "playerUI.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -49,7 +50,9 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_bDashFlag			= false;				// ダッシュフラグ
 	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
 	m_PlayerStatusInit	= m_PlayerStatus;		// プレイヤーの初期ステータス
+	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX;nCntCollision++)
@@ -76,6 +79,10 @@ void CPlayer::Init(void)
 
 	// パッドのポインタ取得
 	m_pPad = CManager::CManager::GetPad(GetPlayerTag());
+
+	// プレイヤーUIの生成
+	m_pPlayerUI = CPlayerUI::Create(GetPlayerTag());
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
@@ -88,6 +95,7 @@ void CPlayer::Init(void)
 			// 薄青色に
 			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 		}
+		/*
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
@@ -96,6 +104,7 @@ void CPlayer::Init(void)
 			// 薄青色に
 			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
 		}
+		*/
 	}
 #endif // _DEBUG
 }
@@ -107,6 +116,10 @@ void CPlayer::Uninit(void)
 {
 	// キャラクター終了処理
 	CCharacter::Uninit();
+
+	// プレイヤーUIの初期化
+	m_pPlayerUI = nullptr;
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
@@ -123,6 +136,11 @@ void CPlayer::Update(void)
 {
 	// 自キャラの行動処理
 	MyAction();
+
+	if (m_pPlayerUI)
+	{	// プレイヤーUIの位置の設定
+		m_pPlayerUI->SetPos(GetPos() + D3DXVECTOR3(0.0f, 80.0f, 0.0f));
+	}
 
 	// モーション設定処理
 	StatusMotion();
@@ -146,6 +164,7 @@ void CPlayer::Update(void)
 			// サイズ設定
 			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PlayerSize);
 		}
+		/*
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
@@ -154,6 +173,7 @@ void CPlayer::Update(void)
 			// サイズ設定
 			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PushSize);
 		}
+		*/
 		// 頂点座標の設定
 		pCollisionBox[nCntCollision]->SetVtxPos();
 	}
@@ -544,9 +564,15 @@ void CPlayer::BlockCollision(void)
 	// 変数宣言
 	CBaseblock * pBaseBlock;									// シーンX情報
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
+	std::vector<CBaseblock::PUSHBLOCK>	v_PushBlock;		// プッシュブロック情報
+	CBaseblock::PUSHBLOCK				Pushblock;			// プッシュブロック情報
 	bool bOn = false;										// 上の当たり判定
 	bool bUnder = false;									// 下の当たり判定
-	int nDieState = 0b000000;
+	int nDieState = 0b000000;								// 死ぬ状態
+	float fDistance = -1.0f;								// 距離
+	D3DXVECTOR3 PredictionPoint;							// 予測点
+	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize, 0.0f, cosf(m_rot.y) * m_PlayerStatus.PushSize);
+	Pushblock = CBaseblock::PUSHBLOCK(NULL, -1.0f, Direct);
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{
@@ -558,21 +584,47 @@ void CPlayer::BlockCollision(void)
 		pBaseBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
 		// NULLなら
 		// ->関数を抜ける
-		if (pBaseBlock == NULL)
-		{
-			continue;
-		}
+		if (pBaseBlock == NULL) continue;
 		// ダッシュ状態なら
 		if (m_bDashFlag)
 		{
 			// 方向に直線を出し
 			// 線とポリゴンで判定を取る
-			//CCalculation::PolygonToLineCollision(
-			//
-			//);
+			Direct = pBaseBlock->PushBlock(
+				m_pos + m_PlayerStatus.PushOffSet,
+				PredictionPoint,
+				fDistance);
+			// ブロックに当たっていたら
+			if(Direct != COLLISIONDIRECTION::NONE)
+			{
+				// プッシュブロックの情報が存在するなら
+				if (Pushblock.pBlock)
+				{
+					// 距離を比較してどちらが近いか
+					if (Pushblock.fDistance > fDistance ||
+						Pushblock.fDistance < 0)
+					{
+						// 情報を代入
+						Pushblock = CBaseblock::PUSHBLOCK(pBaseBlock, fDistance, Direct);
+					}
+				}
+				else
+				{
+					Pushblock = CBaseblock::PUSHBLOCK(pBaseBlock, fDistance, Direct);
+				}
+			}
 
-
-
+			/*
+			D3DXVECTOR3 Offsetpos;
+			Offsetpos = D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, cosf(m_rot.y) * m_PlayerStatus.PlayerOffSet.z);
+			CCalculation::RectAndSphere(
+				pBaseBlock->GetPos(),
+				D3DXVECTOR3(0.0f, pBaseBlock->GetSize().y * 0.5f, 0.0f),
+				D3DXVECTOR3(pBaseBlock->GetSizeRange(), pBaseBlock->GetSizeRange(), pBaseBlock->GetSizeRange()),
+				&CCharacter::GetPos(),
+				Offsetpos,
+				m_PlayerStatus.PlayerSize.x
+			);
 
 
 
@@ -585,6 +637,7 @@ void CPlayer::BlockCollision(void)
 				&m_PlayerStatus.PushSize,
 				m_PlayerStatus.PushOffSet
 			);
+			*/
 			// ブロックの判定
 			// 前
 			if (Direct == COLLISIONDIRECTION::FRONT)
@@ -674,6 +727,34 @@ void CPlayer::BlockCollision(void)
 		)
 	{
 		Die();
+	}
+
+	// ブロックの押し出し処理
+	if (m_bDashFlag)
+	{
+		if (Pushblock.pBlock)
+		{
+			// 前
+			if (Pushblock.Direction == COLLISIONDIRECTION::FRONT)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, -1));
+			}
+			// 後
+			else if (Pushblock.Direction == COLLISIONDIRECTION::BACK)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, 1));
+			}
+			// 左
+			else if (Pushblock.Direction == COLLISIONDIRECTION::LEFT)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(1, 0, 0));
+			}
+			// 右
+			else if (Pushblock.Direction == COLLISIONDIRECTION::RIGHT)
+			{
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-1, 0, 0));
+			}
+		}
 	}
 }
 
@@ -839,7 +920,7 @@ void CPlayer::PlayerStatusLoad(void)
 						// PushSizeが来たら
 						else if (strcmp(cHeadText, "PushSize") == 0)
 						{
-							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushSize.x, &m_PlayerStatus.PushSize.y, &m_PlayerStatus.PushSize.z);
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.PushSize);
 						}
 						// PushOffSetが来たら
 						else if (strcmp(cHeadText, "PushOffSet") == 0)
@@ -893,7 +974,7 @@ void CPlayer::PlayerStatusSave(void)
 		fprintf(pFile, "	JumpInertia		= %.2f\n", m_PlayerStatus.fJumpInertia);
 		fprintf(pFile, "	PlayerSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerSize.x, m_PlayerStatus.PlayerSize.y, m_PlayerStatus.PlayerSize.z);
 		fprintf(pFile, "	PlayerOffSet	= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, m_PlayerStatus.PlayerOffSet.z);
-		fprintf(pFile, "	PushSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushSize.x, m_PlayerStatus.PushSize.y, m_PlayerStatus.PushSize.z);
+		fprintf(pFile, "	PushSize		= %.1f\n", m_PlayerStatus.PushSize);
 		fprintf(pFile, "	PushOffSet		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushOffSet.x, m_PlayerStatus.PushOffSet.y, m_PlayerStatus.PushOffSet.z);
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
@@ -1340,6 +1421,13 @@ void CPlayer::Die(void)
 	// チュートリアル以外のとき死ぬ
 	if (CManager::GetMode() != CManager::MODE_TUTORIAL)
 	{
+		if (m_pPlayerUI)
+		{
+			// プレイヤーUIを開放
+			m_pPlayerUI->Release();
+			m_pPlayerUI = nullptr;
+		}
+
 		// 死亡処理
 		CCharacter::Die();
 
@@ -1446,7 +1534,7 @@ void CPlayer::Debug(void)
 				// プレイヤーのオフセット
 				ImGui::DragFloat3(u8"プレイヤーのオフセット", m_PlayerStatus.PlayerOffSet, 1.0f, 0.0f, 500.0f);
 				// 押し出し用のサイズ
-				ImGui::DragFloat3(u8"押し出し用のサイズ", m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
+				ImGui::DragFloat(u8"押し出し用のサイズ", &m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
 				// 押し出し用のオフセット
 				ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
 

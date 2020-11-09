@@ -839,7 +839,7 @@ void CPlayer::PlayerStatusLoad(void)
 						// PushSizeが来たら
 						else if (strcmp(cHeadText, "PushSize") == 0)
 						{
-							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushSize.x, &m_PlayerStatus.PushSize.y, &m_PlayerStatus.PushSize.z);
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.PushSize);
 						}
 						// PushOffSetが来たら
 						else if (strcmp(cHeadText, "PushOffSet") == 0)
@@ -893,7 +893,7 @@ void CPlayer::PlayerStatusSave(void)
 		fprintf(pFile, "	JumpInertia		= %.2f\n", m_PlayerStatus.fJumpInertia);
 		fprintf(pFile, "	PlayerSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerSize.x, m_PlayerStatus.PlayerSize.y, m_PlayerStatus.PlayerSize.z);
 		fprintf(pFile, "	PlayerOffSet	= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, m_PlayerStatus.PlayerOffSet.z);
-		fprintf(pFile, "	PushSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushSize.x, m_PlayerStatus.PushSize.y, m_PlayerStatus.PushSize.z);
+		fprintf(pFile, "	PushSize		= %.1f\n", m_PlayerStatus.PushSize);
 		fprintf(pFile, "	PushOffSet		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushOffSet.x, m_PlayerStatus.PushOffSet.y, m_PlayerStatus.PushOffSet.z);
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
@@ -1446,7 +1446,7 @@ void CPlayer::Debug(void)
 				// プレイヤーのオフセット
 				ImGui::DragFloat3(u8"プレイヤーのオフセット", m_PlayerStatus.PlayerOffSet, 1.0f, 0.0f, 500.0f);
 				// 押し出し用のサイズ
-				ImGui::DragFloat3(u8"押し出し用のサイズ", m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
+				ImGui::DragFloat(u8"押し出し用のサイズ", &m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
 				// 押し出し用のオフセット
 				ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
 

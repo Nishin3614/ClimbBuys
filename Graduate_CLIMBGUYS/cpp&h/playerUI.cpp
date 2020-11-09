@@ -20,7 +20,8 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define PLAYER_UI_SIZE		(D3DXVECTOR3(50.0f, 50.0f, 0.0f))	// プレイヤーUIのサイズ
+#define PLAYER_UI_SIZE		(D3DXVECTOR3(45.0f, 0.0f, 30.0f))	// プレイヤーUIのサイズ
+#define PLAYER_UI_ROT		(D3DXVECTOR3(-0.5f, 0.0f, 0.0f))	// プレイヤーUIの回転
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -50,6 +51,9 @@ void CPlayerUI::Init(void)
 	// オフセットタイプ設定
 	CScene_THREE::SetOffsetType(OFFSET_TYPE_SIDE_CENTER);
 
+	// 色
+	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.8f));
+
 	// シーン3Dの初期化
 	CScene_THREE::Init();
 }
@@ -67,11 +71,6 @@ void CPlayerUI::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayerUI::Update(void)
 {
-	// ゲームモードだったら
-	if (CManager::GetMode() == CManager::MODE_GAME)
-	{
-	}
-
 	CScene_THREE::Update();
 }
 
@@ -94,9 +93,11 @@ CPlayerUI * CPlayerUI::Create(PLAYER_TAG PlayerTag)
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pPlayerUI = new CPlayerUI();
 	// シーン管理設定
-	pPlayerUI->ManageSetting(CScene::LAYER_UI);
+	pPlayerUI->ManageSetting(CScene::LAYER_PLAYER_UI);
 	// サイズ設定
 	pPlayerUI->SetSize(PLAYER_UI_SIZE);
+	// 回転の設定
+	pPlayerUI->SetRot(PLAYER_UI_ROT);
 	// 初期化処理
 	pPlayerUI->Init();
 	// 各プレイヤーのテクスチャの貼り付け

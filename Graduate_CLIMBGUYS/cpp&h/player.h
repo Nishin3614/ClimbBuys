@@ -212,7 +212,8 @@ private:
 	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	PLAYER_STATUS				m_PlayerStatusInit;				// プレイヤーの初期ステータス
-	std::vector<CPlayerUI*>		m_pPlayerUI;					// プレイヤーUI
+	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
+
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
 #endif // _DEBUG

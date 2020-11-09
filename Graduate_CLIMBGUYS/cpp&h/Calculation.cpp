@@ -599,16 +599,18 @@ D3DXVECTOR3 CCalculation::TwoLine_Inse(D3DXVECTOR2 ALinear, D3DXVECTOR2 BLinear)
 // 	LineBegin	: 線の始点
 // 	LineEnd		: 線の終点
 //	fDistance	: 距離
+//	Direction	: 方向
 // ----------------------------------------------------------------------------------------------------
 bool CCalculation::PolygonToLineCollision(
-	D3DXVECTOR3 const & PolygonVtxA,	//	PolygonVtx	: ポリゴン頂点
-	D3DXVECTOR3 const & PolygonVtxB,	//	PolygonVtx	: ポリゴン頂点
-	D3DXVECTOR3 const & PolygonVtxC,	//	PolygonVtx	: ポリゴン頂点
-	D3DXVECTOR3 const & PolygonVtxD,	//	PolygonVtx	: ポリゴン頂点
-	D3DXVECTOR3 const & PolygonNor,		// 	PolygonNor	: ポリゴン法線
-	D3DXVECTOR3 const & LineBegin,		// 	LineBegin	: 線の始点
-	D3DXVECTOR3 const & LineEnd,		// 	LineEnd		: 線の終点
-	float &				fDistance		//	fDistance	: 距離
+	D3DXVECTOR3 const &			PolygonVtxA,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const &			PolygonVtxB,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const &			PolygonVtxC,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const &			PolygonVtxD,	//	PolygonVtx	: ポリゴン頂点
+	D3DXVECTOR3 const &			PolygonNor,		// 	PolygonNor	: ポリゴン法線
+	D3DXVECTOR3 const &			LineBegin,		// 	LineBegin	: 線の始点
+	D3DXVECTOR3 const &			LineEnd,		// 	LineEnd		: 線の終点
+	float &						fDistance,		//	fDistance	: 距離
+	COLLISIONDIRECTION const &	Direction		//	Direction	: 方向
 )
 {
 	// 変数宣言
@@ -632,14 +634,31 @@ bool CCalculation::PolygonToLineCollision(
 	// 変数宣言
 	float		Ratio;	// 内分比
 	D3DXVECTOR3 Vec3;	// Vec3
-	D3DXVECTOR3 Point3;	// ポリゴンと線分の衝突点
+	D3DXVECTOR3 Point3 = D3DXVECTOR3(-100.0f,-100.0f,-100.0f);	// ポリゴンと線分の衝突点
 	// 内分比を求める
 	Ratio = fDist1 / (fDist1 - fDist2);
 	// 内分を求める
 	Vec3 = (1 - Ratio) * Vec1 + Ratio * Vec2;
+	// ポリゴンと線分の衝突点設定
+	// 右と左の場合
+	if (Direction == COLLISIONDIRECTION::RIGHT ||
+		Direction == COLLISIONDIRECTION::LEFT)
+	{
+		Point3.x = PolygonVtxA.x;
+		Point3.z = LineBegin.z;
+		Point3.y = LineBegin.y;
+	}
+	// 奥と手前の場合
+	else if (Direction == COLLISIONDIRECTION::FRONT ||
+		Direction == COLLISIONDIRECTION::BACK)
+	{
+		Point3.x = LineBegin.x;
+		Point3.z = PolygonVtxA.z;
+		Point3.y = LineBegin.y;
+	}
 	// ポリゴン内に点が入っていたら
 	if (PolygonToPointIn(
-		PolygonVtxA + Vec3,
+		Point3,
 		PolygonVtxA,
 		PolygonVtxB,
 		PolygonVtxC,
@@ -851,22 +870,22 @@ bool CCalculation::PolygonToPointIn(
 	VecCompOri = PosB - PosA;
 	VecAhe = ObjectPos - PosA;
 	D3DXVec3Cross(&Cross1, &VecCompOri, &VecAhe);
-	if (Cross1 < 0) return false;
+	if (Cross1.y < 0) return false;
 	// 二つ目
 	VecCompOri = PosC - PosB;
 	VecAhe = ObjectPos - PosB;
 	D3DXVec3Cross(&Cross2, &VecCompOri, &VecAhe);
-	if (Cross2 < 0) return false;
+	if (Cross2.y < 0) return false;
 	// 三つ目
 	VecCompOri = PosD - PosC;
 	VecAhe = ObjectPos - PosC;
 	D3DXVec3Cross(&Cross3, &VecCompOri, &VecAhe);
-	if (Cross3 < 0) return false;
+	if (Cross3.y < 0) return false;
 	// 三つ目
 	VecCompOri = PosA - PosD;
 	VecAhe = ObjectPos - PosD;
 	D3DXVec3Cross(&Cross4, &VecCompOri, &VecAhe);
-	if (Cross4 < 0) return false;
+	if (Cross4.y < 0) return false;
 	// 範囲に入っている
 	return true;
 }

@@ -53,7 +53,7 @@ C3DLine::~C3DLine()
 // 初期化処理
 // ----------------------------------------
 void C3DLine::Init(void)
-{	
+{
 	// 変数宣言
 	VERTEX_3D *pVtx;							// 頂点情報へのポイント
 	LPDIRECT3DDEVICE9 pDevice =					// デバイスの取得
@@ -133,19 +133,21 @@ void C3DLine::Draw(void)
 
 									// 行列の積(1:ワールド行列 = 2:ワールド行列 * 3:回転行列)
 	D3DXMatrixMultiply(&m_mtxWorld,	// 1
-		&m_mtxWorld,					// 2
-		&mtxRot);							// 3
+		&m_mtxWorld,				// 2
+		&mtxRot);					// 3
 
 
 	// 位置を反映 //
 	// 平行移動行列作成(オフセット)
-	D3DXMatrixTranslation(&mtxTrans,						// 総合の入れ物
-		m_ppos->x, m_ppos->y, m_ppos->z);	// それぞれの移動量
-
-									// 行列の積(1:ワールド行列 = 2:ワールド行列 * 3:移動行列)
-	D3DXMatrixMultiply(&m_mtxWorld,	// 1
-		&m_mtxWorld,					// 2
-		&mtxTrans);							// 3
+	if (m_ppos)
+	{
+		D3DXMatrixTranslation(&mtxTrans,						// 総合の入れ物
+			m_ppos->x, m_ppos->y, m_ppos->z);	// それぞれの移動量
+	// 行列の積(1:ワールド行列 = 2:ワールド行列 * 3:移動行列)
+		D3DXMatrixMultiply(&m_mtxWorld,	// 1
+			&m_mtxWorld,					// 2
+			&mtxTrans);							// 3
+	}
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);

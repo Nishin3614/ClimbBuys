@@ -4,11 +4,11 @@
 SCRIPT
 
 STATUS_SET
-	Move			= 3.0
-	Jump			= 10.0
+	Move			= 1.0
+	Jump			= 7.5
 	Dash			= 80.0
 	NormalInertia	= 0.70
-	JumpInertia		= 1.60
+	JumpInertia		= 1.00
 	PlayerSize		= 20.0	30.0	20.0
 	PlayerOffSet	= 0.0	15.0	0.0
 	PushSize		= 30.0

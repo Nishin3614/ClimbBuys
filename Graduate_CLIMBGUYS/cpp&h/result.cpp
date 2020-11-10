@@ -14,6 +14,10 @@
 #include "manager.h"
 #include "ui.h"
 #include "keyboard.h"
+#include "3Deffect.h"
+#include "bg.h"
+#include "connect_fieldblock.h"
+#include "resultUI.h"
 
 //=============================================================================
 //
@@ -22,6 +26,8 @@
 //=============================================================================
 CResult::CResult()
 {
+	// 初期化
+	m_pResultUI = nullptr;		// リザルトUI
 }
 
 //=============================================================================
@@ -43,8 +49,24 @@ void CResult::Init()
 {
 	// モード初期化
 	CBaseMode::Init();
-	// タイトルUIの生成
-	CUi::LoadCreate(CUi::UITYPE_RESULT);
+
+	// 3Dエフェクトの生成
+	C3DEffect::Create();
+
+	// 試験的背景の生成
+	CBg::Create();
+
+	// 結合されたフィールドブロックの生成
+	CConnect_fieldblock::Create(CGame::STAGE_1);
+
+	// プレイヤー
+	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	// プレイヤーの生成	試験的
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(-50.0, 300.0f, 50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(50.0, 300.0f, 50.0f));
 }
 
 //=============================================================================
@@ -56,6 +78,13 @@ void CResult::Uninit(void)
 {
 	// モード終了
 	CBaseMode::Uninit();
+
+	if (m_pResultUI)
+	{
+		// リザルトUIの終了
+		m_pResultUI->Uninit();
+		m_pResultUI = nullptr;
+	}
 }
 
 //=============================================================================
@@ -68,14 +97,26 @@ void CResult::Update(void)
 	// モード更新
 	CBaseMode::Update();
 
+	if (m_pResultUI)
+	{
+		// リザルトUIの更新
+		m_pResultUI->Update();
+	}
+
 	// タイトル遷移
 	if (CCalculation::PressAnyButton())
 	{
-		// フェード状態が何も起こっていない状態なら
-		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		if (!m_pResultUI)
 		{
-			CManager::GetFade()->SetFade(CManager::MODE_TITLE);
+			// リザルトUIの生成
+			m_pResultUI = CResultUI::Create();
 		}
+
+		//// フェード状態が何も起こっていない状態なら
+		//if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		//{
+		//	CManager::GetFade()->SetFade(CManager::MODE_TITLE);
+		//}
 	}
 }
 
@@ -88,11 +129,17 @@ void CResult::Draw(void)
 {
 	// モード描画
 	CBaseMode::Draw();
+
+	if (m_pResultUI)
+	{
+		// リザルトUIの描画
+		m_pResultUI->Draw();
+	}
 }
 
 //=============================================================================
 //
-// タイトルの生成
+// リザルトの生成
 //
 //=============================================================================
 CResult * CResult::Create(void)

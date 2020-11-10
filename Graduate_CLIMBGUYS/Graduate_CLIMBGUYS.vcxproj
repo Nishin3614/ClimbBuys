@@ -203,6 +203,7 @@
     <ClCompile Include="cpp&amp;h\mouse.cpp" />
     <ClCompile Include="cpp&amp;h\normalblock.cpp" />
     <ClCompile Include="cpp&amp;h\number.cpp" />
+    <ClCompile Include="cpp&amp;h\opening.cpp" />
     <ClCompile Include="cpp&amp;h\player.cpp" />
     <ClCompile Include="cpp&amp;h\playerUI.cpp" />
     <ClCompile Include="cpp&amp;h\rectcollision.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="cpp&amp;h\mouse.h" />
     <ClInclude Include="cpp&amp;h\normalblock.h" />
     <ClInclude Include="cpp&amp;h\number.h" />
+    <ClInclude Include="cpp&amp;h\opening.h" />
     <ClInclude Include="cpp&amp;h\player.h" />
     <ClInclude Include="cpp&amp;h\playerUI.h" />
     <ClInclude Include="cpp&amp;h\rectcollision.h" />

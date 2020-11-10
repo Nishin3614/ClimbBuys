@@ -282,6 +282,9 @@
     <ClCompile Include="cpp&amp;h\playerUI.cpp">
       <Filter>Texture_UI</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\opening.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -505,6 +508,9 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\playerUI.h">
       <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\opening.h">
+      <Filter>Mode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

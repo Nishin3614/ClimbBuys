@@ -14,6 +14,10 @@
 #include "manager.h"
 #include "ui.h"
 #include "keyboard.h"
+#include "3Deffect.h"
+#include "bg.h"
+#include "connect_fieldblock.h"
+#include "connectblock.h"
 
 //=============================================================================
 //
@@ -43,8 +47,34 @@ void CResult::Init()
 {
 	// モード初期化
 	CBaseMode::Init();
-	// タイトルUIの生成
-	CUi::LoadCreate(CUi::UITYPE_RESULT);
+
+	// チュートリアルUIの生成
+	CUi::LoadCreate(CUi::UITYPE_TUTORIAL);
+
+	// 3Dエフェクトの生成
+	C3DEffect::Create();
+
+	// 試験的背景の生成
+	CBg::Create();
+
+	// 結合されたフィールドブロックの生成
+	CConnect_fieldblock::Create(CGame::STAGE_1);
+	// 結合されたブロックの更新ブロック生成
+	CConnectblock::TestCreate();
+
+	//// 床の生成
+	//CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
+	////// 足場の生成
+	//CStand::CreateStand_Tutorial();
+
+	// プレイヤー
+	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
+
+	// プレイヤーの生成	試験的
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-100.0, 300.0f, -100.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(0.0, 300.0f, 100.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(100.0f, 300.0f, 100.0f));
 }
 
 //=============================================================================

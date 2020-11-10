@@ -43,13 +43,13 @@ public:
 		TYPE_PLAYER_UI_02,			// プレイヤーUI_02
 		TYPE_PLAYER_UI_03,			// プレイヤーUI_03
 		TYPE_PLAYER_UI_04,			// プレイヤーUI_04
-		TYPE_RESULT_UI_FRAME_1P,	// 
-		TYPE_RESULT_UI_FRAME_2P,	// 
-		TYPE_RESULT_UI_FRAME_3P,	// 
-		TYPE_RESULT_UI_FRAME_4P,	// 
-
-		TYPE_MAX				// 最大数
+		TYPE_RESULT_UI_FRAME_1P,	// リザルトUI_1Pの枠
+		TYPE_RESULT_UI_FRAME_2P,	// リザルトUI_2Pの枠
+		TYPE_RESULT_UI_FRAME_3P,	// リザルトUI_3Pの枠
+		TYPE_RESULT_UI_FRAME_4P,	// リザルトUI_4Pの枠
+		TYPE_MAX					// 最大数
 	} TYPE;
+
 	/* 関数 */
 	// コンストラクタ
 	CTexture_manager();

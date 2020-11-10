@@ -86,6 +86,7 @@ public:
 		TYPE_PLAYER03_THIGH_LEFT,		// プレイヤー03 左腿
 		TYPE_PLAYER03_LEG_LEFT,			// プレイヤー03 左足
 		TYPE_TUTORIALBLOCK,				// チュートリアルブロック
+		TYPE_OBJECT_MAP,				// 当たり判定無しオブジェクト マップ
 		TYPE_MAX						// 最大数
 	} TYPE;
 
@@ -178,6 +179,21 @@ public:
 		int const &nModelId = 0,					// モデル番号
 		bool const &bShadowMap = false				// シャドウマッピング状態
 	);
+
+	// 作成処理(シーン管理)
+	//	pos			: 位置
+	//	rot			: 回転
+	//	size		: サイズ倍率 1.0が標準
+	//	nModelId	: モデル番号
+	//	bShadowMap	: シャドウマッピング状態
+	static CScene_X * Create(
+		D3DXVECTOR3 const &pos,						// 位置
+		D3DXVECTOR3 const &rot,						// 回転
+		D3DXVECTOR3 const &size,					// サイズ倍率
+		int const &nModelId = 0,					// モデル番号
+		bool const &bShadowMap = false				// シャドウマッピング状態
+	);
+
 	// 作成処理(個人管理)
 	//	pos			: 位置
 	//	rot			: 回転

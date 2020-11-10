@@ -131,6 +131,8 @@ protected:
 private:
 	/* 関数 */
 	void Update_Play(void);						// プレイ時のカメラ
+	// オープニング初期化処理
+	void Init_Opening(void);
 	// チュートリアル初期化処理
 	void Init_Tutorial(void);
 	// タイトル初期化処理

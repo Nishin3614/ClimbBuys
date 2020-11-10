@@ -213,7 +213,7 @@ private:
 	bool						m_bDashFlag;					// ダッシュフラグ
 	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
-	PLAYER_STATUS				m_PlayerStatusInit;				// プレイヤーの初期ステータス
+	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 
 #ifdef _DEBUG

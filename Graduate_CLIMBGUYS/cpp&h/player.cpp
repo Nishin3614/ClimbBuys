@@ -39,7 +39,8 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatus = {};
+CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatus		= {};		// プレイヤーのステータス
+CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatusInit	= {};		// プレイヤーの初期ステータス
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
@@ -50,7 +51,6 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_bDieFlag			= false;				// 死亡フラグ
 	m_bDashFlag			= false;				// ダッシュフラグ
 	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
-	m_PlayerStatusInit	= m_PlayerStatus;		// プレイヤーの初期ステータス
 	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
@@ -943,8 +943,10 @@ void CPlayer::PlayerStatusLoad(void)
 						{
 							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushOffSet.x, &m_PlayerStatus.PushOffSet.y, &m_PlayerStatus.PushOffSet.z);
 						}
-						else if (strcmp(cHeadText, "END_BULLETSET") == 0)
+						else if (strcmp(cHeadText, "END_STATUS_SET") == 0)
 						{
+							// プレイヤーの初期ステータスを保存
+							m_PlayerStatusInit = m_PlayerStatus;
 						}
 					}
 				}

@@ -26,6 +26,8 @@
 //=============================================================================
 CResult::CResult()
 {
+	// 初期化
+	m_pResultUI = nullptr;		// リザルトUI
 }
 
 //=============================================================================
@@ -76,6 +78,13 @@ void CResult::Uninit(void)
 {
 	// モード終了
 	CBaseMode::Uninit();
+
+	if (m_pResultUI)
+	{
+		// リザルトUIの終了
+		m_pResultUI->Uninit();
+		m_pResultUI = nullptr;
+	}
 }
 
 //=============================================================================
@@ -88,11 +97,20 @@ void CResult::Update(void)
 	// モード更新
 	CBaseMode::Update();
 
+	if (m_pResultUI)
+	{
+		// リザルトUIの更新
+		m_pResultUI->Update();
+	}
+
 	// タイトル遷移
 	if (CCalculation::PressAnyButton())
 	{
-		// リザルトUIの生成
-		CResultUI::Create();
+		if (!m_pResultUI)
+		{
+			// リザルトUIの生成
+			m_pResultUI = CResultUI::Create();
+		}
 
 		//// フェード状態が何も起こっていない状態なら
 		//if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
@@ -111,11 +129,17 @@ void CResult::Draw(void)
 {
 	// モード描画
 	CBaseMode::Draw();
+
+	if (m_pResultUI)
+	{
+		// リザルトUIの描画
+		m_pResultUI->Draw();
+	}
 }
 
 //=============================================================================
 //
-// タイトルの生成
+// リザルトの生成
 //
 //=============================================================================
 CResult * CResult::Create(void)

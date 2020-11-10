@@ -13,6 +13,7 @@
 #include "resultUI.h"
 #include "basemode.h"
 #include "debugproc.h"
+#include "scene_two.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -20,7 +21,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define RESULT_UI_FRAME_SIZE		(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// リザルトUIの枠のサイズ
-#define RESULT_UI_FRAME_POS			(D3DXVECTOR3(160.0f + 320.0f * 0, 360.0f, 0.0f))		// リザルトUIの枠の位置
+#define RESULT_UI_FRAME_POS			(D3DXVECTOR3(160.0f + 320.0f * 0, 1080.0f, 0.0f))		// リザルトUIの枠の位置
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -31,8 +32,14 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // イニシャライザコンストラクタ
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-CResultUI::CResultUI() : CScene_TWO::CScene_TWO()
+CResultUI::CResultUI()
 {
+	// 初期化
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		m_pScene2D[nCnt] = nullptr;
+	}
+	m_move = D3DVECTOR3_ZERO;		// 移動量
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,8 +54,22 @@ CResultUI::~CResultUI()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Init(void)
 {
-	// シーン2Dの初期化
-	CScene_TWO::Init();
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		if (m_pScene2D[nCnt])
+		{
+			// 位置の設定
+			m_pScene2D[nCnt]->SetPosition(RESULT_UI_FRAME_POS);
+			// サイズの設定
+			m_pScene2D[nCnt]->SetSize(RESULT_UI_FRAME_SIZE);
+			// サイズの設定
+			m_pScene2D[nCnt]->BindTexture(CTexture_manager::TYPE_RESULT_UI_FRAME_1P);
+
+			// 初期化
+			m_pScene2D[nCnt]->Init();
+		}
+	}
+	m_move = D3DXVECTOR3(0.0f, -70.0f, 0.0f);	// 移動量
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,17 +77,42 @@ void CResultUI::Init(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Uninit(void)
 {
-	// 終了
-	CScene_TWO::Uninit();
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		if (m_pScene2D[nCnt])
+		{
+			// 終了
+			m_pScene2D[nCnt] = nullptr;
+		}
+	}
 }
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 更新処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Update(void)
 {
-	// 更新
-	CScene_TWO::Update();
+	// 位置の取得
+	m_pos = m_pScene2D[0]->GetPosition();
+
+	m_pos.y += m_move.y;
+
+	if (m_pos.y <= 360.0f)
+	{
+		m_pos.y = 360.0f;
+	}
+	
+	// 位置の設定
+	m_pScene2D[0]->SetPosition(m_pos);
+	m_pScene2D[0]->Set_Vtx_Pos();
+
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		if (m_pScene2D[nCnt])
+		{
+			// 更新
+			m_pScene2D[nCnt]->Update();
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -74,8 +120,14 @@ void CResultUI::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Draw(void)
 {
-	// 描画
-	CScene_TWO::Draw();
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		if (m_pScene2D[nCnt])
+		{
+			// 描画
+			m_pScene2D[nCnt]->Draw();
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,16 +139,14 @@ CResultUI * CResultUI::Create(void)
 	CResultUI * pResultUI;		// シーン2Dクラス
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pResultUI = new CResultUI();
-	// シーン管理設定
-	pResultUI->ManageSetting(CScene::LAYER_PLAYER_UI);
-	// サイズ設定
-	pResultUI->SetSize(RESULT_UI_FRAME_SIZE);
-	// サイズ設定
-	pResultUI->SetPosition(RESULT_UI_FRAME_POS);
+
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		// シーン2Dの生成
+		pResultUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, D3DVECTOR3_ZERO, D3DVECTOR2_ZERO, CTexture_manager::TYPE_NONE);
+	}
 	// 初期化処理
 	pResultUI->Init();
-	// テクスチャの設定
-	pResultUI->BindTexture(CTexture_manager::TYPE_RESULT_UI_FRAME_1P);
 
 	// 生成したオブジェクトを返す
 	return pResultUI;

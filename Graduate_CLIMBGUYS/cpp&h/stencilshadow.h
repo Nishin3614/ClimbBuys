@@ -109,7 +109,7 @@ public:
 		TYPE const &type = TYPE_CYLINDER,				// タイプ
 		int const &nWidth = 10,							// 横数
 		int const &nDepth = 1,							// 縦数
-		D3DXCOLOR	const &col = D3DXCOLOR_INI,			// カラー
+		D3DXCOLOR	const &col = D3DXCOLOR(0.0f,0.0f,0.0f,1.0f),			// カラー
 		D3DXVECTOR3 const &rot = D3DVECTOR3_ZERO		// 回転
 	);
 	// 作成処理(個人管理)
@@ -123,25 +123,38 @@ public:
 		D3DXVECTOR3 const &rot = D3DVECTOR3_ZERO		// 回転
 	);
 	// 取得
-	// 使用状態
-	bool GetUse(void);
-	// 設定
 	// 位置設定
 	void SetPos(D3DXVECTOR3 const &pos);
+	// 位置取得
+	D3DXVECTOR3 GetPos(void)				{ return m_pos; };
+	// サイズ設定
+	void SetSize(D3DXVECTOR3 const & size);
+	// サイズ取得
+	D3DXVECTOR3 GetSize(void) { return m_size; };
 	// 回転設定
 	void SetRot(D3DXVECTOR3 const &rot);
+	// 回転取得
+	D3DXVECTOR3 GetRot(void)				{ return m_rot; };
 	// 色設定
 	void SetCol(D3DXCOLOR const &col);
-	// 仕様設定
+	// 色取得
+	D3DXCOLOR GetCol(void)					{ return m_col; };
+	// 使用設定
 	void SetUse(bool const bUse);
+	// 使用状態取得
+	bool GetUse(void)						{ return m_bUse; };
 protected:
 
 private:
 	/* 関数 */
 	// 円柱の設定
 	void SetCylinder(LPDIRECT3DDEVICE9 pDevice);
+	// 円柱の頂点座標の設定
+	void SetCylinderVtxPos(void);
 	// 矩形の設定
 	void SetRect(LPDIRECT3DDEVICE9 pDevice);
+	// 矩形の頂点座標の設定
+	void SetRectVtxPos(void);
 	/* 変数 */
 	static int CStencilshadow::m_nTexId[TYPE_MAX];	// テクスチャーID
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;				// 頂点バッファへのポインタ

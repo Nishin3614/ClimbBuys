@@ -259,6 +259,10 @@ public:
 		D3DXVECTOR3 const & Size,			// サイズ
 		int const & nType	// タイプ
 	);
+	// ステンシルシャドウの使用状態設定
+	void SetUseStencillShadow(bool const & bUse);
+	// ステンシルシャドウの使用状態を取得
+	bool GetUseStencillShadow(void);
 	// 当たり判定設定
 	//	nShapeType	: 0:矩形、1:球、2:円柱
 	//	Obj			: オブジェクトタイプ
@@ -289,6 +293,8 @@ public:
 	D3DXVECTOR3 &GetSize(void) { return m_size; };
 	// 行列取得
 	D3DXMATRIX &GetMatrix(void) { return m_mtxWorld; };
+	// ステンシルシャドウ情報取得
+	CStencilshadow * GetStencillShadow(void) { return m_pStencilshadow; };
 	// 当たり判定状態取得
 	bool const GetbCollision(void);
 	// 当たり判定の情報を取得

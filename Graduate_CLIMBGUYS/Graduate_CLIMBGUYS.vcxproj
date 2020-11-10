@@ -220,6 +220,7 @@
     <ClCompile Include="cpp&amp;h\signboard.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
     <ClCompile Include="cpp&amp;h\spherecollision.cpp" />
+    <ClCompile Include="cpp&amp;h\stagingblock.cpp" />
     <ClCompile Include="cpp&amp;h\stand.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
@@ -298,6 +299,7 @@
     <ClInclude Include="cpp&amp;h\signboard.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
     <ClInclude Include="cpp&amp;h\spherecollision.h" />
+    <ClInclude Include="cpp&amp;h\stagingblock.h" />
     <ClInclude Include="cpp&amp;h\stand.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />
     <ClInclude Include="cpp&amp;h\texture_manager.h" />

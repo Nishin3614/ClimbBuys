@@ -155,7 +155,7 @@ void CCamera::Init_Opening(void)
 {
 	m_rot.x = -1.5f;
 	// íçéãì_à íu
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posR = D3DXVECTOR3(0.0f, 500.0f, -500.0f);
 	m_fLength = 750.0f;
 	m_fHeight = 1000.0f;
 }

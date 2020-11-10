@@ -32,17 +32,22 @@ public:
 	// テクスチャータイプ
 	typedef enum
 	{
-		TYPE_TESTFLOOR = 0,		// テスト用の床
-		TYPE_RESULT_LOG,		// リザルトのロゴ
-		TYPE_ANIBUTTON_LOG,		// AniButtonロゴ
-		TYPE_BG,				// ゲームの背景
-		TYPE_NONE,				// 背景なし
-		TYPE_TUTORIAL_FRAME,	// チュートリアルの枠
-		TYPE_MAGMA,				// ダメージ床用マグマ
-		TYPE_PLAYER_UI_01,		// プレイヤーUI_01
-		TYPE_PLAYER_UI_02,		// プレイヤーUI_02
-		TYPE_PLAYER_UI_03,		// プレイヤーUI_03
-		TYPE_PLAYER_UI_04,		// プレイヤーUI_04
+		TYPE_TESTFLOOR = 0,			// テスト用の床
+		TYPE_RESULT_LOG,			// リザルトのロゴ
+		TYPE_ANIBUTTON_LOG,			// AniButtonロゴ
+		TYPE_BG,					// ゲームの背景
+		TYPE_NONE,					// 背景なし
+		TYPE_TUTORIAL_FRAME,		// チュートリアルの枠
+		TYPE_MAGMA,					// ダメージ床用マグマ
+		TYPE_PLAYER_UI_01,			// プレイヤーUI_01
+		TYPE_PLAYER_UI_02,			// プレイヤーUI_02
+		TYPE_PLAYER_UI_03,			// プレイヤーUI_03
+		TYPE_PLAYER_UI_04,			// プレイヤーUI_04
+		TYPE_RESULT_UI_FRAME_1P,	// 
+		TYPE_RESULT_UI_FRAME_2P,	// 
+		TYPE_RESULT_UI_FRAME_3P,	// 
+		TYPE_RESULT_UI_FRAME_4P,	// 
+
 		TYPE_MAX				// 最大数
 	} TYPE;
 	/* 関数 */

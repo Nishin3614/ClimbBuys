@@ -209,6 +209,7 @@
     <ClCompile Include="cpp&amp;h\rectcollision.cpp" />
     <ClCompile Include="cpp&amp;h\renderer.cpp" />
     <ClCompile Include="cpp&amp;h\result.cpp" />
+    <ClCompile Include="cpp&amp;h\resultUI.cpp" />
     <ClCompile Include="cpp&amp;h\scene.cpp" />
     <ClCompile Include="cpp&amp;h\scene_load.cpp" />
     <ClCompile Include="cpp&amp;h\scene_three.cpp" />
@@ -286,6 +287,7 @@
     <ClInclude Include="cpp&amp;h\rectcollision.h" />
     <ClInclude Include="cpp&amp;h\renderer.h" />
     <ClInclude Include="cpp&amp;h\result.h" />
+    <ClInclude Include="cpp&amp;h\resultUI.h" />
     <ClInclude Include="cpp&amp;h\scene.h" />
     <ClInclude Include="cpp&amp;h\scene_load.h" />
     <ClInclude Include="cpp&amp;h\scene_three.h" />

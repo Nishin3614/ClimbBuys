@@ -27,7 +27,8 @@
 CResult::CResult()
 {
 	// 初期化
-	m_pResultUI = nullptr;		// リザルトUI
+	m_pResultUI				= nullptr;		// リザルトUI
+	m_nCntPressButton		= 0;			// ボタンを押した回数
 }
 
 //=============================================================================
@@ -97,26 +98,38 @@ void CResult::Update(void)
 	// モード更新
 	CBaseMode::Update();
 
+	// NULLチェック
 	if (m_pResultUI)
 	{
 		// リザルトUIの更新
 		m_pResultUI->Update();
 	}
 
-	// タイトル遷移
+	// ボタンを押した回数を加算
 	if (CCalculation::PressAnyButton())
 	{
+		m_nCntPressButton++;
+	}
+
+	// ボタンを押した回数によって起きる処理
+	switch (m_nCntPressButton)
+	{
+	case 1:
+		// リザルトUIが生成されていないとき
 		if (!m_pResultUI)
 		{
 			// リザルトUIの生成
 			m_pResultUI = CResultUI::Create();
 		}
+		break;
 
-		//// フェード状態が何も起こっていない状態なら
-		//if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-		//{
-		//	CManager::GetFade()->SetFade(CManager::MODE_TITLE);
-		//}
+	case 2:
+		// フェード状態が何も起こっていない状態なら
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		{
+			CManager::GetFade()->SetFade(CManager::MODE_TITLE);
+		}
+		break;
 	}
 }
 

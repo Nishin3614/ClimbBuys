@@ -20,8 +20,10 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define RESULT_UI_FRAME_SIZE		(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// リザルトUIの枠のサイズ
-#define RESULT_UI_FRAME_POS			(D3DXVECTOR3(160.0f + 320.0f * 0, 1080.0f, 0.0f))		// リザルトUIの枠の位置
+#define RESULT_UI_FRAME_POS					(D3DXVECTOR3((160.0f + 320.0f * nCnt), (1080.0f + 210.0f * nCnt), 0.0f))		// リザルトUIの枠の位置
+#define RESULT_UI_FRAME_SIZE				(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// リザルトUIの枠のサイズ
+#define RESULT_UI_FRAME_MOVE				(D3DXVECTOR3(0.0f, -70.0f, 0.0f))		// リザルトUIの枠の移動量
+#define RESULT_UI_FRAME_MOVE_STOP_POS_Y		(360.0f)								// リザルトUIの枠の移動が止まる位置Y
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -39,7 +41,7 @@ CResultUI::CResultUI()
 	{
 		m_pScene2D[nCnt] = nullptr;
 	}
-	m_move = D3DVECTOR3_ZERO;		// 移動量
+	m_move			= D3DVECTOR3_ZERO;		// 移動量
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,18 +60,20 @@ void CResultUI::Init(void)
 	{
 		if (m_pScene2D[nCnt])
 		{
-			// 位置の設定
-			m_pScene2D[nCnt]->SetPosition(RESULT_UI_FRAME_POS);
-			// サイズの設定
-			m_pScene2D[nCnt]->SetSize(RESULT_UI_FRAME_SIZE);
-			// サイズの設定
-			m_pScene2D[nCnt]->BindTexture(CTexture_manager::TYPE_RESULT_UI_FRAME_1P);
+			// リザルトUIの枠に共通する設定
+			if (nCnt <= (int)RESULT_UI::FRAME_4P)
+			{
+				// 位置の設定
+				m_pScene2D[nCnt]->SetPosition(RESULT_UI_FRAME_POS);
+				// サイズの設定
+				m_pScene2D[nCnt]->SetSize(RESULT_UI_FRAME_SIZE);
+			}
 
 			// 初期化
 			m_pScene2D[nCnt]->Init();
 		}
 	}
-	m_move = D3DXVECTOR3(0.0f, -70.0f, 0.0f);	// 移動量
+	m_move = RESULT_UI_FRAME_MOVE;	// 移動量
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,24 +95,28 @@ void CResultUI::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Update(void)
 {
-	// 位置の取得
-	m_pos = m_pScene2D[0]->GetPosition();
-
-	m_pos.y += m_move.y;
-
-	if (m_pos.y <= 360.0f)
-	{
-		m_pos.y = 360.0f;
-	}
-	
-	// 位置の設定
-	m_pScene2D[0]->SetPosition(m_pos);
-	m_pScene2D[0]->Set_Vtx_Pos();
-
 	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
 	{
 		if (m_pScene2D[nCnt])
 		{
+			// 位置
+			D3DXVECTOR3 pos = D3DVECTOR3_ZERO;
+
+			// 位置の取得
+			pos = m_pScene2D[nCnt]->GetPosition();
+
+			// 移動
+			pos.y += m_move.y;
+
+			// 移動を止める
+			if (pos.y <= RESULT_UI_FRAME_MOVE_STOP_POS_Y)
+			{
+				pos.y = RESULT_UI_FRAME_MOVE_STOP_POS_Y;
+			}
+
+			// 位置の設定
+			m_pScene2D[nCnt]->SetPosition(pos);
+			m_pScene2D[nCnt]->Set_Vtx_Pos();
 			// 更新
 			m_pScene2D[nCnt]->Update();
 		}
@@ -143,7 +151,7 @@ CResultUI * CResultUI::Create(void)
 	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
 	{
 		// シーン2Dの生成
-		pResultUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, D3DVECTOR3_ZERO, D3DVECTOR2_ZERO, CTexture_manager::TYPE_NONE);
+		pResultUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, D3DVECTOR3_ZERO, D3DVECTOR2_ZERO, (CTexture_manager::TYPE_RESULT_UI_FRAME_1P + nCnt));
 	}
 	// 初期化処理
 	pResultUI->Init();
@@ -164,5 +172,12 @@ HRESULT CResultUI::Load(void)
 // unload処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::UnLoad(void)
+{
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// リザルトUIの移動処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CResultUI::MoveResultUI(void)
 {
 }

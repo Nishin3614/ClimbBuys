@@ -20,7 +20,7 @@
 #define BLOCK_GRAVITY			(1.0f)									// ブロックにかかる重力
 #define STENCIL_SIZE_Y			(200.0f)								// ステンシルバッファのyのサイズ
 #define BLOCK_SIZE_RANGE		(25.0f)									// ブロックのサイズの範囲
-#define BLOCK_SHADOWSIZE		(24.0f)									// ステンシルシャドウのサイズ
+#define BLOCK_SHADOWSIZE		(25.0f)									// ステンシルシャドウのサイズ
 #define BLOCK_STATUS_TXT		("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -65,9 +65,11 @@ void CBaseblock::Init()
 	{
 		// シャドウポリゴンの生成
 		m_pShadowPolygon = CCircleshadow::Create(CScene_X::GetPos(),
-			D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, 0.0f, m_BlockStatus.fBasicShadowSize),
+			D3DXVECTOR3(BLOCK_SHADOWSIZE, 0.0f, BLOCK_SHADOWSIZE),
 			-1
 		);
+		m_pShadowPolygon->SetCol(D3DXCOLOR(0.0f,0.0f,0.0f,1.0f));
+		m_pShadowPolygon->Set_Vtx_Col();
 	}
 	/*
 	if (m_type == TYPE_FIELD)
@@ -197,7 +199,7 @@ void CBaseblock::Update_StencilShadow(CBaseblock * pBlock)
 		m_pShadowPolygon->SetShadow(false);
 		return;
 	}
-	
+
 	// 高さが現在置かれているブロックの高さより高かったら
 
 	else if (this->m_grid.nHeight > CBaseblock::GetHeight(pBlock->GetGrid().nColumn, pBlock->GetGrid().nLine) &&
@@ -209,22 +211,21 @@ void CBaseblock::Update_StencilShadow(CBaseblock * pBlock)
 		// 高さが規定値以上なら
 		if (fDiffHeight >= m_fSizeRange * m_BlockStatus.nAppearance)
 		{
-			// サイズ変更
-			//CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, fDiffHeight, m_BlockStatus.fBasicShadowSize));
+			// 透明度の更新
 			m_pShadowPolygon->SetPos(pBlock->GetPos() + D3DXVECTOR3(0.0f, 30.0f, 0.0f));
-			m_pShadowPolygon->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, 0.0f, m_BlockStatus.fBasicShadowSize));
-			m_pShadowPolygon->Set_Vtx_Pos(CScene_THREE::OFFSET_TYPE_SIDE_CENTER);
+			m_pShadowPolygon->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_BlockStatus.fBasicShadowSize));
+			m_pShadowPolygon->Set_Vtx_Col();
 		}
 		// それ以外
 		else
 		{
+			// 透明度の更新
 			float fSize = m_fSizeRange * m_BlockStatus.nAppearance - fDiffHeight;
-			// サイズ変更
-			//CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize * fSize, fDiffHeight , m_BlockStatus.fBasicShadowSize * fSize));
 			m_pShadowPolygon->SetPos(pBlock->GetPos() + D3DXVECTOR3(0.0f, 30.0f, 0.0f));
-			m_pShadowPolygon->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize * fSize, 0.0f, m_BlockStatus.fBasicShadowSize * fSize));
-			m_pShadowPolygon->Set_Vtx_Pos(CScene_THREE::OFFSET_TYPE_SIDE_CENTER);
+			m_pShadowPolygon->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_BlockStatus.fBasicShadowSize * fSize));
+			m_pShadowPolygon->Set_Vtx_Col();
 		}
+
 	}
 
 
@@ -839,10 +840,10 @@ void CBaseblock::CreateInBulkBlock()
 	for (int nBlockCnt = 0; nBlockCnt < 94; nBlockCnt++)
 	{
 		// 変数宣言
-		
+
 		CBaseblock * pBaseblock;								// シーン2Dクラス
 		pBaseblock = Create(BlockPos[nBlockCnt], 2);			// 生成
-		
+
 		//pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
 	}
 }
@@ -1036,9 +1037,9 @@ void CBaseblock::BlockStatusLoad(void)
 		MessageBox(NULL, "ブロックのステータス読み込み失敗", BLOCK_STATUS_TXT, MB_ICONWARNING);
 	}
 
-	
+
 	// 基本シャドウサイズの設定
-	m_BlockStatus.fBasicShadowSize = BLOCK_SHADOWSIZE / (m_fSizeRange * m_BlockStatus.nAppearance);
+	m_BlockStatus.fBasicShadowSize = 1.0f / (m_fSizeRange * m_BlockStatus.nAppearance);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

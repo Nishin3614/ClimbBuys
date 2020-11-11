@@ -3825,7 +3825,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\game317\\Desktop\\ClimbBuys\\Graduate_CLIMBGUYS\\data\\TEXTURE\\Object\\Grass.jpg";
+    "data\\TEXTURE\\Object\\Grass.jpg";
    }
   }
   Material {
@@ -3834,7 +3834,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\game317\\Desktop\\ClimbBuys\\Graduate_CLIMBGUYS\\data\\TEXTURE\\Object\\Volcano.jpg";
+    "data\\TEXTURE\\Object\\Volcano.jpg";
    }
   }
   Material {

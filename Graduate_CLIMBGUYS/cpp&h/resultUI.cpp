@@ -14,16 +14,24 @@
 #include "basemode.h"
 #include "debugproc.h"
 #include "scene_two.h"
+#include "number.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define RESULT_UI_FRAME_POS					(D3DXVECTOR3((160.0f + 320.0f * nCnt), (1080.0f + 210.0f * nCnt), 0.0f))		// リザルトUIの枠の位置
-#define RESULT_UI_FRAME_SIZE				(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// リザルトUIの枠のサイズ
-#define RESULT_UI_FRAME_MOVE				(D3DXVECTOR3(0.0f, -70.0f, 0.0f))		// リザルトUIの枠の移動量
-#define RESULT_UI_FRAME_MOVE_STOP_POS_Y		(360.0f)								// リザルトUIの枠の移動が止まる位置Y
+/* D3DXVECTOR3(((サイズX / 2) + サイズXの値 * nCnt), ((サイズY / 2 + サイズY[下の画面外に出すため]) + (移動量 * ずらすフレーム数) * nCnt), 0.0f) */
+#define RESULT_UI_FRAME_POS					(D3DXVECTOR3((160.0f + 320.0f * nCnt), (1080.0f + 210.0f * nCnt), 0.0f))		// 枠の位置
+#define RESULT_UI_FRAME_SIZE				(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// 枠のサイズ
+#define RESULT_UI_FRAME_MOVE				(D3DXVECTOR3(0.0f, -70.0f, 0.0f))		// 枠の移動量
+#define RESULT_UI_FRAME_MOVE_STOP_POS_Y		(360.0f)								// 枠の移動が止まる位置Y
+#define RESULT_UI_RANK_POS					(D3DXVECTOR3((265.0f + 320.0f * (nCnt - (int)RESULT_UI::RANK_01)), (740.0f + 210.0f * (nCnt - (int)RESULT_UI::RANK_01)), 0.0f))		// 順位の位置
+#define RESULT_UI_RANK_SIZE					(D3DXVECTOR2(100.0f, 100.0f))				// 順位のサイズ
+#define RESULT_UI_RANK_MOVE_STOP_POS_Y		(55.0f)									// 順位の移動が止まる位置Y
+
+#define RESULT_UI_SCORE_POS					(D3DXVECTOR3(260.0f, 485.0f, 0.0f))		// スコアの位置
+#define RESULT_UI_NUMBER_SIZE				(D3DXVECTOR2(35.0f, 50.0f))				// 数字のサイズ
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -39,9 +47,10 @@ CResultUI::CResultUI()
 	// 初期化
 	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
 	{
-		m_pScene2D[nCnt] = nullptr;
+		m_pScene2D[nCnt]	= nullptr;				// シーン2D
 	}
-	m_move			= D3DVECTOR3_ZERO;		// 移動量
+	m_pNumber				= nullptr;				// ナンバー
+	m_move					= D3DVECTOR3_ZERO;		// 移動量
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -56,24 +65,13 @@ CResultUI::~CResultUI()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Init(void)
 {
-	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
-	{
-		if (m_pScene2D[nCnt])
-		{
-			// リザルトUIの枠に共通する設定
-			if (nCnt <= (int)RESULT_UI::FRAME_4P)
-			{
-				// 位置の設定
-				m_pScene2D[nCnt]->SetPosition(RESULT_UI_FRAME_POS);
-				// サイズの設定
-				m_pScene2D[nCnt]->SetSize(RESULT_UI_FRAME_SIZE);
-			}
-
-			// 初期化
-			m_pScene2D[nCnt]->Init();
-		}
-	}
+	// 初期化
 	m_move = RESULT_UI_FRAME_MOVE;	// 移動量
+
+	// 枠の初期設定
+	InitSettingFrame();
+	// 各スコアの初期設定
+	InitSettingScore();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,42 +83,21 @@ void CResultUI::Uninit(void)
 	{
 		if (m_pScene2D[nCnt])
 		{
-			// 終了
-			m_pScene2D[nCnt] = nullptr;
+			m_pScene2D[nCnt] = nullptr;		// シーン2D
 		}
 	}
+	m_pNumber = nullptr;		// ナンバー
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 更新処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Update(void)
 {
-	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
-	{
-		if (m_pScene2D[nCnt])
-		{
-			// 位置
-			D3DXVECTOR3 pos = D3DVECTOR3_ZERO;
+	// 枠の更新設定
+	UpdateSettingFrame();
 
-			// 位置の取得
-			pos = m_pScene2D[nCnt]->GetPosition();
-
-			// 移動
-			pos.y += m_move.y;
-
-			// 移動を止める
-			if (pos.y <= RESULT_UI_FRAME_MOVE_STOP_POS_Y)
-			{
-				pos.y = RESULT_UI_FRAME_MOVE_STOP_POS_Y;
-			}
-
-			// 位置の設定
-			m_pScene2D[nCnt]->SetPosition(pos);
-			m_pScene2D[nCnt]->Set_Vtx_Pos();
-			// 更新
-			m_pScene2D[nCnt]->Update();
-		}
-	}
+	// 各スコアの更新設定
+	UpdateSettingScore();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -135,6 +112,11 @@ void CResultUI::Draw(void)
 			// 描画
 			m_pScene2D[nCnt]->Draw();
 		}
+	}
+	if (m_pNumber)
+	{
+		// 描画
+		m_pNumber->Draw();
 	}
 }
 
@@ -153,6 +135,9 @@ CResultUI * CResultUI::Create(void)
 		// シーン2Dの生成
 		pResultUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, D3DVECTOR3_ZERO, D3DVECTOR2_ZERO, (CTexture_manager::TYPE_RESULT_UI_FRAME_1P + nCnt));
 	}
+	// ナンバーの生成
+	pResultUI->m_pNumber = CNumber::Create(0, D3DVECTOR3_ZERO);
+
 	// 初期化処理
 	pResultUI->Init();
 
@@ -176,8 +161,110 @@ void CResultUI::UnLoad(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-// リザルトUIの移動処理
+// 枠の初期設定
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CResultUI::MoveResultUI(void)
+void CResultUI::InitSettingFrame(void)
 {
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		if (m_pScene2D[nCnt])
+		{
+			// 枠に共通する設定
+			if (nCnt <= (int)RESULT_UI::FRAME_4P)
+			{
+				// 位置の設定
+				m_pScene2D[nCnt]->SetPosition(RESULT_UI_FRAME_POS);
+				// サイズの設定
+				m_pScene2D[nCnt]->SetSize(RESULT_UI_FRAME_SIZE);
+			}
+			// 順位に共通する設定
+			else if (nCnt <= (int)RESULT_UI::RANK_04)
+			{
+				// 位置の設定
+				m_pScene2D[nCnt]->SetPosition(RESULT_UI_RANK_POS);
+				// サイズの設定
+				m_pScene2D[nCnt]->SetSize(RESULT_UI_RANK_SIZE);
+			}
+
+			// 初期化
+			m_pScene2D[nCnt]->Init();
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 各スコアの初期設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CResultUI::InitSettingScore(void)
+{
+	if (m_pNumber)
+	{
+		// 位置の設定
+		m_pNumber->SetPosition(RESULT_UI_SCORE_POS);
+		// サイズの設定
+		m_pNumber->SetSize(RESULT_UI_NUMBER_SIZE);
+		// テクスチャの設定
+		m_pNumber->BindTexture(CTexture_manager::TYPE_UI_NUMBER);
+		// 初期化
+		m_pNumber->Init();
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 枠の更新設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CResultUI::UpdateSettingFrame(void)
+{
+	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
+	{
+		if (m_pScene2D[nCnt])
+		{
+			// 位置
+			D3DXVECTOR3 pos = D3DVECTOR3_ZERO;
+
+			// 位置の取得
+			pos = m_pScene2D[nCnt]->GetPosition();
+
+			// 移動
+			pos.y += m_move.y;
+
+			// 枠に共通する設定
+			if (nCnt <= (int)RESULT_UI::FRAME_4P)
+			{
+				// 移動を止める
+				if (pos.y <= RESULT_UI_FRAME_MOVE_STOP_POS_Y)
+				{
+					pos.y = RESULT_UI_FRAME_MOVE_STOP_POS_Y;
+				}
+			}
+			// 順位に共通する設定
+			else if (nCnt <= (int)RESULT_UI::RANK_04)
+			{
+				// 移動を止める
+				if (pos.y <= RESULT_UI_RANK_MOVE_STOP_POS_Y)
+				{
+					pos.y = RESULT_UI_RANK_MOVE_STOP_POS_Y;
+				}
+			}
+			// 位置の設定
+			m_pScene2D[nCnt]->SetPosition(pos);
+			m_pScene2D[nCnt]->Set_Vtx_Pos();
+			// 更新
+			m_pScene2D[nCnt]->Update();
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 各スコアの更新設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CResultUI::UpdateSettingScore(void)
+{
+	if (m_pNumber)
+	{
+		// 位置の設定
+		m_pNumber->Set_Vtx_Pos();
+		// 更新
+		m_pNumber->Update();
+	}
 }

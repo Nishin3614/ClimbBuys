@@ -190,6 +190,7 @@ public:
 		D3DXVECTOR3 const &pos,						// 位置
 		D3DXVECTOR3 const &rot,						// 回転
 		D3DXVECTOR3 const &size,					// サイズ倍率
+		D3DXCOLOR color,							// カラー
 		int const &nModelId = 0,					// モデル番号
 		bool const &bShadowMap = false				// シャドウマッピング状態
 	);

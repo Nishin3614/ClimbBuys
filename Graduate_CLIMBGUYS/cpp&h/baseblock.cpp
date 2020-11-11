@@ -16,6 +16,7 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 #define BLOCK_GRAVITY			(1.0f)									// ブロックにかかる重力
 #define STENCIL_SIZE_Y			(200.0f)								// ステンシルバッファのyのサイズ
 #define BLOCK_SIZE_RANGE		(25.0f)									// ブロックのサイズの範囲
@@ -196,7 +197,9 @@ void CBaseblock::Update_StencilShadow(CBaseblock * pBlock)
 		m_pShadowPolygon->SetShadow(false);
 		return;
 	}
+	
 	// 高さが現在置かれているブロックの高さより高かったら
+
 	else if (this->m_grid.nHeight > CBaseblock::GetHeight(pBlock->GetGrid().nColumn, pBlock->GetGrid().nLine) &&
 		this->m_grid.nHeight > pBlock->GetGrid().nHeight)
 	{
@@ -836,9 +839,11 @@ void CBaseblock::CreateInBulkBlock()
 	for (int nBlockCnt = 0; nBlockCnt < 94; nBlockCnt++)
 	{
 		// 変数宣言
+		
 		CBaseblock * pBaseblock;								// シーン2Dクラス
 		pBaseblock = Create(BlockPos[nBlockCnt], 2);			// 生成
-		pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
+		
+		//pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
 	}
 }
 
@@ -1031,6 +1036,7 @@ void CBaseblock::BlockStatusLoad(void)
 		MessageBox(NULL, "ブロックのステータス読み込み失敗", BLOCK_STATUS_TXT, MB_ICONWARNING);
 	}
 
+	
 	// 基本シャドウサイズの設定
 	m_BlockStatus.fBasicShadowSize = BLOCK_SHADOWSIZE / (m_fSizeRange * m_BlockStatus.nAppearance);
 }

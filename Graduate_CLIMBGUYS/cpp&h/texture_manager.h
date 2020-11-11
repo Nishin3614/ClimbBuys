@@ -47,6 +47,11 @@ public:
 		TYPE_RESULT_UI_FRAME_2P,	// リザルトUI_2Pの枠
 		TYPE_RESULT_UI_FRAME_3P,	// リザルトUI_3Pの枠
 		TYPE_RESULT_UI_FRAME_4P,	// リザルトUI_4Pの枠
+		TYPE_RESULT_UI_RANK_01,		// リザルトUI_順位_01
+		TYPE_RESULT_UI_RANK_02,		// リザルトUI_順位_02
+		TYPE_RESULT_UI_RANK_03,		// リザルトUI_順位_03
+		TYPE_RESULT_UI_RANK_04,		// リザルトUI_順位_04
+		TYPE_UI_NUMBER,				// ナンバー
 		TYPE_MAX					// 最大数
 	} TYPE;
 

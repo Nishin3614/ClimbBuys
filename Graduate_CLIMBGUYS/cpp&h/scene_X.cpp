@@ -332,7 +332,7 @@ CScene_X * CScene_X::Create(
 //	nModelId	: モデル番号
 //	bShadowMap	: シャドウマッピング状態
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CScene_X * CScene_X::Create(D3DXVECTOR3 const & pos, D3DXVECTOR3 const & rot, D3DXVECTOR3 const & size, int const & nModelId, bool const & bShadowMap)
+CScene_X * CScene_X::Create(D3DXVECTOR3 const & pos, D3DXVECTOR3 const & rot, D3DXVECTOR3 const & size, D3DXCOLOR color, int const & nModelId, bool const & bShadowMap)
 {
 	// 変数宣言
 	CScene_X * pScene_X;		// シーン3Dクラス
@@ -344,6 +344,7 @@ CScene_X * CScene_X::Create(D3DXVECTOR3 const & pos, D3DXVECTOR3 const & rot, D3
 	pScene_X->m_pos = pos;
 	pScene_X->m_rot = rot;
 	pScene_X->m_size = size;
+	pScene_X->SetModelColor(color);
 	pScene_X->m_nModelId = nModelId;
 	pScene_X->m_bShadowMap = bShadowMap;
 	// 初期化処理

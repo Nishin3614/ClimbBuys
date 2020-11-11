@@ -26,9 +26,9 @@
 #define RESULT_UI_FRAME_SIZE				(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// 枠のサイズ
 #define RESULT_UI_FRAME_MOVE				(D3DXVECTOR3(0.0f, -70.0f, 0.0f))		// 枠の移動量
 #define RESULT_UI_FRAME_MOVE_STOP_POS_Y		(360.0f)								// 枠の移動が止まる位置Y
-#define RESULT_UI_RANK_POS					(D3DXVECTOR3((260.0f + 320.0f * (nCnt - (int)RESULT_UI::RANK_01)), (740.0f + 210.0f * (nCnt - (int)RESULT_UI::RANK_01)), 0.0f))		// 順位の位置
-#define RESULT_UI_RANK_SIZE					(D3DXVECTOR2(90.0f, 90.0f))				// 順位のサイズ
-#define RESULT_UI_RANK_MOVE_STOP_POS_Y		(60.0f)									// 順位の移動が止まる位置Y
+#define RESULT_UI_RANK_POS					(D3DXVECTOR3((265.0f + 320.0f * (nCnt - (int)RESULT_UI::RANK_01)), (740.0f + 210.0f * (nCnt - (int)RESULT_UI::RANK_01)), 0.0f))		// 順位の位置
+#define RESULT_UI_RANK_SIZE					(D3DXVECTOR2(100.0f, 100.0f))				// 順位のサイズ
+#define RESULT_UI_RANK_MOVE_STOP_POS_Y		(55.0f)									// 順位の移動が止まる位置Y
 
 #define RESULT_UI_SCORE_POS					(D3DXVECTOR3(260.0f, 485.0f, 0.0f))		// スコアの位置
 #define RESULT_UI_NUMBER_SIZE				(D3DXVECTOR2(35.0f, 50.0f))				// 数字のサイズ
@@ -203,7 +203,8 @@ void CResultUI::InitSettingScore(void)
 		m_pNumber->SetPosition(RESULT_UI_SCORE_POS);
 		// サイズの設定
 		m_pNumber->SetSize(RESULT_UI_NUMBER_SIZE);
-
+		// テクスチャの設定
+		m_pNumber->BindTexture(CTexture_manager::TYPE_UI_NUMBER);
 		// 初期化
 		m_pNumber->Init();
 	}

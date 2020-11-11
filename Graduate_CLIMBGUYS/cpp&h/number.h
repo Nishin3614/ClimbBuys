@@ -78,11 +78,11 @@ public:
 	static void UnLoad(void);
 	// 作成
 	static CNumber * Create(
-		int							const & nScore,									// スコア
-		D3DXVECTOR3					const & pos,									// 位置
-		CTexture_manager::TYPE		const & tex		= CTexture_manager::TYPE_NONE,	// テクスチャータイプ
-		D3DXVECTOR2					const & size	= D3DXVECTOR2(100.0f,100.0f),	// サイズ
-		D3DXCOLOR					const & col		= D3DXCOLOR_INI					// 色
+		int							const & nScore,										// スコア
+		D3DXVECTOR3					const & pos,										// 位置
+		CTexture_manager::TYPE		const & tex		= CTexture_manager::TYPE_UI_NUMBER,	// テクスチャータイプ
+		D3DXVECTOR2					const & size	= D3DXVECTOR2(100.0f,100.0f),		// サイズ
+		D3DXCOLOR					const & col		= D3DXCOLOR_INI						// 色
 	);	// 作成
 protected:
 

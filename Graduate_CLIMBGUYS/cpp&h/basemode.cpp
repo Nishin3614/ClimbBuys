@@ -98,6 +98,8 @@ void CBaseMode::Debug(void)
 	CDebugproc::Print("[Ctrl] + テンキー [2] : Tutorialに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [3] : Gameに遷移\n");
 	CDebugproc::Print("[Ctrl] + テンキー [4] : Resultに遷移\n");
+	CDebugproc::Print("[Ctrl] + テンキー [5] : Openingに遷移\n");
+
 	CDebugproc::Print(NEWLINE);
 
 	// 現在のモード表記
@@ -118,6 +120,11 @@ void CBaseMode::Debug(void)
 	case CManager::MODE_RESULT:
 		CDebugproc::Print("現在のモード : [ Result ]\n");
 		break;
+
+	case CManager::MODE_OPENING:
+		CDebugproc::Print("現在のモード : [ OPENING ]\n");
+		break;
+
 	}
 
 	// 一時停止
@@ -171,6 +178,11 @@ void CBaseMode::Debug(void)
 			if (key->GetKeyboardTrigger(DIK_NUMPAD4))
 			{
 				CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+			}
+			// オープニング
+			if (key->GetKeyboardTrigger(DIK_NUMPAD5))
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_OPENING);
 			}
 		}
 	}

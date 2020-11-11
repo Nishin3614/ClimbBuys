@@ -803,7 +803,7 @@ void CBaseblock::CreateInBulkBlock()
 		// 変数宣言
 		CBaseblock * pBaseblock;		// シーン2Dクラス
 		pBaseblock = Create(BlockPos[nBlockCnt], 2);
-		pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
+		//pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
 	}
 }
 

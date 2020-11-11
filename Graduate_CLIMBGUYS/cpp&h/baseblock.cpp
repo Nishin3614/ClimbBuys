@@ -9,6 +9,7 @@
 #include "debugproc.h"
 #include "stencilshadow.h"
 #include "game.h"
+#include "circleshadow.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -38,6 +39,7 @@ std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CBaseblock::CBaseblock() : CScene_X::CScene_X()
 {
+	m_pShadowPolygon = NULL;
 	m_type = TYPE_NORMAL;	// タイプ
 	m_bFall = false;		// 落ちる状態
 	CScene::SetObj(CScene::OBJ::OBJ_BLOCK);	// オブジェクトタイプの設定
@@ -57,11 +59,15 @@ void CBaseblock::Init()
 {
 	// シーンXの初期化処理
 	CScene_X::Init();
-	// ステンシルシャドウの設定
-	CScene_X::SetStencilshadow(
-		D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, STENCIL_SIZE_Y, m_BlockStatus.fBasicShadowSize),
-		CStencilshadow::TYPE_RECT
-	);
+	// フィールドブロック以外なら
+	if (m_type != TYPE_FIELD)
+	{
+		// シャドウポリゴンの生成
+		m_pShadowPolygon = CCircleshadow::Create(CScene_X::GetPos(),
+			D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, 0.0f, m_BlockStatus.fBasicShadowSize),
+			-1
+		);
+	}
 	/*
 	if (m_type == TYPE_FIELD)
 	{
@@ -95,7 +101,16 @@ void CBaseblock::Update(void)
 	CScene_X::Update();
 	// 落ちる処理
 	Update_Fall();
-
+	// シャドウポリゴンの位置設定
+	if (m_pShadowPolygon)
+	{
+		// 変数宣言
+		D3DXVECTOR3 ShadowPos;	// シャドウ位置
+		ShadowPos = m_pShadowPolygon->GetPos();
+		ShadowPos.x = CScene_X::GetPos().x;
+		ShadowPos.z = CScene_X::GetPos().z;
+		m_pShadowPolygon->SetPos(ShadowPos);
+	}
 	// ブロックのループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK);nCntBlock++)
 	{
@@ -162,44 +177,50 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Update_StencilShadow(CBaseblock * pBlock)
 {
+	// シャドウのポリゴンのNULLチェック
+	if (!m_pShadowPolygon) return;
 	// フィールドブロックなら
 	// ->関数を抜ける
-	if (m_type == TYPE_FIELD) return;
-	// ステンシルシャドウの使用状態がfalseなら
-	// ->関数を抜ける
-	else if (!this->GetStencillShadow()) return;
+	else if (m_type == TYPE_FIELD) return;
 	// 落ちている状態なら
 	// ->ステンシルシャドウの使用状態をfalseに
 	else if (!this->GetFall())
 	{
-		CScene_X::SetUseStencillShadow(false);
+		m_pShadowPolygon->SetShadow(false);
 		return;
 	}
 	// 下にブロックがあるなら
 	// ->ステンシルシャドウの使用状態をfalseに
 	else if (m_grid.nHeight - 1 == pBlock->GetGrid().nHeight)
 	{
-		CScene_X::SetUseStencillShadow(false);
+		m_pShadowPolygon->SetShadow(false);
 		return;
 	}
 	// 高さが現在置かれているブロックの高さより高かったら
 	else if (this->m_grid.nHeight > CBaseblock::GetHeight(pBlock->GetGrid().nColumn, pBlock->GetGrid().nLine) &&
 		this->m_grid.nHeight > pBlock->GetGrid().nHeight)
 	{
+		m_pShadowPolygon->SetShadow(true);
 		// 変数宣言
 		float fDiffHeight = this->GetPos().y - pBlock->GetPos().y;	// 比較した高さの差
 		// 高さが規定値以上なら
 		if (fDiffHeight >= m_fSizeRange * m_BlockStatus.nAppearance)
 		{
 			// サイズ変更
-			CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, fDiffHeight, m_BlockStatus.fBasicShadowSize));
+			//CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, fDiffHeight, m_BlockStatus.fBasicShadowSize));
+			m_pShadowPolygon->SetPos(pBlock->GetPos() + D3DXVECTOR3(0.0f, 30.0f, 0.0f));
+			m_pShadowPolygon->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, 0.0f, m_BlockStatus.fBasicShadowSize));
+			m_pShadowPolygon->Set_Vtx_Pos(CScene_THREE::OFFSET_TYPE_SIDE_CENTER);
 		}
 		// それ以外
 		else
 		{
 			float fSize = m_fSizeRange * m_BlockStatus.nAppearance - fDiffHeight;
 			// サイズ変更
-			CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize * fSize, fDiffHeight , m_BlockStatus.fBasicShadowSize * fSize));
+			//CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize * fSize, fDiffHeight , m_BlockStatus.fBasicShadowSize * fSize));
+			m_pShadowPolygon->SetPos(pBlock->GetPos() + D3DXVECTOR3(0.0f, 30.0f, 0.0f));
+			m_pShadowPolygon->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize * fSize, 0.0f, m_BlockStatus.fBasicShadowSize * fSize));
+			m_pShadowPolygon->Set_Vtx_Pos(CScene_THREE::OFFSET_TYPE_SIDE_CENTER);
 		}
 	}
 

@@ -134,7 +134,7 @@ void CScene_TWO::Draw(void)
 
 	// Zテストを無効にする
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_OFF);
-	
+
 	// ポリゴン描画
 	pDevice->DrawPrimitive(
 		D3DPT_TRIANGLESTRIP,
@@ -367,26 +367,39 @@ void CScene_TWO::Set_Vtx_Pos(
 			0,
 			(void **)&pVtx,
 			0);
-	}
-	// オフセットタイプ
-	switch (offsettype)
-	{
-		// センター
-	case OFFSET_TYPE_CENTER:
-		Offset_Center(pVtx);
-		break;
-		// 左
-	case OFFSET_TYPE_LEFT:
-		Offset_Left(pVtx);
-		break;
-	default:
-		break;
-	}
-	// 頂点情報がヌルだったら
-	if (pVtx == NULL)
-	{
+		// オフセットタイプ
+		switch (offsettype)
+		{
+			// センター
+		case OFFSET_TYPE_CENTER:
+			Offset_Center(pVtx);
+			break;
+			// 左
+		case OFFSET_TYPE_LEFT:
+			Offset_Left(pVtx);
+			break;
+		default:
+			break;
+		}
 		// アンロック
 		m_pVtxBuff->Unlock();
+	}
+	else
+	{
+		// オフセットタイプ
+		switch (offsettype)
+		{
+			// センター
+		case OFFSET_TYPE_CENTER:
+			Offset_Center(pVtx);
+			break;
+			// 左
+		case OFFSET_TYPE_LEFT:
+			Offset_Left(pVtx);
+			break;
+		default:
+			break;
+		}
 	}
 }
 

@@ -24,6 +24,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class CCircleshadow;	// 円シャドウクラス
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 構造体
@@ -238,20 +239,19 @@ public:
 	);
 
 	// ベースブロック
-	void SetType(TYPE const type)		{ m_type = type; };
+	void SetType(TYPE const type)				{ m_type = type; };
 	// ベースブロック
-	TYPE GetType(void) const			{ return m_type; };
+	TYPE GetType(void) const					{ return m_type; };
 	// 落ちる状態設定
-	void SetFall(bool const & bFall)	{ m_bFall = bFall; };
+	void SetFall(bool const & bFall)			{ m_bFall = bFall; };
 	// 落ちる状態取得
-	bool & GetFall(void)				{ return m_bFall; };
+	bool & GetFall(void)						{ return m_bFall; };
 	// 盤面情報取得
-	GRID & GetGrid(void)				{ return m_grid; };
+	GRID & GetGrid(void)						{ return m_grid; };
 	// 盤面情報設定
-	void SetGrid(GRID const &grid)		{ m_grid = grid; };
+	void SetGrid(GRID const &grid)				{ m_grid = grid; };
 	// 前回の位置取得
-	D3DXVECTOR3 & GetPosOld(void)		{ return m_posOld; };
-
+	D3DXVECTOR3 & GetPosOld(void)				{ return m_posOld; };
 	// ベースブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// ベースブロック全ソースの開放
@@ -356,11 +356,12 @@ private:
 	// ステンシルシャドウの更新処理
 	void Update_StencilShadow(CBaseblock * pBlock);
 	/* 変数 */
-	static BLOCK_STATUS		m_BlockStatus;	// ブロックのステータス
-	D3DXVECTOR3				m_posOld;		// 前回の位置
-	TYPE					m_type;			// ベースブロック
-	GRID					m_grid;			// 盤面情報
-	bool					m_bFall;		// 落ちる状態
+	static BLOCK_STATUS		m_BlockStatus;		// ブロックのステータス
+	CCircleshadow *			m_pShadowPolygon;	// シャドウポリゴン
+	D3DXVECTOR3				m_posOld;			// 前回の位置
+	TYPE					m_type;				// ベースブロック
+	GRID					m_grid;				// 盤面情報
+	bool					m_bFall;			// 落ちる状態
 	// 試験用
 	static int m_anHeight[20][20];
 };

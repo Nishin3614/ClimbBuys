@@ -251,6 +251,7 @@ COpeningManager::COpeningManager()
 	m_Targetpos[93] = STAGINGBLOCK_POS_S_11;
 
 	m_nCount = 0;
+	m_NextStateCnt = 120;
 	// オブジェクトの生成
 	CreateAll();
 }
@@ -282,7 +283,7 @@ void COpeningManager::Update(void)
 		if (pOpening && pOpening->GetState() == COpening::OpeningState::BUILDING)
 		{
 			/////////////----------------------------------------
-			if (m_pStagingBlock[m_nCount]->GetPos().y >= m_Targetpos[m_nCount].y)
+			if (m_pStagingBlock[m_nCount]->GetPos().y > m_Targetpos[m_nCount].y)
 			{ // ブロックを一個ずつ目的地まで移動
 				m_pStagingBlock[m_nCount]->BlockFall();
 			}
@@ -306,10 +307,17 @@ void COpeningManager::Update(void)
 		// オープニングの状態が STAGING だったら
 		if (pOpening && pOpening->GetState() == COpening::OpeningState::STAGING)
 		{
-			for (int nNum = 0; nNum < MAX_STAGINGBLOCK; nNum++)
+			if (m_NextStateCnt <= 0)
 			{
-				// ブロックの破裂
-				m_pStagingBlock[nNum]->BlockBurst();
+				for (int nNum = 0; nNum < MAX_STAGINGBLOCK; nNum++)
+				{
+					// ブロックの破裂
+					m_pStagingBlock[nNum]->BlockBurst();
+				}
+			}
+			else
+			{
+				m_NextStateCnt--;
 			}
 		}
 	}
@@ -343,5 +351,7 @@ void COpeningManager::CreateAll()
 			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
 			CScene_X::TYPE_BLOCK,
 			false);
+
+		m_pStagingBlock[nCnt]->SetBlockNum(nCnt);
 	}
 }

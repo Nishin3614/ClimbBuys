@@ -47,6 +47,7 @@ private:
 	static D3DXVECTOR3	m_Targetpos[MAX_STAGINGBLOCK];			// 各ブロックの目標座標
 	CStagingBlock		*m_pStagingBlock[MAX_STAGINGBLOCK];		// 演出用ブロッククラスのポインタ
 	int					m_nCount;
+	int					m_NextStateCnt;							// 次のステートに変わるまでの時間
 };
 
 #endif

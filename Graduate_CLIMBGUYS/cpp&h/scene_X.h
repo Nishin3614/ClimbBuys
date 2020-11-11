@@ -86,7 +86,16 @@ public:
 		TYPE_PLAYER03_THIGH_LEFT,		// プレイヤー03 左腿
 		TYPE_PLAYER03_LEG_LEFT,			// プレイヤー03 左足
 		TYPE_TUTORIALBLOCK,				// チュートリアルブロック
-		TYPE_OBJECT_MAP,				// 当たり判定無しオブジェクト マップ
+		TYPE_OBJECT_MAP,				// マップ
+		TYPE_OBJECT_BLOCK_C,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_L,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_I,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_M,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_B,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_G,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_U,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_Y,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_S,			// 当たり判定無し演出用ブロック
 		TYPE_MAX						// 最大数
 	} TYPE;
 

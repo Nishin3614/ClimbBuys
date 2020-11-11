@@ -89,16 +89,20 @@ void CCircleshadow::Draw(void)
 	// 変数宣言
 	LPDIRECT3DDEVICE9 pDevice =					// デバイスの取得
 		CManager::GetRenderer()->GetDevice();
+	/*
 	// 減算
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	*/
 	// 描画
 	CScene_THREE::Draw();
+	/*
 	// 通常ブレンド
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	*/
 }
 
 // ----------------------------------------

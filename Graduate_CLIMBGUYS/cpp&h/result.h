@@ -50,5 +50,6 @@ public:
 
 private:
 	CResultUI			*m_pResultUI;							// リザルトUI
+	int					m_nCntPressButton;						// ボタンを押した回数
 };
 #endif

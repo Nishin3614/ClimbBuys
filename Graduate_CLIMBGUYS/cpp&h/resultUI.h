@@ -40,6 +40,9 @@ public:
 	{
 		UI_NONE = -1,
 		FRAME_1P,			// 1Pの枠
+		FRAME_2P,			// 2Pの枠
+		FRAME_3P,			// 3Pの枠
+		FRAME_4P,			// 4Pの枠
 		UI_MAX
 	};
 
@@ -61,9 +64,11 @@ public:
 protected:
 private:
 	/* 関数 */
+	void			MoveResultUI(void);						// リザルトUIの移動処理
 	/* 変数 */
 	CScene_TWO		*m_pScene2D[(int)RESULT_UI::UI_MAX];	// シーン2D
-	D3DXVECTOR3		m_pos;			// 位置
-	D3DXVECTOR3		m_move;			// 移動量
+	D3DXVECTOR3		m_move;									// 移動量
+	int				m_nMoveCnt;								// 移動を開始するカウント
+	bool			m_bMoveStart;							
 };
 #endif

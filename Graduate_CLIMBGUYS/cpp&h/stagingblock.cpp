@@ -45,6 +45,7 @@ void CStagingBlock::Init()
 {
 	// 速さの初期値
 	m_fSpeed = 100.0f;
+	m_fBurstSpeed = 10.0f;
 	// 吹っ飛びベクトルをランダムに設定
 	SetBurstVector(CCalculation::RandomDirectionVector(NULL, true));
 	// シーンxの初期化
@@ -154,5 +155,5 @@ void CStagingBlock::BlockFall()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CStagingBlock::BlockBurst()
 {
-	this->SetPos(this->GetPos() + m_Vector * m_fSpeed);
+	this->SetPos(this->GetPos() + m_Vector * m_fBurstSpeed);
 }

@@ -11,6 +11,9 @@
 #include "opening.h"
 #include "stagingblock.h"
 
+#include "3dparticle.h"
+#include "3deffect.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
@@ -60,9 +63,10 @@ COpeningManager::COpeningManager()
 	// S
 	m_Targetpos[8] = STAGINGBLOCK_POS_S;
 
-
+	// 3Dエフェクトの生成
+	C3DEffect::Create();
 	m_nCount = 0;
-	m_NextStateCnt = 120;
+	m_NextStateCnt = 60;
 	// オブジェクトの生成
 	CreateAll();
 }
@@ -132,6 +136,12 @@ void COpeningManager::Update(void)
 			}
 		}
 	}
+
+	// パーティクル生成
+	C3DParticle::Create(
+		C3DParticle::PARTICLE_ID_UNKNOWN,
+		D3DXVECTOR3(1000.0f, 500.0f, 900.0f)
+	);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -152,6 +162,13 @@ D3DXVECTOR3 COpeningManager::GetTargetpos(int num)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void COpeningManager::CreateAll()
 {
+	// 背景オブジェクトの生成
+	CScene_X::Create(
+		D3DVECTOR3_ZERO,					// 位置
+		D3DVECTOR3_ZERO,					// 回転
+		CScene_X::TYPE_OBJECT_MAP,			// モデル番号
+		false);								// シャドウマッピング状態
+
 	// ブロックの最大数分生成しポインタを保存
 	for (int nCnt = 0; nCnt < MAX_STAGINGBLOCK; nCnt++)
 	{

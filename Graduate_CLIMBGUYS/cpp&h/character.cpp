@@ -154,7 +154,12 @@ void CCharacter::Init()
 		D3DXVECTOR3 pos = m_pos;
 		//pos.y = 0;
 		// ステンシルシャドウの生成
-		m_pStencilshadow = CStencilshadow::Create(m_pos, D3DXVECTOR3(10.0f, 10000.0f, 10.0f),CStencilshadow::TYPE_CYLINDER);
+		m_pStencilshadow = CStencilshadow::Create(
+			m_pos, 
+			D3DXVECTOR3(10.0f, 10000.0f, 10.0f),
+			CStencilshadow::TYPE_CYLINDER,
+			CScene::LAYER_3DCHARACTERSHADOW
+		);
 	}
 	// 行列の初期化処理
 	D3DXMatrixIdentity(&m_mtxWorld);

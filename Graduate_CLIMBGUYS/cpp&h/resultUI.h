@@ -26,6 +26,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 class CScene_TWO;		// シーン2D
+class CNumber;			// ナンバー
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -35,11 +36,18 @@ class CScene_TWO;		// シーン2D
 class CResultUI
 {
 public:
-	/* 列挙型 */
+	/* リザルトUI */
 	enum class RESULT_UI
 	{
 		UI_NONE = -1,
 		FRAME_1P,			// 1Pの枠
+		FRAME_2P,			// 2Pの枠
+		FRAME_3P,			// 3Pの枠
+		FRAME_4P,			// 4Pの枠
+		RANK_01,			// 1位
+		RANK_02,			// 2位
+		RANK_03,			// 3位
+		RANK_04,			// 4位
 		UI_MAX
 	};
 
@@ -61,9 +69,15 @@ public:
 protected:
 private:
 	/* 関数 */
+	void			InitSettingFrame(void);					// 枠の初期設定
+	void			InitSettingScore(void);					// 各スコアの初期設定
+	void			UpdateSettingFrame(void);				// 枠の更新設定
+	void			UpdateSettingScore(void);				// 各スコアの更新設定
 	/* 変数 */
 	CScene_TWO		*m_pScene2D[(int)RESULT_UI::UI_MAX];	// シーン2D
-	D3DXVECTOR3		m_pos;			// 位置
-	D3DXVECTOR3		m_move;			// 移動量
+	CNumber			*m_pNumber;								// ナンバー
+	D3DXVECTOR3		m_move;									// 移動量
+	int				m_nMoveCnt;								// 移動を開始するカウント
+	bool			m_bMoveStart;							
 };
 #endif

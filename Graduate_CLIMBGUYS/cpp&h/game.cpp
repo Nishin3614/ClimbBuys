@@ -132,6 +132,7 @@ void CGame::Update(void)
 
 	// 結合されたブロックの更新ブロック生成
 	CConnectblock::Update_CreateBlock();
+
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)
@@ -181,6 +182,8 @@ void CGame::Debug(void)
 {
 	// ベースモードのデバッグ処理
 	CBaseMode::Debug();
+	// ブロック全体のデバッグ処理
+	CBaseblock::AllDebug();
 }
 #endif // _DEBUG
 

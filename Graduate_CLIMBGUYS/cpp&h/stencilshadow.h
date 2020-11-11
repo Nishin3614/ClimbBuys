@@ -104,13 +104,14 @@ public:
 	static void UnLoad(void);
 	// 作成処理(シーン管理)
 	static CStencilshadow * Create(
-		D3DXVECTOR3 const &pos,							// 位置
-		D3DXVECTOR3 const &size,						// サイズ
-		TYPE const &type = TYPE_CYLINDER,				// タイプ
-		int const &nWidth = 10,							// 横数
-		int const &nDepth = 1,							// 縦数
-		D3DXCOLOR	const &col = D3DXCOLOR(0.0f,0.0f,0.0f,1.0f),			// カラー
-		D3DXVECTOR3 const &rot = D3DVECTOR3_ZERO		// 回転
+		D3DXVECTOR3 const &		pos,									// 位置
+		D3DXVECTOR3 const &		size,									// サイズ
+		TYPE const &			type = TYPE_CYLINDER,					// タイプ
+		CScene::LAYER const &	layer = CScene::LAYER_3DBLOCKSHADOW,	// レイヤー
+		int const &				nWidth = 10,							// 横数
+		int const &				nDepth = 1,								// 縦数
+		D3DXCOLOR	const &		col = D3DXCOLOR(0.0f,0.0f,0.0f,0.5f),	// カラー
+		D3DXVECTOR3 const &		rot = D3DVECTOR3_ZERO					// 回転
 	);
 	// 作成処理(個人管理)
 	static CStencilshadow * Create_Self(
@@ -171,7 +172,7 @@ private:
 	int		m_nBlock_Width;							// 横ブロック数
 	bool	m_bUse;									// 使用
 	TYPE	m_type;									// タイプ
-	std::unique_ptr<CScene_TWO> m_pSceneTwo;		// 2Dポリゴン
+	static CScene_TWO * m_pShadow;
 #ifdef _DEBUG
 	static bool	m_bStencil;							// ステンシル描画するかしないか
 #endif // _DEBUG

@@ -15,10 +15,11 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define BLOCK_GRAVITY		(1.0f)									// ブロックにかかる重力
-#define STENCIL_SIZE_Y		(10000.0f)								// ステンシルバッファのyのサイズ
-#define BLOCK_SIZE_RANGE	(25.0f)									// ブロックのサイズの範囲
-#define BLOCK_STATUS_TXT	("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
+#define BLOCK_GRAVITY			(1.0f)									// ブロックにかかる重力
+#define STENCIL_SIZE_Y			(200.0f)								// ステンシルバッファのyのサイズ
+#define BLOCK_SIZE_RANGE		(25.0f)									// ブロックのサイズの範囲
+#define BLOCK_SHADOWSIZE		(24.0f)									// ステンシルシャドウのサイズ
+#define BLOCK_STATUS_TXT		("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -58,7 +59,7 @@ void CBaseblock::Init()
 	CScene_X::Init();
 	// ステンシルシャドウの設定
 	CScene_X::SetStencilshadow(
-		CScene_X::GetModel()->size + D3DXVECTOR3(0.0f, STENCIL_SIZE_Y,0.0f),
+		D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, STENCIL_SIZE_Y, m_BlockStatus.fBasicShadowSize),
 		CStencilshadow::TYPE_RECT
 	);
 	/*
@@ -161,9 +162,12 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Update_StencilShadow(CBaseblock * pBlock)
 {
+	// フィールドブロックなら
+	// ->関数を抜ける
+	if (m_type == TYPE_FIELD) return;
 	// ステンシルシャドウの使用状態がfalseなら
 	// ->関数を抜ける
-	if (!this->GetStencillShadow()) return;
+	else if (!this->GetStencillShadow()) return;
 	// 落ちている状態なら
 	// ->ステンシルシャドウの使用状態をfalseに
 	else if (!this->GetFall())
@@ -178,15 +182,25 @@ void CBaseblock::Update_StencilShadow(CBaseblock * pBlock)
 		CScene_X::SetUseStencillShadow(false);
 		return;
 	}
-	// 変数宣言
-	CBaseblock::GRID MyGrid = pBlock->GetGrid();	// 行列高
 	// 高さが現在置かれているブロックの高さより高かったら
-	if (MyGrid.nHeight > CBaseblock::GetHeight(MyGrid.nColumn, MyGrid.nLine))
+	else if (this->m_grid.nHeight > CBaseblock::GetHeight(pBlock->GetGrid().nColumn, pBlock->GetGrid().nLine) &&
+		this->m_grid.nHeight > pBlock->GetGrid().nHeight)
 	{
-		// サイズ変更
-
-
-		// 透明度変更
+		// 変数宣言
+		float fDiffHeight = this->GetPos().y - pBlock->GetPos().y;	// 比較した高さの差
+		// 高さが規定値以上なら
+		if (fDiffHeight >= m_fSizeRange * m_BlockStatus.nAppearance)
+		{
+			// サイズ変更
+			CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize, fDiffHeight, m_BlockStatus.fBasicShadowSize));
+		}
+		// それ以外
+		else
+		{
+			float fSize = m_fSizeRange * m_BlockStatus.nAppearance - fDiffHeight;
+			// サイズ変更
+			CScene_X::GetStencillShadow()->SetSize(D3DXVECTOR3(m_BlockStatus.fBasicShadowSize * fSize, fDiffHeight , m_BlockStatus.fBasicShadowSize * fSize));
+		}
 	}
 
 
@@ -801,8 +815,8 @@ void CBaseblock::CreateInBulkBlock()
 	for (int nBlockCnt = 0; nBlockCnt < 94; nBlockCnt++)
 	{
 		// 変数宣言
-		CBaseblock * pBaseblock;		// シーン2Dクラス
-		pBaseblock = Create(BlockPos[nBlockCnt], 2);
+		CBaseblock * pBaseblock;								// シーン2Dクラス
+		pBaseblock = Create(BlockPos[nBlockCnt], 2);			// 生成
 		pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
 	}
 }
@@ -996,8 +1010,8 @@ void CBaseblock::BlockStatusLoad(void)
 		MessageBox(NULL, "ブロックのステータス読み込み失敗", BLOCK_STATUS_TXT, MB_ICONWARNING);
 	}
 
-	// 基本サイズの設定
-	//m_BlockStatus.fBasicShadowSize =
+	// 基本シャドウサイズの設定
+	m_BlockStatus.fBasicShadowSize = BLOCK_SHADOWSIZE / (m_fSizeRange * m_BlockStatus.nAppearance);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

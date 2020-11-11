@@ -41,6 +41,7 @@ int CStencilshadow::m_nTexId[TYPE_MAX] =
 {
 	0,
 };
+CScene_TWO * CStencilshadow::m_pShadow = NULL;	// シャドウ2D
 
 #ifdef _DEBUG
 bool	CStencilshadow::m_bStencil = true;								// ステンシル描画するかしないか
@@ -67,7 +68,6 @@ CStencilshadow::CStencilshadow() : CScene()
 	m_nBlock_Depth = 1;
 	m_bUse = true;
 	m_type = TYPE_CYLINDER;
-	m_pSceneTwo = NULL;
 }
 
 // ----------------------------------------
@@ -103,14 +103,6 @@ void CStencilshadow::Init(void)
 	default:
 		break;
 	}
-	m_pSceneTwo = std::move(CScene_TWO::Creat_Unique(
-		CScene_TWO::OFFSET_TYPE_CENTER,
-		{ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f },
-		{ SCREEN_WIDTH,SCREEN_HEIGHT },
-		-1,
-		0.0f,
-		{0.0f,0.0f,0.0f,1.0f}
-	));
 }
 
 // ----------------------------------------
@@ -123,12 +115,6 @@ void CStencilshadow::Uninit(void)
 	{
 		m_pVtxBuff->Release();
 		m_pVtxBuff = NULL;
-	}
-	// 2Dポリゴンの開放
-	if (m_pSceneTwo != NULL)
-	{
-		m_pSceneTwo->Uninit();
-		m_pSceneTwo = NULL;
 	}
 }
 
@@ -199,8 +185,8 @@ void CStencilshadow::Draw(void)
 			0,
 			0,
 			m_nNumberVertex,		//使用する頂点数 三角ポリゴンの頂点
-			0,		//頂点の読み取りを開始する位置
-			m_nNumPolygon);	//ポリゴンの枚数
+			0,						//頂点の読み取りを開始する位置
+			m_nNumPolygon);			//ポリゴンの枚数
 
 					// カリングしない
 		CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNORMAL);
@@ -277,10 +263,11 @@ void CStencilshadow::Draw(void)
 		pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
 		// 反時計カリング(元のカリング)
 		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-		// 2Dポリゴンの描画
-		if (m_pSceneTwo != NULL)
+		// シャドウ2Dが存在していたら
+		if (m_pShadow)
 		{
-			m_pSceneTwo->Draw();
+			// シャドウ2Dの開放
+			m_pShadow->Draw();
 		}
 		// ステンシルバッファを無効にする
 		pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
@@ -306,6 +293,18 @@ void CStencilshadow::Debug(void)
 // ----------------------------------------
 HRESULT CStencilshadow::Load(void)
 {
+	// シャドウ2Dが存在していたら
+	if (!m_pShadow)
+	{
+		m_pShadow = CScene_TWO::Create_Self(
+			CScene_TWO::OFFSET_TYPE_CENTER,
+			{ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f },
+			{ SCREEN_WIDTH,SCREEN_HEIGHT },
+			-1,
+			0.0f,
+			D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.8f)
+		);
+	}
 	return S_OK;
 }
 
@@ -314,19 +313,28 @@ HRESULT CStencilshadow::Load(void)
 // ----------------------------------------
 void CStencilshadow::UnLoad(void)
 {
+	// シャドウ2Dが存在していたら
+	if (m_pShadow)
+	{
+		// シャドウ2Dの開放
+		m_pShadow->Uninit();
+		delete m_pShadow;
+		m_pShadow = NULL;
+	}
 }
 
 // ----------------------------------------
 // 作成処理(シーン管理)
 // ----------------------------------------
 CStencilshadow * CStencilshadow::Create(
-	D3DXVECTOR3 const &pos,		// 位置
-	D3DXVECTOR3 const &size,	// サイズ
-	TYPE const &type,			// タイプ
-	int const &nWidth,			// 横数
-	int const &nDepth,			// 縦数
-	D3DXCOLOR	const &col,		// カラー
-	D3DXVECTOR3 const &rot		// 回転
+	D3DXVECTOR3 const &		pos,	// 位置
+	D3DXVECTOR3 const &		size,	// サイズ
+	TYPE const &			type,	// タイプ
+	CScene::LAYER const &	layer,	// レイヤー
+	int const &				nWidth,	// 横数
+	int const &				nDepth,	// 縦数
+	D3DXCOLOR	const &		col,	// カラー
+	D3DXVECTOR3 const &		rot		// 回転
 )
 {
 	// 変数宣言
@@ -334,7 +342,7 @@ CStencilshadow * CStencilshadow::Create(
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pStencilshadow = new CStencilshadow();
 	// シーン管理設定
-	pStencilshadow->ManageSetting(CScene::LAYER_3DSHADOW);
+	pStencilshadow->ManageSetting(layer);
 	// 位置情報
 	pStencilshadow->m_pos = pos;
 	// サイズ情報
@@ -342,7 +350,7 @@ CStencilshadow * CStencilshadow::Create(
 	// 回転情報
 	pStencilshadow->m_rot = rot;
 	// 色情報
-	pStencilshadow->m_col = col;
+	pStencilshadow->m_col = D3DXCOLOR(0.0f,0.0f,0.0f,0.5f);
 	// 横ブロック
 	pStencilshadow->m_nBlock_Width = nWidth;
 	// 縦ブロック
@@ -435,13 +443,20 @@ void CStencilshadow::SetCol(D3DXCOLOR const & col)
 {
 	// 色設定
 	m_col = col;
-	// シーン2D情報NULLチェック
-	if (m_pSceneTwo)
+	// シャドウ2Dが存在していたら
+	if (m_pShadow)
 	{
-		// 色の設定
-		m_pSceneTwo->SetCol(col);
-		m_pSceneTwo->Set_Vtx_Col();
+		// シャドウ2Dの開放
+		m_pShadow->SetCol(m_col);
+		m_pShadow->Set_Vtx_Col();
 	}
+	// // シーン2D情報NULLチェック
+	// if (m_pSceneTwo)
+	// {
+	// 	// 色の設定
+	// 	m_pSceneTwo->SetCol(m_col);
+	// 	m_pSceneTwo->Set_Vtx_Col();
+	// }
 }
 
 // ----------------------------------------

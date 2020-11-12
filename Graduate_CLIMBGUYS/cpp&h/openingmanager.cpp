@@ -5,6 +5,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "openingmanager.h"
+#include "camera.h"
 
 #include "manager.h"
 #include "basemode.h"
@@ -90,13 +91,32 @@ void COpeningManager::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void COpeningManager::Update(void)
 {
-	// オープニングの状態が BUILDING だったら
 	if (CManager::GetMode() == CManager::MODE_OPENING)
 	{
 		COpening *pOpening = (COpening*)(CManager::GetBaseMode());
 
+		if (pOpening && pOpening->GetState() == COpening::OpeningState::ERUPTION)
+		{
+			if (CManager::GetRenderer()->GetCamera()->GetShakeEndFlag())
+			{
+				// 次のステートに移行
+				pOpening->SetState(COpening::OpeningState::BUILDING);
+			}
+			else
+			{
+				// カメラの振動
+				CManager::GetRenderer()->GetCamera()->CameraShake();
+			}
+		}
+
 		if (pOpening && pOpening->GetState() == COpening::OpeningState::BUILDING)
 		{
+			// パーティクル生成
+			C3DParticle::Create(
+				C3DParticle::PARTICLE_ID_UNKNOWN,
+				D3DXVECTOR3(1000.0f, 500.0f, 900.0f)
+			);
+
 			/////////////----------------------------------------
 			if (m_pStagingBlock[m_nCount]->GetPos().y > m_Targetpos[m_nCount].y)
 			{ // ブロックを一個ずつ目的地まで移動
@@ -136,12 +156,6 @@ void COpeningManager::Update(void)
 			}
 		}
 	}
-
-	// パーティクル生成
-	C3DParticle::Create(
-		C3DParticle::PARTICLE_ID_UNKNOWN,
-		D3DXVECTOR3(1000.0f, 500.0f, 900.0f)
-	);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

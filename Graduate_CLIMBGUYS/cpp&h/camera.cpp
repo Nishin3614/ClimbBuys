@@ -158,6 +158,9 @@ void CCamera::Init_Opening(void)
 	m_posR = D3DXVECTOR3(0.0f, 500.0f, -500.0f);
 	m_fLength = 750.0f;
 	m_fHeight = 1000.0f;
+
+	// カメラの振動情報の初期化
+	SetShakeInfo();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -634,6 +637,77 @@ void CCamera::SetCamera_Motion(
 	CCalculation::Rot_One_Limit(m_rotDest.x);
 	CCalculation::Rot_One_Limit(m_rotDest.y);
 	CCalculation::Rot_One_Limit(m_rotDest.z);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// カメラの振動
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CCamera::CameraShake()
+{
+	// インターバルの回数分振動を繰り返す
+	if (m_Shake.nInterbalCnt > m_Shake.nInterbalCntSave)
+	{
+		// 右に移動時
+		if (m_Shake.nInterbalCntSave % 2 == 0)
+		{
+			// 最小地点と比較
+			if (m_posR.x >= m_Shake.fRange[0])
+			{
+				m_posR.x -= m_Shake.fShakeSpeed;
+
+				if (m_posR.x <= m_Shake.fRange[0])
+				{// 目標地点に到達したらカウント加算
+					m_Shake.nInterbalCntSave++;
+				}
+			}
+		}
+		// 左に移動時
+		else if (m_Shake.nInterbalCntSave % 2 == 1)
+		{
+			// 最大地点と比較
+			if (m_posR.x <= m_Shake.fRange[1])
+			{
+				m_posR.x += m_Shake.fShakeSpeed;
+
+				if (m_posR.x >= m_Shake.fRange[1])
+				{// 目標地点に到達したらカウント加算
+					m_Shake.nInterbalCntSave++;
+				}
+			}
+		}
+
+		// カウントを満たしたら元の位置に戻し終了フラグをtrueにする
+		if (m_Shake.nInterbalCnt <= m_Shake.nInterbalCntSave)
+		{
+			m_posR = m_Shake.CameraCurrentPos;
+			m_Shake.bEnd = true;
+		}
+	}
+
+	// 条件を既に満たしていたら即終了
+	else
+	{
+		return;
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// カメラの振動情報の設定 振動させたいmodeのカメラの初期化でする
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CCamera::SetShakeInfo()
+{
+	// 振動情報
+	m_Shake.nInterbalCnt = 20;
+	m_Shake.nInterbalCntSave = 0;
+	m_Shake.fDistance = 120.0f;
+	m_Shake.fShakeSpeed = 60.0f;
+
+	m_Shake.fRange[0] = m_Shake.fDistance *-1.0f;
+	m_Shake.fRange[1] = m_Shake.fDistance;
+
+	m_Shake.CameraCurrentPos = m_posR;
+
+	m_Shake.bEnd = false;
 }
 
 /*

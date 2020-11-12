@@ -8,6 +8,10 @@
 #include "debugproc.h"
 
 #include "manager.h"
+#include "camera.h"
+#include "renderer.h"
+#include "fade.h"
+
 #include "basemode.h"
 #include "opening.h"
 #include "openingmanager.h"
@@ -155,5 +159,27 @@ void CStagingBlock::BlockFall()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CStagingBlock::BlockBurst()
 {
-	this->SetPos(this->GetPos() + m_Vector * m_fBurstSpeed);
+	if (this->m_nBlockNun == 4)
+	{
+		m_Vector = CManager::GetRenderer()->GetCamera()->GetPosV() - D3DXVECTOR3(this->GetPos().x, this->GetPos().y + 80, this->GetPos().z);
+
+		if (CCalculation::Range_Absolute(CManager::GetRenderer()->GetCamera()->GetPosV().z, this->GetPos().z) <= 50)
+		{
+			// タイトルへ遷移
+			// フェード状態が何も起こっていない状態なら
+			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_TITLE);
+			}
+		}
+		else
+		{
+			D3DXVec3Normalize(&m_Vector, &m_Vector);
+			this->SetPos(this->GetPos() + m_Vector * m_fBurstSpeed);
+		}
+	}
+	else
+	{
+		this->SetPos(this->GetPos() + m_Vector * m_fBurstSpeed);
+	}
 }

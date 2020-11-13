@@ -39,7 +39,8 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatus = {};
+CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatus		= {};		// プレイヤーのステータス
+CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatusInit	= {};		// プレイヤーの初期ステータス
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
@@ -50,7 +51,6 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_bDieFlag			= false;				// 死亡フラグ
 	m_bDashFlag			= false;				// ダッシュフラグ
 	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
-	m_PlayerStatusInit	= m_PlayerStatus;		// プレイヤーの初期ステータス
 	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
@@ -609,8 +609,9 @@ void CPlayer::BlockCollision(void)
 				m_pos + m_PlayerStatus.PushOffSet,
 				PredictionPoint,
 				fDistance);
+
 			// ブロックに当たっていたら
-			if(Direct != COLLISIONDIRECTION::NONE)
+			if (Direct != COLLISIONDIRECTION::NONE)
 			{
 				// プッシュブロックの情報が存在するなら
 				if (Pushblock.pBlock)
@@ -628,79 +629,16 @@ void CPlayer::BlockCollision(void)
 					Pushblock = CBaseblock::PUSHBLOCK(pBaseBlock, fDistance, Direct);
 				}
 			}
-
-			/*
-			D3DXVECTOR3 Offsetpos;
-			Offsetpos = D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, cosf(m_rot.y) * m_PlayerStatus.PlayerOffSet.z);
-			CCalculation::RectAndSphere(
-				pBaseBlock->GetPos(),
-				D3DXVECTOR3(0.0f, pBaseBlock->GetSize().y * 0.5f, 0.0f),
-				D3DXVECTOR3(pBaseBlock->GetSizeRange(), pBaseBlock->GetSizeRange(), pBaseBlock->GetSizeRange()),
-				&CCharacter::GetPos(),
-				Offsetpos,
-				m_PlayerStatus.PlayerSize.x
-			);
-
-
-
-			// 当たり判定
-			Direct = pBaseBlock->PushCollision(
-				CCharacter::GetObj(),
-				&CCharacter::GetPos(),
-				&CCharacter::GetPosOld(),
-				&CCharacter::GetMove(),
-				&m_PlayerStatus.PushSize,
-				m_PlayerStatus.PushOffSet
-			);
-			*/
-			// ブロックの判定
-			// 前
-			if (Direct == COLLISIONDIRECTION::FRONT)
-			{
-				PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, -1));
-			}
-			// 後
-			else if (Direct == COLLISIONDIRECTION::BACK)
-			{
-				PushBlock(pBaseBlock, CBaseblock::GRID(0, 0, 1));
-			}
-			// 左
-			else if (Direct == COLLISIONDIRECTION::LEFT)
-			{
-				PushBlock(pBaseBlock, CBaseblock::GRID(1, 0, 0));
-			}
-			// 右
-			else if (Direct == COLLISIONDIRECTION::RIGHT)
-			{
-				PushBlock(pBaseBlock, CBaseblock::GRID(-1, 0, 0));
-			}
-			// 上
-			else if (Direct == COLLISIONDIRECTION::UP)
-			{
-				// ジャンプ可能設定
-				SetJumpAble(true);
-				// プレイヤーが下のブロックに当たっている
-				bOn ^= true;
-			}
-			// 下
-			else if (Direct == COLLISIONDIRECTION::DOWN)
-			{
-				// プレイヤーがしたブロックに当たっている
-				bUnder ^= true;
-			}
 		}
-		if (Direct == COLLISIONDIRECTION::NONE)
-		{
-			// 当たり判定
-			Direct = pBaseBlock->PushCollision(
-				CCharacter::GetObj(),
-				&CCharacter::GetPos(),
-				&CCharacter::GetPosOld(),
-				&CCharacter::GetMove(),
-				&m_PlayerStatus.PlayerSize,
-				m_PlayerStatus.PlayerOffSet
-			);
-		}
+		// 当たり判定
+		Direct = pBaseBlock->PushCollision(
+			CCharacter::GetObj(),
+			&CCharacter::GetPos(),
+			&CCharacter::GetPosOld(),
+			&CCharacter::GetMove(),
+			&m_PlayerStatus.PlayerSize,
+			m_PlayerStatus.PlayerOffSet
+		);
 		// ブロックの判定
 		// 前
 		if (Direct == COLLISIONDIRECTION::FRONT)
@@ -736,8 +674,8 @@ void CPlayer::BlockCollision(void)
 		}
 	}
 	// 挟まったら死ぬ処理
-	if (nDieState == (DIESTATE_UP + DIESTATE_UNDER)		||
-		nDieState == (DIESTATE_LEFT + DIESTATE_RIGHT)	||
+	if (nDieState == (DIESTATE_UP + DIESTATE_UNDER) ||
+		nDieState == (DIESTATE_LEFT + DIESTATE_RIGHT) ||
 		nDieState == (DIESTATE_FRONT + DIESTATE_BACK)
 		)
 	{
@@ -943,8 +881,10 @@ void CPlayer::PlayerStatusLoad(void)
 						{
 							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushOffSet.x, &m_PlayerStatus.PushOffSet.y, &m_PlayerStatus.PushOffSet.z);
 						}
-						else if (strcmp(cHeadText, "END_BULLETSET") == 0)
+						else if (strcmp(cHeadText, "END_STATUS_SET") == 0)
 						{
+							// プレイヤーの初期ステータスを保存
+							m_PlayerStatusInit = m_PlayerStatus;
 						}
 					}
 				}

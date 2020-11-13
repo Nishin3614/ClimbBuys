@@ -28,16 +28,6 @@
 class CNumber : public CScene_TWO
 {
 public:
-	/* 列挙型 */
-	// テクスチャータイプ
-	typedef enum
-	{
-		TEX_TIME,
-		TEX_SCORE,
-		TEX_KNOCK,
-		TEX_MAX
-	} TEX;
-
 	/* 関数 */
 	CNumber();
 	~CNumber();
@@ -77,7 +67,6 @@ public:
 		CScene * pScene = NULL		// 相手のシーン情報
 	) {};
 	void SetNum(int const &nNum);											// 番号設定
-	void SetTex(TEX const &tex);											// テクスチャー番号設定
 	void SetAnim(int const &nRandamTime) {
 		m_nRandamTime = nRandamTime;
 		m_bRand = true;
@@ -89,17 +78,15 @@ public:
 	static void UnLoad(void);
 	// 作成
 	static CNumber * Create(
-		int			const & nScore,								// スコア
-		D3DXVECTOR3 const & pos,								// 位置
-		TEX			const & tex = TEX_SCORE,					// テクスチャータイプ
-		D3DXVECTOR2 const & size = D3DXVECTOR2(100.0f,100.0f),	// サイズ
-		D3DXCOLOR	const & col = D3DXCOLOR_INI					// 色
+		int							const & nScore,										// スコア
+		D3DXVECTOR3					const & pos,										// 位置
+		CTexture_manager::TYPE		const & tex		= CTexture_manager::TYPE_UI_NUMBER,	// テクスチャータイプ
+		D3DXVECTOR2					const & size	= D3DXVECTOR2(100.0f,100.0f),		// サイズ
+		D3DXCOLOR					const & col		= D3DXCOLOR_INI						// 色
 	);	// 作成
 protected:
 
 private:
-	static int		m_TexId[TEX_MAX];	// テクスチャーID
-	TEX				m_texID;			// テクスチャー番号
 	int				m_nNum;				// 渡された数字
 	int				m_nRandamTime;		// ランダムに数字が切り替わる演出時間
 	int				m_nFram;			// フレームタイム

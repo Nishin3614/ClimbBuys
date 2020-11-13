@@ -55,6 +55,21 @@ public:
 		float	fTrunRot;				// 回転量
 		bool	bSpin;					// 回転状態
 	} TURN;
+
+	// 振動情報
+	struct SHAKE
+	{
+		int			nInterbalCnt;			// 振動する回数
+		int			nInterbalCntSave;		// 振動する回数をカウント
+		float		fDistance;				// 距離
+		float		fRange[2];				// 距離の範囲_最小最大
+		float		fShakeSpeed;			// 振動する速さ
+		D3DXVECTOR3 CameraCurrentPos;		// カメラの現在地_振動前の座標
+		bool		bEnd;					// 終了フラグ
+
+		//float fAngle;						// 角度
+	};
+
 	/* 関数 */
 	// コンストラクタ
 	CCamera();
@@ -126,11 +141,23 @@ public:
 	);
 	// カメラの視点取得
 	D3DXVECTOR3 &GetPosV(void) { return m_posV; };
+
+	// カメラの振動
+	void CameraShake();
+
+	// カメラの振動の情報設定 modeのカメラの初期化でする
+	void SetShakeInfo();
+
+	// カメラの振動が終了した際のフラグ取得bEnd
+	bool GetShakeEndFlag() { return m_Shake.bEnd; };
+
 protected:
 
 private:
 	/* 関数 */
 	void Update_Play(void);						// プレイ時のカメラ
+	// オープニング初期化処理
+	void Init_Opening(void);
 	// チュートリアル初期化処理
 	void Init_Tutorial(void);
 	// タイトル初期化処理
@@ -173,6 +200,7 @@ private:
 	float			m_fIntertia;				// 慣性の比率
 	bool			m_bSet;						// カメラ設定
 	TURN			m_Turn;						// 360°回転
+	SHAKE			m_Shake;					// 振動情報
 };
 
 #endif

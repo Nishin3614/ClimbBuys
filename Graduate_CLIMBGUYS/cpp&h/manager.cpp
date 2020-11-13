@@ -23,6 +23,7 @@
 #include "scene.h"
 #include "game.h"
 #include "fade.h"
+#include "opening.h"
 #include "title.h"
 #include "tutorial.h"
 #include "result.h"
@@ -33,7 +34,7 @@
 // マクロ関数
 //
 // ----------------------------------------------------------------------------------------------------
-#define STARTMODE (CManager::MODE_TITLE)
+#define STARTMODE (CManager::MODE_OPENING)
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ CKeyConfig		* CManager::m_keyconfig								= NULL;					// キー詳細
 CSound			* CManager::m_sound									= NULL;					// サウンド
 CFade			* CManager::m_fade									= NULL;					// フェード
 CBaseMode		* CManager::m_BaseMode								= NULL;					// ベースモード
-CManager::MODE	CManager::m_mode									= CManager::MODE_TITLE;	// モード
+CManager::MODE	CManager::m_mode									= CManager::MODE_OPENING;// モード
 bool			CManager::m_bWire									= false;				// ワイヤー
 
 // ----------------------------------------------------------------------------------------------------
@@ -290,6 +291,9 @@ void CManager::SetMode(MODE const &mode)
 	// 前のモード終了
 	switch (m_mode)
 	{
+		// オープニング
+	case MODE_OPENING:
+		break;
 		// タイトル
 	case MODE_TITLE:
 		break;
@@ -314,6 +318,13 @@ void CManager::SetMode(MODE const &mode)
 	// 現在のモード初期化
 	switch (mode)
 	{
+		// オープニング
+	case MODE_OPENING:
+		// オープニング生成
+		m_BaseMode = COpening::Create();
+		// ゲーム音
+		//CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
+		break;
 		// タイトル
 	case MODE_TITLE:
 		// タイトル生成

@@ -50,7 +50,8 @@ public:
 	// モード
 	typedef enum
 	{
-		MODE_TITLE = 0,	// タイトル
+		MODE_OPENING = 0,// オープニング
+		MODE_TITLE,		// タイトル
 		MODE_TUTORIAL,	// チュートリアル
 		MODE_GAME,		// ゲーム
 		MODE_RESULT,	// リザルト

@@ -88,6 +88,20 @@ void CTitle::Update(void)
 			CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
 		}
 	}
+
+	// 一定時間操作していなったら自動でタイトルへ移行する
+	if (CBaseMode::GetTransitionCnt() <= 0)
+	{
+		// フェード状態が何も起こっていない状態なら
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		{
+			CManager::GetFade()->SetFade(CManager::MODE_OPENING);
+		}
+	}
+	else
+	{
+		CBaseMode::SetTransitionCnt(CBaseMode::GetTransitionCnt()-1);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

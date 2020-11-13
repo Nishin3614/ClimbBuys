@@ -64,6 +64,9 @@
     <Filter Include="Model\Block">
       <UniqueIdentifier>{00e28d2a-b0ba-4b93-be00-7c7bc84449b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{772d826e-f82e-4b6c-82b1-a465f6cbdad5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp">
@@ -281,6 +284,18 @@
     </ClCompile>
     <ClCompile Include="cpp&amp;h\playerUI.cpp">
       <Filter>Texture_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\resultUI.cpp">
+      <Filter>Texture_UI</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\opening.cpp">
+      <Filter>Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\stagingblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\openingmanager.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -505,6 +520,18 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\playerUI.h">
       <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\resultUI.h">
+      <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\opening.h">
+      <Filter>Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\stagingblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\openingmanager.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

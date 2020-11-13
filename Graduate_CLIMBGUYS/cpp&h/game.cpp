@@ -181,6 +181,8 @@ void CGame::Debug(void)
 {
 	// ベースモードのデバッグ処理
 	CBaseMode::Debug();
+	// ブロック全体のデバッグ処理
+	CBaseblock::AllDebug();
 }
 #endif // _DEBUG
 

@@ -203,11 +203,14 @@
     <ClCompile Include="cpp&amp;h\mouse.cpp" />
     <ClCompile Include="cpp&amp;h\normalblock.cpp" />
     <ClCompile Include="cpp&amp;h\number.cpp" />
+    <ClCompile Include="cpp&amp;h\opening.cpp" />
+    <ClCompile Include="cpp&amp;h\openingmanager.cpp" />
     <ClCompile Include="cpp&amp;h\player.cpp" />
     <ClCompile Include="cpp&amp;h\playerUI.cpp" />
     <ClCompile Include="cpp&amp;h\rectcollision.cpp" />
     <ClCompile Include="cpp&amp;h\renderer.cpp" />
     <ClCompile Include="cpp&amp;h\result.cpp" />
+    <ClCompile Include="cpp&amp;h\resultUI.cpp" />
     <ClCompile Include="cpp&amp;h\scene.cpp" />
     <ClCompile Include="cpp&amp;h\scene_load.cpp" />
     <ClCompile Include="cpp&amp;h\scene_three.cpp" />
@@ -218,6 +221,7 @@
     <ClCompile Include="cpp&amp;h\signboard.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
     <ClCompile Include="cpp&amp;h\spherecollision.cpp" />
+    <ClCompile Include="cpp&amp;h\stagingblock.cpp" />
     <ClCompile Include="cpp&amp;h\stand.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
@@ -279,11 +283,14 @@
     <ClInclude Include="cpp&amp;h\mouse.h" />
     <ClInclude Include="cpp&amp;h\normalblock.h" />
     <ClInclude Include="cpp&amp;h\number.h" />
+    <ClInclude Include="cpp&amp;h\opening.h" />
+    <ClInclude Include="cpp&amp;h\openingmanager.h" />
     <ClInclude Include="cpp&amp;h\player.h" />
     <ClInclude Include="cpp&amp;h\playerUI.h" />
     <ClInclude Include="cpp&amp;h\rectcollision.h" />
     <ClInclude Include="cpp&amp;h\renderer.h" />
     <ClInclude Include="cpp&amp;h\result.h" />
+    <ClInclude Include="cpp&amp;h\resultUI.h" />
     <ClInclude Include="cpp&amp;h\scene.h" />
     <ClInclude Include="cpp&amp;h\scene_load.h" />
     <ClInclude Include="cpp&amp;h\scene_three.h" />
@@ -294,6 +301,7 @@
     <ClInclude Include="cpp&amp;h\signboard.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
     <ClInclude Include="cpp&amp;h\spherecollision.h" />
+    <ClInclude Include="cpp&amp;h\stagingblock.h" />
     <ClInclude Include="cpp&amp;h\stand.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />
     <ClInclude Include="cpp&amp;h\texture_manager.h" />

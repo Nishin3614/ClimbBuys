@@ -19,6 +19,7 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#define TRANSTION_TIME (300) // 自動遷移するまでの時間
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -47,12 +48,18 @@ public:
 	virtual void Update(void);
 	// 描画処理
 	virtual void Draw(void);
+
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void Debug(void);
 #endif // _DEBUG
+
+	void SetTransitionCnt(int nCnt) { m_TransitionCnt = nCnt; };
+	int  GetTransitionCnt() const{ return m_TransitionCnt; };
+
 protected:
 private:
-	bool	m_bSceneStop;	// シーンを止めるフラグ
+	bool	m_bSceneStop;						// シーンを止めるフラグ
+	int		m_TransitionCnt = TRANSTION_TIME;	// 自動で画面遷移までのカウント
 };
 #endif

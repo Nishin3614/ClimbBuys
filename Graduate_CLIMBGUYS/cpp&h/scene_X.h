@@ -86,6 +86,16 @@ public:
 		TYPE_PLAYER03_THIGH_LEFT,		// プレイヤー03 左腿
 		TYPE_PLAYER03_LEG_LEFT,			// プレイヤー03 左足
 		TYPE_TUTORIALBLOCK,				// チュートリアルブロック
+		TYPE_OBJECT_MAP,				// マップ
+		TYPE_OBJECT_BLOCK_C,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_L,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_I,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_M,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_B,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_G,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_U,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_Y,			// 当たり判定無し演出用ブロック
+		TYPE_OBJECT_BLOCK_S,			// 当たり判定無し演出用ブロック
 		TYPE_MAX						// 最大数
 	} TYPE;
 
@@ -178,6 +188,22 @@ public:
 		int const &nModelId = 0,					// モデル番号
 		bool const &bShadowMap = false				// シャドウマッピング状態
 	);
+
+	// 作成処理(シーン管理)
+	//	pos			: 位置
+	//	rot			: 回転
+	//	size		: サイズ倍率 1.0が標準
+	//	nModelId	: モデル番号
+	//	bShadowMap	: シャドウマッピング状態
+	static CScene_X * Create(
+		D3DXVECTOR3 const &pos,						// 位置
+		D3DXVECTOR3 const &rot,						// 回転
+		D3DXVECTOR3 const &size,					// サイズ倍率
+		D3DXCOLOR color,							// カラー
+		int const &nModelId = 0,					// モデル番号
+		bool const &bShadowMap = false				// シャドウマッピング状態
+	);
+
 	// 作成処理(個人管理)
 	//	pos			: 位置
 	//	rot			: 回転
@@ -259,6 +285,10 @@ public:
 		D3DXVECTOR3 const & Size,			// サイズ
 		int const & nType	// タイプ
 	);
+	// ステンシルシャドウの使用状態設定
+	void SetUseStencillShadow(bool const & bUse);
+	// ステンシルシャドウの使用状態を取得
+	bool GetUseStencillShadow(void);
 	// 当たり判定設定
 	//	nShapeType	: 0:矩形、1:球、2:円柱
 	//	Obj			: オブジェクトタイプ
@@ -289,6 +319,8 @@ public:
 	D3DXVECTOR3 &GetSize(void) { return m_size; };
 	// 行列取得
 	D3DXMATRIX &GetMatrix(void) { return m_mtxWorld; };
+	// ステンシルシャドウ情報取得
+	CStencilshadow * GetStencillShadow(void) { return m_pStencilshadow; };
 	// 当たり判定状態取得
 	bool const GetbCollision(void);
 	// 当たり判定の情報を取得

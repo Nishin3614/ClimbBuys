@@ -31,6 +31,7 @@
 // ----------------------------------------
 CCircleshadow::CCircleshadow() : CScene_THREE::CScene_THREE()
 {
+	m_bShadow = true;
 }
 
 // ----------------------------------------
@@ -52,8 +53,6 @@ void CCircleshadow::Init(void)
 	// シーン3Dの初期化
 	CScene_THREE::Init();
 	//CScene_THREE::SetLighting(true);		// ライティング
-	// テクスチャータイプ設定
-	CScene_THREE::SetTexType(1);	// テクスチャー渡し
 }
 
 // ----------------------------------------
@@ -84,37 +83,49 @@ void CCircleshadow::Update(void)
 // ----------------------------------------
 void CCircleshadow::Draw(void)
 {
+	// シャドウ状態がfalseなら
+	// ->関数を抜ける
+	if (!m_bShadow) return;
 	// 変数宣言
 	LPDIRECT3DDEVICE9 pDevice =					// デバイスの取得
 		CManager::GetRenderer()->GetDevice();
-	// 減算 
+	/*
+	// 減算
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	*/
 	// 描画
 	CScene_THREE::Draw();
+	/*
 	// 通常ブレンド
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	*/
 }
 
 // ----------------------------------------
 // 作成処理
 // ----------------------------------------
 CCircleshadow * CCircleshadow::Create(
-	D3DXVECTOR3 const &pos,							// 位置
-	D3DXVECTOR3 const &size							// サイズ
+	D3DXVECTOR3 const &	pos,						// 位置
+	D3DXVECTOR3 const &	size,						// サイズ
+	int const &			nTexType					// テクスチャータイプ
 )
 {
 	// 変数宣言
 	CCircleshadow * pCircleshadow;		// シーン3Dクラス
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pCircleshadow = new CCircleshadow();
+	// シーンマネージャ設定
+	pCircleshadow->ManageSetting(CScene::LAYER_3DBLOCKSHADOW);
 	// 位置設定
 	pCircleshadow->SetPos(pos);
 	// サイズ設定
 	pCircleshadow->SetSize(D3DXVECTOR3(size.x,0.0f,size.z));
+	// テクスチャータイプ設定
+	pCircleshadow->SetTexType(nTexType);
 	// 初期化処理
 	pCircleshadow->Init();
 	// 生成したオブジェクトを返す

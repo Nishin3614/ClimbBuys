@@ -37,6 +37,7 @@ public:
 	/* 列挙型 */
 	// enumclass
 	enum class OpeningState {
+		ERUPTION,		// 噴火
 		BUILDING,		// 必要素材の構築
 		STAGING,		// 演出
 		END,			// 終了 いらないかも

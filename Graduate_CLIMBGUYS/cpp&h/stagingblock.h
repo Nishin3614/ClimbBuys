@@ -114,6 +114,8 @@ private:
 	/* 関数 */
 	/* 変数 */
 	float				m_fSpeed;								// 移動量
+	float				m_fBurstSpeed;							// 移動量
+
 	D3DXVECTOR3			m_Vector;								// ブロックが飛んでいく方向ベクトル
 	int					m_nBlockNun;							// ブロックの番号
 	bool				m_bStopMove;							// 座標の更新を止める

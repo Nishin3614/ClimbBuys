@@ -38,7 +38,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 COpening::COpening()
 {
-	m_state = OpeningState::BUILDING;
+	m_state = OpeningState::ERUPTION;
 	m_pOpeningManager = nullptr;
 }
 
@@ -57,13 +57,6 @@ void COpening::Init(void)
 {
 	// モード初期化
 	CBaseMode::Init();
-
-	// 背景オブジェクトの生成
-	CScene_X::Create(
-		D3DVECTOR3_ZERO,					// 位置
-		D3DVECTOR3_ZERO,					// 回転
-		CScene_X::TYPE_OBJECT_MAP,			// モデル番号
-		false);								// シャドウマッピング状態
 
 	// オープニング管理クラスの生成
 	m_pOpeningManager = new COpeningManager;

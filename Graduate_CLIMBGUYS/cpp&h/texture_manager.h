@@ -43,6 +43,7 @@ public:
 		TYPE_PLAYER_UI_02,			// プレイヤーUI_02
 		TYPE_PLAYER_UI_03,			// プレイヤーUI_03
 		TYPE_PLAYER_UI_04,			// プレイヤーUI_04
+		TYPE_UI_NUMBER,				// ナンバー
 		TYPE_RESULT_UI_FRAME_1P,	// リザルトUI_1Pの枠
 		TYPE_RESULT_UI_FRAME_2P,	// リザルトUI_2Pの枠
 		TYPE_RESULT_UI_FRAME_3P,	// リザルトUI_3Pの枠
@@ -51,7 +52,14 @@ public:
 		TYPE_RESULT_UI_RANK_02,		// リザルトUI_順位_02
 		TYPE_RESULT_UI_RANK_03,		// リザルトUI_順位_03
 		TYPE_RESULT_UI_RANK_04,		// リザルトUI_順位_04
-		TYPE_UI_NUMBER,				// ナンバー
+		TYPE_RESULT_UI_DEATH_01,	// リザルトUI_死因_01
+		TYPE_RESULT_UI_DEATH_02,	// リザルトUI_死因_02
+		TYPE_RESULT_UI_DEATH_03,	// リザルトUI_死因_03
+		TYPE_RESULT_UI_DEATH_04,	// リザルトUI_死因_04
+		TYPE_GAME_UI_NAME_TAG_01,	// ゲームUI_ネームタグ_01
+		TYPE_GAME_UI_NAME_TAG_02,	// ゲームUI_ネームタグ_02
+		TYPE_GAME_UI_NAME_TAG_03,	// ゲームUI_ネームタグ_03
+		TYPE_GAME_UI_NAME_TAG_04,	// ゲームUI_ネームタグ_04
 		TYPE_MAX					// 最大数
 	} TYPE;
 

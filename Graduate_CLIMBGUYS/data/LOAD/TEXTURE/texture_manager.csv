@@ -9,6 +9,7 @@ data/TEXTURE/UI/PLAYER/Player01.png
 data/TEXTURE/UI/PLAYER/Player02.png
 data/TEXTURE/UI/PLAYER/Player03.png
 data/TEXTURE/UI/PLAYER/Player04.png
+data/TEXTURE/UI/Number02.png
 data/TEXTURE/UI/RESULT/1P_frame.png
 data/TEXTURE/UI/RESULT/2P_frame.png
 data/TEXTURE/UI/RESULT/3P_frame.png
@@ -17,4 +18,11 @@ data/TEXTURE/UI/RESULT/rank_01.png
 data/TEXTURE/UI/RESULT/rank_02.png
 data/TEXTURE/UI/RESULT/rank_03.png
 data/TEXTURE/UI/RESULT/rank_04.png
-data/TEXTURE/UI/Number02.png
+data/TEXTURE/UI/RESULT/cause_death_01.png
+data/TEXTURE/UI/RESULT/cause_death_02.png
+data/TEXTURE/UI/RESULT/cause_death_03.png
+data/TEXTURE/UI/RESULT/cause_death_04.png
+data/TEXTURE/UI/GAME/name_tag_01.png
+data/TEXTURE/UI/GAME/name_tag_02.png
+data/TEXTURE/UI/GAME/name_tag_03.png
+data/TEXTURE/UI/GAME/name_tag_04.png

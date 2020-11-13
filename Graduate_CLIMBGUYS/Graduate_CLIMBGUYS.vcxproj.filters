@@ -309,6 +309,9 @@
     <ClCompile Include="cpp&amp;h\multinumber.cpp">
       <Filter>Number</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\gameUI.cpp">
+      <Filter>Texture_UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -553,6 +556,9 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\multinumber.h">
       <Filter>Number</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\gameUI.h">
+      <Filter>Texture_UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

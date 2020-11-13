@@ -181,6 +181,8 @@ void C3DEffect::Draw(void)
 			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, nCount * 4, 2);
 		}
 	}
+	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	//アルファテスト戻す
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	//Zバッファ　有効

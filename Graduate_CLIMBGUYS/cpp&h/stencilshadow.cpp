@@ -41,6 +41,7 @@ int CStencilshadow::m_nTexId[TYPE_MAX] =
 {
 	0,
 };
+CScene_TWO * CStencilshadow::m_pShadow = NULL;	// シャドウ2D
 
 #ifdef _DEBUG
 bool	CStencilshadow::m_bStencil = true;								// ステンシル描画するかしないか
@@ -65,9 +66,8 @@ CStencilshadow::CStencilshadow() : CScene()
 	m_nNumPolygon = 2;
 	m_nBlock_Width = 1;
 	m_nBlock_Depth = 1;
-	m_bUse = false;
+	m_bUse = true;
 	m_type = TYPE_CYLINDER;
-	m_pSceneTwo = NULL;
 }
 
 // ----------------------------------------
@@ -103,14 +103,6 @@ void CStencilshadow::Init(void)
 	default:
 		break;
 	}
-	m_pSceneTwo = std::move(CScene_TWO::Creat_Unique(
-		CScene_TWO::OFFSET_TYPE_CENTER,
-		{ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f },
-		{ SCREEN_WIDTH,SCREEN_HEIGHT },
-		-1,
-		0.0f,
-		{0.0f,0.0f,0.0f,1.0f}
-	));
 }
 
 // ----------------------------------------
@@ -124,11 +116,6 @@ void CStencilshadow::Uninit(void)
 		m_pVtxBuff->Release();
 		m_pVtxBuff = NULL;
 	}
-	// 2Dポリゴンの開放
-	if (m_pSceneTwo != NULL)
-	{
-		m_pSceneTwo->Uninit();
-	}
 }
 
 // ----------------------------------------
@@ -136,45 +123,7 @@ void CStencilshadow::Uninit(void)
 // ----------------------------------------
 void CStencilshadow::Update(void)
 {
-	/*
-	// 変数宣言
-	VERTEX_3D *pVtx;	// 頂点情報へのポイント
-	int nCountDirect;
-	int nCountWidth;
 
-	// 頂点データの範囲をロックし、頂点バッファへのポインタ
-	m_pVtxBuff->Lock(
-		0,
-		0,
-		(void **)&pVtx,
-		0);
-	//頂点設定 //
-	//行ループ
-	for (nCountDirect = 0; nCountDirect < m_nBlock_Depth + 1; nCountDirect++)
-	{
-		// 列ループ
-		for (nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
-		{
-			// テクスチャーの設定
-			pVtx[0].tex = pVtx[0].tex +
-				D3DXVECTOR2(
-					1.0f / m_nBlock_Width * 0.1f,
-					0.0f);
-			// 色設定
-			pVtx[0].col = m_col;
-
-			// ポイント合わせ
-			pVtx++;
-		}
-	}
-	// アンロック
-	m_pVtxBuff->Unlock();
-	// 2Dポリゴンの開放
-	if (m_pSceneTwo != NULL)
-	{
-		m_pSceneTwo->Update();
-	}
-	*/
 }
 
 // ----------------------------------------
@@ -182,6 +131,7 @@ void CStencilshadow::Update(void)
 // ----------------------------------------
 void CStencilshadow::Draw(void)
 {
+	if (!m_bUse) return;
 	// 描画状態
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLBACK);
 	// 変数宣言
@@ -235,8 +185,8 @@ void CStencilshadow::Draw(void)
 			0,
 			0,
 			m_nNumberVertex,		//使用する頂点数 三角ポリゴンの頂点
-			0,		//頂点の読み取りを開始する位置
-			m_nNumPolygon);	//ポリゴンの枚数
+			0,						//頂点の読み取りを開始する位置
+			m_nNumPolygon);			//ポリゴンの枚数
 
 					// カリングしない
 		CManager::GetRenderer()->SetType(CRenderer::TYPE_CULLNORMAL);
@@ -313,10 +263,11 @@ void CStencilshadow::Draw(void)
 		pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
 		// 反時計カリング(元のカリング)
 		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-		// 2Dポリゴンの描画
-		if (m_pSceneTwo != NULL)
+		// シャドウ2Dが存在していたら
+		if (m_pShadow)
 		{
-			m_pSceneTwo->Draw();
+			// シャドウ2Dの開放
+			m_pShadow->Draw();
 		}
 		// ステンシルバッファを無効にする
 		pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
@@ -342,6 +293,18 @@ void CStencilshadow::Debug(void)
 // ----------------------------------------
 HRESULT CStencilshadow::Load(void)
 {
+	// シャドウ2Dが存在していたら
+	if (!m_pShadow)
+	{
+		m_pShadow = CScene_TWO::Create_Self(
+			CScene_TWO::OFFSET_TYPE_CENTER,
+			{ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f },
+			{ SCREEN_WIDTH,SCREEN_HEIGHT },
+			-1,
+			0.0f,
+			D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.8f)
+		);
+	}
 	return S_OK;
 }
 
@@ -350,19 +313,28 @@ HRESULT CStencilshadow::Load(void)
 // ----------------------------------------
 void CStencilshadow::UnLoad(void)
 {
+	// シャドウ2Dが存在していたら
+	if (m_pShadow)
+	{
+		// シャドウ2Dの開放
+		m_pShadow->Uninit();
+		delete m_pShadow;
+		m_pShadow = NULL;
+	}
 }
 
 // ----------------------------------------
 // 作成処理(シーン管理)
 // ----------------------------------------
 CStencilshadow * CStencilshadow::Create(
-	D3DXVECTOR3 const &pos,		// 位置
-	D3DXVECTOR3 const &size,	// サイズ
-	TYPE const &type,			// タイプ
-	int const &nWidth,			// 横数
-	int const &nDepth,			// 縦数
-	D3DXCOLOR	const &col,		// カラー
-	D3DXVECTOR3 const &rot		// 回転
+	D3DXVECTOR3 const &		pos,	// 位置
+	D3DXVECTOR3 const &		size,	// サイズ
+	TYPE const &			type,	// タイプ
+	CScene::LAYER const &	layer,	// レイヤー
+	int const &				nWidth,	// 横数
+	int const &				nDepth,	// 縦数
+	D3DXCOLOR	const &		col,	// カラー
+	D3DXVECTOR3 const &		rot		// 回転
 )
 {
 	// 変数宣言
@@ -370,7 +342,7 @@ CStencilshadow * CStencilshadow::Create(
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pStencilshadow = new CStencilshadow();
 	// シーン管理設定
-	pStencilshadow->ManageSetting(CScene::LAYER_3DSHADOW);
+	pStencilshadow->ManageSetting(layer);
 	// 位置情報
 	pStencilshadow->m_pos = pos;
 	// サイズ情報
@@ -378,9 +350,7 @@ CStencilshadow * CStencilshadow::Create(
 	// 回転情報
 	pStencilshadow->m_rot = rot;
 	// 色情報
-	pStencilshadow->m_col = col;
-	// 色情報
-	pStencilshadow->m_col = D3DXCOLOR(0.0f,0.0f,0.0f,1.0f);
+	pStencilshadow->m_col = D3DXCOLOR(0.0f,0.0f,0.0f,0.5f);
 	// 横ブロック
 	pStencilshadow->m_nBlock_Width = nWidth;
 	// 縦ブロック
@@ -431,19 +401,31 @@ CStencilshadow * CStencilshadow::Create_Self(
 }
 
 // ----------------------------------------
-// 使用状態取得
-// ----------------------------------------
-bool CStencilshadow::GetUse(void)
-{
-	return m_bUse;
-}
-
-// ----------------------------------------
 // 位置設定
 // ----------------------------------------
 void CStencilshadow::SetPos(D3DXVECTOR3 const & pos)
 {
 	m_pos = pos;
+}
+
+// ----------------------------------------
+// サイズ設定
+// ----------------------------------------
+void CStencilshadow::SetSize(D3DXVECTOR3 const & size)
+{
+	// サイズ設定
+	m_size = size;
+	// 頂点座標の設定
+	// タイプが円柱なら
+	if (m_type == TYPE_CYLINDER)
+	{
+		SetCylinderVtxPos();
+	}
+	// タイプが矩形なら
+	else if (m_type == TYPE_RECT)
+	{
+		SetRectVtxPos();
+	}
 }
 
 // ----------------------------------------
@@ -459,7 +441,22 @@ void CStencilshadow::SetRot(D3DXVECTOR3 const & rot)
 // ----------------------------------------
 void CStencilshadow::SetCol(D3DXCOLOR const & col)
 {
+	// 色設定
 	m_col = col;
+	// シャドウ2Dが存在していたら
+	if (m_pShadow)
+	{
+		// シャドウ2Dの開放
+		m_pShadow->SetCol(m_col);
+		m_pShadow->Set_Vtx_Col();
+	}
+	// // シーン2D情報NULLチェック
+	// if (m_pSceneTwo)
+	// {
+	// 	// 色の設定
+	// 	m_pSceneTwo->SetCol(m_col);
+	// 	m_pSceneTwo->Set_Vtx_Col();
+	// }
 }
 
 // ----------------------------------------
@@ -499,7 +496,6 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 	m_nNumPolygon =
 		m_nBlock_Depth * m_nBlock_Width * 2 +
 		4 * (m_nBlock_Depth - 1);
-
 	// 角度の計算
 	fAngle = D3DX_PI * 2 / m_nBlock_Width;
 
@@ -607,6 +603,52 @@ void CStencilshadow::SetCylinder(LPDIRECT3DDEVICE9 pDevice)
 }
 
 // ----------------------------------------
+// 矩形の頂点座標の設定
+// ----------------------------------------
+void CStencilshadow::SetCylinderVtxPos(void)
+{
+	// 変数宣言
+	VERTEX_3D *pVtx;			// 頂点情報へのポイント
+	float fOriginY;				// yの位置
+	float fAngle;				// 角度
+	float fRadian;				// yのラジアン値
+	// ブロック描画の原点の初期設定
+	fOriginY = -m_size.y * m_nBlock_Depth;
+	// 角度の計算
+	fAngle = D3DX_PI * 2 / m_nBlock_Width;
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタ
+	m_pVtxBuff->Lock(
+		0,
+		0,
+		(void **)&pVtx,
+		0);
+
+	//頂点設定 //
+	//行ループ
+	for (int nCountDirect = 0; nCountDirect < m_nBlock_Depth + 1; nCountDirect++)
+	{
+		// 列ループ
+		for (int nCountWidth = 0; nCountWidth < m_nBlock_Width + 1; nCountWidth++)
+		{
+			// ラジアン値
+			fRadian = fAngle * nCountWidth;
+			fRadian = CCalculation::Rot_One_Limit(fRadian);
+			// 頂点座標の設定
+			pVtx[0].pos =
+				D3DXVECTOR3(
+				(sinf(fRadian) * m_size.x),
+					fOriginY + m_size.y * nCountDirect,
+					(cosf(fRadian) * m_size.z));
+			// ポイント合わせ
+			pVtx++;
+		}
+	}
+	// アンロック
+	m_pVtxBuff->Unlock();
+}
+
+// ----------------------------------------
 // 矩形の設定
 // ----------------------------------------
 void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
@@ -710,4 +752,32 @@ void CStencilshadow::SetRect(LPDIRECT3DDEVICE9 pDevice)
 	}
 	//インデックスのバッファのアンロック
 	m_pIndex->Unlock();
+}
+
+// ----------------------------------------
+// 矩形の頂点座標の設定
+// ----------------------------------------
+void CStencilshadow::SetRectVtxPos(void)
+{
+	//頂点情報へのポインタ
+	VERTEX_3D *pVtx;
+
+	//頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点の合計 = 8
+	pVtx[0].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y, m_size.z * 0.5f);
+	pVtx[1].pos = D3DXVECTOR3(m_size.x * 0.5f, -m_size.y, m_size.z * 0.5f);
+	pVtx[2].pos = D3DXVECTOR3(m_size.x * 0.5f, -m_size.y, -m_size.z * 0.5f);
+	pVtx[3].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y, -m_size.z * 0.5f);
+	pVtx[4].pos = D3DXVECTOR3(-m_size.x * 0.5f, -m_size.y, m_size.z * 0.5f);
+
+	pVtx[5].pos = D3DXVECTOR3(-m_size.x * 0.5f, 0.0f, m_size.z * 0.5f);
+	pVtx[6].pos = D3DXVECTOR3(m_size.x * 0.5f, 0.0f, m_size.z * 0.5f);
+	pVtx[7].pos = D3DXVECTOR3(m_size.x * 0.5f, 0.0f, -m_size.z * 0.5f);
+	pVtx[8].pos = D3DXVECTOR3(-m_size.x * 0.5f, 0.0f, -m_size.z * 0.5f);
+	pVtx[9].pos = D3DXVECTOR3(-m_size.x * 0.5f, 0.0f, m_size.z * 0.5f);
+
+	//頂点データをアンロック
+	m_pVtxBuff->Unlock();
 }

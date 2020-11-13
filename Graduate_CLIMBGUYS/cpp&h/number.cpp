@@ -31,18 +31,12 @@
 // 静的変数宣言
 //
 // ----------------------------------------
-int CNumber::m_TexId[CNumber::TEX_MAX] = {
-	4,
-	5,
-	6
-};
 
 // ----------------------------------------
 // コンストラクタ処理
 // ----------------------------------------
 CNumber::CNumber() : CScene_TWO::CScene_TWO()
 {
-	m_texID = TEX_SCORE;
 	m_nNum = 0;
 	m_nRandamTime = 0;
 	m_nFram = 0;
@@ -62,7 +56,6 @@ CNumber::~CNumber()
 void CNumber::Init(void)
 {	
 	CScene_TWO::Init();
-	CScene_TWO::BindTexture(m_TexId[m_texID]);
 }
 
 // ----------------------------------------
@@ -103,6 +96,8 @@ void CNumber::Update(void)
 		// フレームタイムアップ
 		m_nFram++;
 	}
+	// 更新
+	CScene_TWO::Update();
 }
 
 // ----------------------------------------
@@ -128,14 +123,6 @@ void CNumber::SetNum(int const &nNum)
 		D3DXVECTOR2(fTex, 0.0f),
 		D3DXVECTOR2(fTex + 0.1f, 1.0f)
 	);
-}
-
-// ----------------------------------------
-// テクスチャー処理
-// ----------------------------------------
-void CNumber::SetTex(TEX const &tex)
-{
-	m_texID = tex;
 }
 
 // ----------------------------------------
@@ -166,11 +153,11 @@ void CNumber::UnLoad(void)
 // 作成処理
 // ----------------------------------------
 CNumber * CNumber::Create(
-	int			const & nScore,
-	D3DXVECTOR3 const & pos,
-	TEX			const & tex,			
-	D3DXVECTOR2 const & size,
-	D3DXCOLOR	const & col
+	int						const & nScore,
+	D3DXVECTOR3				const & pos,
+	CTexture_manager::TYPE	const & tex,
+	D3DXVECTOR2				const & size,
+	D3DXCOLOR				const & col
 )
 {
 	// 変数宣言
@@ -182,7 +169,9 @@ CNumber * CNumber::Create(
 	//サイズ設定
 	pNumber->SetSize(size);
 	// テクスチャータイプ設定
-	pNumber->SetTex(tex);
+	pNumber->BindTexture(tex);
+	// マネージャー管理
+	pNumber->ManageSetting(CScene::LAYER_UI);
 	// 初期化処理
 	pNumber->Init();
 	// スコア設定

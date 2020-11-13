@@ -24,6 +24,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class CCircleshadow;	// 円シャドウクラス
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 構造体
@@ -43,6 +44,26 @@ public:
 		TYPE_FIELD,			// フィールドブロック
 		TYPE_MAX,			// タイプ全体数
 	} TYPE;
+
+	// ベースブロックの種類
+	enum class BlockType
+	{
+		NORMAL,
+		SPRING,
+		BOMB
+	};
+
+	// 上下左右前後
+	typedef enum
+	{
+		DIRECTION_UP = 0b000001,	// 上
+		DIRECTION_UNDER = 0b000010,	// 下
+		DIRECTION_LEFT = 0b000100,	// 左
+		DIRECTION_RIGHT = 0b001000,	// 右
+		DIRECTION_FRONT = 0b010000,	// 前
+		DIRECTION_BACK = 0b100000,	// 後ろ
+		DIRECTION_MAX
+	} DIRECTION;
 
 	/* 構造体 */
 	// 盤面情報
@@ -129,6 +150,14 @@ public:
 		float fDistance;					// 距離
 		COLLISIONDIRECTION Direction;		// 方向
 	} PUSHBLOCK;
+
+	// ----- ブロックのステータス ----- //
+	typedef struct
+	{
+		float				fMove;				// 移動量
+		int					nAppearance;		// 出現する高さ
+		float				fBasicShadowSize;	// シャドウサイズ
+	}BLOCK_STATUS;
 
 	/* 関数 */
 	// コンストラクタ
@@ -218,20 +247,23 @@ public:
 	);
 
 	// ベースブロック
-	void SetType(TYPE const type)		{ m_type = type; };
+	void SetType(TYPE const type)				{ m_type = type; };
 	// ベースブロック
-	TYPE GetType(void) const			{ return m_type; };
+	TYPE GetType(void) const					{ return m_type; };
 	// 落ちる状態設定
-	void SetFall(bool const & bFall)	{ m_bFall = bFall; };
+	void SetFall(bool const & bFall)			{ m_bFall = bFall; };
 	// 落ちる状態取得
-	bool & GetFall(void)				{ return m_bFall; };
+	bool & GetFall(void)						{ return m_bFall; };
 	// 盤面情報取得
-	GRID & GetGrid(void)				{ return m_grid; };
+	GRID & GetGrid(void)						{ return m_grid; };
 	// 盤面情報設定
-	void SetGrid(GRID const &grid)		{ m_grid = grid; };
+	void SetGrid(GRID const &grid)				{ m_grid = grid; };
 	// 前回の位置取得
-	D3DXVECTOR3 & GetPosOld(void)		{ return m_posOld; };
-
+	D3DXVECTOR3 & GetPosOld(void)				{ return m_posOld; };
+	// ベースブロックの種類設定
+	void SetBaseBlockType(BlockType type) { m_BlockType = type; };
+	// ベースブロックの種類取得
+	BlockType GetBaseBlockType() { return m_BlockType; };
 	// ベースブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// ベースブロック全ソースの開放
@@ -306,7 +338,15 @@ public:
 	static void SetHeight(
 		GRID const & Grid
 	);
+	// ブロックのステータス情報取得
+	static BLOCK_STATUS const & GetBlockStatus(void) { return m_BlockStatus; };
+	// ブロックのステータス読み込み処理
+	static void BlockStatusLoad(void);
+	// ブロックのステータス書き込み処理
+	static void BlockStatusSave(void);
 #ifdef _DEBUG
+	// 全体のデバッグ処理
+	static void AllDebug(void);
 	// デバッグ処理
 	virtual void  Debug(void);
 #endif // _DEBUG
@@ -323,11 +363,18 @@ private:
 	/* 関数 */
 	// 落ちる更新処理
 	void Update_Fall(void);
+	// 当たり判定処理
+	void Collision(CBaseblock * pBlock);
+	// ステンシルシャドウの更新処理
+	void Update_StencilShadow(CBaseblock * pBlock);
 	/* 変数 */
-	D3DXVECTOR3		m_posOld;		// 前回の位置
-	TYPE			m_type;			// ベースブロック
-	GRID			m_grid;			// 盤面情報
-	bool			m_bFall;		// 落ちる状態
+	static BLOCK_STATUS		m_BlockStatus;		// ブロックのステータス
+	CCircleshadow *			m_pShadowPolygon;	// シャドウポリゴン
+	D3DXVECTOR3				m_posOld;			// 前回の位置
+	TYPE					m_type;				// ベースブロック
+	BlockType				m_BlockType;		// ベースブロックの種類
+	GRID					m_grid;				// 盤面情報
+	bool					m_bFall;			// 落ちる状態
 	// 試験用
 	static int m_anHeight[20][20];
 };

@@ -472,8 +472,9 @@ void CRenderer::SetBlend(
 		break;
 		// Œ¸Z‡¬
 	case BLEND_SUBTRACTION:
-		m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
-		m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+		m_pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
+		m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 		break;
 		// æZ‡¬1
 	case BLEND_MULTIPUL1:

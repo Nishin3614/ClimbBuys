@@ -32,6 +32,7 @@
 #include "connect_fieldblock.h"
 #include "baseblock.h"
 #include "player.h"
+#include "stencilshadow.h"
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
@@ -98,6 +99,12 @@ void CScene_load::LoadAll(void)
 	if (!CNumber::Load() == S_OK)
 	{
 		CCalculation::Messanger("番号読み取り失敗");
+	}
+
+	// ステンシルシャドウ
+	if (!CStencilshadow::Load() == S_OK)
+	{
+		CCalculation::Messanger("ステンシルシャドウ読み取り失敗");
 	}
 
 	/* 3Dオブジェクト*/
@@ -185,6 +192,8 @@ void CScene_load::UnLoadAll(void)
 	CMeshsphere::Unload();
 	// 円形シャドウ
 	CCircleshadow::UnLoad();
+	// ステンシルシャドウ
+	CStencilshadow::UnLoad();
 	// メッシュウォール
 	CMeshwall::UnLoad();
 	// フェード

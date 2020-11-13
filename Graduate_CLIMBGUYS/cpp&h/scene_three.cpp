@@ -430,34 +430,55 @@ void CScene_THREE::Set_Vtx_Pos(
 			0,
 			(void **)&pVtx,
 			0);
-	}
-	// 頂点座標のオフセット選択
-	switch (offsettype)
-	{
-		// 縦のセンター
-	case OFFSET_TYPE_VERTICAL_CENTER:
-		Offset_Virtical_Center(pVtx);
-		break;
-		// 縦の左
-	case OFFSET_TYPE_VERTICAL_LEFT:
-		Offset_Virtical_Left(pVtx);
-		break;
-		// 縦の下
-	case OFFSET_TYPE_VERTICAL_UNDER:
-		Offset_Virtical_Under(pVtx);
-		break;
-		// 横の中心
-	case OFFSET_TYPE_SIDE_CENTER:
-		Offset_Side_Center(pVtx);
-		break;
-	default:
-		break;
-	}
-	// 頂点情報がヌルだったら
-	if (pVtx == NULL)
-	{
+			// 頂点座標のオフセット選択
+		switch (offsettype)
+		{
+			// 縦のセンター
+		case OFFSET_TYPE_VERTICAL_CENTER:
+			Offset_Virtical_Center(pVtx);
+			break;
+			// 縦の左
+		case OFFSET_TYPE_VERTICAL_LEFT:
+			Offset_Virtical_Left(pVtx);
+			break;
+			// 縦の下
+		case OFFSET_TYPE_VERTICAL_UNDER:
+			Offset_Virtical_Under(pVtx);
+			break;
+			// 横の中心
+		case OFFSET_TYPE_SIDE_CENTER:
+			Offset_Side_Center(pVtx);
+			break;
+		default:
+			break;
+		}
 		// アンロック
 		m_pVtxBuff->Unlock();
+	}
+	else
+	{
+		// 頂点座標のオフセット選択
+		switch (offsettype)
+		{
+			// 縦のセンター
+		case OFFSET_TYPE_VERTICAL_CENTER:
+			Offset_Virtical_Center(pVtx);
+			break;
+			// 縦の左
+		case OFFSET_TYPE_VERTICAL_LEFT:
+			Offset_Virtical_Left(pVtx);
+			break;
+			// 縦の下
+		case OFFSET_TYPE_VERTICAL_UNDER:
+			Offset_Virtical_Under(pVtx);
+			break;
+			// 横の中心
+		case OFFSET_TYPE_SIDE_CENTER:
+			Offset_Side_Center(pVtx);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -466,7 +487,7 @@ void CScene_THREE::Set_Vtx_Pos(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CScene_THREE::Set_Vtx_Col(VERTEX_3D * pVtx)
 {
-	// 頂点情報がヌルだったら
+	// 頂点情報がNULLなら
 	if (pVtx == NULL)
 	{
 		// 頂点データの範囲をロックし、頂点バッファへのポインタ
@@ -475,17 +496,22 @@ void CScene_THREE::Set_Vtx_Col(VERTEX_3D * pVtx)
 			0,
 			(void **)&pVtx,
 			0);
-	}
-	// 頂点カラー
-	pVtx[0].col = m_col;
-	pVtx[1].col = m_col;
-	pVtx[2].col = m_col;
-	pVtx[3].col = m_col;
-	// 頂点情報がヌルだったら
-	if (pVtx == NULL)
-	{
+		// 頂点カラー
+		pVtx[0].col = m_col;
+		pVtx[1].col = m_col;
+		pVtx[2].col = m_col;
+		pVtx[3].col = m_col;
 		// アンロック
 		m_pVtxBuff->Unlock();
+	}
+	// それ以外なら
+	else
+	{
+		// 頂点カラー
+		pVtx[0].col = m_col;
+		pVtx[1].col = m_col;
+		pVtx[2].col = m_col;
+		pVtx[3].col = m_col;
 	}
 }
 

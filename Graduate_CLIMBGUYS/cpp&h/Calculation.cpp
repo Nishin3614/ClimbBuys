@@ -1473,9 +1473,46 @@ D3DXVECTOR3 CCalculation::RandomVector3(float Max)
 
 	Value.x = Random(Max);
 	Value.y = Random(Max);
-	//Value.z = Random(Max);
+	Value.z = Random(Max);
 
 	return Value;
+}
+
+// ----------------------------------------------------------------------------------------------------
+// 360度のランダムな方向ベクトルを求める 正規化
+// ----------------------------------------------------------------------------------------------------
+D3DXVECTOR3 CCalculation::RandomDirectionVector(float fMax, bool bNormalization)
+{
+	D3DXVECTOR3 randV = D3DVECTOR3_ZERO;
+
+	if (fMax == NULL)
+	{
+		// X Y Z のランダムな方向を求める
+		randV.x = Random(1.0f);
+		randV.y = Random(1.0f);
+		randV.z = Random(1.0f);
+	}
+	else
+	{
+		// X Y Z のランダムな方向を求める
+		randV.x = Random(fMax);
+		randV.y = Random(fMax);
+		randV.z = Random(fMax);
+	}
+
+	// 正規化して方向ベクトルに変換
+	if (bNormalization)
+	{
+		D3DXVec3Normalize(&randV, &randV);
+		return randV;
+	}
+	// 正規化しないならこのまま値を返す
+	else
+	{
+		return randV;
+	}
+
+	return randV;
 }
 
 // ----------------------------------------------------------------------------------------------------

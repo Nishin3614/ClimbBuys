@@ -19,8 +19,6 @@
 // マクロ定義
 //
 // ----------------------------------------
-#define CIRCLESHADOW_HP (20)
-#define CIRCLESHADOW_MP (50)
 
 // ------------------------------------------
 //
@@ -69,17 +67,20 @@ public:
 	) {};
 	// 作成(シーン継承あり)
 	static CCircleshadow * Create(
-		D3DXVECTOR3 const &pos,							// 位置
-		D3DXVECTOR3 const &size							// サイズ
+		D3DXVECTOR3 const &	pos,						// 位置
+		D3DXVECTOR3 const &	size,						// サイズ
+		int const &			nTexType					// テクスチャータイプ
 	);					// 作成
 	static HRESULT Load(void);							// 読み込み
 	static void UnLoad(void);							// 破棄
-	// 設定 //
-
-	// 取得 //
+	// シャドウ状態を設定
+	void SetShadow(bool const & bShadow) { m_bShadow = bShadow; };
+	// シャドウ状態を取得
+	bool GetShadow(void) { return m_bShadow; };
 protected:
 private:
 	/* 関数 */
 	/* 変数 */
+	bool	m_bShadow;	// シャドウ状態
 };
 #endif

@@ -9,15 +9,19 @@
 #include "debugproc.h"
 #include "stencilshadow.h"
 #include "game.h"
+#include "circleshadow.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define BLOCK_GRAVITY		(1.0f)			// ブロックにかかる重力
-#define STENCIL_SIZE_Y		(10000.0f)		// ステンシルバッファのyのサイズ
-#define BLOCK_SIZE_RANGE	(25.0f)			// ブロックのサイズの範囲
+
+#define BLOCK_GRAVITY			(1.0f)									// ブロックにかかる重力
+#define STENCIL_SIZE_Y			(200.0f)								// ステンシルバッファのyのサイズ
+#define BLOCK_SIZE_RANGE		(25.0f)									// ブロックのサイズの範囲
+#define BLOCK_SHADOWSIZE		(25.0f)									// ステンシルシャドウのサイズ
+#define BLOCK_STATUS_TXT		("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -25,6 +29,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 試験用
+CBaseblock::BLOCK_STATUS CBaseblock::m_BlockStatus = {};
 int CBaseblock::m_anHeight[20][20] = {};		// 1つ1つの行列の高さ
 
 float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
@@ -35,9 +40,11 @@ std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CBaseblock::CBaseblock() : CScene_X::CScene_X()
 {
+	m_pShadowPolygon = NULL;
 	m_type = TYPE_NORMAL;	// タイプ
 	m_bFall = false;		// 落ちる状態
 	CScene::SetObj(CScene::OBJ::OBJ_BLOCK);	// オブジェクトタイプの設定
+	m_BlockType = BlockType::NORMAL;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -54,11 +61,17 @@ void CBaseblock::Init()
 {
 	// シーンXの初期化処理
 	CScene_X::Init();
-	// ステンシルシャドウの設定
-	//CScene_X::SetStencilshadow(
-	//	CScene_X::GetModel()->size + D3DXVECTOR3(0.0f, STENCIL_SIZE_Y,0.0f),
-	//	CStencilshadow::TYPE_RECT
-	//);
+	// フィールドブロック以外なら
+	if (m_type != TYPE_FIELD)
+	{
+		// シャドウポリゴンの生成
+		m_pShadowPolygon = CCircleshadow::Create(CScene_X::GetPos(),
+			D3DXVECTOR3(BLOCK_SHADOWSIZE, 0.0f, BLOCK_SHADOWSIZE),
+			-1
+		);
+		m_pShadowPolygon->SetCol(D3DXCOLOR(0.0f,0.0f,0.0f,1.0f));
+		m_pShadowPolygon->Set_Vtx_Col();
+	}
 	/*
 	if (m_type == TYPE_FIELD)
 	{
@@ -88,42 +101,36 @@ void CBaseblock::Update(void)
 {
 	// 前回の位置を代入
 	m_posOld = CScene_X::GetPos();
-
 	// シーンX更新処理
 	CScene_X::Update();
 	// 落ちる処理
 	Update_Fall();
-
-
-
-
-	COLLISIONDIRECTION Direct;
-
-	if (!this->GetFall()) return;
-	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
+	// シャドウポリゴンの位置設定
+	if (m_pShadowPolygon)
+	{
+		// 変数宣言
+		D3DXVECTOR3 ShadowPos;	// シャドウ位置
+		ShadowPos = m_pShadowPolygon->GetPos();
+		ShadowPos.x = CScene_X::GetPos().x;
+		ShadowPos.z = CScene_X::GetPos().z;
+		m_pShadowPolygon->SetPos(ShadowPos);
+	}
+	// ブロックのループ
+	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK);nCntBlock++)
 	{
 		// 情報取得
-		CBaseblock * pBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
-		// pBlockがNULLなら
+		CBaseblock * pBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);	// ブロック情報
+		// 取得したブロックのNULLチェック ||
+		// 取得したブロックと現在ブロックが同じ
 		// ->ループスキップ
 		if (pBlock == NULL ||
 			pBlock == this) continue;
 		else if (pBlock->m_grid.nColumn != this->m_grid.nColumn ||
 			pBlock->m_grid.nLine != this->m_grid.nLine) continue;
-
-		// 当たり判定
-		Direct = Collision(
-			CScene::OBJ_BLOCK,
-			&pBlock->GetPos(),
-			&pBlock->GetPosOld(),
-			&pBlock->GetModel()->size,
-			D3DXVECTOR3(0.0f, pBlock->GetModel()->size.y, 0.0f)
-		);
-
-		if (Direct != COLLISIONDIRECTION::NONE)
-		{
-			HitCollision(Direct, CScene::OBJ_BLOCK, pBlock);
-		}
+		// 当たり判定処理
+		Collision(pBlock);
+		// ブロックのステンシルシャドウの更新
+		Update_StencilShadow(pBlock);
 	}
 }
 
@@ -141,6 +148,88 @@ void CBaseblock::Update_Fall(void)
 	pos.y -= BLOCK_GRAVITY;
 	// 位置設定
 	CScene_X::SetPos(pos);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 当たり判定処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::Collision(CBaseblock * pBlock)
+{
+	// 落ちている状態なら
+	// ->関数を抜ける
+	if (!this->GetFall()) return;
+	// 変数宣言
+	COLLISIONDIRECTION Direct;	// 当たり判定方向
+	// 当たり判定
+	Direct = Collision(
+		CScene::OBJ_BLOCK,
+		&pBlock->GetPos(),
+		&pBlock->GetPosOld(),
+		&pBlock->GetModel()->size,
+		D3DXVECTOR3(0.0f, pBlock->GetModel()->size.y, 0.0f)
+	);
+	// ブロックが当たっているなら
+	if (Direct != COLLISIONDIRECTION::NONE)
+	{
+		// 当たった処理
+		HitCollision(Direct, CScene::OBJ_BLOCK, pBlock);
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ステンシルシャドウの更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::Update_StencilShadow(CBaseblock * pBlock)
+{
+	// シャドウのポリゴンのNULLチェック
+	if (!m_pShadowPolygon) return;
+	// フィールドブロックなら
+	// ->関数を抜ける
+	else if (m_type == TYPE_FIELD) return;
+	// 落ちている状態なら
+	// ->ステンシルシャドウの使用状態をfalseに
+	else if (!this->GetFall())
+	{
+		m_pShadowPolygon->SetShadow(false);
+		return;
+	}
+	// 下にブロックがあるなら
+	// ->ステンシルシャドウの使用状態をfalseに
+	else if (m_grid.nHeight - 1 == pBlock->GetGrid().nHeight)
+	{
+		m_pShadowPolygon->SetShadow(false);
+		return;
+	}
+
+	// 高さが現在置かれているブロックの高さより高かったら
+
+	else if (this->m_grid.nHeight > CBaseblock::GetHeight(pBlock->GetGrid().nColumn, pBlock->GetGrid().nLine) &&
+		this->m_grid.nHeight > pBlock->GetGrid().nHeight)
+	{
+		m_pShadowPolygon->SetShadow(true);
+		// 変数宣言
+		float fDiffHeight = this->GetPos().y - pBlock->GetPos().y;	// 比較した高さの差
+		// 高さが規定値以上なら
+		if (fDiffHeight >= m_fSizeRange * m_BlockStatus.nAppearance)
+		{
+			// 透明度の更新
+			m_pShadowPolygon->SetPos(pBlock->GetPos() + D3DXVECTOR3(0.0f, 30.0f, 0.0f));
+			m_pShadowPolygon->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_BlockStatus.fBasicShadowSize));
+			m_pShadowPolygon->Set_Vtx_Col();
+		}
+		// それ以外
+		else
+		{
+			// 透明度の更新
+			float fSize = m_fSizeRange * m_BlockStatus.nAppearance - fDiffHeight;
+			m_pShadowPolygon->SetPos(pBlock->GetPos() + D3DXVECTOR3(0.0f, 30.0f, 0.0f));
+			m_pShadowPolygon->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_BlockStatus.fBasicShadowSize * fSize));
+			m_pShadowPolygon->Set_Vtx_Col();
+		}
+
+	}
+
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -318,10 +407,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::BACK;
-
 				// 素材状の左に
 				pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
-
 				// 移動量の初期化
 				move->z = 0.0f;
 			}
@@ -547,6 +634,7 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 HRESULT CBaseblock::Load(void)
 {
 	m_fSizeRange = BLOCK_SIZE_RANGE;
+	BlockStatusLoad();
 	return S_OK;
 }
 
@@ -753,9 +841,11 @@ void CBaseblock::CreateInBulkBlock()
 	for (int nBlockCnt = 0; nBlockCnt < 94; nBlockCnt++)
 	{
 		// 変数宣言
-		CBaseblock * pBaseblock;		// シーン2Dクラス
-		pBaseblock = Create(BlockPos[nBlockCnt], 2);
-		pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
+
+		CBaseblock * pBaseblock;								// シーン2Dクラス
+		pBaseblock = Create(BlockPos[nBlockCnt], 2);			// 生成
+
+		//pBaseblock->SetSize(D3DXVECTOR3(0.25f, 0.25f, 0.25f));	// サイズ設定
 	}
 }
 
@@ -882,7 +972,155 @@ void CBaseblock::SetHeight(
 	m_anHeight[Grid.nColumn][Grid.nLine] = Grid.nHeight;
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックのステータスのロード
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::BlockStatusLoad(void)
+{
+	// ファイルポイント
+	FILE *pFile = nullptr;
+
+	char cReadText[128];			// 文字として読み取る
+	char cHeadText[128];			// 比較用
+	char cDie[128];					// 不要な文字
+
+									// ファイルを開く
+	pFile = fopen(BLOCK_STATUS_TXT, "r");
+
+	// 開いているとき
+	if (pFile)
+	{
+		// SCRIPTが来るまでループ
+		while (strcmp(cHeadText, "SCRIPT") != 0)
+		{
+			fgets(cReadText, sizeof(cReadText), pFile); // 一文読み込み
+			sscanf(cReadText, "%s", &cHeadText);		// 比較用テキストに文字を代入
+		}
+
+		// SCRIPTが来たら
+		if (strcmp(cHeadText, "SCRIPT") == 0)
+		{
+			// END_SCRIPTが来るまでループ
+			while (strcmp(cHeadText, "END_SCRIPT") != 0)
+			{
+				fgets(cReadText, sizeof(cReadText), pFile);
+				sscanf(cReadText, "%s", &cHeadText);
+
+				// STATUS_SETが来たら
+				if (strcmp(cHeadText, "STATUS_SET") == 0)
+				{
+					// END_STATUS_SETが来るまでループ
+					while (strcmp(cHeadText, "END_STATUS_SET") != 0)
+					{
+						fgets(cReadText, sizeof(cReadText), pFile);
+						sscanf(cReadText, "%s", &cHeadText);
+
+						// Moveが来たら
+						if (strcmp(cHeadText, "Move") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_BlockStatus.fMove);
+						}
+						// Jumpが来たら
+						else if (strcmp(cHeadText, "App") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_BlockStatus.nAppearance);
+						}
+					}
+				}
+			}
+		}
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{
+		// 読み込み失敗時の警告表示
+		MessageBox(NULL, "ブロックのステータス読み込み失敗", BLOCK_STATUS_TXT, MB_ICONWARNING);
+	}
+
+
+	// 基本シャドウサイズの設定
+	m_BlockStatus.fBasicShadowSize = 1.0f / (m_fSizeRange * m_BlockStatus.nAppearance);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックのステータスのセーブ
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::BlockStatusSave(void)
+{
+	// ファイルポイント
+	FILE	*pFile = nullptr;
+
+	// ファイルを開く
+	pFile = fopen(BLOCK_STATUS_TXT, "w");
+
+	// 開いているとき
+	if (pFile)
+	{
+		fprintf(pFile, COMMENT02);
+		fprintf(pFile, "// ブロックのステータス\n");
+		fprintf(pFile, COMMENT02);
+
+		fprintf(pFile, "SCRIPT\n");
+		fprintf(pFile, NEWLINE);
+
+		// セーブするモデルの情報
+		fprintf(pFile, "STATUS_SET\n");
+		fprintf(pFile, "	Move			= %.1f\n", m_BlockStatus.fMove);
+		fprintf(pFile, "	App				= %d\n", m_BlockStatus.nAppearance);
+		fprintf(pFile, "END_STATUS_SET\n\n");
+
+		fprintf(pFile, "END_SCRIPT\n");
+
+		// ファイルを閉じる
+		fclose(pFile);
+
+		// 読み込み成功時の結果表示
+		MessageBox(NULL, "セーブしました", BLOCK_STATUS_TXT, MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		// 読み込み失敗時の警告表示
+		MessageBox(NULL, "読み込み失敗", BLOCK_STATUS_TXT, MB_ICONWARNING);
+	}
+}
+
 #ifdef _DEBUG
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 全てのデバッグ表示
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::AllDebug(void)
+{
+	if (ImGui::Begin(u8"ブロックのステータス"))
+	{
+		// 移動量
+		ImGui::DragFloat(u8"移動量", &m_BlockStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
+		// 落ちる高さ
+		ImGui::DragInt(u8"落ちる高さ", &m_BlockStatus.nAppearance, 1.0f);						/* 10.0f */
+
+		// セーブボタン
+		if (ImGui::Button(u8"保存"))
+		{
+			// ブロックのステータスのセーブ
+			BlockStatusSave();
+		}
+
+		// 改行キャンセル
+		ImGui::SameLine();
+
+		// 初期化
+		if (ImGui::Button(u8"初期化"))
+		{
+			// ブロックの初期ステータス代入
+			//BlockStatusInitLoad();
+		}
+		// 区切り線
+		ImGui::Separator();
+	}
+	// End
+	ImGui::End();
+}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デバッグ表示
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

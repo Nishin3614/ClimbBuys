@@ -138,7 +138,6 @@ void CGame::Update(void)
 	CBaseMode::Update();
 
 	// 結合されたブロックの更新ブロック生成
-	//CConnectblock::Update_CreateBlock();
 
 	/*
 	// ポーズ状態ならば

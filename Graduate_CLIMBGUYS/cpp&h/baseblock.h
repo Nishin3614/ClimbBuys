@@ -45,6 +45,14 @@ public:
 		TYPE_MAX,			// タイプ全体数
 	} TYPE;
 
+	// ベースブロックの種類
+	enum class BlockType
+	{
+		NORMAL,
+		SPRING,
+		BOMB
+	};
+
 	// 上下左右前後
 	typedef enum
 	{
@@ -252,6 +260,10 @@ public:
 	void SetGrid(GRID const &grid)				{ m_grid = grid; };
 	// 前回の位置取得
 	D3DXVECTOR3 & GetPosOld(void)				{ return m_posOld; };
+	// ベースブロックの種類設定
+	void SetBaseBlockType(BlockType type) { m_BlockType = type; };
+	// ベースブロックの種類取得
+	BlockType GetBaseBlockType() { return m_BlockType; };
 	// ベースブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// ベースブロック全ソースの開放
@@ -360,6 +372,7 @@ private:
 	CCircleshadow *			m_pShadowPolygon;	// シャドウポリゴン
 	D3DXVECTOR3				m_posOld;			// 前回の位置
 	TYPE					m_type;				// ベースブロック
+	BlockType				m_BlockType;		// ベースブロックの種類
 	GRID					m_grid;				// 盤面情報
 	bool					m_bFall;			// 落ちる状態
 	// 試験用

@@ -32,6 +32,7 @@
 
 #include "normalblock.h"
 #include "fieldblock.h"
+#include "springblock.h"
 
 /* ポーズ */
 //#include "pause.h"
@@ -100,6 +101,12 @@ void CGame::Init(void)
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),
 		10000.0f);
 		*/
+
+		// ばねブロックの生成 // 実験用
+	/*CSpringblock::Create(
+		D3DXVECTOR3(0,30,0),
+		CScene::LAYER_3DBLOCK
+	);*/
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,7 +138,6 @@ void CGame::Update(void)
 	CBaseMode::Update();
 
 	// 結合されたブロックの更新ブロック生成
-	CConnectblock::Update_CreateBlock();
 
 	/*
 	// ポーズ状態ならば

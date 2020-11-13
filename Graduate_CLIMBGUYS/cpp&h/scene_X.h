@@ -96,6 +96,8 @@ public:
 		TYPE_OBJECT_BLOCK_U,			// 当たり判定無し演出用ブロック
 		TYPE_OBJECT_BLOCK_Y,			// 当たり判定無し演出用ブロック
 		TYPE_OBJECT_BLOCK_S,			// 当たり判定無し演出用ブロック
+		TYPE_BLOCK_SPRING,				// 特殊ブロック_バネ
+
 		TYPE_MAX						// 最大数
 	} TYPE;
 
@@ -327,6 +329,8 @@ public:
 	CCollision * GetCollision(void);
 	// モデル情報の取得
 	static MODEL_LOAD * GetModelLoad(int const &nModelId);
+	// モデルidの取得
+	int GetModelId() { return m_nModelId; };
 protected:
 private:
 	/* 関数 */

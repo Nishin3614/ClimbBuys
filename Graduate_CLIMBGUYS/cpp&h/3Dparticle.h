@@ -35,6 +35,7 @@ public:
 	{
 		PARTICLE_ID_NONE = -1,
 		PARTICLE_ID_UNKNOWN,			// –¢‚¾Œˆ‚Ü‚Á‚Ä‚¢‚È‚¢
+		PARTICLE_ID_UNKNOWN2,			// –¢‚¾Œˆ‚Ü‚Á‚Ä‚¢‚È‚¢
 		PARTICLE_ID_MAX,
 	} PARTICLE_ID;
 	/* \‘¢‘Ì */

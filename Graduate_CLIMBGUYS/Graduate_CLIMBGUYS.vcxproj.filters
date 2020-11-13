@@ -297,6 +297,12 @@
     <ClCompile Include="cpp&amp;h\openingmanager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\bombblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\springblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
     <ClCompile Include="cpp&amp;h\number.cpp">
       <Filter>Number</Filter>
     </ClCompile>
@@ -535,6 +541,12 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\openingmanager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\bombblock..h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\springblock.h">
+      <Filter>Model\Block</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\number.h">
       <Filter>Number</Filter>

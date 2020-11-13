@@ -104,7 +104,7 @@ void CGame::Init(void)
 
 		// ばねブロックの生成 // 実験用
 	/*CSpringblock::Create(
-		D3DXVECTOR3(0,30,0),
+		D3DXVECTOR3(0,530,0),
 		CScene::LAYER_3DBLOCK
 	);*/
 }

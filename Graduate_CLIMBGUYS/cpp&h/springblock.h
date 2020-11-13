@@ -84,13 +84,34 @@ public:
 	//	size	: サイズ
 	bool PushCollision(CPlayer * pplayer, D3DXVECTOR3 const &OffsetPos, D3DXVECTOR3 *size);// 上からの判定
 
+	// 当たった後の判定
+	//	Obj		: オブジェタイプ
+	//	pScene	: シーン情報
+	void HitCollision(
+		COLLISIONDIRECTION const &Direct,	// 前後左右上下
+		CScene::OBJ const & Obj,			// オブジェタイプ
+		CScene * pScene = NULL				// シーン情報
+	);
+
 	// 作成(シーン管理)
 	//	pos			: 位置
 	//	nModelId	: モデル番号
 	//	layer		: レイヤー
+	//static CSpringblock * Create(
+	//	D3DXVECTOR3		const & pos,									// 位置
+	//	CScene::LAYER	const & layer = CScene::LAYER_3DBLOCK				// レイヤー
+	//);
+
+	// 作成(シーン管理)
+	//	pos			: 位置
+	//	nModelId	: モデル番号
+	//	pCol		: 色情報
+	//	layer		: レイヤー
 	static CSpringblock * Create(
-		D3DXVECTOR3		const & pos,									// 位置
-		CScene::LAYER	const & layer = CScene::LAYER_3DBLOCK				// レイヤー
+		int				const & nModelId,							// モデル番号
+		GRID			const & Grid,								// 行列高さ番号
+		D3DXCOLOR		* pCol,										// 色情報
+		CScene::LAYER	const & layer = CScene::LAYER_3DBLOCK		// レイヤー
 	);
 
 	/* 変数宣言 */

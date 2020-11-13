@@ -93,7 +93,7 @@ void CGame::Init(void)
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);
 	// 結合されたブロックの更新ブロック生成
-	CConnectblock::TestCreate();
+	//CConnectblock::TestCreate();
 	// ダメージ床の生成
 	CDamageFloor::Create();
 	/*
@@ -138,6 +138,7 @@ void CGame::Update(void)
 	CBaseMode::Update();
 
 	// 結合されたブロックの更新ブロック生成
+	CConnectblock::Update_CreateBlock();
 
 	/*
 	// ポーズ状態ならば

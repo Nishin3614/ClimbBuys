@@ -26,7 +26,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 class CScene_TWO;		// シーン2D
-class CNumber;			// ナンバー
+class CMultiNumber;		// マルチナンバー
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -44,12 +44,31 @@ public:
 		FRAME_2P,			// 2Pの枠
 		FRAME_3P,			// 3Pの枠
 		FRAME_4P,			// 4Pの枠
-		RANK_01,			// 1位
-		RANK_02,			// 2位
-		RANK_03,			// 3位
-		RANK_04,			// 4位
+		RANK_01,			// 1Pの順位
+		RANK_02,			// 2Pの順位
+		RANK_03,			// 3Pの順位
+		RANK_04,			// 4Pの順位
+		DEATH_01,			// 1Pの死因
+		DEATH_02,			// 2Pの死因
+		DEATH_03,			// 3Pの死因
+		DEATH_04,			// 4Pの死因
 		UI_MAX
 	};
+	/* リザルトスコア */
+	typedef struct
+	{
+		CMultiNumber		*m_pSurvivalTime;	// 生存時間
+		CMultiNumber		*m_pPressBlock;		// ブロックを押した回数
+	}RESULT_SCORE;
+
+	///* リザルトスコア */
+	//enum class RESULT_SCORE
+	//{
+	//	SCORE_NONE = -1,
+	//	SURVIVAL_TIME,		// 生存時間
+	//	PRESS_BLOCK,		// ブロックを押した回数
+	//	SCORE_MAX
+	//};
 
 	/* 関数 */
 	CResultUI();
@@ -69,15 +88,15 @@ public:
 protected:
 private:
 	/* 関数 */
-	void			InitSettingFrame(void);					// 枠の初期設定
-	void			InitSettingScore(void);					// 各スコアの初期設定
-	void			UpdateSettingFrame(void);				// 枠の更新設定
-	void			UpdateSettingScore(void);				// 各スコアの更新設定
+	void			InitSettingFrame(void);							// 枠の初期設定
+	void			InitSettingScore(void);							// 各スコアの初期設定
+	void			UpdateSettingFrame(void);						// 枠の更新設定
+	void			UpdateSettingScore(void);						// 各スコアの更新設定
 	/* 変数 */
-	CScene_TWO		*m_pScene2D[(int)RESULT_UI::UI_MAX];	// シーン2D
-	CNumber			*m_pNumber;								// ナンバー
-	D3DXVECTOR3		m_move;									// 移動量
-	int				m_nMoveCnt;								// 移動を開始するカウント
+	CScene_TWO		*m_pScene2D[(int)RESULT_UI::UI_MAX];			// シーン2D
+	RESULT_SCORE	m_ResultScore[(int)PLAYER_TAG::PLAYER_MAX];	// リザルトスコア
+	D3DXVECTOR3		m_move;											// 移動量
+	int				m_nMoveCnt;										// 移動を開始するカウント
 	bool			m_bMoveStart;							
 };
 #endif

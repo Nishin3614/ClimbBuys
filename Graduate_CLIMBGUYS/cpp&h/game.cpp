@@ -132,7 +132,6 @@ void CGame::Update(void)
 
 	// 結合されたブロックの更新ブロック生成
 	CConnectblock::Update_CreateBlock();
-
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)

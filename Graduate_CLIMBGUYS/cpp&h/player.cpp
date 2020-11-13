@@ -21,6 +21,7 @@
 #include "stand.h"
 #include "playerUI.h"
 #include "3Dline.h"
+#include "springblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -177,6 +178,8 @@ void CPlayer::Update(void)
 			D3DXVECTOR3 DirectVec = CCharacter::GetDirectionVec();
 #ifdef _DEBUG
 			CDebugproc::Print("方向:(%.2f,%.2f,%.2f)\n", DirectVec.x, DirectVec.y, DirectVec.z);
+			CDebugproc::Print("JumpAble:(%d)\n", GetJumpAble());
+
 #endif // _DEBUG
 
 			// 位置設定
@@ -546,6 +549,7 @@ void CPlayer::StandCollision(void)
 				&m_PlayerStatus.PlayerSize,
 				m_PlayerStatus.PlayerOffSet
 			);
+
 		//}
 		// ブロックの判定
 		// 上
@@ -639,6 +643,27 @@ void CPlayer::BlockCollision(void)
 			&m_PlayerStatus.PlayerSize,
 			m_PlayerStatus.PlayerOffSet
 		);
+
+		// ブロックの種類がバネブロックだったら
+		CSpringblock *pSpringblock = (CSpringblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
+		if (pSpringblock && pSpringblock->GetModelId() == CScene_X::TYPE_BLOCK_SPRING)
+		{
+			if (// バネブロックの上からの処理
+				pSpringblock->PushCollision(
+					this,
+					m_PlayerStatus.PlayerOffSet,
+					&m_PlayerStatus.PlayerSize
+				))
+			{
+				SetJumpAble(false);
+				Direct = COLLISIONDIRECTION::NONE;
+			}
+			else
+			{
+				m_bSpringFlag = false;
+			}
+		}
+
 		// ブロックの判定
 		// 前
 		if (Direct == COLLISIONDIRECTION::FRONT)
@@ -932,6 +957,7 @@ void CPlayer::PlayerStatusSave(void)
 		fprintf(pFile, "	PlayerOffSet	= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, m_PlayerStatus.PlayerOffSet.z);
 		fprintf(pFile, "	PushSize		= %.1f\n", m_PlayerStatus.PushSize);
 		fprintf(pFile, "	PushOffSet		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushOffSet.x, m_PlayerStatus.PushOffSet.y, m_PlayerStatus.PushOffSet.z);
+
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
 		fprintf(pFile, "END_SCRIPT\n");
@@ -956,6 +982,50 @@ void CPlayer::PlayerStatusInitLoad(void)
 {
 	// プレイヤーの初期ステータスを代入
 	m_PlayerStatus	= m_PlayerStatusInit;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// バネ用ジャンプ処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::SpringJump(void)
+{
+	if (!m_bSpringFlag)
+	{
+		// 変数宣言
+		D3DXVECTOR3 move;				// 移動量
+
+										// 情報取得
+		move = CCharacter::GetMove();	// 移動量
+
+										// バネ用ジャンプ
+		move.y += m_PlayerStatus.fJump * 2.0f;
+		SetJumpAble(false);
+
+		// ジャンプしているときの慣性
+		if (!GetJumpAble())
+		{
+			move.x += (-m_move.x) * m_PlayerStatus.fJumpInertia;
+			move.z += (-m_move.z) * m_PlayerStatus.fJumpInertia;
+		}
+		else
+		{
+			move.x += (-m_move.x) * m_PlayerStatus.fNormalInertia;
+			move.z += (-m_move.z) * m_PlayerStatus.fNormalInertia;
+		}
+
+		// yの上限設定
+		if (move.y > PLAYER_UPMOVELIMIT)
+		{
+			move.y = PLAYER_UPMOVELIMIT;
+		}
+		if (move.y < -PLAYER_UNDERMOVELIMIT)
+		{
+			move.y = -PLAYER_UNDERMOVELIMIT;
+		}
+		CCharacter::SetMove(move);
+
+		m_bSpringFlag = true;
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -163,6 +163,7 @@
     <ClCompile Include="cpp&amp;h\baseblock.cpp" />
     <ClCompile Include="cpp&amp;h\basemode.cpp" />
     <ClCompile Include="cpp&amp;h\bg.cpp" />
+    <ClCompile Include="cpp&amp;h\bombblock.cpp" />
     <ClCompile Include="cpp&amp;h\Calculation.cpp" />
     <ClCompile Include="cpp&amp;h\camera.cpp" />
     <ClCompile Include="cpp&amp;h\character.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="cpp&amp;h\model.cpp" />
     <ClCompile Include="cpp&amp;h\model_info.cpp" />
     <ClCompile Include="cpp&amp;h\mouse.cpp" />
+    <ClCompile Include="cpp&amp;h\multinumber.cpp" />
     <ClCompile Include="cpp&amp;h\normalblock.cpp" />
     <ClCompile Include="cpp&amp;h\number.cpp" />
     <ClCompile Include="cpp&amp;h\opening.cpp" />
@@ -221,6 +223,7 @@
     <ClCompile Include="cpp&amp;h\signboard.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
     <ClCompile Include="cpp&amp;h\spherecollision.cpp" />
+    <ClCompile Include="cpp&amp;h\springblock.cpp" />
     <ClCompile Include="cpp&amp;h\stagingblock.cpp" />
     <ClCompile Include="cpp&amp;h\stand.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
@@ -241,6 +244,7 @@
     <ClInclude Include="cpp&amp;h\baseblock.h" />
     <ClInclude Include="cpp&amp;h\basemode.h" />
     <ClInclude Include="cpp&amp;h\bg.h" />
+    <ClInclude Include="cpp&amp;h\bombblock..h" />
     <ClInclude Include="cpp&amp;h\Calculation.h" />
     <ClInclude Include="cpp&amp;h\camera.h" />
     <ClInclude Include="cpp&amp;h\character.h" />
@@ -281,6 +285,7 @@
     <ClInclude Include="cpp&amp;h\model.h" />
     <ClInclude Include="cpp&amp;h\model_info.h" />
     <ClInclude Include="cpp&amp;h\mouse.h" />
+    <ClInclude Include="cpp&amp;h\multinumber.h" />
     <ClInclude Include="cpp&amp;h\normalblock.h" />
     <ClInclude Include="cpp&amp;h\number.h" />
     <ClInclude Include="cpp&amp;h\opening.h" />
@@ -301,6 +306,7 @@
     <ClInclude Include="cpp&amp;h\signboard.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
     <ClInclude Include="cpp&amp;h\spherecollision.h" />
+    <ClInclude Include="cpp&amp;h\springblock.h" />
     <ClInclude Include="cpp&amp;h\stagingblock.h" />
     <ClInclude Include="cpp&amp;h\stand.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />

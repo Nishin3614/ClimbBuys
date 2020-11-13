@@ -8,6 +8,7 @@
 #include "baseblock.h"
 #include "normalblock.h"
 #include "game.h"
+#include "springblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -131,6 +132,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 1, 0), &m_col);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
 		break;
 		// Tブロック
 	case SHAPE_T:
@@ -138,6 +140,8 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, -1, 0), &m_col);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
+
 		break;
 		// Zブロック
 	case SHAPE_Z:
@@ -145,7 +149,16 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
 		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
 		break;
+		// バネブロック
+	case SHAPE_SPRING:
+		CNormalblock::Create(2, BaseGrid, &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
+		break;
+
 	}
 }
 

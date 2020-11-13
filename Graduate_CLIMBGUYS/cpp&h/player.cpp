@@ -993,8 +993,6 @@ void CPlayer::SpringJump(void)
 	{
 		// 変数宣言
 		D3DXVECTOR3 move;				// 移動量
-
-										// 情報取得
 		move = CCharacter::GetMove();	// 移動量
 
 										// バネ用ジャンプ

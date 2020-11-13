@@ -98,7 +98,7 @@ void CGame::Init(void)
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);
 	// 結合されたブロックの更新ブロック生成
-	CConnectblock::TestCreate();
+	//CConnectblock::TestCreate();
 	// ダメージ床の生成
 	CDamageFloor::Create();
 	/*
@@ -109,7 +109,7 @@ void CGame::Init(void)
 
 		// ばねブロックの生成 // 実験用
 	/*CSpringblock::Create(
-		D3DXVECTOR3(0,30,0),
+		D3DXVECTOR3(0,530,0),
 		CScene::LAYER_3DBLOCK
 	);*/
 }
@@ -158,6 +158,7 @@ void CGame::Update(void)
 	}
 
 	// 結合されたブロックの更新ブロック生成
+	CConnectblock::Update_CreateBlock();
 
 	/*
 	// ポーズ状態ならば

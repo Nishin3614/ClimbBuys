@@ -85,7 +85,7 @@ void CGame::Init(void)
 	CBg::Create();
 	// ゲームUIの生成
 	m_pGameUI = CGameUI::Create();
-
+	
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -157,9 +157,12 @@ void CGame::Update(void)
 		m_pGameUI->Update();
 	}
 
-	// 結合されたブロックの更新ブロック生成
-	CConnectblock::Update_CreateBlock();
-
+	// スタートの表示が出た後に生成
+	if (m_pGameUI->GetStartFlag())
+	{
+		// 結合されたブロックの更新ブロック生成
+		CConnectblock::Update_CreateBlock();
+	}
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)

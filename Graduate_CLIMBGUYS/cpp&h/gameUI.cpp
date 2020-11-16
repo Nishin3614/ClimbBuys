@@ -28,8 +28,7 @@
 #define GAME_UI_TIMER_COLOR						(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f))	// タイマーの色
 #define TIMER_INIT_NUM							(3)									// タイマーの初期値
 
-#define GAME_UI_START_SIZE						(D3DXVECTOR2(500.0f, 250.0f))		// 始めの合図のサイズ
-#define GAME_UI_FINISH_SIZE						(D3DXVECTOR2(300.0f, 150.0f))		// 終了の合図のサイズ
+#define GAME_UI_SIGNAL_SIZE						(D3DXVECTOR2(700.0f, 350.0f))		// 合図のサイズ
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -50,6 +49,7 @@ CGameUI::CGameUI()
 	m_pStartCount			= nullptr;			// スタートカウント
 	m_nCntTimer				= 0;				// タイマーカウント
 	m_nTimerNum				= TIMER_INIT_NUM;	// タイマーのナンバー
+	m_bStart				= false;			// スタートフラグ
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,8 +84,12 @@ void CGameUI::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CGameUI::Update(void)
 {
-	// スタートタイマーの処理
-	StartTimer();
+	// スタートの合図が存在しているとき
+	if (m_pScene2D[(int)GAME_UI::START])
+	{
+		// スタートタイマーの処理
+		StartTimer();
+	}
 
 	for (int nCnt = 0; nCnt < (int)GAME_UI::UI_MAX; nCnt++)
 	{
@@ -125,14 +129,14 @@ CGameUI * CGameUI::Create(void)
 	// シーン2Dの生成
 	for (int nCnt = 0; nCnt < (int)GAME_UI::UI_MAX; nCnt++)
 	{
-		pGameUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_START_SIZE, (CTexture_manager::TYPE_GAME_UI_START + nCnt));
+		pGameUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_START + nCnt));
 		// 透明にする
 		pGameUI->m_pScene2D[nCnt]->SetCol(D3DXCOLOR_CA(1.0f, 0.0f));
 		pGameUI->m_pScene2D[nCnt]->Set_Vtx_Col();
 	}
 	// スタートカウントの生成
 	pGameUI->m_pStartCount = CNumber::Create(TIMER_INIT_NUM, SCREEN_CENTER_POS, CTexture_manager::TYPE_UI_NUMBER, GAME_UI_TIMER_SIZE);
-	pGameUI->m_pStartCount->SetCol(GAME_UI_TIMER_COLOR);
+	pGameUI->m_pStartCount->SetCol(D3DXCOLOR_INI);
 	pGameUI->m_pStartCount->Set_Vtx_Col();
 
 	// 初期化処理
@@ -200,6 +204,8 @@ void CGameUI::StartTimer()
 				m_pScene2D[(int)GAME_UI::START]->Release();
 				m_pScene2D[(int)GAME_UI::START] = nullptr;
 			}
+			// スタートフラグをオンにする
+			m_bStart = true;
 		}
 	}
 }

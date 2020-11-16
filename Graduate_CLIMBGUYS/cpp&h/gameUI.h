@@ -60,6 +60,7 @@ public:
 	// 設定 //
 
 	// 取得 //
+	bool			GetStartFlag() { return m_bStart; };	// スタートフラグの取得
 protected:
 private:
 	/* 関数 */
@@ -70,5 +71,6 @@ private:
 	CNumber			*m_pStartCount;							// スタートカウント
 	int				m_nCntTimer;							// タイマーカウント
 	int				m_nTimerNum;							// タイマーのナンバー
+	bool			m_bStart;								// スタートフラグ
 };
 #endif

@@ -87,11 +87,11 @@ void CPlayerUI::Draw(void)
 	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 	// ビルボードの設定
 	CCalculation::SetBillboard(&mtxView, &mtxView);
-	//Zテスト通常
+	// Zテスト通常
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_OFF);
 	// 描画
 	CScene_THREE::Draw();
-	//Zテスト通常
+	// Zテスト通常
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_DEFAULT);
 }
 

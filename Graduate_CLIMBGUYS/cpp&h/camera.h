@@ -164,6 +164,8 @@ private:
 	void Init_Title(void);
 	// ゲーム初期化処理
 	void Init_Game(void);
+	// リザルト初期化処理
+	void Init_Result(void);
 	// チュートリアル更新処理
 	void Update_Tutorial(void);
 	// タイトル更新処理

@@ -1423,15 +1423,15 @@ void CCalculation::SetBillboard_XZ_Only(D3DXMATRIX * pMtx)
 	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 
 	//ビルボード設定
-	pMtx->_11 = mtxView._11;
-	pMtx->_12 = mtxView._21;
-	pMtx->_13 = mtxView._31;
-	//pMtx->_21 = mtxView._12;
-	//pMtx->_22 = mtxView._22;
-	//pMtx->_23 = mtxView._32;
-	pMtx->_31 = mtxView._13;
-	pMtx->_32 = mtxView._23;
-	pMtx->_33 = mtxView._33;
+	//pMtx->_11 = mtxView._11;
+	//pMtx->_12 = mtxView._21;
+	//pMtx->_13 = mtxView._31;
+	pMtx->_21 = mtxView._12;
+	pMtx->_22 = mtxView._22;
+	pMtx->_23 = mtxView._32;
+	//pMtx->_31 = mtxView._13;
+	//pMtx->_32 = mtxView._23;
+	//pMtx->_33 = mtxView._33;
 }
 
 //------------------------------------------------------------------------------

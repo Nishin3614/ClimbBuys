@@ -14,7 +14,7 @@
 #include "basemode.h"
 #include "debugproc.h"
 #include "scene_two.h"
-#include "multinumber.h"
+#include "number.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -24,6 +24,12 @@
 #define GAME_UI_NAME_TAG_POS					(D3DXVECTOR3((250.0f + 260.0f * nCnt), (680.0f), 0.0f))		// 枠の位置
 #define GAME_UI_NAME_TAG_SIZE					(D3DXVECTOR2(150.0f, 60.0f))	// 枠のサイズ
 
+#define GAME_UI_TIMER_SIZE						(D3DXVECTOR2(300.0f, 300.0f))		// タイマーのサイズ
+#define GAME_UI_TIMER_COLOR						(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f))	// タイマーの色
+#define TIMER_INIT_NUM							(3)									// タイマーの初期値
+
+#define GAME_UI_START_SIZE						(D3DXVECTOR2(500.0f, 250.0f))		// 始めの合図のサイズ
+#define GAME_UI_FINISH_SIZE						(D3DXVECTOR2(300.0f, 150.0f))		// 終了の合図のサイズ
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -41,6 +47,9 @@ CGameUI::CGameUI()
 	{
 		m_pScene2D[nCnt]	= nullptr;			// シーン2D
 	}
+	m_pStartCount			= nullptr;			// スタートカウント
+	m_nCntTimer				= 0;				// タイマーカウント
+	m_nTimerNum				= TIMER_INIT_NUM;	// タイマーのナンバー
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -75,6 +84,9 @@ void CGameUI::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CGameUI::Update(void)
 {
+	// スタートタイマーの処理
+	StartTimer();
+
 	for (int nCnt = 0; nCnt < (int)GAME_UI::UI_MAX; nCnt++)
 	{
 		if (m_pScene2D[nCnt])
@@ -110,11 +122,19 @@ CGameUI * CGameUI::Create(void)
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pGameUI = new CGameUI();
 
+	// シーン2Dの生成
 	for (int nCnt = 0; nCnt < (int)GAME_UI::UI_MAX; nCnt++)
 	{
-		// シーン2Dの生成
-		pGameUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, GAME_UI_NAME_TAG_POS, GAME_UI_NAME_TAG_SIZE, (CTexture_manager::TYPE_GAME_UI_NAME_TAG_01 + nCnt));
+		pGameUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_START_SIZE, (CTexture_manager::TYPE_GAME_UI_START + nCnt));
+		// 透明にする
+		pGameUI->m_pScene2D[nCnt]->SetCol(D3DXCOLOR_CA(1.0f, 0.0f));
+		pGameUI->m_pScene2D[nCnt]->Set_Vtx_Col();
 	}
+	// スタートカウントの生成
+	pGameUI->m_pStartCount = CNumber::Create(TIMER_INIT_NUM, SCREEN_CENTER_POS, CTexture_manager::TYPE_UI_NUMBER, GAME_UI_TIMER_SIZE);
+	pGameUI->m_pStartCount->SetCol(GAME_UI_TIMER_COLOR);
+	pGameUI->m_pStartCount->Set_Vtx_Col();
+
 	// 初期化処理
 	pGameUI->Init();
 
@@ -135,4 +155,64 @@ HRESULT CGameUI::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CGameUI::UnLoad(void)
 {
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// スタートタイマーの処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CGameUI::StartTimer()
+{
+	// カウントアップ
+	m_nCntTimer++;
+
+	// 1秒ごとにカウントダウン
+	if (m_nCntTimer % 60 == 0)
+	{
+		m_nTimerNum--;
+
+		// スタートカウントのNULLチェック
+		if (m_pStartCount)
+		{
+			// カウントダウン
+			if (m_nTimerNum > 0)
+			{
+				// ナンバーの設定
+				m_pStartCount->SetNum(m_nTimerNum);
+			}
+			// ナンバーを削除し、スタートの合図を出す
+			else
+			{
+				// ナンバーの削除
+				m_pStartCount->Release();
+				m_pStartCount = nullptr;
+
+				// スタートの合図を出す
+				m_pScene2D[(int)GAME_UI::START]->SetCol(D3DXCOLOR_CA(1.0f, 1.0f));
+				m_pScene2D[(int)GAME_UI::START]->Set_Vtx_Col();
+			}
+		}
+		// スタートの合図を消す
+		if (m_nTimerNum < 0)
+		{
+			if (m_pScene2D[(int)GAME_UI::START])
+			{
+				// スタートの合図の削除
+				m_pScene2D[(int)GAME_UI::START]->Release();
+				m_pScene2D[(int)GAME_UI::START] = nullptr;
+			}
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 終了の合図
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CGameUI::FinishSignal()
+{
+	if (m_pScene2D[(int)GAME_UI::FINISH])
+	{
+		// 終了の合図を出す
+		m_pScene2D[(int)GAME_UI::FINISH]->SetCol(D3DXCOLOR_CA(1.0f, 1.0f));
+		m_pScene2D[(int)GAME_UI::FINISH]->Set_Vtx_Col();
+	}
 }

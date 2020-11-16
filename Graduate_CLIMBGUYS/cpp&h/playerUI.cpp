@@ -20,8 +20,7 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define PLAYER_UI_SIZE		(D3DXVECTOR3(45.0f, 0.0f, 30.0f))	// プレイヤーUIのサイズ
-#define PLAYER_UI_ROT		(D3DXVECTOR3(-1.57f, 0.0f, 0.0f))	// プレイヤーUIの回転
+#define PLAYER_UI_SIZE		(D3DXVECTOR3(45.0f, 30.0f, 0.0f))	// プレイヤーUIのサイズ
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -49,7 +48,7 @@ CPlayerUI::~CPlayerUI()
 void CPlayerUI::Init(void)
 {
 	// オフセットタイプ設定
-	CScene_THREE::SetOffsetType(OFFSET_TYPE_SIDE_CENTER);
+	CScene_THREE::SetOffsetType(OFFSET_TYPE_VERTICAL_CENTER);
 
 	// 色
 	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.8f));
@@ -78,13 +77,20 @@ void CPlayerUI::Update(void)
 // 描画処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayerUI::Draw(void)
-{
+{	
+	// 変数宣言
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice(); // デバイスの取得
+
+	// ビューマトリックスの代入用
+	D3DXMATRIX mtxView;
+	// 現在のビューマトリックスを取得
+	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
+	// ビルボードの設定
+	CCalculation::SetBillboard(&mtxView, &mtxView);
 	//Zテスト通常
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_OFF);
-
 	// 描画
 	CScene_THREE::Draw();
-
 	//Zテスト通常
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_ZTEST_DEFAULT);
 }
@@ -102,15 +108,12 @@ CPlayerUI * CPlayerUI::Create(PLAYER_TAG PlayerTag)
 	pPlayerUI->ManageSetting(CScene::LAYER_PLAYER_UI);
 	// サイズ設定
 	pPlayerUI->SetSize(PLAYER_UI_SIZE);
-	// 回転の設定
-	pPlayerUI->SetRot(PLAYER_UI_ROT);
 	// 初期化処理
 	pPlayerUI->Init();
 	// 各プレイヤーのテクスチャの貼り付け
 	pPlayerUI->SetTexType(CTexture_manager::TYPE_PLAYER_UI_01 + (int)PlayerTag);
 	// ビルボードの設定
 	pPlayerUI->SetBillboard(true);
-
 	// 生成したオブジェクトを返す
 	return pPlayerUI;
 }

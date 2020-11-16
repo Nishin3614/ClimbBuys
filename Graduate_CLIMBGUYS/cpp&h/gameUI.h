@@ -26,7 +26,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 class CScene_TWO;		// シーン2D
-class CMultiNumber;		// マルチナンバー
+class CNumber;			// ナンバー
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -40,10 +40,8 @@ public:
 	enum class GAME_UI
 	{
 		UI_NONE = -1,
-		PLAYER_1P,			// 1Pのネームタグ
-		PLAYER_2P,			// 2Pのネームタグ
-		PLAYER_3P,			// 3Pのネームタグ
-		PLAYER_4P,			// 4Pのネームタグ
+		START,					// 始め
+		FINISH,					// 終了
 		UI_MAX
 	};
 
@@ -62,10 +60,17 @@ public:
 	// 設定 //
 
 	// 取得 //
+	bool			GetStartFlag() { return m_bStart; };	// スタートフラグの取得
 protected:
 private:
 	/* 関数 */
+	void			StartTimer();							// スタートタイマー
+	void			FinishSignal();							// 終了の合図
 	/* 変数 */
-	CScene_TWO		*m_pScene2D[(int)GAME_UI::UI_MAX];				// シーン2D
+	CScene_TWO		*m_pScene2D[(int)GAME_UI::UI_MAX];		// シーン2D
+	CNumber			*m_pStartCount;							// スタートカウント
+	int				m_nCntTimer;							// タイマーカウント
+	int				m_nTimerNum;							// タイマーのナンバー
+	bool			m_bStart;								// スタートフラグ
 };
 #endif

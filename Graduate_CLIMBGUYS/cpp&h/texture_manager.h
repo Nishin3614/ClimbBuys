@@ -60,6 +60,8 @@ public:
 		TYPE_GAME_UI_NAME_TAG_02,	// ゲームUI_ネームタグ_02
 		TYPE_GAME_UI_NAME_TAG_03,	// ゲームUI_ネームタグ_03
 		TYPE_GAME_UI_NAME_TAG_04,	// ゲームUI_ネームタグ_04
+		TYPE_GAME_UI_START,			// ゲームUI_START
+		TYPE_GAME_UI_FINISH,		// ゲームUI_FINISH
 		TYPE_MAX					// 最大数
 	} TYPE;
 

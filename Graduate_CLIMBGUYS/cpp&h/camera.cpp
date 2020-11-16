@@ -173,6 +173,11 @@ void CCamera::Init_Tutorial(void)
 	m_posR = D3DXVECTOR3(200.0f, 0.0f, -50.0f);
 	m_fLength = 420.0f;
 	m_fHeight = 700.0f;
+	// 一度の回転にかかるタイム
+	m_Turn.nOneTime = 4000;
+	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
+	// 一度の回転にかかるタイムカウント
+	m_Turn.nCntTime = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -211,7 +216,7 @@ void CCamera::Init_Game(void)
 	// 回転回数
 	m_Turn.nSpin = 1;
 	// 一度の回転にかかるタイム
-	m_Turn.nOneTime = 240;
+	m_Turn.nOneTime = 4000;
 	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
 	// 一度の回転にかかるタイムカウント
 	m_Turn.nCntTime = 0;
@@ -284,6 +289,19 @@ void CCamera::Update_Game(void)
 		// ポインターエラー防止用にnull
 		pDamageFloor = nullptr;
 	}
+
+	// タイムカウントが1週にかかる時間と同じになったら
+	if (m_Turn.nCntTime == m_Turn.nOneTime)
+	{
+		// カウントタイムの初期化
+		m_Turn.nCntTime = 0;
+		return;
+	}
+	// カウントタイム
+	m_Turn.nCntTime++;
+	// 回転更新
+	m_rot.y -= m_Turn.fTrunRot;
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

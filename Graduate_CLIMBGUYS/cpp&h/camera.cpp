@@ -266,8 +266,8 @@ void CCamera::Init_Game(void)
 	m_rot.x = 0.0f;
 	// 注視点位置
 	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_fLength = 250.0f;
-	m_fHeight = 600.0f;
+	m_fLength = 400.0f;
+	m_fHeight = 400.0f;
 	// 回転回数
 	m_Turn.nSpin = 1;
 	// 一度の回転にかかるタイム
@@ -302,8 +302,8 @@ void CCamera::Init_Result(void)
 	m_rot.x = 0.0f;
 	// 注視点位置
 	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_fLength = 250.0f;
-	m_fHeight = 600.0f;
+	m_fLength = 400.0f;
+	m_fHeight = 400.0f;
 	// 回転回数
 	m_Turn.nSpin = 1;
 	// 一度の回転にかかるタイム

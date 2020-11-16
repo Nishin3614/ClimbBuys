@@ -155,7 +155,7 @@ void CCharacter::Init()
 		//pos.y = 0;
 		// ステンシルシャドウの生成
 		m_pStencilshadow = CStencilshadow::Create(
-			m_pos, 
+			m_pos,
 			D3DXVECTOR3(10.0f, 10000.0f, 10.0f),
 			CStencilshadow::TYPE_CYLINDER,
 			CScene::LAYER_3DCHARACTERSHADOW

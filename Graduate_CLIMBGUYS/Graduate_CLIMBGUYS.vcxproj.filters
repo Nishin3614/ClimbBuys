@@ -67,6 +67,9 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{772d826e-f82e-4b6c-82b1-a465f6cbdad5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Number">
+      <UniqueIdentifier>{69af0c86-88ca-4ada-a761-8802a8f40839}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp">
@@ -76,9 +79,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\3Dmap.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\number.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\ImGui\imgui.cpp">
@@ -297,6 +297,21 @@
     <ClCompile Include="cpp&amp;h\openingmanager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\bombblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\springblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\number.cpp">
+      <Filter>Number</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\multinumber.cpp">
+      <Filter>Number</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\gameUI.cpp">
+      <Filter>Texture_UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -306,9 +321,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\3Dmap.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\number.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\shape.h">
@@ -532,6 +544,21 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\openingmanager.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\bombblock..h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\springblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\number.h">
+      <Filter>Number</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\multinumber.h">
+      <Filter>Number</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\gameUI.h">
+      <Filter>Texture_UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

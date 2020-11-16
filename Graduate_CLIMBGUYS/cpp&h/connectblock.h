@@ -38,6 +38,7 @@ public:
 		SHAPE_S,		// Sブロック
 		SHAPE_T,		// Tブロック
 		SHAPE_Z,		// Zブロック
+		SHAPE_SPRING,	// バネブロック
 		SHAPE_MAX		// 最大数
 	} SHAPE;
 	// フィールドタイプ情報

@@ -19,6 +19,8 @@
 #include "circleshadow.h"
 #include "stencilshadow.h"
 #include "debugproc.h"
+#include "basemode.h"
+#include "game.h"
 
 #include "fade.h"
 
@@ -538,13 +540,12 @@ void CCharacter::Die(void)
 	// 総キャラクターカウントダウン
 	m_nAllCharacter--;
 	// 総キャラクターが一人だけなら
-	// ->タイトルへフェード
+	// ->リザルトへフェード
 	if (m_nAllCharacter <= 1)
 	{
-		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-		{
-			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
-		}
+		// ゲームの終了フラグをオンにする
+		CGame *pGame = (CGame*)(CManager::GetBaseMode());
+		pGame->SetFinishFlag(true);
 	}
 }
 

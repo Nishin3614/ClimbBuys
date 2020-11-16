@@ -80,6 +80,8 @@ public:
 	static void SetStage(STAGE const & Stage) { m_Stage = Stage; };
 	// ステージの取得
 	static STAGE GetStage(void) { return m_Stage; };
+	// 終了フラグの設定
+	void SetFinishFlag(bool bFlag) { m_bFinishFlag = bFlag; };
 #ifdef _DEBUG
 	void Debug(void);
 #endif // _DEBUG
@@ -92,9 +94,10 @@ private:
 	// ポーズの状態
 	void PauseState(void);
 	/* 変数 */
-	CPause *		m_pause;	// ポーズ
-	static STAGE	m_Stage;	// ステージ
-	CGameUI			*m_pGameUI;	// ゲームUI
-
+	CPause *		m_pause;		// ポーズ
+	static STAGE	m_Stage;		// ステージ
+	CGameUI			*m_pGameUI;		// ゲームUI
+	int				m_nCntFinish;	// 終了カウント
+	bool			m_bFinishFlag;	// 終了フラグ
 };
 #endif

@@ -57,6 +57,8 @@ public:
 	static CGameUI	*Create(void);					// 作成
 	static HRESULT	Load(void);						// 読み込み
 	static void		UnLoad(void);					// 破棄
+
+	void			FinishSignal();							// 終了の合図
 	// 設定 //
 
 	// 取得 //
@@ -65,7 +67,6 @@ protected:
 private:
 	/* 関数 */
 	void			StartTimer();							// スタートタイマー
-	void			FinishSignal();							// 終了の合図
 	/* 変数 */
 	CScene_TWO		*m_pScene2D[(int)GAME_UI::UI_MAX];		// シーン2D
 	CNumber			*m_pStartCount;							// スタートカウント

@@ -222,7 +222,6 @@ void CRenderer::Update(void)
 	m_pCamera->Update();
 	// ライトの更新
 	m_pLight->Update();
-
 #ifdef _DEBUG
 	CDebugproc::Print("デバッグモード:F2\n");
 	CDebugproc::Print("1フレーム再生:L\n");

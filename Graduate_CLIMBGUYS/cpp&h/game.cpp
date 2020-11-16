@@ -215,8 +215,6 @@ void CGame::Debug(void)
 {
 	// ベースモードのデバッグ処理
 	CBaseMode::Debug();
-	// ブロック全体のデバッグ処理
-	CBaseblock::AllDebug();
 }
 #endif // _DEBUG
 
@@ -239,6 +237,7 @@ CGame * CGame::Create(void)
 void CGame::StaticInit(void)
 {
 	CCharacter::InitStatic();
+	CBaseblock::BlockStaticValue();
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

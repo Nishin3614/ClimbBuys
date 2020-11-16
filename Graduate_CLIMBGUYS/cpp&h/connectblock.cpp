@@ -92,6 +92,8 @@ void CConnectblock::SetBlockShape(void)
 	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());
 	// Œ`
 	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue + rand() % (nFeedValue * 2), CBaseblock::GetBlockStatus().nAppearance, -nFeedValue + rand() % (nFeedValue * 2));
+
+	//BaseGrid = CBaseblock::GRID(10,10,0);
 	switch (m_Shape)
 	{
 		// ‹éŒ`

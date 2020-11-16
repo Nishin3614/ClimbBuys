@@ -96,6 +96,8 @@ void CNumber::Update(void)
 		// フレームタイムアップ
 		m_nFram++;
 	}
+	// 更新
+	CScene_TWO::Update();
 }
 
 // ----------------------------------------
@@ -168,6 +170,8 @@ CNumber * CNumber::Create(
 	pNumber->SetSize(size);
 	// テクスチャータイプ設定
 	pNumber->BindTexture(tex);
+	// マネージャー管理
+	pNumber->ManageSetting(CScene::LAYER_UI);
 	// 初期化処理
 	pNumber->Init();
 	// スコア設定

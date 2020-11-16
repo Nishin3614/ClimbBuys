@@ -28,10 +28,11 @@
 #include "damagefloor.h"
 #include "bg.h"
 #include "XInputPad.h"
-
+#include "gameUI.h"
 
 #include "normalblock.h"
 #include "fieldblock.h"
+#include "springblock.h"
 
 /* ポーズ */
 //#include "pause.h"
@@ -54,7 +55,9 @@ CGame::STAGE	CGame::m_Stage = CGame::STAGE_1;	// ステージ
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CGame::CGame()
 {
+	// 初期化
 	m_pause = NULL;
+	m_pGameUI = nullptr;		// ゲームUI
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,6 +83,9 @@ void CGame::Init(void)
 	C3DEffect::Create();
 	// 試験的背景の生成
 	CBg::Create();
+	// ゲームUIの生成
+	m_pGameUI = CGameUI::Create();
+
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -92,7 +98,7 @@ void CGame::Init(void)
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);
 	// 結合されたブロックの更新ブロック生成
-	CConnectblock::TestCreate();
+	//CConnectblock::TestCreate();
 	// ダメージ床の生成
 	CDamageFloor::Create();
 	/*
@@ -100,6 +106,12 @@ void CGame::Init(void)
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),
 		10000.0f);
 		*/
+
+		// ばねブロックの生成 // 実験用
+	/*CSpringblock::Create(
+		D3DXVECTOR3(0,530,0),
+		CScene::LAYER_3DBLOCK
+	);*/
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -118,6 +130,14 @@ void CGame::Uninit(void)
 		m_pause = NULL;
 	}
 	*/
+
+	if (m_pGameUI)
+	{
+		// ゲームUIの終了
+		m_pGameUI->Uninit();
+		m_pGameUI = nullptr;
+	}
+
 	// シーンの静的変数の初期化
 	StaticInit();
 }
@@ -130,8 +150,16 @@ void CGame::Update(void)
 	// モードの更新
 	CBaseMode::Update();
 
+	// NULLチェック
+	if (m_pGameUI)
+	{
+		// ゲームUIの更新
+		m_pGameUI->Update();
+	}
+
 	// 結合されたブロックの更新ブロック生成
 	CConnectblock::Update_CreateBlock();
+
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)
@@ -171,6 +199,12 @@ void CGame::Draw(void)
 {
 	// モードの描画
 	CBaseMode::Draw();
+
+	if (m_pGameUI)
+	{
+		// ゲームUIの描画
+		m_pGameUI->Draw();
+	}
 }
 
 #ifdef _DEBUG
@@ -181,8 +215,6 @@ void CGame::Debug(void)
 {
 	// ベースモードのデバッグ処理
 	CBaseMode::Debug();
-	// ブロック全体のデバッグ処理
-	CBaseblock::AllDebug();
 }
 #endif // _DEBUG
 
@@ -205,6 +237,7 @@ CGame * CGame::Create(void)
 void CGame::StaticInit(void)
 {
 	CCharacter::InitStatic();
+	CBaseblock::BlockStaticValue();
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

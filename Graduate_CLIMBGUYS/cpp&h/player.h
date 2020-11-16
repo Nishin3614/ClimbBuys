@@ -167,6 +167,9 @@ public:
 	void SetDashFlag(bool const &bDashFlag) { m_bDashFlag = bDashFlag; };
 	// ダッシュしているかどうかのフラグの取得
 	bool		&GetDashFlag(void) { return m_bDashFlag; };
+
+	// バネ用ジャンプ処理
+	void SpringJump(void);
 protected:
 private:
 	/* 構造体 */
@@ -184,7 +187,7 @@ private:
 	);
 	// ブロックの押し出し処理
 	void PushBlock(
-		CScene_X * pScene_X,			// シーンX情報
+		CBaseblock * pBlock,			// ブロック情報
 		CBaseblock::GRID const & Grid	// 方向
 	);
 	// 当たり判定処理
@@ -211,10 +214,12 @@ private:
 	CXInputPad					*m_pPad;						// パッドのポインタ
 	bool						m_bDieFlag;						// 死亡フラグ
 	bool						m_bDashFlag;					// ダッシュフラグ
+	bool						m_bTackleFrag;					// タックルフラグ
 	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
+	bool						m_bSpringFlag;					// ばねの判定を一回だけ通す
 
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];

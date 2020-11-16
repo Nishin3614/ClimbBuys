@@ -92,7 +92,7 @@ void CGame::Init(void)
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);
 	// 結合されたブロックの更新ブロック生成
-	CConnectblock::TestCreate();
+	//CConnectblock::TestCreate();
 	// ダメージ床の生成
 	CDamageFloor::Create();
 	/*
@@ -181,8 +181,6 @@ void CGame::Debug(void)
 {
 	// ベースモードのデバッグ処理
 	CBaseMode::Debug();
-	// ブロック全体のデバッグ処理
-	CBaseblock::AllDebug();
 }
 #endif // _DEBUG
 
@@ -205,6 +203,7 @@ CGame * CGame::Create(void)
 void CGame::StaticInit(void)
 {
 	CCharacter::InitStatic();
+	CBaseblock::BlockStaticValue();
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

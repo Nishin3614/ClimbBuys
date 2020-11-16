@@ -142,11 +142,30 @@ public:
 		float fDistance;					// 距離
 		COLLISIONDIRECTION Direction;		// 方向
 	} PUSHBLOCK;
+	// 押し出した後の変数
+	typedef struct PUSHAFTER
+	{
+		PUSHAFTER() {};
+		PUSHAFTER(bool const & SoucePushState,GRID const & SourceGrid) : bPushState(SoucePushState) , PushGrid(SourceGrid)
+		{
+		}
+		void Init()
+		{
+			bPushState = false;
+			PushGrid = GRID(0, 0, 0);
+			GoalPos = D3DVECTOR3_ZERO;
+		}
+		bool		bPushState;	// 押し出し状態
+		GRID		PushGrid;	// 行列高
+		D3DXVECTOR3	GoalPos;	// 目的位置
+	} PUSHAFTER;
+
 
 	// ----- ブロックのステータス ----- //
 	typedef struct
 	{
-		float				fMove;				// 移動量
+		float				fGravity;			// 重力
+		float				fMove;				// 移動力
 		int					nAppearance;		// 出現する高さ
 		float				fBasicShadowSize;	// シャドウサイズ
 	}BLOCK_STATUS;
@@ -239,19 +258,27 @@ public:
 	);
 
 	// ベースブロック
-	void SetType(TYPE const type)				{ m_type = type; };
+	void SetType(TYPE const type)					{ m_type = type; };
 	// ベースブロック
-	TYPE GetType(void) const					{ return m_type; };
+	TYPE GetType(void) const						{ return m_type; };
 	// 落ちる状態設定
-	void SetFall(bool const & bFall)			{ m_bFall = bFall; };
+	void SetFall(bool const & bFall)				{ m_bFall = bFall; };
 	// 落ちる状態取得
-	bool & GetFall(void)						{ return m_bFall; };
+	bool & GetFall(void)							{ return m_bFall; };
+	// シャドウの使用状態状態設定
+	void SetShadow(bool const & bShadow)			{ m_bShadow = bShadow; };
+	// シャドウの使用状態状態取得
+	bool & GetShadow(void)							{ return m_bShadow; };
 	// 盤面情報取得
-	GRID & GetGrid(void)						{ return m_grid; };
+	GRID & GetGrid(void)							{ return m_grid; };
 	// 盤面情報設定
-	void SetGrid(GRID const &grid)				{ m_grid = grid; };
+	void SetGrid(GRID const &grid)					{ m_grid = grid; };
+	// 押し出し後情報取得
+	PUSHAFTER & GetPushAfter(void)					{ return m_PushAfeter; };
+	// 押し出し後情報設定
+	void SetPushAfter(PUSHAFTER const &PushAfter);
 	// 前回の位置取得
-	D3DXVECTOR3 & GetPosOld(void)				{ return m_posOld; };
+	D3DXVECTOR3 & GetPosOld(void)					{ return m_posOld; };
 	// ベースブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// ベースブロック全ソースの開放
@@ -332,6 +359,8 @@ public:
 	static void BlockStatusLoad(void);
 	// ブロックのステータス書き込み処理
 	static void BlockStatusSave(void);
+	// ブロックの静的変数を初期化する
+	static void BlockStaticValue(void);
 #ifdef _DEBUG
 	// 全体のデバッグ処理
 	static void AllDebug(void);
@@ -351,17 +380,23 @@ private:
 	/* 関数 */
 	// 落ちる更新処理
 	void Update_Fall(void);
+	// 押し出し状態のブロックの更新処理
+	void Update_PushState(void);
+	// 自身のシャドウの出現条件処理
+	void Update_MyShadow(void);
 	// 当たり判定処理
 	void Collision(CBaseblock * pBlock);
-	// ステンシルシャドウの更新処理
-	void Update_StencilShadow(CBaseblock * pBlock);
+	// 自信と他のブロックの比較し、シャドウを更新させる処理
+	void Update_OtherShadow(CBaseblock * pBlock);
 	/* 変数 */
 	static BLOCK_STATUS		m_BlockStatus;		// ブロックのステータス
 	CCircleshadow *			m_pShadowPolygon;	// シャドウポリゴン
 	D3DXVECTOR3				m_posOld;			// 前回の位置
 	TYPE					m_type;				// ベースブロック
 	GRID					m_grid;				// 盤面情報
+	PUSHAFTER				m_PushAfeter;		// 押し出した後要の変数
 	bool					m_bFall;			// 落ちる状態
+	bool					m_bShadow;			// シャドウの使用状態
 	// 試験用
 	static int m_anHeight[20][20];
 };

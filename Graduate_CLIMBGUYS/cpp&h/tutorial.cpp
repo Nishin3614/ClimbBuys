@@ -68,6 +68,8 @@ void CTutorial::Init(void)
 {
 	// モード初期化
 	CBaseMode::Init();
+	// ブロックの静的変数の初期化処理
+	CBaseblock::BlockStaticValue();
 
 	// チュートリアルUIの生成
 	CUi::LoadCreate(CUi::UITYPE_TUTORIAL);
@@ -81,7 +83,7 @@ void CTutorial::Init(void)
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CGame::STAGE_1);
 	// 結合されたブロックの更新ブロック生成
-	CConnectblock::TestCreate();
+	//CConnectblock::TestCreate();
 
 	//// 床の生成
 	//CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);

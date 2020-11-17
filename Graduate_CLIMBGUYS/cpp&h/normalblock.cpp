@@ -103,16 +103,15 @@ void CNormalblock::Scene_MyCollision(
 		if (!(MyGrid.nColumn == OppGrid.nColumn &&
 			MyGrid.nLine == OppGrid.nLine)) return;
 		// 変数宣言
-		int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フェードの値
 		int nHeight = CBaseblock::GetHeight(				// 高さ
-			MyGrid.nColumn + nFeedValue,
-			MyGrid.nLine + nFeedValue) + 1;
+			MyGrid.nColumn,
+			MyGrid.nLine) + 1;
 		// 高さを行列高に代入
 		MyGrid.nHeight = nHeight;
 		// 高さの設定
 		CBaseblock::SetHeight(
-			MyGrid.nColumn + nFeedValue,
-			MyGrid.nLine + nFeedValue,
+			MyGrid.nColumn,
+			MyGrid.nLine,
 			MyGrid.nHeight
 		);
 		// 現在の行列高の設定
@@ -150,16 +149,15 @@ void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene
 		if (!(MyGrid.nColumn == OppGrid.nColumn &&
 			MyGrid.nLine == OppGrid.nLine)) return;
 		// 変数宣言
-		int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フェードの値
 		int nHeight = CBaseblock::GetHeight(				// 高さ
-			MyGrid.nColumn + nFeedValue,
-			MyGrid.nLine + nFeedValue) + 1;
+			MyGrid.nColumn,
+			MyGrid.nLine) + 1;
 		// 高さを行列高に代入
 		MyGrid.nHeight = nHeight;
 		// 高さの設定
 		CBaseblock::SetHeight(
-			MyGrid.nColumn + nFeedValue,
-			MyGrid.nLine + nFeedValue,
+			MyGrid.nColumn,
+			MyGrid.nLine,
 			MyGrid.nHeight
 		);
 		// 現在の行列高の設定
@@ -204,16 +202,15 @@ void CNormalblock::HitCollision(
 			if (!(MyGrid.nColumn == OppGrid.nColumn &&
 				MyGrid.nLine == OppGrid.nLine)) return;
 			// 変数宣言
-			int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フェードの値
 			int nHeight = CBaseblock::GetHeight(			// 高さ
-				MyGrid.nColumn + nFeedValue,
-				MyGrid.nLine + nFeedValue) + 1;
+				MyGrid.nColumn,
+				MyGrid.nLine) + 1;
 			// 高さを行列高に代入
 			MyGrid.nHeight = nHeight;
 			// 高さの設定
 			CBaseblock::SetHeight(
-				MyGrid.nColumn + nFeedValue,
-				MyGrid.nLine + nFeedValue,
+				MyGrid.nColumn,
+				MyGrid.nLine,
 				MyGrid.nHeight
 			);
 			// 現在の行列高の設定
@@ -222,6 +219,16 @@ void CNormalblock::HitCollision(
 			CBaseblock::SetPos(MyGrid.GetPos(m_fSizeRange));
 			// 落ちている状態設定
 			CBaseblock::SetFall(false);
+		}
+		// 当たった方向が上なら
+		else if (Direct == COLLISIONDIRECTION::UP)
+		{
+
+		}
+		// 当たった方向がそれ以外なら
+		else
+		{
+
 		}
 	}
 }

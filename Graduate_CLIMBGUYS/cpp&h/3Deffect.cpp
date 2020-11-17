@@ -95,12 +95,16 @@ void C3DEffect::Update(void)
 		CEffect::UpdateMove(pEffect);
 		// 頂点情報の更新
 		CEffect::UpdateVetex(pEffect);
+		// 頂点テクスチャー情報の更新
+		CEffect::Updata_Animation(pEffect);
 		// 位置更新
 		pEffect->pos += pEffect->move;
 		// 頂点サイズの設定
 		SetVartexSize(pVtx, pEffect);
 		// 頂点カラーの設定
 		SetVetexColor(pVtx, pEffect);
+		// 頂点テクスチャーの設定
+		SetVetexTex(pVtx, pEffect);
 	}
 	// 頂点データをアンロックする
 	m_pVtxBuff->Unlock();
@@ -313,6 +317,46 @@ void C3DEffect::SetVetexColor(VERTEX_3D * pVtx, EFFECT * pEffect, const int * nI
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 頂点テクスチャー設定
+//	pVtx	: 3D頂点情報
+//	pEffect	: エフェクト情報
+//	nIndex	: 番号情報
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void C3DEffect::SetVetexTex(VERTEX_3D * pVtx, EFFECT * pEffect, const int * nIndex)
+{
+	if (nIndex != NULL)
+	{
+		// 変数宣言
+		C3DEffect::EFFECT *pLocalEffect;					// エフェクトのポインタ
+		pLocalEffect = &C3DEffect::m_aEffect[*nIndex];		// ポインタの初期化
+															// アニメーション情報が存在しないなら
+		if (!pLocalEffect->Animation.bUse &&
+			!pLocalEffect->Animation.bTexUpdate) return;
+		// 頂点テクスチャー
+		pVtx[0].tex = D3DXVECTOR2(pLocalEffect->Animation.FirstPos.x, pLocalEffect->Animation.FirstPos.y);
+		pVtx[1].tex = D3DXVECTOR2(pLocalEffect->Animation.EndPos.x, pLocalEffect->Animation.FirstPos.y);
+		pVtx[2].tex = D3DXVECTOR2(pLocalEffect->Animation.FirstPos.x, pLocalEffect->Animation.EndPos.y);
+		pVtx[3].tex = D3DXVECTOR2(pLocalEffect->Animation.EndPos.x, pLocalEffect->Animation.EndPos.y);
+		// 頂点テクスチャー更新状態をfalseに
+		pLocalEffect->Animation.bTexUpdate = false;
+
+	}
+	else if (pEffect != NULL)
+	{
+		// アニメーション情報が存在しないなら
+		if (!pEffect->Animation.bUse &&
+			!pEffect->Animation.bTexUpdate) return;
+		// 頂点テクスチャー
+		pVtx[0].tex = D3DXVECTOR2(pEffect->Animation.FirstPos.x, pEffect->Animation.FirstPos.y);
+		pVtx[1].tex = D3DXVECTOR2(pEffect->Animation.EndPos.x, pEffect->Animation.FirstPos.y);
+		pVtx[2].tex = D3DXVECTOR2(pEffect->Animation.FirstPos.x, pEffect->Animation.EndPos.y);
+		pVtx[3].tex = D3DXVECTOR2(pEffect->Animation.EndPos.x, pEffect->Animation.EndPos.y);
+		// 頂点テクスチャー更新状態をfalseに
+		pEffect->Animation.bTexUpdate = false;
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 生成
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 C3DEffect * C3DEffect::Create(void)
@@ -338,6 +382,7 @@ void C3DEffect::Set3DEffect(
 	D3DXCOLOR const &col,
 	D3DXVECTOR2 const &size,
 	int const &nLife,
+	ANIMATION_LOAD const & Anim,	// アニメーション情報読み込み
 	CRenderer::BLEND const &Blend,
 	D3DXVECTOR2 const &sizeValue,
 	float const &fAlphaValue
@@ -377,18 +422,32 @@ void C3DEffect::Set3DEffect(
 			pEffect->rot = rot;
 			// ブレンドタイプ設定
 			pEffect->BlendType = Blend;
-			// 頂点位置の設定
-			SetVartexSize(pVtx, pEffect);
+			// アニメーション設定
+			pEffect->Animation = Anim;
+			// 始点位置
+			pEffect->Animation.FirstPos = D3DXVECTOR2(
+				pEffect->Animation.nHorizonAnim * pEffect->Animation.fHorizonSize,
+				pEffect->Animation.nVirticalAnim * pEffect->Animation.fVirticalSize
+			);
+			// 終点位置
+			pEffect->Animation.EndPos = D3DXVECTOR2(
+				pEffect->Animation.nHorizonAnim * pEffect->Animation.fHorizonSize + pEffect->Animation.fHorizonSize,
+				pEffect->Animation.nVirticalAnim * pEffect->Animation.fVirticalSize + pEffect->Animation.fVirticalSize
+			);
 			// 色の設定
 			pEffect->col = col;
-			// 頂点カラーの設定
-			SetVetexColor(pVtx, pEffect);
 			// アルファ変化値の設定
 			pEffect->fAlphaValue = fAlphaValue;
 			// サイズ変化値の設定
 			pEffect->sizeValue = sizeValue;
 			// 使用フラグをオン
 			pEffect->bUse = true;
+			// 頂点位置の設定
+			SetVartexSize(pVtx, pEffect);
+			// 頂点カラーの設定
+			SetVetexColor(pVtx, pEffect);
+			// 頂点テクスチャーの設定
+			SetVetexTex(pVtx, pEffect);
 			//頂点データをアンロック
 			m_pVtxBuff->Unlock();
 			break;

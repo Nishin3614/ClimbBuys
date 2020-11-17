@@ -50,8 +50,10 @@ public:
 	// キャラクター
 	typedef enum
 	{
-		CHARACTER_PLAYER = 0,	// プレイヤー
-		CHARACTER_NPC,			// NPC
+		CHARACTER_PLAYER_0 = 0,	// プレイヤー0
+		CHARACTER_PLAYER_1,		// プレイヤー1
+		CHARACTER_PLAYER_2,		// プレイヤー2
+		CHARACTER_PLAYER_3,		// プレイヤー3
 		CHARACTER_MAX,			// キャラクター全体数
 	} CHARACTER;
 

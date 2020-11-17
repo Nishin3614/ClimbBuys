@@ -28,7 +28,7 @@
 #include "damagefloor.h"
 #include "bg.h"
 #include "XInputPad.h"
-
+#include "gameUI.h"
 
 #include "normalblock.h"
 #include "fieldblock.h"
@@ -42,6 +42,7 @@
 // マクロ定義
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#define FINISH_TIME		(120)			// 終了する時間
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -55,7 +56,11 @@ CGame::STAGE	CGame::m_Stage = CGame::STAGE_1;	// ステージ
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CGame::CGame()
 {
-	m_pause = NULL;
+	// 初期化
+	m_pause			= NULL;
+	m_pGameUI		= nullptr;		// ゲームUI
+	m_nCntFinish	= 0;			// 終了のカウント
+	m_bFinishFlag	= false;		// 終了フラグ
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,14 +86,17 @@ void CGame::Init(void)
 	C3DEffect::Create();
 	// 試験的背景の生成
 	CBg::Create();
+	// ゲームUIの生成
+	m_pGameUI = CGameUI::Create();
+	
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 	// プレイヤーの生成	試験的
-	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1,D3DXVECTOR3(0.0,300.0f,0.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(0.0, 300.0f, 100.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(100.0f, 300.0f, 100.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(-50.0, 300.0f, 50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(50.0, 300.0f, 50.0f));
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);
@@ -104,7 +112,7 @@ void CGame::Init(void)
 
 		// ばねブロックの生成 // 実験用
 	/*CSpringblock::Create(
-		D3DXVECTOR3(0,30,0),
+		D3DXVECTOR3(0,530,0),
 		CScene::LAYER_3DBLOCK
 	);*/
 }
@@ -125,6 +133,14 @@ void CGame::Uninit(void)
 		m_pause = NULL;
 	}
 	*/
+
+	if (m_pGameUI)
+	{
+		// ゲームUIの終了
+		m_pGameUI->Uninit();
+		m_pGameUI = nullptr;
+	}
+
 	// シーンの静的変数の初期化
 	StaticInit();
 }
@@ -137,9 +153,19 @@ void CGame::Update(void)
 	// モードの更新
 	CBaseMode::Update();
 
-	// 結合されたブロックの更新ブロック生成
-	CConnectblock::Update_CreateBlock();
+	// NULLチェック
+	if (m_pGameUI)
+	{
+		// ゲームUIの更新
+		m_pGameUI->Update();
+	}
 
+	// スタートの表示が出た後に生成
+	if (m_pGameUI->GetStartFlag())
+	{
+		// 結合されたブロックの更新ブロック生成
+		CConnectblock::Update_CreateBlock();
+	}
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)
@@ -151,6 +177,25 @@ void CGame::Update(void)
 	}
 	*/
 
+	// 終了フラグがオンになったとき
+	if (m_bFinishFlag)
+	{
+		// カウントアップ
+		m_nCntFinish++;
+
+		// 終了の表示を出す
+		m_pGameUI->FinishSignal();
+
+		// 一定時間経過後
+		if (m_nCntFinish >= FINISH_TIME)
+		{
+			// リザルトに遷移する
+			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+			}
+		}
+	}
 #ifdef _DEBUG
 
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
@@ -179,6 +224,12 @@ void CGame::Draw(void)
 {
 	// モードの描画
 	CBaseMode::Draw();
+
+	if (m_pGameUI)
+	{
+		// ゲームUIの描画
+		m_pGameUI->Draw();
+	}
 }
 
 #ifdef _DEBUG
@@ -189,8 +240,6 @@ void CGame::Debug(void)
 {
 	// ベースモードのデバッグ処理
 	CBaseMode::Debug();
-	// ブロック全体のデバッグ処理
-	CBaseblock::AllDebug();
 }
 #endif // _DEBUG
 
@@ -213,6 +262,7 @@ CGame * CGame::Create(void)
 void CGame::StaticInit(void)
 {
 	CCharacter::InitStatic();
+	CBaseblock::BlockStaticValue();
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

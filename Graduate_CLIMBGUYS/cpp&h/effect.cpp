@@ -111,6 +111,85 @@ void CEffect::UpdateMove(
 	*/
 }
 
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// アニメーション更新処理
+//	pEffect	: エフェクト情報
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CEffect::Updata_Animation(
+	EFFECT *pEffect		// エフェクト情報
+)
+{
+	// アニメーション使用状態がfalseなら
+	if (!pEffect->Animation.bUse) return;
+
+	// カウントアニメアップ
+	pEffect->Animation.nCntAnim++;
+	// カウントアニメが最大カウントアニメで割り切れたら
+	if (pEffect->Animation.nCntAnim % pEffect->Animation.nMaxCntAnim == 0)
+	{
+		// 水平アニメーションカウントアップ
+		pEffect->Animation.nHorizonAnim++;
+		if (pEffect->Animation.nHorizonAnim >= pEffect->Animation.nMaxHorizonAnim)
+		{
+			// 水平アニメーションカウント初期化
+			pEffect->Animation.nHorizonAnim = 0;
+			// 垂直アニメーションカウントアップ
+			pEffect->Animation.nVirticalAnim++;
+			if (pEffect->Animation.nVirticalAnim >= pEffect->Animation.nMaxVirticalAnim)
+			{
+				// 垂直アニメーションカウント初期化
+				pEffect->Animation.nVirticalAnim = 0;
+			}
+		}
+		// 始点位置
+		pEffect->Animation.FirstPos = D3DXVECTOR2(
+			pEffect->Animation.nHorizonAnim * pEffect->Animation.fHorizonSize,
+			pEffect->Animation.nVirticalAnim * pEffect->Animation.fVirticalSize
+		);
+		// 終点位置
+		pEffect->Animation.EndPos = D3DXVECTOR2(
+			pEffect->Animation.nHorizonAnim * pEffect->Animation.fHorizonSize + pEffect->Animation.fHorizonSize,
+			pEffect->Animation.nVirticalAnim * pEffect->Animation.fVirticalSize + pEffect->Animation.fVirticalSize
+		);
+		// テクスチャーの更新処理状態
+		pEffect->Animation.bTexUpdate = true;
+	}
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// テクスチャーアニメーションの設定
+//	nMaxCntAnim			: 最大アニメーションカウント
+//	nMaxHorizonAnim		: 最大水平アニメーションカウント
+//	nMaxVirticalAnim	: 最大垂直アニメーションカウント
+//	bLoop				: ループ状態
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CEffect::SetTexAnim(
+	EFFECT * pEffect,				// エフェクト情報
+	int const & nMaxCntAnim,		// カウントアニメ最大数
+	int const & nMaxHorizonAnim,	// 水平アニメーション最大数
+	int const & nMaxVirticalAnim	// 垂直アニメーション最大数
+)
+{
+	// 各項目の設定
+	pEffect->Animation.nMaxCntAnim = nMaxCntAnim;				// 最大アニメーションカウント
+	pEffect->Animation.nMaxHorizonAnim = nMaxHorizonAnim;		// 最大水平アニメーションカウント
+	pEffect->Animation.nMaxVirticalAnim = nMaxVirticalAnim;		// 最大垂直アニメーションカウント
+	pEffect->Animation.fHorizonSize = 1.0f / nMaxHorizonAnim;	// 垂直アニメーションの1つのサイズ
+	pEffect->Animation.fVirticalSize = 1.0f / nMaxVirticalAnim;	// 垂直アニメーションの1つのサイズ
+	pEffect->Animation.bUse = true;								// 使用状態
+
+																// 始点位置
+	pEffect->Animation.FirstPos = D3DXVECTOR2(
+		pEffect->Animation.nHorizonAnim * pEffect->Animation.fHorizonSize,
+		pEffect->Animation.nVirticalAnim * pEffect->Animation.fVirticalSize
+	);
+	// 終点位置
+	pEffect->Animation.EndPos = D3DXVECTOR2(
+		pEffect->Animation.nHorizonAnim * pEffect->Animation.fHorizonSize + pEffect->Animation.fHorizonSize,
+		pEffect->Animation.nVirticalAnim * pEffect->Animation.fVirticalSize + pEffect->Animation.fVirticalSize
+	);
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 値の初期化処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,13 +210,8 @@ void CEffect::InitValues(
 		pEffect->fAlphaValue		= 0.0f;								// アルファ値の変化値
 		pEffect->nLife				= 0;								// 持ち時間
 		pEffect->nTexType			= 0;								// テクスチャータイプ
-		pEffect->nCntAnim			= 0;								// カウントアニメ
-		pEffect->nMaxCntAnim		= 1;								// 最大カウントアニメ
-		pEffect->nHorizonAnim		= 0;								// 水平のアニメーション
-		pEffect->nVirticalAnim		= 0;								// 垂直のアニメーション
-		pEffect->nMaxHorizonAnim	= 1;								// 最大水平アニメーション
-		pEffect->nMaxVirticalAnim	= 1;								// 最大垂直アニメーション
 		pEffect->bUse				= false;							// 使用しているかどうか
+		pEffect->Animation.Init();										// アニメーションの初期化処理
 		pEffect->BlendType			= CRenderer::BLEND_ADD_TRANSLUCENT;	// ブレンドタイプ
 		pEffect->EffectType			= CEffect::EFFECT_TYPE_NONE;		// エフェクトの種類
 	}
@@ -161,13 +235,8 @@ void CEffect::Init_OneValues(
 	pEffect->fAlphaValue = 0.0f;							// アルファ値の変化値
 	pEffect->nLife = 0;										// 持ち時間
 	pEffect->nTexType = 0;									// テクスチャータイプ
-	pEffect->nCntAnim = 0;									// カウントアニメ
-	pEffect->nMaxCntAnim = 1;								// 最大カウントアニメ
-	pEffect->nHorizonAnim = 0;								// 水平のアニメーション
-	pEffect->nVirticalAnim = 0;								// 垂直のアニメーション
-	pEffect->nMaxHorizonAnim = 1;							// 最大水平アニメーション
-	pEffect->nMaxVirticalAnim = 1;							// 最大垂直アニメーション
 	pEffect->bUse = false;									// 使用しているかどうか
+	pEffect->Animation.Init();								// アニメーションの初期化処理
 	pEffect->BlendType = CRenderer::BLEND_ADD_TRANSLUCENT;	// ブレンドタイプ
 	pEffect->EffectType = CEffect::EFFECT_TYPE_NONE;		// エフェクトの種類
 }

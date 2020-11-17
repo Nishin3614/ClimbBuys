@@ -153,6 +153,20 @@ void CCamera::Update_Play(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Init_Opening(void)
 {
+	// カメラの初期化
+	m_rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
+	m_rotDest = m_rot;
+	m_rotDiff = D3DVECTOR3_ZERO;
+	m_rotOrigin = D3DVECTOR3_ZERO;
+	m_bSet = false;
+	// 目的の視点
+	m_posV.x =
+		m_posR.x + sinf(m_rot.y) * m_fLength;
+	m_posV.y =
+		m_posR.y + cosf(m_rot.x) * m_fHeight;
+	m_posV.z =
+		m_posR.z + cosf(m_rot.y) * m_fLength;
+
 	m_rot.x = -1.5f;
 	// 注視点位置
 	m_posR = D3DXVECTOR3(0.0f, 500.0f, -500.0f);
@@ -168,11 +182,30 @@ void CCamera::Init_Opening(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Init_Tutorial(void)
 {
+	// カメラの初期化
+	m_rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
+	m_rotDest = m_rot;
+	m_rotDiff = D3DVECTOR3_ZERO;
+	m_rotOrigin = D3DVECTOR3_ZERO;
+	m_bSet = false;
+	// 目的の視点
+	m_posV.x =
+		m_posR.x + sinf(m_rot.y) * m_fLength;
+	m_posV.y =
+		m_posR.y + cosf(m_rot.x) * m_fHeight;
+	m_posV.z =
+		m_posR.z + cosf(m_rot.y) * m_fLength;
+
 	m_rot.x = 0.0f;
 	// 注視点位置
 	m_posR = D3DXVECTOR3(200.0f, 0.0f, -50.0f);
 	m_fLength = 420.0f;
 	m_fHeight = 700.0f;
+	// 一度の回転にかかるタイム
+	m_Turn.nOneTime = 10000;
+	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
+	// 一度の回転にかかるタイムカウント
+	m_Turn.nCntTime = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -180,6 +213,20 @@ void CCamera::Init_Tutorial(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Init_Title(void)
 {
+	// カメラの初期化
+	m_rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
+	m_rotDest = m_rot;
+	m_rotDiff = D3DVECTOR3_ZERO;
+	m_rotOrigin = D3DVECTOR3_ZERO;
+	m_bSet = false;
+	// 目的の視点
+	m_posV.x =
+		m_posR.x + sinf(m_rot.y) * m_fLength;
+	m_posV.y =
+		m_posR.y + cosf(m_rot.x) * m_fHeight;
+	m_posV.z =
+		m_posR.z + cosf(m_rot.y) * m_fLength;
+
 	m_rot.x = 1.5f;
 	// 注視点位置
 	m_posR = D3DXVECTOR3(0.0f, 40.0f, -350.0f);
@@ -203,15 +250,64 @@ void CCamera::Init_Title(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Init_Game(void)
 {
+	// カメラの初期化
+	m_rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
+	m_rotDest = m_rot;
+	m_rotDiff = D3DVECTOR3_ZERO;
+	m_rotOrigin = D3DVECTOR3_ZERO;
+	m_bSet = false;
+	// 目的の視点
+	m_posV.x =
+		m_posR.x + sinf(m_rot.y) * m_fLength;
+	m_posV.y =
+		m_posR.y + cosf(m_rot.x) * m_fHeight;
+	m_posV.z =
+		m_posR.z + cosf(m_rot.y) * m_fLength;
 	m_rot.x = 0.0f;
 	// 注視点位置
 	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_fLength = 250.0f;
-	m_fHeight = 600.0f;
+	m_fLength = 400.0f;
+	m_fHeight = 400.0f;
 	// 回転回数
 	m_Turn.nSpin = 1;
 	// 一度の回転にかかるタイム
-	m_Turn.nOneTime = 240;
+	m_Turn.nOneTime = 10000;
+	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
+	// 一度の回転にかかるタイムカウント
+	m_Turn.nCntTime = 0;
+	// スピンカウント
+	m_Turn.nCntSpin = 0;
+	// 360°回転を再開させる
+	m_Turn.bSpin = false;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// リザルト時の更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CCamera::Init_Result(void)
+{
+	// カメラの初期化
+	m_rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
+	m_rotDest = m_rot;
+	m_rotDiff = D3DVECTOR3_ZERO;
+	m_rotOrigin = D3DVECTOR3_ZERO;
+	m_bSet = false;
+	// 目的の視点
+	m_posV.x =
+		m_posR.x + sinf(m_rot.y) * m_fLength;
+	m_posV.y =
+		m_posR.y + cosf(m_rot.x) * m_fHeight;
+	m_posV.z =
+		m_posR.z + cosf(m_rot.y) * m_fLength;
+	m_rot.x = 0.0f;
+	// 注視点位置
+	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_fLength = 400.0f;
+	m_fHeight = 400.0f;
+	// 回転回数
+	m_Turn.nSpin = 1;
+	// 一度の回転にかかるタイム
+	m_Turn.nOneTime = 10000;
 	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
 	// 一度の回転にかかるタイムカウント
 	m_Turn.nCntTime = 0;
@@ -284,6 +380,19 @@ void CCamera::Update_Game(void)
 		// ポインターエラー防止用にnull
 		pDamageFloor = nullptr;
 	}
+
+	// タイムカウントが1週にかかる時間と同じになったら
+	if (m_Turn.nCntTime == m_Turn.nOneTime)
+	{
+		// カウントタイムの初期化
+		m_Turn.nCntTime = 0;
+		return;
+	}
+	// カウントタイム
+	m_Turn.nCntTime++;
+	// 回転更新
+	m_rot.y -= m_Turn.fTrunRot;
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -434,6 +543,10 @@ void CCamera::ModeCameraInit(void)
 		// ゲーム
 	case CManager::MODE_GAME:
 		Init_Game();
+		break;
+		// リザルト
+	case CManager::MODE_RESULT:
+		Init_Result();
 		break;
 
 	default:

@@ -120,10 +120,8 @@ void CXInputPad::Update(void)
 			vibration.wRightMotorSpeed = 65535;
 		}
 	}
-
-
 	//ジョイスティックにバイブレータデータを送信。
-	XInputSetState(0, &vibration);
+	XInputSetState((int)m_PlayerTag, &vibration);
 }
 
 // =====================================================================================================================================================================

@@ -187,7 +187,7 @@ private:
 	);
 	// ブロックの押し出し処理
 	void PushBlock(
-		CScene_X * pScene_X,			// シーンX情報
+		CBaseblock * pBlock,			// ブロック情報
 		CBaseblock::GRID const & Grid	// 方向
 	);
 	// 当たり判定処理
@@ -214,6 +214,7 @@ private:
 	CXInputPad					*m_pPad;						// パッドのポインタ
 	bool						m_bDieFlag;						// 死亡フラグ
 	bool						m_bDashFlag;					// ダッシュフラグ
+	bool						m_bTackleFrag;					// タックルフラグ
 	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス

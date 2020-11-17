@@ -278,6 +278,7 @@ void C3DParticle::Update(void)
 					col,
 					size,
 					nLife,
+					m_ParticleOffset[m_offsetID]->Anim,
 					m_ParticleOffset[m_offsetID]->Blend,
 					sizeValue,
 					fAlphaDerease
@@ -301,6 +302,7 @@ void C3DParticle::Update(void)
 					col,
 					size,
 					nLife,
+					m_ParticleOffset[m_offsetID]->Anim,
 					m_ParticleOffset[m_offsetID]->Blend,
 					sizeValue,
 					fAlphaDerease
@@ -790,6 +792,29 @@ HRESULT C3DParticle::Load(void)
 					// テクスチャータイプの代入
 					sscanf(cRead, "%s %s %d", &cEmpty, &cEmpty,
 						&m_ParticleOffset[nCntOffset]->nEffectTexType);
+					// 文字列の初期化
+					cComp[0] = '\0';
+				}
+				// アニメーションが読み込まれたら
+				else if (strcmp(cComp, "ANIMATION") == 0)
+				{
+					/*
+					// アニメーション情報のNULLチェック
+					if (!m_ParticleOffset[nCntOffset]->Anim)
+					{
+					m_ParticleOffset[nCntOffset]->Anim = new ANIMATION_LOAD;
+					}
+					*/
+					// アニメーション情報代入
+					sscanf(cRead, "%s %s %d %d %d", &cEmpty, &cEmpty,
+						&m_ParticleOffset[nCntOffset]->Anim.nMaxCntAnim,
+						&m_ParticleOffset[nCntOffset]->Anim.nMaxHorizonAnim,
+						&m_ParticleOffset[nCntOffset]->Anim.nMaxVirticalAnim
+					);
+					// 水平アニメーションと垂直アニメーションの設定
+					m_ParticleOffset[nCntOffset]->Anim.fHorizonSize = 1.0f / m_ParticleOffset[nCntOffset]->Anim.nMaxHorizonAnim;
+					m_ParticleOffset[nCntOffset]->Anim.fVirticalSize = 1.0f / m_ParticleOffset[nCntOffset]->Anim.nMaxVirticalAnim;
+					m_ParticleOffset[nCntOffset]->Anim.bUse = true;
 					// 文字列の初期化
 					cComp[0] = '\0';
 				}

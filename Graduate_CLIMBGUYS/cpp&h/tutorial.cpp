@@ -32,6 +32,7 @@
 #include "connectblock.h"
 #include "damagefloor.h"
 #include "bg.h"
+#include "tutorialUI.h"
 
 // ------------------------------------------
 //
@@ -52,6 +53,7 @@ CTutorial::CTutorial()
 {
 	// ステージ決定カウントを設定
 	m_nDeterminationCnt = 120;
+	m_pTutorialUI = nullptr;
 }
 
 // ------------------------------------------
@@ -68,9 +70,12 @@ void CTutorial::Init(void)
 {
 	// モード初期化
 	CBaseMode::Init();
+	// ブロックの静的変数の初期化処理
+	CBaseblock::BlockStaticValue();
 
 	// チュートリアルUIの生成
 	CUi::LoadCreate(CUi::UITYPE_TUTORIAL);
+	m_pTutorialUI = CTutorialUI::Create();
 
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
@@ -81,7 +86,7 @@ void CTutorial::Init(void)
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CGame::STAGE_1);
 	// 結合されたブロックの更新ブロック生成
-	CConnectblock::TestCreate();
+	//CConnectblock::TestCreate();
 
 	//// 床の生成
 	//CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
@@ -92,10 +97,10 @@ void CTutorial::Init(void)
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 	// プレイヤーの生成	試験的
-	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(0.0, 300.0f, 0.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(0.0, 300.0f, 100.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(100.0f, 300.0f, 100.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(-50.0, 300.0f, 50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(50.0, 300.0f, 50.0f));
 
 	// ダメージ床の生成
 	CDamageFloor::Create();
@@ -108,6 +113,13 @@ void CTutorial::Uninit(void)
 {
 	// モード終了
 	CBaseMode::Uninit();
+
+	if (m_pTutorialUI)
+	{
+		// チュートリアルUIの終了
+		m_pTutorialUI->Uninit();
+		m_pTutorialUI = nullptr;
+	}
 }
 
 // ------------------------------------------
@@ -115,6 +127,13 @@ void CTutorial::Uninit(void)
 // ------------------------------------------
 void CTutorial::Update(void)
 {
+	// NULLチェック
+	if (m_pTutorialUI)
+	{
+		// チュートリアルUIの更新
+		m_pTutorialUI->Update();
+	}
+
 //#ifdef _DEBUG
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -168,6 +187,12 @@ void CTutorial::Draw(void)
 {
 	// モード描画
 	CBaseMode::Draw();
+
+	if (m_pTutorialUI)
+	{
+		// チュートリアルUIの描画
+		m_pTutorialUI->Draw();
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

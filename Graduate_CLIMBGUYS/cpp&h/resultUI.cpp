@@ -14,7 +14,6 @@
 #include "basemode.h"
 #include "debugproc.h"
 #include "scene_two.h"
-#include "number.h"
 #include "multinumber.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +31,7 @@
 #define RESULT_UI_RANK_MOVE_STOP_POS_Y		(55.0f)									// 順位の移動が止まる位置Y
 
 #define RESULT_UI_DEATH_POS					(D3DXVECTOR3((160.0f + 320.0f * (nCnt - (int)RESULT_UI::DEATH_01)), (1080.0f + 210.0f * (nCnt - (int)RESULT_UI::DEATH_01)), 0.0f))	// 死因の位置
-#define RESULT_UI_DEATH_SIZE				(D3DXVECTOR2(200.0f, 45.0f))			// 死因のサイズ
+#define RESULT_UI_DEATH_SIZE				(D3DXVECTOR2(200.0f, 80.0f))			// 死因のサイズ
 #define RESULT_UI_DEATH_MOVE_STOP_POS_Y		(685.0f)								// 死因の移動が止まる位置Y
 
 #define RESULT_SCORE_SURVIVAL_TIME_POS		(D3DXVECTOR3((260.0f + 320.0f * nCnt), 485.0f, 0.0f))				// 生存時間の位置
@@ -225,7 +224,7 @@ void CResultUI::InitSettingFrame(void)
 				// サイズの設定
 				m_pScene2D[nCnt]->SetSize(RESULT_UI_DEATH_SIZE);
 				// テクスチャの設定 試験的
-				m_pScene2D[nCnt]->BindTexture(CTexture_manager::TYPE_UI_NUMBER);
+				m_pScene2D[nCnt]->BindTexture(CTexture_manager::TYPE_RESULT_UI_DEATH_01);
 			}
 
 			// 初期化

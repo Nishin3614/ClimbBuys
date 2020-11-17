@@ -135,7 +135,7 @@ CFieldblock * CFieldblock::Create(
 	pFieldblock->SetGrid(Grid);			// 行列高さの番号
 	pFieldblock->SetModelColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	// 現在のブロックの高さを設定
-	CBaseblock::SetHeight(Grid.nColumn + m_nFeedValue[CGame::GetStage()], Grid.nLine + m_nFeedValue[CGame::GetStage()], Grid.nHeight);
+	CBaseblock::SetHeight(Grid.nColumn, Grid.nLine, Grid.nHeight);
 
 	// 初期化処理
 	pFieldblock->Init();

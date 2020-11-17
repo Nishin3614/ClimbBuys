@@ -1,11 +1,11 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// リザルトのUI[resultUI.h]
+// ゲームのUI[gameUI.h]
 // Author : Yoshiki Sato
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#ifndef _RESULTUI_H_
-#define _RESULTUI_H_	 // ファイル名を基準を決める
+#ifndef _GAMEUI_H_
+#define _GAMEUI_H_	 // ファイル名を基準を決める
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -26,66 +26,52 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 class CScene_TWO;		// シーン2D
-class CMultiNumber;		// マルチナンバー
+class CNumber;			// ナンバー
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // クラス
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CResultUI
+class CGameUI
 {
 public:
-	/* リザルトUI */
-	enum class RESULT_UI
+	/* ゲームUI */
+	enum class GAME_UI
 	{
 		UI_NONE = -1,
-		FRAME_1P,			// 1Pの枠
-		FRAME_2P,			// 2Pの枠
-		FRAME_3P,			// 3Pの枠
-		FRAME_4P,			// 4Pの枠
-		RANK_01,			// 1Pの順位
-		RANK_02,			// 2Pの順位
-		RANK_03,			// 3Pの順位
-		RANK_04,			// 4Pの順位
-		DEATH_01,			// 1Pの死因
-		DEATH_02,			// 2Pの死因
-		DEATH_03,			// 3Pの死因
-		DEATH_04,			// 4Pの死因
+		START,					// 始め
+		FINISH,					// 終了
 		UI_MAX
 	};
-	/* リザルトスコア */
-	typedef struct
-	{
-		CMultiNumber		*m_pSurvivalTime;	// 生存時間
-		CMultiNumber		*m_pPressBlock;		// ブロックを押した回数
-	}RESULT_SCORE;
 
 	/* 関数 */
-	CResultUI();
-	~CResultUI();
+	CGameUI();
+	~CGameUI();
 	void Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 
 	// 作成(シーン継承あり)
-	static CResultUI * Create(void);					// 作成
-	static HRESULT Load(void);							// 読み込み
-	static void UnLoad(void);							// 破棄
+	static CGameUI	*Create(void);					// 作成
+	static HRESULT	Load(void);						// 読み込み
+	static void		UnLoad(void);					// 破棄
+
+	void			FinishSignal();							// 終了の合図
 	// 設定 //
 
 	// 取得 //
+	bool			GetStartFlag() { return m_bStart; };	// スタートフラグの取得
 protected:
 private:
 	/* 関数 */
-	void			InitSettingFrame(void);							// 枠の初期設定
-	void			InitSettingScore(void);							// 各スコアの初期設定
-	void			UpdateSettingFrame(void);						// 枠の更新設定
-	void			UpdateSettingScore(void);						// 各スコアの更新設定
+	void			StartTimer();							// スタートタイマー
 	/* 変数 */
-	CScene_TWO		*m_pScene2D[(int)RESULT_UI::UI_MAX];			// シーン2D
-	RESULT_SCORE	m_ResultScore[(int)PLAYER_TAG::PLAYER_MAX];	// リザルトスコア
-	D3DXVECTOR3		m_move;											// 移動量
+	CScene_TWO		*m_pScene2D[(int)GAME_UI::UI_MAX];		// シーン2D
+	CNumber			*m_pStartCount;							// スタートカウント
+	int				m_nCntTimer;							// タイマーカウント
+	int				m_nTimerNum;							// タイマーのナンバー
+	bool			m_bStart;								// スタートフラグ
 };
 #endif

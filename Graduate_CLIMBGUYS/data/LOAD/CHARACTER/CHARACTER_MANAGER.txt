@@ -1,2 +1,4 @@
-data/LOAD/CHARACTER/player.txt
-data/LOAD/CHARACTER/NPC.txt
+data/LOAD/CHARACTER/player0.txt
+data/LOAD/CHARACTER/player1.txt
+data/LOAD/CHARACTER/player2.txt
+data/LOAD/CHARACTER/player3.txt

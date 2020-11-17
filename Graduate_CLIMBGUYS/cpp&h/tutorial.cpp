@@ -32,6 +32,7 @@
 #include "connectblock.h"
 #include "damagefloor.h"
 #include "bg.h"
+#include "tutorialUI.h"
 
 // ------------------------------------------
 //
@@ -52,6 +53,7 @@ CTutorial::CTutorial()
 {
 	// ステージ決定カウントを設定
 	m_nDeterminationCnt = 120;
+	m_pTutorialUI = nullptr;
 }
 
 // ------------------------------------------
@@ -73,6 +75,7 @@ void CTutorial::Init(void)
 
 	// チュートリアルUIの生成
 	CUi::LoadCreate(CUi::UITYPE_TUTORIAL);
+	m_pTutorialUI = CTutorialUI::Create();
 
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
@@ -84,11 +87,6 @@ void CTutorial::Init(void)
 	CConnect_fieldblock::Create(CGame::STAGE_1);
 	// 結合されたブロックの更新ブロック生成
 	//CConnectblock::TestCreate();
-
-	//// 床の生成
-	//CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
-	////// 足場の生成
-	//CStand::CreateStand_Tutorial();
 
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
@@ -110,6 +108,13 @@ void CTutorial::Uninit(void)
 {
 	// モード終了
 	CBaseMode::Uninit();
+
+	if (m_pTutorialUI)
+	{
+		// チュートリアルUIの終了
+		m_pTutorialUI->Uninit();
+		m_pTutorialUI = nullptr;
+	}
 }
 
 // ------------------------------------------
@@ -117,6 +122,13 @@ void CTutorial::Uninit(void)
 // ------------------------------------------
 void CTutorial::Update(void)
 {
+	// NULLチェック
+	if (m_pTutorialUI)
+	{
+		// チュートリアルUIの更新
+		m_pTutorialUI->Update();
+	}
+
 //#ifdef _DEBUG
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -127,10 +139,14 @@ void CTutorial::Update(void)
 		// ゲーム遷移
 		if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN) || InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_START, 1))
 		{
-			// フェード状態が何も起こっていない状態なら
-			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+			// 全員が準備完了したとき
+			if (m_pTutorialUI->Ready(nCnt))
 			{
-				CManager::GetFade()->SetFade(CManager::MODE_GAME);
+				// フェード状態が何も起こっていない状態なら
+				if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+				{
+					CManager::GetFade()->SetFade(CManager::MODE_GAME);
+				}
 			}
 		}
 	}
@@ -170,6 +186,12 @@ void CTutorial::Draw(void)
 {
 	// モード描画
 	CBaseMode::Draw();
+
+	if (m_pTutorialUI)
+	{
+		// チュートリアルUIの描画
+		m_pTutorialUI->Draw();
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

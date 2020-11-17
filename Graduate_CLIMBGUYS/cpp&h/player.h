@@ -170,6 +170,9 @@ public:
 
 	// バネ用ジャンプ処理
 	void SpringJump(void);
+
+	// ゲームパッドの取得
+	CXInputPad *GetPad() { return m_pPad; };
 protected:
 private:
 	/* 構造体 */

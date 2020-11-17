@@ -37,7 +37,7 @@ public:
 		TYPE_ANIBUTTON_LOG,			// AniButtonロゴ
 		TYPE_BG,					// ゲームの背景
 		TYPE_NONE,					// 背景なし
-		TYPE_TUTORIAL_FRAME,		// チュートリアルの枠
+		TYPE_TUTORIAL_UI_FRAME,		// チュートリアルUI_枠
 		TYPE_MAGMA,					// ダメージ床用マグマ
 		TYPE_PLAYER_UI_01,			// プレイヤーUI_01
 		TYPE_PLAYER_UI_02,			// プレイヤーUI_02
@@ -62,6 +62,7 @@ public:
 		TYPE_GAME_UI_NAME_TAG_04,	// ゲームUI_ネームタグ_04
 		TYPE_GAME_UI_START,			// ゲームUI_START
 		TYPE_GAME_UI_FINISH,		// ゲームUI_FINISH
+		TYPE_TUTORIAL_UI_OK,		// チュートリアルUI_OKサイン
 		TYPE_MAX					// 最大数
 	} TYPE;
 

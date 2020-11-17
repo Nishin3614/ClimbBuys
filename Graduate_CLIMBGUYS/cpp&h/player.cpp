@@ -146,7 +146,7 @@ void CPlayer::Update(void)
 
 	if (m_pPlayerUI)
 	{	// プレイヤーUIの位置の設定
-		m_pPlayerUI->SetPos(GetPos() + D3DXVECTOR3(0.0f, 80.0f, 0.0f));
+		m_pPlayerUI->SetPos(GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));
 	}
 
 	// モーション設定処理
@@ -1410,6 +1410,11 @@ void CPlayer::Die(void)
 	{
 		if (m_pPlayerUI)
 		{
+#ifdef _DEBUG
+			// バイブレーションの設定
+			m_pPad->StartVibration(60);
+#endif // _DEBUG
+
 			// プレイヤーUIを開放
 			m_pPlayerUI->Release();
 			m_pPlayerUI = nullptr;

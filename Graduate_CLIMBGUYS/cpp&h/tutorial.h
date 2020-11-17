@@ -26,6 +26,7 @@
 //
 // ------------------------------------------
 class CPlayer;				// プレイヤークラス
+class CTutorialUI;			// チュートリアル
 
 // ------------------------------------------
 //
@@ -59,5 +60,6 @@ public:
 protected:
 private:
 	int					m_nDeterminationCnt;
+	CTutorialUI			*m_pTutorialUI;							// チュートリアルUI
 };
 #endif

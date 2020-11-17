@@ -499,7 +499,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 
 					// ‘fÞó‚Ì¶‚É
 					pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y - 3.0f;
-					posOld->y = pos->y;
+					//posOld->y = pos->y;
 					// ˆÚ“®—Ê‚Ì‰Šú‰»
 					move->y = 0.0f;
 					// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -514,7 +514,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::UP;
 					// ‘fÞó‚Ì¶‚É
 					pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
-					posOld->y = pos->y;
+					//posOld->y = pos->y;
 					// ˆÚ“®—Ê‚Ì‰Šú‰»
 					move->y = 0.0f;
 					// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -531,7 +531,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 
 						// ‘fÞó‚Ì¶‚É
 						pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
-						posOld->y = pos->y;
+						//posOld->y = pos->y;
 
 						// ˆÚ“®—Ê‚Ì‰Šú‰»
 						move->y = 0.0f;
@@ -547,7 +547,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 						Direct = COLLISIONDIRECTION::UP;
 						// ‘fÞó‚Ì¶‚É
 						pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
-						posOld->y = pos->y;
+						//posOld->y = pos->y;
 						// ˆÚ“®—Ê‚Ì‰Šú‰»
 						move->y = 0.0f;
 						// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -590,7 +590,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				Direct = COLLISIONDIRECTION::LEFT;
 				// ‘fÞó‚Ì¶‚É
 				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
-				posOld->x = pos->x;
+				//posOld->x = pos->x;
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->x = 0.0f;
 				// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -604,7 +604,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				Direct = COLLISIONDIRECTION::RIGHT;
 				// ‘fÞó‚Ì¶‚É
 				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
-				posOld->x = pos->x;
+				//posOld->x = pos->x;
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->x = 0.0f;
 				// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -620,7 +620,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::LEFT;
 					// ‘fÞó‚Ì¶‚É
 					pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
-					posOld->x = pos->x;
+					//posOld->x = pos->x;
 					// ˆÚ“®—Ê‚Ì‰Šú‰»
 					move->x = 0.0f;
 					// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -634,7 +634,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::RIGHT;
 					// ‘fÞó‚Ì¶‚É
 					pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
-					posOld->x = pos->x;
+					//posOld->x = pos->x;
 					// ˆÚ“®—Ê‚Ì‰Šú‰»
 					move->x = 0.0f;
 					// ‰Ÿ‚µo‚µó‘Ô‚ªtrue
@@ -670,7 +670,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				Direct = COLLISIONDIRECTION::BACK;
 				// ‘fÞó‚Ì¶‚É
 				pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
-				posOld->z = pos->z;
+				//posOld->z = pos->z;
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->z = 0.0f;
 			}
@@ -686,7 +686,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				pos->z =
 					BlockPos.z + m_fSizeRange * 0.5f +
 					size->z * 0.5f - OffsetPos.z;
-				posOld->z = pos->z;
+				//posOld->z = pos->z;
 
 				// ˆÚ“®—Ê‚Ì‰Šú‰»
 				move->z = 0.0f;
@@ -701,7 +701,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::BACK;
 					// ‘fÞó‚Ì¶‚É
 					pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
-					posOld->z = pos->z;
+					//posOld->z = pos->z;
 					// ˆÚ“®—Ê‚Ì‰Šú‰»
 					move->z = 0.0f;
 				}
@@ -717,7 +717,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					pos->z =
 						BlockPos.z + m_fSizeRange * 0.5f +
 						size->z * 0.5f - OffsetPos.z;
-					posOld->z = pos->z;
+					//posOld->z = pos->z;
 
 					// ˆÚ“®—Ê‚Ì‰Šú‰»
 					move->z = 0.0f;

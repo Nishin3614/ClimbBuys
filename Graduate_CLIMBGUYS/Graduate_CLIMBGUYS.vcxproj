@@ -231,6 +231,7 @@
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
     <ClCompile Include="cpp&amp;h\title.cpp" />
     <ClCompile Include="cpp&amp;h\tutorial.cpp" />
+    <ClCompile Include="cpp&amp;h\tutorialUI.cpp" />
     <ClCompile Include="cpp&amp;h\ui.cpp" />
     <ClCompile Include="cpp&amp;h\ui_group.cpp" />
     <ClCompile Include="cpp&amp;h\XInputPad.cpp" />
@@ -315,6 +316,7 @@
     <ClInclude Include="cpp&amp;h\texture_manager.h" />
     <ClInclude Include="cpp&amp;h\title.h" />
     <ClInclude Include="cpp&amp;h\tutorial.h" />
+    <ClInclude Include="cpp&amp;h\tutorialUI.h" />
     <ClInclude Include="cpp&amp;h\ui.h" />
     <ClInclude Include="cpp&amp;h\ui_group.h" />
     <ClInclude Include="cpp&amp;h\XInputPad.h" />

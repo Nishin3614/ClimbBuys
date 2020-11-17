@@ -1,11 +1,11 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// ゲームのUI[gameUI.h]
+// チュートリアルのUI[tutorialUI.h]
 // Author : Yoshiki Sato
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#ifndef _GAMEUI_H_
-#define _GAMEUI_H_	 // ファイル名を基準を決める
+#ifndef _TUTORIALUI_H_
+#define _TUTORIALUI_H_	 // ファイル名を基準を決める
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -26,52 +26,47 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 class CScene_TWO;		// シーン2D
-class CNumber;			// ナンバー
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // クラス
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CGameUI
+class CTutorialUI
 {
 public:
 	/* ゲームUI */
-	enum class GAME_UI
+	enum class TUTORIAL_UI
 	{
 		UI_NONE = -1,
-		START,					// 始め
-		FINISH,					// 終了
+		OK_01,				// OK_01
+		OK_02,				// OK_02
+		OK_03,				// OK_03
+		OK_04,				// OK_04
 		UI_MAX
 	};
 
 	/* 関数 */
-	CGameUI();
-	~CGameUI();
+	CTutorialUI();
+	~CTutorialUI();
 	void Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 
 	// 作成(シーン継承あり)
-	static CGameUI	*Create(void);					// 作成
-	static HRESULT	Load(void);						// 読み込み
-	static void		UnLoad(void);					// 破棄
+	static CTutorialUI	*Create(void);					// 作成
+	static HRESULT		Load(void);						// 読み込み
+	static void			UnLoad(void);					// 破棄
 
-	void			FinishSignal();							// 終了の合図
 	// 設定 //
 
 	// 取得 //
-	bool			GetStartFlag() { return m_bStart; };	// スタートフラグの取得
 protected:
 private:
 	/* 関数 */
-	void			StartTimer();							// スタートタイマー
 	/* 変数 */
-	CScene_TWO		*m_pScene2D[(int)GAME_UI::UI_MAX];		// シーン2D
-	CNumber			*m_pStartCount;							// スタートカウント
-	int				m_nCntTimer;							// タイマーカウント
-	int				m_nTimerNum;							// タイマーのナンバー
+	CScene_TWO		*m_pScene2D[(int)TUTORIAL_UI::UI_MAX];	// シーン2D
 	bool			m_bStart;								// スタートフラグ
 };
 #endif

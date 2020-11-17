@@ -19,6 +19,8 @@
 #include "circleshadow.h"
 #include "stencilshadow.h"
 #include "debugproc.h"
+#include "basemode.h"
+#include "game.h"
 
 #include "fade.h"
 
@@ -55,7 +57,7 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 {
 	m_pMeshobit = NULL;								// 軌跡
 	m_pModel = NULL;								// モデル
-	m_character = CHARACTER_NPC;					// キャラクター
+	m_character = CHARACTER_PLAYER_0;				// キャラクター
 	m_pos = D3DXVECTOR3(0.0f,0.0f,0.0f);			// 位置
 	m_posold = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 前の位置
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
@@ -155,7 +157,7 @@ void CCharacter::Init()
 		//pos.y = 0;
 		// ステンシルシャドウの生成
 		m_pStencilshadow = CStencilshadow::Create(
-			m_pos, 
+			m_pos,
 			D3DXVECTOR3(10.0f, 10000.0f, 10.0f),
 			CStencilshadow::TYPE_CYLINDER,
 			CScene::LAYER_3DCHARACTERSHADOW
@@ -538,13 +540,12 @@ void CCharacter::Die(void)
 	// 総キャラクターカウントダウン
 	m_nAllCharacter--;
 	// 総キャラクターが一人だけなら
-	// ->タイトルへフェード
+	// ->リザルトへフェード
 	if (m_nAllCharacter <= 1)
 	{
-		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-		{
-			CManager::GetFade()->SetFade(CManager::MODE_RESULT);
-		}
+		// ゲームの終了フラグをオンにする
+		CGame *pGame = (CGame*)(CManager::GetBaseMode());
+		pGame->SetFinishFlag(true);
 	}
 }
 

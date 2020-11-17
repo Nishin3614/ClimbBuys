@@ -39,6 +39,39 @@ public:
 	} EFFECT_TYPE;
 
 	/* 構造体 */
+	// エフェクトアニメーション
+	typedef struct _EFFECTANIM : public ANIMATION
+	{
+		_EFFECTANIM() : ANIMATION()
+		{
+			FirstPos = D3DVECTOR2_ZERO;		// 初期位置
+			EndPos = D3DVECTOR2_ZERO;		// 末期位置
+			bUse = false;					// アニメーション使用状態
+			bTexUpdate = false;				// テクスチャー更新状態
+		}
+		// アニメーション読み込み代入
+		_EFFECTANIM& operator = (ANIMATION_LOAD const & AnimLoad)
+		{
+			ANIMATION * pAnim = (ANIMATION *)this;
+			*pAnim = AnimLoad;
+			bUse = true;
+			return *this;
+		}
+		// 初期化処理
+		void Init(void)
+		{
+			ANIMATION::Init();				// アニメーションの初期化
+			FirstPos = D3DVECTOR2_ZERO;		// 初期位置
+			EndPos = D3DVECTOR2_ZERO;		// 末期位置
+			bUse = false;					// アニメーション使用状態
+			bTexUpdate = false;				// テクスチャー更新状態
+		}
+
+		D3DXVECTOR2			FirstPos;			// 初期位置
+		D3DXVECTOR2			EndPos;				// 末期位置
+		bool				bUse;				// アニメーション使用状態
+		bool				bTexUpdate;			// テクスチャー更新状態
+	} EFFECTANIM;
 	// エフェクトプリミティブ
 	typedef struct
 	{
@@ -52,13 +85,8 @@ public:
 		float				fAlphaValue;		// アルファ値の変化値
 		int					nLife;				// 持ち時間
 		int					nTexType;			// テクスチャの種類
-		int					nCntAnim;			// アニメカウント
-		int					nMaxCntAnim;			// 最大アニメカウント
-		int					nHorizonAnim;		// 水平のアニメーションパターン
-		int					nVirticalAnim;		// 垂直のアニメーションパターン
-		int					nMaxHorizonAnim;	// 最大水平アニメーションパターン数
-		int					nMaxVirticalAnim;	// 最大垂直のアニメーションパターン数
 		bool				bUse;				// 使用しているかどうか
+		EFFECTANIM			Animation;			// アニメーション情報
 		EFFECT_TYPE			EffectType;			// エフェクトの種類
 		CRenderer::BLEND	BlendType;			// ブレンドタイプ
 	} EFFECT;
@@ -120,6 +148,17 @@ public:
 	D3DXVECTOR3 * Scene_GetPPosold(void) { return NULL; };
 	// ポインター移動量情報の取得
 	D3DXVECTOR3 * Scene_GetPMove(void) { return NULL; };
+	// テクスチャーアニメーションの設定
+	//	nMaxCntAnim			: 最大アニメーションカウント
+	//	nMaxHorizonAnim		: 最大水平アニメーションカウント
+	//	nMaxVirticalAnim	: 最大垂直アニメーションカウント
+	//	bLoop				: ループ状態
+	void SetTexAnim(
+		EFFECT * pEffect,				// エフェクト情報
+		int const & nMaxCntAnim,		// カウントアニメ最大数
+		int const & nMaxHorizonAnim,	// 水平アニメーション最大数
+		int const & nMaxVirticalAnim	// 垂直アニメーション最大数
+	);
 
 	// 値の初期化処理
 	//	pEffect		: エフェクト情報
@@ -150,6 +189,11 @@ protected:
 	//	pVtx	: 2D頂点情報
 	//	pEffect	: エフェクト情報
 	void UpdateMove(
+		EFFECT *pEffect		// エフェクト情報
+	);
+	// アニメーション更新処理
+	//	pEffect	: エフェクト情報
+	void Updata_Animation(
 		EFFECT *pEffect		// エフェクト情報
 	);
 private:

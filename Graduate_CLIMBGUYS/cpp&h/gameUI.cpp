@@ -127,13 +127,11 @@ CGameUI * CGameUI::Create(void)
 	pGameUI = new CGameUI();
 
 	// シーン2Dの生成
-	for (int nCnt = 0; nCnt < (int)GAME_UI::UI_MAX; nCnt++)
-	{
-		pGameUI->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_START + nCnt));
-		// 透明にする
-		pGameUI->m_pScene2D[nCnt]->SetCol(D3DXCOLOR_CA(1.0f, 0.0f));
-		pGameUI->m_pScene2D[nCnt]->Set_Vtx_Col();
-	}
+	pGameUI->m_pScene2D[(int)GAME_UI::START] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_START));
+	// 透明にする
+	pGameUI->m_pScene2D[(int)GAME_UI::START]->SetCol(D3DXCOLOR_CA(1.0f, 0.0f));
+	pGameUI->m_pScene2D[(int)GAME_UI::START]->Set_Vtx_Col();
+
 	// スタートカウントの生成
 	pGameUI->m_pStartCount = CNumber::Create(TIMER_INIT_NUM, SCREEN_CENTER_POS, CTexture_manager::TYPE_UI_NUMBER, GAME_UI_TIMER_SIZE);
 	pGameUI->m_pStartCount->SetCol(D3DXCOLOR_INI);
@@ -215,9 +213,10 @@ void CGameUI::StartTimer()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CGameUI::FinishSignal()
 {
-	if (m_pScene2D[(int)GAME_UI::FINISH])
+	if (!m_pScene2D[(int)GAME_UI::FINISH])
 	{
 		// 終了の合図を出す
+		m_pScene2D[(int)GAME_UI::FINISH] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_FINISH));
 		m_pScene2D[(int)GAME_UI::FINISH]->SetCol(D3DXCOLOR_CA(1.0f, 1.0f));
 		m_pScene2D[(int)GAME_UI::FINISH]->Set_Vtx_Col();
 	}

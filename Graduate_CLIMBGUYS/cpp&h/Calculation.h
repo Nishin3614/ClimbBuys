@@ -138,6 +138,14 @@ typedef struct INTEGER2
 	}
 	int nMax;
 	int	nMin;
+
+	union INTEGER2_UNION
+	{
+		struct INTEGER2
+		{
+			int nInteger[2];
+		};
+	};
 }INTEGER2, *PINTEGER2;
 
 // 整数型3個
@@ -332,20 +340,74 @@ typedef struct CHARFILE
 		[64];		// モデルのファイル名
 } CHARFILE;
 
+// アニメーション読み込み用
+typedef struct _ANIMATION_LOAD
+{
+	_ANIMATION_LOAD()
+	{
+		nMaxCntAnim = 1;				// 最大アニメカウント
+		nMaxHorizonAnim = 1;			// 最大水平アニメーションパターン数
+		nMaxVirticalAnim = 1;			// 最大垂直のアニメーションパターン数
+		fHorizonSize = 1.0f;			// 水平のアニメーション1つのサイズ
+		fVirticalSize = 1.0f;			// 垂直のアニメーション1つのサイズ
+
+		bUse = false;					// 使用状態
+	}
+	int					nMaxCntAnim;		// 最大アニメカウント
+	int					nMaxHorizonAnim;	// 最大水平アニメーションパターン数
+	int					nMaxVirticalAnim;	// 最大垂直のアニメーションパターン数
+	float				fHorizonSize;		// 水平のアニメーション1つのサイズ
+	float				fVirticalSize;		// 垂直のアニメーション1つのサイズ
+
+	bool				bUse;				// 使用状態
+} ANIMATION_LOAD, *PANIMATION_LOAD;
+
 // アニメーション
 typedef struct ANIMATION
 {
 	ANIMATION()
 	{
-		nCntAnim = 0;			// アニメカウント
-		nMaxCntAnim = 0;		// 最大アニメカウント
-		nHorizonAnim = 0;		// 水平のアニメーションパターン
-		nVirticalAnim = 0;		// 垂直のアニメーションパターン
-		nMaxHorizonAnim = 1;	// 最大水平アニメーションパターン数
-		nMaxVirticalAnim = 1;	// 最大垂直のアニメーションパターン数
-		fHorizonSize = 1.0f;	// 水平のアニメーション1つのサイズ
-		fVirticalSize = 1.0f;	// 垂直のアニメーション1つのサイズ
-		bLoop = true;			// ループ状態
+		nCntAnim = 0;					// アニメカウント
+		nMaxCntAnim = 0;				// 最大アニメカウント
+		nHorizonAnim = 0;				// 水平のアニメーションパターン
+		nVirticalAnim = 0;				// 垂直のアニメーションパターン
+		nMaxHorizonAnim = 1;			// 最大水平アニメーションパターン数
+		nMaxVirticalAnim = 1;			// 最大垂直のアニメーションパターン数
+		fHorizonSize = 1.0f;			// 水平のアニメーション1つのサイズ
+		fVirticalSize = 1.0f;			// 垂直のアニメーション1つのサイズ
+	}
+	// 読み込んだ情報を代入
+	ANIMATION(ANIMATION_LOAD const & AnimLoad)
+	{
+		nMaxCntAnim = AnimLoad.nMaxCntAnim;
+		nMaxHorizonAnim = AnimLoad.nMaxHorizonAnim;
+		nMaxVirticalAnim = AnimLoad.nMaxVirticalAnim;
+		fHorizonSize = AnimLoad.fHorizonSize;
+		fVirticalSize = AnimLoad.fVirticalSize;
+	}
+
+	// アニメーション読み込み代入
+	ANIMATION& operator = (ANIMATION_LOAD const & AnimLoad)
+	{
+		nMaxCntAnim = AnimLoad.nMaxCntAnim;
+		nMaxHorizonAnim = AnimLoad.nMaxHorizonAnim;
+		nMaxVirticalAnim = AnimLoad.nMaxVirticalAnim;
+		fHorizonSize = AnimLoad.fHorizonSize;
+		fVirticalSize = AnimLoad.fVirticalSize;
+		return *this;
+	}
+
+	// 初期化処理
+	void Init(void)
+	{
+		nCntAnim = 1;					// アニメカウント
+		nMaxCntAnim = 1;				// 最大アニメカウント
+		nHorizonAnim = 0;				// 水平のアニメーションパターン
+		nVirticalAnim = 0;				// 垂直のアニメーションパターン
+		nMaxHorizonAnim = 1;			// 最大水平アニメーションパターン数
+		nMaxVirticalAnim = 1;			// 最大垂直のアニメーションパターン数
+		fHorizonSize = 1.0f;			// 水平のアニメーション1つのサイズ
+		fVirticalSize = 1.0f;			// 垂直のアニメーション1つのサイズ
 	}
 	int					nCntAnim;			// アニメカウント
 	int					nMaxCntAnim;		// 最大アニメカウント
@@ -355,7 +417,6 @@ typedef struct ANIMATION
 	int					nMaxVirticalAnim;	// 最大垂直のアニメーションパターン数
 	float				fHorizonSize;		// 水平のアニメーション1つのサイズ
 	float				fVirticalSize;		// 垂直のアニメーション1つのサイズ
-	bool				bLoop;				// ループ状態
 } ANIMATION, *PANIMATION;
 
 // ----------------------------------------------------------------------------------------------------

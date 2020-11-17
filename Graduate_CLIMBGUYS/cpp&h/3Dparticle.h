@@ -80,6 +80,8 @@ public:
 			/* ライフ情報 */
 			nLife			= 0;				// ライフ
 			nLifeRand		= INTEGER2(0, 0);	// ライフのランダム用
+			/* アニメーション情報 */
+			Anim = ANIMATION_LOAD();							// アニメーション情報
 			/* ブレンドタイプ */
 			Blend = CRenderer::BLEND_TRANSLUCENT;	// ブレンドタイプ
 		}
@@ -117,6 +119,8 @@ public:
 		/* 速度情報 */
 		float				fSpeed;			// 速度
 		INTEGER2			nSpeedRand;		// 速度のランダム用
+		/* アニメーション情報 */
+		ANIMATION_LOAD		Anim;			// アニメーション情報
 		/* タイプ */
 		int					nParticleType;	// パーティクルタイプ
 		/* ライフ情報 */

@@ -1565,17 +1565,40 @@ CPlayer * CPlayer::Create(PLAYER_TAG tag,
 )
 {
 	// 変数宣言
-	CPlayer * pPlayer;		// シーン2Dクラス
-	// メモリの生成(初め->基本クラス,後->派生クラス)
-	pPlayer = new CPlayer(CHARACTER_PLAYER);
-	// シーン管理設定
-	pPlayer->ManageSetting(CScene::LAYER_CHARACTER);
-	// 位置情報
-	pPlayer->m_pos = pos;
-	// プレイヤータグの設定
-	pPlayer->SetPlayerTag(tag);
-	// 初期化処理
-	pPlayer->Init();
+	CPlayer * pPlayer = nullptr;		// シーン2Dクラス
+
+	switch (tag)
+	{
+	case PLAYER_TAG::PLAYER_1:
+		// メモリの生成(初め->基本クラス,後->派生クラス)
+		pPlayer = new CPlayer(CHARACTER_PLAYER_0);
+		break;
+	case PLAYER_TAG::PLAYER_2:
+		// メモリの生成(初め->基本クラス,後->派生クラス)
+		pPlayer = new CPlayer(CHARACTER_PLAYER_1);
+		break;
+	case PLAYER_TAG::PLAYER_3:
+		// メモリの生成(初め->基本クラス,後->派生クラス)
+		pPlayer = new CPlayer(CHARACTER_PLAYER_2);
+		break;
+	case PLAYER_TAG::PLAYER_4:
+		// メモリの生成(初め->基本クラス,後->派生クラス)
+		pPlayer = new CPlayer(CHARACTER_PLAYER_3);
+		break;
+	}
+
+	if (pPlayer)
+	{
+		// シーン管理設定
+		pPlayer->ManageSetting(CScene::LAYER_CHARACTER);
+		// 位置情報
+		pPlayer->m_pos = pos;
+		// プレイヤータグの設定
+		pPlayer->SetPlayerTag(tag);
+		// 初期化処理
+		pPlayer->Init();
+	}
+
 	// 生成したオブジェクトを返す
 	return pPlayer;
 }

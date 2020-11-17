@@ -74,6 +74,7 @@ public:
 		D3DXCOLOR const &col,												// 色
 		D3DXVECTOR2 const &size,											// サイズ
 		int const &nLife,													// ライフ
+		ANIMATION_LOAD const & Anim,										// アニメーション情報読み込み
 		CRenderer::BLEND const &Blend = CRenderer::BLEND_ADD_TRANSLUCENT,	// ブレンドタイプ
 		D3DXVECTOR2 const &sizeValue = D3DVECTOR2_ZERO,						// サイズ変化値
 		float const &fAlphaValue = 0.0f										// α変化値
@@ -98,11 +99,11 @@ private:
 		EFFECT *pEffect = NULL,		// エフェクト情報
 		const int *nIndex = NULL	// 番号情報
 	);
-	// 頂点テクスチャー座標設定
+	// 頂点テクスチャー設定
 	//	pVtx	: 2D頂点情報
 	//	pEffect	: エフェクト情報
 	//	nIndex	: 番号情報
-	static void SetVartexTexSize(
+	static void SetVetexTex(
 		VERTEX_2D *pVtx,			// 2D頂点情報
 		EFFECT *pEffect = NULL,		// エフェクト情報
 		const int *nIndex = NULL	// 番号情報

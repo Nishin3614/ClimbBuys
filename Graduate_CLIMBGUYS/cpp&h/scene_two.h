@@ -142,8 +142,7 @@ public:
 	void SetTexAnim(
 		int	const &nMaxCntAnim,			// 最大アニメーションカウント
 		int	const &nMaxHorizonAnim,		// 最大水平アニメーションカウント
-		int	const &nMaxVirticalAnim,	// 最大垂直アニメーションカウント
-		bool const &bLoop = true		// ループ状態
+		int	const &nMaxVirticalAnim		// 最大垂直アニメーションカウント
 	);
 	// テクスチャー設定
 	void BindTexture(int const &nTexId) { m_nTexId = nTexId; };

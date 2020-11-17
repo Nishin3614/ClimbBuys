@@ -42,6 +42,7 @@
 // マクロ定義
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#define FINISH_TIME		(120)			// 終了する時間
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -56,8 +57,10 @@ CGame::STAGE	CGame::m_Stage = CGame::STAGE_1;	// ステージ
 CGame::CGame()
 {
 	// 初期化
-	m_pause = NULL;
-	m_pGameUI = nullptr;		// ゲームUI
+	m_pause			= NULL;
+	m_pGameUI		= nullptr;		// ゲームUI
+	m_nCntFinish	= 0;			// 終了のカウント
+	m_bFinishFlag	= false;		// 終了フラグ
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,10 +93,10 @@ void CGame::Init(void)
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 	// プレイヤーの生成	試験的
-	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1,D3DXVECTOR3(0.0,300.0f,0.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(100.0f, 300.0f, 0.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(0.0, 300.0f, 100.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(100.0f, 300.0f, 100.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0, 300.0f, -50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(-50.0, 300.0f, 50.0f));
+	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(50.0, 300.0f, 50.0f));
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(m_Stage);
@@ -174,6 +177,25 @@ void CGame::Update(void)
 	}
 	*/
 
+	// 終了フラグがオンになったとき
+	if (m_bFinishFlag)
+	{
+		// カウントアップ
+		m_nCntFinish++;
+
+		// 終了の表示を出す
+		m_pGameUI->FinishSignal();
+
+		// 一定時間経過後
+		if (m_nCntFinish >= FINISH_TIME)
+		{
+			// リザルトに遷移する
+			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+			{
+				CManager::GetFade()->SetFade(CManager::MODE_RESULT);
+			}
+		}
+	}
 #ifdef _DEBUG
 
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};

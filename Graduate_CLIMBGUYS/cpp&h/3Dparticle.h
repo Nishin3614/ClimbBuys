@@ -35,7 +35,11 @@ public:
 	{
 		PARTICLE_ID_NONE = -1,
 		PARTICLE_ID_UNKNOWN,			// 未だ決まっていない
-		PARTICLE_ID_UNKNOWN2,			// 未だ決まっていない
+		PARTICLE_ID_ERUPTION_0,			// 噴火 0 アニメーション 煙
+		PARTICLE_ID_SMOKE,				// 煙 アニメーション
+		PARTICLE_ID_SPARK,				// 火花 アニメーション
+		PARTICLE_ID_BLOCK,				// 噴火用ブロック
+		PARTICLE_ID_FIRE,				// 火
 		PARTICLE_ID_MAX,
 	} PARTICLE_ID;
 	/* 構造体 */
@@ -189,6 +193,7 @@ public:
 		D3DXVECTOR3 const	&origin,		// 初期位置
 		bool		const	&b2D = false	// 2D描画状態
 	);
+
 	// 全リソース情報の読み込み
 	static HRESULT Load(void);
 	// 全リソース情報の開放

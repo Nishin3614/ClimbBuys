@@ -64,22 +64,10 @@ END_OFFSET
 # [1] tly2
 #==============================================================================
 OFFSET
-	# 位置ランダム
-	SET_POSRAND
-		POSX = 40 -20
-		POSY = 40 -20
-		POSZ = 40 -20
-	ENDSET_POSRAND
-	# 色ランダム
-	SET_COLRAND
-		RED
-		GREEN
-		BLUE
-	ENDSET_COLRAND
 	# サイズランダム
 	SET_SIZERAND
-		SIZEX = 10 60
-		SIZEY = 10 60
+		SIZEX = 100 100
+		SIZEY = 100 100
 	ENDSET_SIZERAND
 	# スピードランダム
 	SET_SPEEDRAND
@@ -92,14 +80,15 @@ OFFSET
 	COL = 1.0 1.0 1.0 1.0
 	# サイズ情報
 	SIZE = 0.0 0.0
-	SIZE_DESCREASE	# 回転情報
+	SIZE_CHANGE = 0.0
+	# 回転情報
 	ROT = 0.0 0.0 0.0
 	# 方向情報
 	VECTOR = 0.0 1.0 0.0
 	# スピード情報
 	SPEED = 0.0
 	# ライフ情報
-	LIFE = 100
+	LIFE = 60
 	# フレーム情報
 	FRAME = 1
 	# 一度に出せる個数情報
@@ -107,9 +96,176 @@ OFFSET
 	# テクスチャータイプ情報
 	TEXTYPE = 20
 	# アニメーション情報
-	ANIMATION = 26 10 1
+	ANIMATION = 6 10 1
 	# エフェクトタイプ情報
 	EFFECTTYPE = 5
+	# パーティクルタイプ情報
+	PARTICLETYPE = 1
+	# ブレンドタイプ情報
+	BLEND = 3
+END_OFFSET
+#==============================================================================
+# [2] tly2
+#==============================================================================
+OFFSET
+	# サイズランダム
+	SET_SIZERAND
+		SIZEX = 100 100
+		SIZEY = 100 100
+	ENDSET_SIZERAND
+	# スピードランダム
+	SET_SPEEDRAND
+		MAX = 2
+		MIN = 1
+	ENDSET_SPEEDRAND
+	# 方向ランダム
+	SET_VECTORRAND
+		VECTORX = 10 -5
+		VECTORY = 20 0
+		VECTORZ = 0 0
+	ENDSET_VECTORRAND
+	# 位置情報
+	POS = 0.0 0.0 0.0
+	# 色情報
+	COL = 1.0 1.0 1.0 1.0
+	# サイズ情報
+	SIZE = 0.0 0.0
+	SIZE_CHANGE = 0.0
+	# 回転情報
+	ROT = 0.0 0.0 0.0
+	# 方向情報
+	VECTOR = 0.0 0.0 0.0
+	# スピード情報
+	SPEED = 0.0
+	# ライフ情報
+	LIFE = 300
+	# フレーム情報
+	FRAME = 1
+	# 一度に出せる個数情報
+	NUMBER = 1
+	# テクスチャータイプ情報
+	TEXTYPE = 32
+	# アニメーション情報
+	ANIMATION = 6 10 1
+	# エフェクトタイプ情報
+	EFFECTTYPE = 5
+	# パーティクルタイプ情報
+	PARTICLETYPE = 1
+	# ブレンドタイプ情報
+	BLEND = 3
+END_OFFSET
+
+#==============================================================================
+# [3] tly2
+#==============================================================================
+OFFSET
+	# 位置情報
+	POS = 0.0 0.0 0.0
+	# 色情報
+	COL = 1.0 1.0 1.0 1.0
+	# サイズ情報
+	SIZE = 300.0 400.0
+	SIZE_CHANGE = 0.0
+	# 回転情報
+	ROT = 0.0 0.0 2.0ff
+	# 方向情報
+	VECTOR = 0.0 0.0 0.0
+	# スピード情報
+	SPEED = 0.0
+	# ライフ情報
+	LIFE = 120
+	# フレーム情報
+	FRAME = 1
+	# 一度に出せる個数情報
+	NUMBER = 1
+	# テクスチャータイプ情報
+	TEXTYPE = 33
+	# アニメーション情報
+	ANIMATION = 1 5 4
+	# エフェクトタイプ情報
+	EFFECTTYPE = 5
+	# パーティクルタイプ情報
+	PARTICLETYPE = 1
+	# ブレンドタイプ情報
+	BLEND = 3
+END_OFFSET
+#==============================================================================
+# [4] tly2
+#==============================================================================
+OFFSET
+	# サイズランダム
+	SET_SIZERAND
+		SIZEX = 50 50
+		SIZEY = 50 50
+	ENDSET_SIZERAND
+	# スピードランダム
+	SET_SPEEDRAND
+		MAX = 8
+		MIN = 8
+	ENDSET_SPEEDRAND
+	# 方向ランダム
+	SET_VECTORRAND
+		VECTORX = 10 -5
+		VECTORY = 20 0
+		VECTORZ = 0 0
+	ENDSET_VECTORRAND
+	# 位置情報
+	POS = 0.0 0.0 0.0
+	# 色情報
+	COL = 1.0 1.0 1.0 1.0
+	# サイズ情報
+	SIZE = 0.0 0.0
+	SIZE_CHANGE = 0.0
+	# 回転情報
+	ROT = 0.0 0.0 0.0
+	# 方向情報
+	VECTOR = 0.0 0.0 0.0
+	# スピード情報
+	SPEED = 0.0
+	# ライフ情報
+	LIFE = 300
+	# フレーム情報
+	FRAME = 1
+	# 一度に出せる個数情報
+	NUMBER = 1
+	# テクスチャータイプ情報
+	TEXTYPE = 34
+	# エフェクトタイプ情報
+	EFFECTTYPE = 5
+	# パーティクルタイプ情報
+	PARTICLETYPE = 1
+	# ブレンドタイプ情報
+	BLEND = 0
+END_OFFSET
+#==============================================================================
+# [5] 火
+#==============================================================================
+OFFSET
+	# 位置情報
+	POS = 0.0 0.0 0.0
+	# 色情報
+	COL = 1.0 1.0 1.0 1.0
+	# サイズ情報
+	SIZE = 200.0 400.0
+	SIZE_CHANGE = 0.0
+	# 回転情報
+	ROT = 0.0 0.0 0.0
+	# 方向情報
+	VECTOR = 0.0 0.0 0.0
+	# スピード情報
+	SPEED = 0.0
+	# ライフ情報
+	LIFE = 1
+	# フレーム情報
+	FRAME = 1
+	# 一度に出せる個数情報
+	NUMBER = 1
+	# テクスチャータイプ情報
+	TEXTYPE = 35
+	# アニメーション情報
+	ANIMATION = 1 10 1
+	# エフェクトタイプ情報
+	EFFECTTYPE = 0
 	# パーティクルタイプ情報
 	PARTICLETYPE = 1
 	# ブレンドタイプ情報

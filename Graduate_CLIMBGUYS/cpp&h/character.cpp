@@ -57,7 +57,7 @@ CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 {
 	m_pMeshobit = NULL;								// 軌跡
 	m_pModel = NULL;								// モデル
-	m_character = CHARACTER_NPC;					// キャラクター
+	m_character = CHARACTER_PLAYER_0;				// キャラクター
 	m_pos = D3DXVECTOR3(0.0f,0.0f,0.0f);			// 位置
 	m_posold = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 前の位置
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量

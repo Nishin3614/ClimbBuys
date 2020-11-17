@@ -31,8 +31,10 @@
 #define D3DVECTOR3_ONE			D3DXVECTOR3(1.0f,1.0f,1.0f)
 // D3DVECTOR4型の初期化(0.0f)
 #define D3DVECTOR4_ZERO			D3DXVECTOR4(0.0f,0.0f,0.0f,0.0f)
-// D3DXCOLOR型の初期化
+// D3DXCOLOR型の初期化(1.0f)
 #define D3DXCOLOR_INI			D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)
+// D3DXCOLOR型の初期化(0.0f)
+#define D3DXCOLOR_ZERO			D3DXCOLOR(0.0f,0.0f,0.0f,0.0f)
 // D3DXCOLOR型の初期化(基本色)
 #define D3DXCOLOR_C(col)		D3DXCOLOR(col,col,col,1.0f)
 // D3DXCOLOR型の初期化(基本色,透明度)
@@ -757,7 +759,7 @@ public:
 	// ランダムなvector3型で値を返す
 	static D3DXVECTOR3 RandomVector3(float Max);
 	// 360度のランダムな方向ベクトルを求める 方向を求めたいならfmaxはNULLでいい
-	static D3DXVECTOR3 RandomDirectionVector(float fMax, bool bNormalization);
+	static D3DXVECTOR3 RandomDirectionVector(float fMax, bool bBombization);
 	// 範囲の中からランダムに値を求める
 	static uint64_t GetRandomRange(uint64_t min_value, uint64_t max_value);
 	// ランダムにカラーを求める

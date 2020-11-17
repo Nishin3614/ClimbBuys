@@ -42,6 +42,8 @@ public:
 	{
 		TYPE_NORMAL = 0,	// 通常
 		TYPE_FIELD,			// フィールドブロック
+		TYPE_BOMB,			// ボムブロック
+		TYPE_SPRING,		// スプリングブロック
 		TYPE_MAX,			// タイプ全体数
 	} TYPE;
 
@@ -288,9 +290,14 @@ public:
 	// 前回の位置取得
 	D3DXVECTOR3 & GetPosOld(void)					{ return m_posOld; };
 	// ベースブロックの種類設定
-	void SetBaseBlockType(BlockType type) { m_BlockType = type; };
+	void SetBaseBlockType(BlockType type)			{ m_BlockType = type; };
 	// ベースブロックの種類取得
-	BlockType GetBaseBlockType() { return m_BlockType; };
+	BlockType GetBaseBlockType()					{ return m_BlockType; };
+	// 指定したベースブロックを削除する処理
+	//	pBlock	: ブロック情報
+	static bool DeleteBlock(
+		CBaseblock * pBlock	// ブロック情報
+	);
 	// ベースブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// ベースブロック全ソースの開放

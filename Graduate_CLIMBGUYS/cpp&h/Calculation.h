@@ -757,7 +757,7 @@ public:
 	// ランダムなvector3型で値を返す
 	static D3DXVECTOR3 RandomVector3(float Max);
 	// 360度のランダムな方向ベクトルを求める 方向を求めたいならfmaxはNULLでいい
-	static D3DXVECTOR3 RandomDirectionVector(float fMax, bool bNormalization);
+	static D3DXVECTOR3 RandomDirectionVector(float fMax, bool bBombization);
 	// 範囲の中からランダムに値を求める
 	static uint64_t GetRandomRange(uint64_t min_value, uint64_t max_value);
 	// ランダムにカラーを求める

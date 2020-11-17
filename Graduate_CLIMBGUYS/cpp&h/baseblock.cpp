@@ -10,6 +10,7 @@
 #include "stencilshadow.h"
 #include "game.h"
 #include "circleshadow.h"
+#include "bombblock..h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -519,6 +520,14 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					move->y = 0.0f;
 					// 押し出し状態がtrue
 					bPush = true;
+					// タイプがボムなら
+					if (m_type == TYPE::TYPE_BOMB)
+					{
+						// 変数宣言
+						CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
+						// ボムの状態設定
+						pBombBlock->SetbBomb(true);
+					}
 				}
 				if (Direct == COLLISIONDIRECTION::NONE)
 				{
@@ -552,6 +561,14 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 						move->y = 0.0f;
 						// 押し出し状態がtrue
 						bPush = true;
+						// タイプがボムなら
+						if (m_type == TYPE::TYPE_BOMB)
+						{
+							// 変数宣言
+							CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
+																			// ボムの状態設定
+							pBombBlock->SetbBomb(true);
+						}
 					}
 					// 当たり判定(下)
 					else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
@@ -567,6 +584,14 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					{
 						// めり込んでいる
 						Direct = COLLISIONDIRECTION::UP;
+						// タイプがボムなら
+						if (m_type == TYPE::TYPE_BOMB)
+						{
+							// 変数宣言
+							CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
+																			// ボムの状態設定
+							pBombBlock->SetbBomb(true);
+						}
 					}
 				}
 			}
@@ -928,6 +953,23 @@ void CBaseblock::SetPushAfter(PUSHAFTER const & PushAfter)
 {
 	m_PushAfeter = PushAfter;
 	m_PushAfeter.GoalPos = (m_grid + m_PushAfeter.PushGrid).GetPos(m_fSizeRange);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 指定したベースブロックを削除する処理
+//	pBlock	: ブロック情報
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool CBaseblock::DeleteBlock(
+	CBaseblock * pBlock	// ブロック情報
+)
+{
+	// 押す前のブロックの上にあったブロックを落とさせる
+	CBaseblock::FallBlock_Grid(pBlock->GetGrid());
+	// 押したブロックの現在までいた行列の高さ情報を更新
+	CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(0, -1, 0));
+	// リリース処理
+	pBlock->Release();
+	return true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

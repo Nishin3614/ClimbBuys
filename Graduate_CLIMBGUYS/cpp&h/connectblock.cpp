@@ -7,6 +7,7 @@
 #include "connectblock.h"
 #include "baseblock.h"
 #include "normalblock.h"
+#include "bombblock..h"
 #include "game.h"
 #include "springblock.h"
 
@@ -332,9 +333,20 @@ void CConnectblock::StaticDebug(void)
 		// 変数宣言
 		static int nBlockGrid[3];	// ブロック行列高
 		ImGui::InputInt3("BlockGrid", nBlockGrid);
-		if (ImGui::Button("CreateBlock"))
+		// 通常ブロック生成
+		if (ImGui::Button("CreateNormal"))
 		{
 			CNormalblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		}
+		// ボムブロック生成
+		if (ImGui::Button("CreateBomb"))
+		{
+			CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+		}
+		// ばねブロック生成
+		if (ImGui::Button("CreateSpring"))
+		{
+			CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 		}
 	}
 	ImGui::End();

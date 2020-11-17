@@ -564,13 +564,11 @@ void CScene_TWO::Set_Vtx_Tex(
 //	nMaxCntAnim			: 最大アニメーションカウント
 //	nMaxHorizonAnim		: 最大水平アニメーションカウント
 //	nMaxVirticalAnim	: 最大垂直アニメーションカウント
-//	bLoop				: ループ状態
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CScene_TWO::SetTexAnim(
 	int	const &nMaxCntAnim,			// 最大アニメーションカウント
 	int	const &nMaxHorizonAnim,		// 最大水平アニメーションカウント
-	int	const &nMaxVirticalAnim,	// 最大垂直アニメーションカウント
-	bool const &bLoop				// ループ状態
+	int	const &nMaxVirticalAnim	// 最大垂直アニメーションカウント
 )
 {
 	// アニメーション情報がNULLなら
@@ -588,7 +586,6 @@ void CScene_TWO::SetTexAnim(
 	m_unipAnim->nMaxVirticalAnim = nMaxVirticalAnim;		// 最大垂直アニメーションカウント
 	m_unipAnim->fHorizonSize = 1.0f / nMaxHorizonAnim;		// 垂直アニメーションの1つのサイズ
 	m_unipAnim->fVirticalSize = 1.0f / nMaxVirticalAnim;	// 垂直アニメーションの1つのサイズ
-	m_unipAnim->bLoop = bLoop;								// ループ状態
 	// 始点位置
 	FirstPos = D3DXVECTOR2(
 		m_unipAnim->nHorizonAnim * m_unipAnim->fHorizonSize,

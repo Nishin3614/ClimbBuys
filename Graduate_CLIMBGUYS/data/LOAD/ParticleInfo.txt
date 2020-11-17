@@ -52,6 +52,7 @@ OFFSET
 	NUMBER = 10
 	# テクスチャータイプ情報
 	TEXTYPE = 5
+	# アニメーション情報
 	# エフェクトタイプ情報
 	EFFECTTYPE = 5
 	# パーティクルタイプ情報
@@ -80,16 +81,10 @@ OFFSET
 		SIZEX = 10 60
 		SIZEY = 10 60
 	ENDSET_SIZERAND
-	# 方向ランダム
-	SET_VECTORRAND
-		VECTORX = 10 -5
-		VECTORY = 20 0
-		VECTORZ = 5 -5
-	ENDSET_VECTORRAND
 	# スピードランダム
 	SET_SPEEDRAND
-		MAX = 3
-		MIN = 5
+		MAX = 2
+		MIN = 2
 	ENDSET_SPEEDRAND
 	# 位置情報
 	POS = 0.0 0.0 0.0
@@ -100,22 +95,24 @@ OFFSET
 	SIZE_DESCREASE	# 回転情報
 	ROT = 0.0 0.0 0.0
 	# 方向情報
-	VECTOR = 0.0 0.0 0.0
+	VECTOR = 0.0 1.0 0.0
 	# スピード情報
 	SPEED = 0.0
 	# ライフ情報
-	LIFE = 60
+	LIFE = 100
 	# フレーム情報
 	FRAME = 1
 	# 一度に出せる個数情報
 	NUMBER = 10
 	# テクスチャータイプ情報
-	TEXTYPE = 50
+	TEXTYPE = 20
+	# アニメーション情報
+	ANIMATION = 26 10 1
 	# エフェクトタイプ情報
 	EFFECTTYPE = 5
 	# パーティクルタイプ情報
 	PARTICLETYPE = 1
 	# ブレンドタイプ情報
-	BLEND = 4
+	BLEND = 3
 END_OFFSET
 END_SCRIPT

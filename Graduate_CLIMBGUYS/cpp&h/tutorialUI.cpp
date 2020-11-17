@@ -14,14 +14,21 @@
 #include "basemode.h"
 #include "debugproc.h"
 #include "scene_two.h"
+#include "tutorial.h"
+#include "XInputPad.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define TUTORIAL_UI_OK_POS						(D3DXVECTOR3((865.0f + 120.0f * nCnt), (690.0f), 0.0f))		// OKサインの位置
+#define TUTORIAL_UI_OK_POS						(D3DXVECTOR3((870.0f + 118.0f * nCnt), (687.0f), 0.0f))		// OKサインの位置
 #define TUTORIAL_UI_OK_SIZE						(D3DXVECTOR2(70.0f, 50.0f))									// OKサインのサイズ
+
+#define TUTORIAL_UI_OK_COLOR_01					(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))									// OKサインの色_01
+#define TUTORIAL_UI_OK_COLOR_02					(D3DXCOLOR(0.0f, 0.25f, 0.8f, 1.0f))								// OKサインの色_02
+#define TUTORIAL_UI_OK_COLOR_03					(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f))									// OKサインの色_03
+#define TUTORIAL_UI_OK_COLOR_04					(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f))									// OKサインの色_04
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -35,7 +42,7 @@
 CTutorialUI::CTutorialUI()
 {
 	// 初期化
-	for (int nCnt = 0; nCnt < (int)TUTORIAL_UI::UI_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		m_pScene2D[nCnt]	= nullptr;			// シーン2D
 	}
@@ -61,7 +68,7 @@ void CTutorialUI::Init(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTutorialUI::Uninit(void)
 {
-	for (int nCnt = 0; nCnt < (int)TUTORIAL_UI::UI_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		if (m_pScene2D[nCnt])
 		{
@@ -74,7 +81,7 @@ void CTutorialUI::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTutorialUI::Update(void)
 {
-	for (int nCnt = 0; nCnt < (int)TUTORIAL_UI::UI_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		if (m_pScene2D[nCnt])
 		{
@@ -89,7 +96,7 @@ void CTutorialUI::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTutorialUI::Draw(void)
 {
-	for (int nCnt = 0; nCnt < (int)TUTORIAL_UI::UI_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		if (m_pScene2D[nCnt])
 		{
@@ -109,14 +116,22 @@ CTutorialUI * CTutorialUI::Create(void)
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pTutorial = new CTutorialUI();
 
-	for (int nCnt = 0; nCnt < (int)TUTORIAL_UI::UI_MAX; nCnt++)
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		// シーン2Dの生成
 		pTutorial->m_pScene2D[nCnt] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, TUTORIAL_UI_OK_POS, TUTORIAL_UI_OK_SIZE, (CTexture_manager::TYPE_TUTORIAL_UI_OK));
 		// 透明にする
-		pTutorial->m_pScene2D[nCnt]->SetCol(D3DXCOLOR_CA(1.0f, 1.0f));
+	}
+	// 色の設定
+	pTutorial->m_pScene2D[(int)PLAYER_TAG::PLAYER_1]->SetCol(D3DXCOLOR_ZERO);
+	pTutorial->m_pScene2D[(int)PLAYER_TAG::PLAYER_2]->SetCol(D3DXCOLOR_ZERO);
+	pTutorial->m_pScene2D[(int)PLAYER_TAG::PLAYER_3]->SetCol(D3DXCOLOR_ZERO);
+	pTutorial->m_pScene2D[(int)PLAYER_TAG::PLAYER_4]->SetCol(D3DXCOLOR_ZERO);
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
 		pTutorial->m_pScene2D[nCnt]->Set_Vtx_Col();
 	}
+
 	// 初期化処理
 	pTutorial->Init();
 
@@ -137,4 +152,49 @@ HRESULT CTutorialUI::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTutorialUI::UnLoad(void)
 {
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// unload処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool CTutorialUI::Ready(int nCntPlayer)
+{
+	if (m_pScene2D[nCntPlayer])
+	{
+		// 色の設定
+		switch (nCntPlayer)
+		{
+		case (int)PLAYER_TAG::PLAYER_1:
+			m_pScene2D[nCntPlayer]->SetCol(TUTORIAL_UI_OK_COLOR_01);
+			m_pScene2D[nCntPlayer]->Set_Vtx_Col();
+			break;
+
+		case (int)PLAYER_TAG::PLAYER_2:
+			m_pScene2D[nCntPlayer]->SetCol(TUTORIAL_UI_OK_COLOR_02);
+			m_pScene2D[nCntPlayer]->Set_Vtx_Col();
+			break;
+
+		case (int)PLAYER_TAG::PLAYER_3:
+			m_pScene2D[nCntPlayer]->SetCol(TUTORIAL_UI_OK_COLOR_03);
+			m_pScene2D[nCntPlayer]->Set_Vtx_Col();
+			break;
+
+		case (int)PLAYER_TAG::PLAYER_4:
+			m_pScene2D[nCntPlayer]->SetCol(TUTORIAL_UI_OK_COLOR_04);
+			m_pScene2D[nCntPlayer]->Set_Vtx_Col();
+			break;
+
+		default:
+			break;
+		}
+		// 全員のOKサインが出たとき
+		if (m_pScene2D[(int)PLAYER_TAG::PLAYER_1]->GetCol().a >= 1.0f &&
+			m_pScene2D[(int)PLAYER_TAG::PLAYER_2]->GetCol().a >= 1.0f &&
+			m_pScene2D[(int)PLAYER_TAG::PLAYER_3]->GetCol().a >= 1.0f &&
+			m_pScene2D[(int)PLAYER_TAG::PLAYER_4]->GetCol().a >= 1.0f)
+		{
+			return true;
+		}
+	}
+	return false;
 }

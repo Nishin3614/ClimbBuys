@@ -99,67 +99,68 @@ void CConnectblock::SetBlockShape(void)
 	{
 		// 矩形
 	case SHAPE_RECT:
-		CNormalblock::Create(2, BaseGrid,&m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1), &m_col);
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid,&D3DXCOLOR(0.0f,0.0f,0.0f,1.0));
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 1), &m_col);
 		break;
 		// Iブロック
 	case SHAPE_I:
-		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(2, 0, 0), &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0));
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(3, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(4, 0, 0), &m_col);
 		break;
 		// Jブロック
 	case SHAPE_J:
-		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0));
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
 		break;
 		// Lブロック
 	case SHAPE_L:
-		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
 		break;
 		// Sブロック
 	case SHAPE_S:
-		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 0), &m_col);
 		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
 		break;
 		// Tブロック
 	case SHAPE_T:
-		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, -1, 0), &m_col);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, -1, 0), &m_col);
+		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
 
 		break;
 		// Zブロック
 	case SHAPE_Z:
-		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
+		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col);
 		break;
 		// バネブロック
 	case SHAPE_SPRING:
-		CNormalblock::Create(2, BaseGrid, &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
+		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col);
 		break;
 
 	}

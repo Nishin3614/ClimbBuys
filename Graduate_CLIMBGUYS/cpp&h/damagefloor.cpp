@@ -159,6 +159,9 @@ void CDamageFloor::ComparisonHeight()
 			//‚‚³‚ð”äŠr‚µ‚ÄƒvƒŒƒCƒ„[‚ª°‚æ‚è‰º‚É—Ž‚¿‚½‚çŽ€–Sƒtƒ‰ƒO‚ðtrue
 			if (this->GetPos().y >= pPlayer->GetPos().y)
 			{
+				// ‹L˜^XV_Ž€–SŒ´ˆö
+				pPlayer->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
+				// Ž€–SÝ’è
 				pPlayer->SetDie(true);
 			}
 			pPlayer = nullptr;

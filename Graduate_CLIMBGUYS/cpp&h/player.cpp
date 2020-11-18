@@ -54,6 +54,7 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_bTackleFrag		= false;				// タックルフラグ
 	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
 	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
+	m_Record			= RECORD();				// 記録
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
 #ifdef _DEBUG
@@ -120,6 +121,9 @@ void CPlayer::Init(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Uninit(void)
 {
+	// 記録情報をリザルトに渡す
+
+
 	// キャラクター終了処理
 	CCharacter::Uninit();
 
@@ -686,6 +690,9 @@ void CPlayer::BlockCollision(void)
 		(bRight && bLeft)
 		)
 	{
+		// 記録更新
+		m_Record.DieCause = DIECAUSE::DIECAUSE_PRESS;
+		// 死亡処理
 		Die();
 	}
 
@@ -727,8 +734,6 @@ void CPlayer::CharacterCollision(void)
 	// 変数宣言
 	CCharacter * pCharacter;	// キャラクター情報
 	COLLISIONDIRECTION Direct;	// 当たり判定の方向
-	bool bOn = false;			// 上の当たり判定
-	bool bUnder = false;		// 下の当たり判定
 								// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntBlock++)
 	{
@@ -751,12 +756,6 @@ void CPlayer::CharacterCollision(void)
 			&m_PlayerStatus.PlayerSize,
 			m_PlayerStatus.PlayerOffSet
 		);
-	}
-	// 上も下もブロックに当たっていたら
-	if (bOn && bUnder)
-	{
-		// プレイヤーは死ぬ
-		Die();
 	}
 }
 
@@ -1038,6 +1037,8 @@ void CPlayer::PushBlock(
 	{
 		return;
 	}
+	// 記録更新_押し出し回数
+	m_Record.nPushCnt++;
 	// 押し出し後の設定
 	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, Grid));
 }
@@ -1419,7 +1420,10 @@ void CPlayer::Die(void)
 			m_pPlayerUI->Release();
 			m_pPlayerUI = nullptr;
 		}
-
+		// 記録更新_ランキング
+		m_Record.nRanking = CCharacter::GetAllCharacter();
+		// 記録更新_タイム
+		m_Record.nTime = CGame::GetSecond();
 		// 死亡処理
 		CCharacter::Die();
 

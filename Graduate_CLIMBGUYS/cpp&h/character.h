@@ -186,6 +186,8 @@ public:
 		int nMotionID,							// モーションID
 		int nNowKeyCnt = -1						// 現在のキーカウント
 	);
+	// 出現している人数取得
+	int GetAllCharacter(void) { return m_nAllCharacter; };
 	// キャラクター全ソースの読み込み
 	static HRESULT Load(void);
 	// キャラクターの情報読み込み

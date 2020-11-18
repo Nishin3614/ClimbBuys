@@ -77,11 +77,15 @@ public:
 	// 生成処理
 	static CGame * Create(void);
 	// ステージの設定
-	static void SetStage(STAGE const & Stage) { m_Stage = Stage; };
+	static void SetStage(STAGE const & Stage)	{ m_Stage = Stage; };
 	// ステージの取得
-	static STAGE GetStage(void) { return m_Stage; };
+	static STAGE GetStage(void)					{ return m_Stage; };
+	// タイムの取得
+	static int GetCntTime(void)					{ return m_nCntTime; };
+	// カウントタイムを秒刻みで取得
+	static int GetSecond(void)					{ return m_nCntTime / 60; };
 	// 終了フラグの設定
-	void SetFinishFlag(bool bFlag) { m_bFinishFlag = bFlag; };
+	void SetFinishFlag(bool bFlag)				{ m_bFinishFlag = bFlag; };
 #ifdef _DEBUG
 	void Debug(void);
 #endif // _DEBUG
@@ -96,6 +100,7 @@ private:
 	/* 変数 */
 	CPause *		m_pause;		// ポーズ
 	static STAGE	m_Stage;		// ステージ
+	static int		m_nCntTime;			// タイム
 	CGameUI			*m_pGameUI;		// ゲームUI
 	int				m_nCntFinish;	// 終了カウント
 	bool			m_bFinishFlag;	// 終了フラグ

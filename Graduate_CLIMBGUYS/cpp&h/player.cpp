@@ -114,7 +114,6 @@ void CPlayer::Init(void)
 				m_pos + m_PlayerStatus.PushOffSet,
 				m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize,0.0f,cosf(m_rot.y) * m_PlayerStatus.PushSize));
 		}
-
 	}
 
 #endif // _DEBUG
@@ -125,6 +124,9 @@ void CPlayer::Init(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Uninit(void)
 {
+	// 記録更新_タイム
+	m_Record.nTime = CGame::GetSecond();
+
 	// 記録情報をリザルトに渡す
 	CResultUI::SetRecord(GetPlayerTag(), m_Record);
 
@@ -609,7 +611,8 @@ void CPlayer::BlockCollision(void)
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
 		// ダッシュ状態なら
-		if (m_bTackleFrag)
+		if (m_bTackleFrag &&
+			!pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_FIELD)
 		{
 			// 方向に直線を出し
 			// 線とポリゴンで判定を取る
@@ -755,7 +758,7 @@ void CPlayer::CharacterCollision(void)
 	// 変数宣言
 	CCharacter * pCharacter;	// キャラクター情報
 	COLLISIONDIRECTION Direct;	// 当たり判定の方向
-								// ブロックループ
+	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntBlock++)
 	{
 		// NULL代入

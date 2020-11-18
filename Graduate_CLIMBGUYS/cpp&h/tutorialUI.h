@@ -35,17 +35,6 @@ class CScene_TWO;		// シーン2D
 class CTutorialUI
 {
 public:
-	/* ゲームUI */
-	enum class TUTORIAL_UI
-	{
-		UI_NONE = -1,
-		OK_01,				// OK_01
-		OK_02,				// OK_02
-		OK_03,				// OK_03
-		OK_04,				// OK_04
-		UI_MAX
-	};
-
 	/* 関数 */
 	CTutorialUI();
 	~CTutorialUI();
@@ -59,6 +48,7 @@ public:
 	static HRESULT		Load(void);						// 読み込み
 	static void			UnLoad(void);					// 破棄
 
+	bool Ready(int nCntPlayer);		// 準備完了
 	// 設定 //
 
 	// 取得 //
@@ -66,7 +56,7 @@ protected:
 private:
 	/* 関数 */
 	/* 変数 */
-	CScene_TWO		*m_pScene2D[(int)TUTORIAL_UI::UI_MAX];	// シーン2D
+	CScene_TWO		*m_pScene2D[(int)PLAYER_TAG::PLAYER_MAX];	// シーン2D
 	bool			m_bStart;								// スタートフラグ
 };
 #endif

@@ -16,6 +16,8 @@
 #include "opening.h"
 #include "openingmanager.h"
 
+#include "3dparticle.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
@@ -48,7 +50,7 @@ CStagingBlock::~CStagingBlock()
 void CStagingBlock::Init()
 {
 	// 速さの初期値
-	m_fSpeed = 100.0f;
+	m_fSpeed = 10.0f;
 	m_fBurstSpeed = 10.0f;
 	// 吹っ飛びベクトルをランダムに設定
 	SetBurstVector(CCalculation::RandomDirectionVector(NULL, true));

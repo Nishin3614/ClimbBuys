@@ -91,6 +91,27 @@ void COpeningManager::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void COpeningManager::Update(void)
 {
+	//--------------テスト中-----------------------------
+	//static int nCnt = 0;
+	//nCnt++;
+
+	//if (nCnt % 6 == 0)
+	//{
+	//	// パーティクル生成
+	//	C3DParticle::Create(
+	//		C3DParticle::PARTICLE_ID_SMOKE,
+	//		D3DXVECTOR3(1020.0f, 500.0f, 900.0f)
+	//	);
+	//}
+
+	//C3DParticle::Create(
+	//	C3DParticle::PARTICLE_ID_BLOCK,
+	//	D3DXVECTOR3(1030.0f, 500.0f, 950.0f)
+	//);
+
+	//----------------------------------------------
+
+
 	if (CManager::GetMode() == CManager::MODE_OPENING)
 	{
 		COpening *pOpening = (COpening*)(CManager::GetBaseMode());
@@ -111,11 +132,11 @@ void COpeningManager::Update(void)
 
 		if (pOpening && pOpening->GetState() == COpening::OpeningState::BUILDING)
 		{
-			// パーティクル生成
-			C3DParticle::Create(
-				C3DParticle::PARTICLE_ID_UNKNOWN,
-				D3DXVECTOR3(1000.0f, 500.0f, 900.0f)
-			);
+			//// パーティクル生成
+			//C3DParticle::Create(
+			//	C3DParticle::PARTICLE_ID_UNKNOWN,
+			//	D3DXVECTOR3(1000.0f, 500.0f, 900.0f)
+			//);
 
 			/////////////----------------------------------------
 			if (m_pStagingBlock[m_nCount]->GetPos().y > m_Targetpos[m_nCount].y)

@@ -31,15 +31,27 @@ public:
 	// 形情報
 	typedef enum
 	{
-		SHAPE_RECT = 0,	// 矩形
-		SHAPE_I,		// Iブロック
-		SHAPE_J,		// Jブロック
-		SHAPE_L,		// Lブロック
-		SHAPE_S,		// Sブロック
-		SHAPE_T,		// Tブロック
-		SHAPE_Z,		// Zブロック
-		SHAPE_SPRING,	// バネブロック
-		SHAPE_MAX		// 最大数
+		SHAPE_RECT = 0,					// 矩形
+		SHAPE_I,						// Iブロック
+		SHAPE_J,						// Jブロック
+		SHAPE_L,						// Lブロック
+		SHAPE_S,						// Sブロック
+		SHAPE_T,						// Tブロック
+		SHAPE_Z,						// Zブロック
+		SHAPE_SPRING,					// バネブロック
+		SHAPE_CROSS_STEP_01,			// クロスブロック_1段
+		SHAPE_CROSS_STEP_02,			// クロスブロック_2段
+		SHAPE_PLUS_CENTER_HOLE_STEP_01,	// 中空きプラスブロック_1段
+		SHAPE_PLUS_CENTER_HOLE_STEP_02,	// 中空きプラスブロック_2段
+		SHAPE_PLUS,						// プラスブロック
+		SHAPE_PLUS_CENTER_PROTRUSION,	// 中突起プラスブロック
+		SHAPE_DIAGONAL_01,				// 対角線ブロック_01
+		SHAPE_DIAGONAL_02,				// 対角線ブロック_02
+		SHAPE_BEARD_01,					// 髭ブロック_01
+		SHAPE_BEARD_02,					// 髭ブロック_02
+		SHAPE_BEARD_03,					// 髭ブロック_03
+		SHAPE_BEARD_04,					// 髭ブロック_040
+		SHAPE_MAX						// 最大数
 	} SHAPE;
 	// フィールドタイプ情報
 	typedef enum
@@ -135,6 +147,9 @@ public:
 
 	// 更新_ブロック生成
 	static void Update_CreateBlock(void);
+
+	// チュートリアルのブロックの初期配置
+	static void Tutorial_InitArrangementBlock(void);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);

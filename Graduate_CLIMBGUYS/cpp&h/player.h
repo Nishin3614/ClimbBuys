@@ -75,7 +75,82 @@ public:
 		float				PushSize;			// 押し出し用のサイズ
 		D3DXVECTOR3			PushOffSet;			// 押し出し用のオフセット
 	}PLAYER_STATUS;
+	// ----- スタン状態 ----- //
+	typedef struct _STAN
+	{
+		// コンストラクタ
+		_STAN()
+		{
+			bStan = false;  // スタン状態
+			nStanTime = 0;	// スタン継続時間
+		}
+		// 初期化処理
+		void Init()
+		{
+			bStan = false;  // スタン状態
+			nStanTime = 0;	// スタン継続時間
+		}
+		// スタン設定
+		void Set(bool const & bSouceStan, int const & nSouceStanTime)
+		{
+			bStan = bSouceStan;			// スタン状態
+			nStanTime = nSouceStanTime;	// スタン継続時間
+		}
+		bool		bStan;			// スタン状態
+		int			nStanTime;		// スタン継続時間
+	} STAN;
+	// ----- 無敵状態 ----- //
+	typedef struct _INVINCIBLE
+	{
+		// コンストラクタ
+		_INVINCIBLE()
+		{
+			bInvincible = false;  // スタン状態
+			nInvincibleTime = 0;	// スタン継続時間
+		}
+		// 初期化処理
+		void Init()
+		{
+			bInvincible = false;  // スタン状態
+			nInvincibleTime = 0;	// スタン継続時間
+		}
+		// スタン設定
+		void Set(bool const & bSouceInvincible, int const & nSouceInvincibleTime)
+		{
+			bInvincible = bSouceInvincible;			// スタン状態
+			nInvincibleTime = nSouceInvincibleTime;	// スタン継続時間
+		}
+		bool		bInvincible;			// スタン状態
+		int			nInvincibleTime;		// スタン継続時間
+	} INVINCIBLE;
 
+
+
+	// 列挙
+	// 死んだ原因
+	typedef enum
+	{
+		LIVE = 0,			// 生きている
+		DIECAUSE_PRESS,		// 圧死
+		DIECAUSE_FALL,		// 落下死
+		DIECAUSEMAX			// 最大数
+	} DIECAUSE;
+	// ----- 記録 ----- //
+	typedef struct _RECORD
+	{
+		// コンストラクタ
+		_RECORD()
+		{
+			nRanking = 1;  					// ランキング
+			nTime = -1;						// タイム
+			nPushCnt = 0;					// 押した数
+			DieCause = DIECAUSE::LIVE;		// 死んだ原因
+		}
+		int			nRanking;		// ランキング
+		int			nTime;			// タイム
+		int			nPushCnt;		// 押した数
+		DIECAUSE	DieCause;		// 死んだ原因
+	} RECORD;
 	/* 関数 */
 	// コンストラクタ
 	CPlayer(CCharacter::CHARACTER const &character);
@@ -166,10 +241,14 @@ public:
 	// ダッシュしているかどうかのフラグの設定
 	void SetDashFlag(bool const &bDashFlag) { m_bDashFlag = bDashFlag; };
 	// ダッシュしているかどうかのフラグの取得
-	bool		&GetDashFlag(void) { return m_bDashFlag; };
-
+	bool		&GetDashFlag(void)			{ return m_bDashFlag; };
+	// 記録情報の取得
+	RECORD & GetRecord(void)				{ return m_Record; };
 	// バネ用ジャンプ処理
 	void SpringJump(void);
+
+	// ゲームパッドの取得
+	CXInputPad *GetPad()					{ return m_pPad; };
 protected:
 private:
 	/* 構造体 */
@@ -218,9 +297,11 @@ private:
 	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
+	STAN						m_Stan;							// スタン状態
+	INVINCIBLE					m_Invincible;					// 無敵状態
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 	bool						m_bSpringFlag;					// ばねの判定を一回だけ通す
-
+	RECORD						m_Record;						// 記録情報
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
 	C3DLine *	pCollisionLine;

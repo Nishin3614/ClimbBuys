@@ -22,6 +22,10 @@
 #include "playerUI.h"
 #include "3Dline.h"
 #include "springblock.h"
+#include "resultUI.h"
+
+#include "sound.h"
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -29,12 +33,15 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define PLAYER_GRAVITY				(0.1f)		// プレイヤーの重力
-#define PLAYER_UPMOVELIMIT			(30.0f)		// プレイヤーの上昇移動量制限
+#define PLAYER_UPMOVELIMIT			(20.0f)		// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT		(5.0f)		// プレイヤーの下降移動量制限
 #define DASH_TIME_MAX				(30)		// ダッシュしている時間
 #define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
 #define PLAYER_STATUS_TXT			("data/LOAD/STATUS/PlayerStatus.txt")	// プレイヤーのステータスのテキスト
 #define RESPAWN_POS					(D3DXVECTOR3(0.0f, 300.0f, 0.0f))		// リスポーン地点
+#define PLAYER_STANTIME				(60)									// プレイヤースタンタイム
+#define PLAYER_INVINCIBLETIME		(60)									// プレイヤー無敵タイム
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // 静的変数宣言
@@ -54,6 +61,7 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_bTackleFrag		= false;				// タックルフラグ
 	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
 	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
+	m_Record			= RECORD();				// 記録
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
 #ifdef _DEBUG
@@ -109,7 +117,6 @@ void CPlayer::Init(void)
 				m_pos + m_PlayerStatus.PushOffSet,
 				m_pos + m_PlayerStatus.PushOffSet + D3DXVECTOR3(sinf(m_rot.y) * m_PlayerStatus.PushSize,0.0f,cosf(m_rot.y) * m_PlayerStatus.PushSize));
 		}
-
 	}
 
 #endif // _DEBUG
@@ -120,6 +127,12 @@ void CPlayer::Init(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Uninit(void)
 {
+	// 記録更新_タイム
+	m_Record.nTime = CGame::GetSecond();
+
+	// 記録情報をリザルトに渡す
+	CResultUI::SetRecord(GetPlayerTag(), m_Record);
+
 	// キャラクター終了処理
 	CCharacter::Uninit();
 
@@ -141,8 +154,22 @@ void CPlayer::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Update(void)
 {
-	// 自キャラの行動処理
-	MyAction();
+	if (CManager::GetMode() == CManager::MODE_GAME)
+	{
+		// 行動可能状態なら行動可能
+		CGame *pGame = (CGame*)CManager::GetBaseMode();
+
+		if (pGame && pGame->GetbOperatable())
+		{
+			// 自キャラの行動処理
+			MyAction();
+		}
+	}
+	else
+	{
+		// 自キャラの行動処理
+		MyAction();
+	}
 
 	if (m_pPlayerUI)
 	{	// プレイヤーUIの位置の設定
@@ -328,12 +355,14 @@ void CPlayer::MyMove(void)
 	// 試験的キーボードジャンプ
 	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
 	{
+		SetMotion(MOTIONTYPE_JUMP);
 		move.y += m_PlayerStatus.fJump;
 		SetJumpAble(false);
 	}
 	// 試験的タックル
 	if (pKeyboard->GetKeyboardTrigger(DIK_J))
 	{
+		SetMotion(MOTIONTYPE_DASH);
 		m_bDashFlag = true;
 		m_bTackleFrag = true;
 	}
@@ -356,6 +385,8 @@ void CPlayer::MyMove(void)
 			// ゲームパッド移動
 			if (fValueH != 0 || fValueV != 0)
 			{
+				SetMotion(MOTIONTYPE_MOVE);
+
 				// 角度の計算
 				fAngle = atan2f((float)fValueH, (float)fValueV);
 
@@ -377,6 +408,8 @@ void CPlayer::MyMove(void)
 			// 試験的ジャンプ ( のちに中身変わる予定 多分 )
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
 			{
+				SetMotion(MOTIONTYPE_JUMP);
+
 				move.y += m_PlayerStatus.fJump;
 				SetJumpAble(false);
 			}
@@ -384,6 +417,8 @@ void CPlayer::MyMove(void)
 			// 試験的タックル ( のちに中身変わる予定 多分 )
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 			{
+				SetMotion(MOTIONTYPE_DASH);
+
 				m_bDashFlag = true;
 				m_bTackleFrag = true;
 
@@ -587,7 +622,9 @@ void CPlayer::BlockCollision(void)
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
 		// ダッシュ状態なら
-		if (m_bTackleFrag)
+		if (pBaseBlock->GetType() != CBaseblock::TYPE::TYPE_FIELD &&
+			m_bTackleFrag &&
+			!pBaseBlock->GetPushAfter().bPushState)
 		{
 			// 方向に直線を出し
 			// 線とポリゴンで判定を取る
@@ -686,6 +723,9 @@ void CPlayer::BlockCollision(void)
 		(bRight && bLeft)
 		)
 	{
+		// 記録更新
+		m_Record.DieCause = DIECAUSE::DIECAUSE_PRESS;
+		// 死亡処理
 		Die();
 	}
 
@@ -694,6 +734,9 @@ void CPlayer::BlockCollision(void)
 	{
 		if (Pushblock.pBlock)
 		{
+			// 殴り音
+			CManager::GetSound()->PlaySound(CSound::LABEL_SE_PUNCH);
+
 			// 前
 			if (Pushblock.Direction == COLLISIONDIRECTION::FRONT)
 			{
@@ -725,25 +768,23 @@ void CPlayer::BlockCollision(void)
 void CPlayer::CharacterCollision(void)
 {
 	// 変数宣言
-	CCharacter * pCharacter;	// キャラクター情報
+	CPlayer * pPlayer;	// キャラクター情報
 	COLLISIONDIRECTION Direct;	// 当たり判定の方向
-	bool bOn = false;			// 上の当たり判定
-	bool bUnder = false;		// 下の当たり判定
-								// ブロックループ
+	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntBlock++)
 	{
 		// NULL代入
-		pCharacter = NULL;
+		pPlayer = NULL;
 		// 情報取得
-		pCharacter = (CCharacter *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntBlock);
+		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntBlock);
 		// NULLなら
 		// ->関数を抜ける
-		if (pCharacter == NULL)
+		if (pPlayer == NULL)
 		{
 			continue;
 		}
 		// 当たり判定
-		Direct = pCharacter->PushCollision(
+		Direct = pPlayer->PushCollision(
 			CCharacter::GetObj(),
 			&CCharacter::GetPos(),
 			&CCharacter::GetPosOld(),
@@ -751,12 +792,34 @@ void CPlayer::CharacterCollision(void)
 			&m_PlayerStatus.PlayerSize,
 			m_PlayerStatus.PlayerOffSet
 		);
-	}
-	// 上も下もブロックに当たっていたら
-	if (bOn && bUnder)
-	{
-		// プレイヤーは死ぬ
-		Die();
+		// 相手プレイヤーが上にいるとき
+		if (Direct == COLLISIONDIRECTION::UP)
+		{
+			// 変数宣言
+			D3DXVECTOR3 move;				// 移動量
+			move = CCharacter::GetMove();	// 移動量
+
+			// プレイヤーを踏んだ時のジャンプ
+			move.y += m_PlayerStatus.fJump * 0.5f;
+			SetJumpAble(false);
+			// yの上限設定
+			if (move.y > PLAYER_UPMOVELIMIT)
+			{
+				move.y = PLAYER_UPMOVELIMIT;
+			}
+			if (move.y < -PLAYER_UNDERMOVELIMIT)
+			{
+				move.y = -PLAYER_UNDERMOVELIMIT;
+			}
+			// 移動設定
+			CCharacter::SetMove(move);
+
+			// 相手プレイヤーの処理
+			// スタン状態設定
+			pPlayer->m_Stan.Set(true, PLAYER_STANTIME);
+			// 無敵状態設定
+			pPlayer->m_Invincible.Set(true, PLAYER_INVINCIBLETIME);
+		}
 	}
 }
 
@@ -973,12 +1036,15 @@ void CPlayer::SpringJump(void)
 {
 	if (!m_bSpringFlag)
 	{
+		// バネ
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_SPRING);
+
 		// 変数宣言
 		D3DXVECTOR3 move;				// 移動量
 		move = CCharacter::GetMove();	// 移動量
 
 										// バネ用ジャンプ
-		move.y += m_PlayerStatus.fJump * 2.0f;
+		move.y += m_PlayerStatus.fJump * 1.5f;
 		SetJumpAble(false);
 
 		// ジャンプしているときの慣性
@@ -1038,6 +1104,8 @@ void CPlayer::PushBlock(
 	{
 		return;
 	}
+	// 記録更新_押し出し回数
+	m_Record.nPushCnt++;
 	// 押し出し後の設定
 	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, Grid));
 }
@@ -1410,7 +1478,8 @@ void CPlayer::Die(void)
 	{
 		if (m_pPlayerUI)
 		{
-#ifdef _DEBUG
+// リリース時にのみ通る
+#ifndef _DEBUG
 			// バイブレーションの設定
 			m_pPad->StartVibration(60);
 #endif // _DEBUG
@@ -1419,7 +1488,10 @@ void CPlayer::Die(void)
 			m_pPlayerUI->Release();
 			m_pPlayerUI = nullptr;
 		}
-
+		// 記録更新_ランキング
+		m_Record.nRanking = CCharacter::GetAllCharacter();
+		// 記録更新_タイム
+		m_Record.nTime = CGame::GetSecond();
 		// 死亡処理
 		CCharacter::Die();
 
@@ -1575,11 +1647,11 @@ CPlayer * CPlayer::Create(PLAYER_TAG tag,
 		break;
 	case PLAYER_TAG::PLAYER_2:
 		// メモリの生成(初め->基本クラス,後->派生クラス)
-		pPlayer = new CPlayer(CHARACTER_PLAYER_1);
+		pPlayer = new CPlayer(CHARACTER_PLAYER_2);
 		break;
 	case PLAYER_TAG::PLAYER_3:
 		// メモリの生成(初め->基本クラス,後->派生クラス)
-		pPlayer = new CPlayer(CHARACTER_PLAYER_2);
+		pPlayer = new CPlayer(CHARACTER_PLAYER_1);
 		break;
 	case PLAYER_TAG::PLAYER_4:
 		// メモリの生成(初め->基本クラス,後->派生クラス)

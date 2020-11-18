@@ -97,7 +97,7 @@ public:
 		TYPE_OBJECT_BLOCK_Y,			// 当たり判定無し演出用ブロック
 		TYPE_OBJECT_BLOCK_S,			// 当たり判定無し演出用ブロック
 		TYPE_BLOCK_SPRING,				// 特殊ブロック_バネ
-
+		TYPE_BLOCK_BOMB,				// 特殊ブロック_ボム
 		TYPE_MAX						// 最大数
 	} TYPE;
 

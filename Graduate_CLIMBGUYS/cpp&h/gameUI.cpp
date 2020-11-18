@@ -15,6 +15,7 @@
 #include "debugproc.h"
 #include "scene_two.h"
 #include "number.h"
+#include "sound.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -50,6 +51,7 @@ CGameUI::CGameUI()
 	m_nCntTimer				= 0;				// タイマーカウント
 	m_nTimerNum				= TIMER_INIT_NUM;	// タイマーのナンバー
 	m_bStart				= false;			// スタートフラグ
+	m_bSEflag				= false;			// 効果音フラグ
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,6 +89,13 @@ void CGameUI::Update(void)
 	// スタートの合図が存在しているとき
 	if (m_pScene2D[(int)GAME_UI::START])
 	{
+		if (!m_bSEflag)
+		{
+			// カウントダウン
+			CManager::GetSound()->PlaySound(CSound::LABEL_SE_COUNTDOWN);
+			m_bSEflag = true;
+		}
+
 		// スタートタイマーの処理
 		StartTimer();
 	}
@@ -129,7 +138,7 @@ CGameUI * CGameUI::Create(void)
 	// シーン2Dの生成
 	pGameUI->m_pScene2D[(int)GAME_UI::START] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_START));
 	// 透明にする
-	pGameUI->m_pScene2D[(int)GAME_UI::START]->SetCol(D3DXCOLOR_CA(1.0f, 0.0f));
+	pGameUI->m_pScene2D[(int)GAME_UI::START]->SetCol(D3DXCOLOR_ZERO);
 	pGameUI->m_pScene2D[(int)GAME_UI::START]->Set_Vtx_Col();
 
 	// スタートカウントの生成
@@ -189,7 +198,7 @@ void CGameUI::StartTimer()
 				m_pStartCount = nullptr;
 
 				// スタートの合図を出す
-				m_pScene2D[(int)GAME_UI::START]->SetCol(D3DXCOLOR_CA(1.0f, 1.0f));
+				m_pScene2D[(int)GAME_UI::START]->SetCol(D3DXCOLOR_INI);
 				m_pScene2D[(int)GAME_UI::START]->Set_Vtx_Col();
 			}
 		}
@@ -217,7 +226,7 @@ void CGameUI::FinishSignal()
 	{
 		// 終了の合図を出す
 		m_pScene2D[(int)GAME_UI::FINISH] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_FINISH));
-		m_pScene2D[(int)GAME_UI::FINISH]->SetCol(D3DXCOLOR_CA(1.0f, 1.0f));
+		m_pScene2D[(int)GAME_UI::FINISH]->SetCol(D3DXCOLOR_INI);
 		m_pScene2D[(int)GAME_UI::FINISH]->Set_Vtx_Col();
 	}
 }

@@ -15,6 +15,8 @@
 #include "basemode.h"
 #include "debugproc.h"
 
+#include "sound.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // マクロ定義
@@ -159,6 +161,10 @@ void CDamageFloor::ComparisonHeight()
 			//高さを比較してプレイヤーが床より下に落ちたら死亡フラグをtrue
 			if (this->GetPos().y >= pPlayer->GetPos().y)
 			{
+				// 記録更新_死亡原因
+				pPlayer->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
+				// 死亡設定
+				CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
 				pPlayer->SetDie(true);
 			}
 			pPlayer = nullptr;

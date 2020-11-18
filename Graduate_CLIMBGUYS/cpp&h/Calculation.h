@@ -31,8 +31,10 @@
 #define D3DVECTOR3_ONE			D3DXVECTOR3(1.0f,1.0f,1.0f)
 // D3DVECTOR4型の初期化(0.0f)
 #define D3DVECTOR4_ZERO			D3DXVECTOR4(0.0f,0.0f,0.0f,0.0f)
-// D3DXCOLOR型の初期化
+// D3DXCOLOR型の初期化(1.0f)
 #define D3DXCOLOR_INI			D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)
+// D3DXCOLOR型の初期化(0.0f)
+#define D3DXCOLOR_ZERO			D3DXCOLOR(0.0f,0.0f,0.0f,0.0f)
 // D3DXCOLOR型の初期化(基本色)
 #define D3DXCOLOR_C(col)		D3DXCOLOR(col,col,col,1.0f)
 // D3DXCOLOR型の初期化(基本色,透明度)
@@ -43,6 +45,33 @@
 #define SCREEN_SIZE				(D3DXVECTOR2(SCREEN_WIDTH, SCREEN_HEIGHT))
 // 画面中央の座標
 #define SCREEN_CENTER_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f , SCREEN_HEIGHT * 0.5f ,0.0f))
+
+// ColorList //
+// 白
+#define COLOR_WHITE			D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)
+// 赤
+#define COLOR_RED			D3DXCOLOR(1.0f,0.0f,0.0f,1.0f)
+// 緑
+#define COLOR_GREEN			D3DXCOLOR(0.0f,1.0f,0.0f,1.0f)
+// 青
+#define COLOR_BLUE			D3DXCOLOR(0.0f,0.0f,1.0f,1.0f)
+// 黄色
+#define COLOR_YELLOW		D3DXCOLOR(1.0f,1.0f,0.0f,1.0f)
+// ヴァイオレット色
+#define COLOR_VIOLET		D3DXCOLOR(1.0f,0.0f,1.0f,1.0f)
+// 水色
+#define COLOR_LIGHTBLUE		D3DXCOLOR(0.0f,1.0f,1.0f,1.0f)
+// オレンジ色
+#define COLOR_ORANGE		D3DXCOLOR(1.0f,0.5f,0.0f,1.0f)
+// 黄緑色
+#define COLOR_LIME			D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
+// 紫色
+#define COLOR_PURPURE		D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
+// ピンク色
+#define COLOR_PINK			D3DXCOLOR(1.0f,0.5f,1.0f,1.0f)
+// エメラルド色
+#define COLOR_EMERALD		D3DXCOLOR(0.0f,1.0f,0.5f,1.0f)
+
 
 /* テキスト用 */
 // 改行
@@ -757,7 +786,7 @@ public:
 	// ランダムなvector3型で値を返す
 	static D3DXVECTOR3 RandomVector3(float Max);
 	// 360度のランダムな方向ベクトルを求める 方向を求めたいならfmaxはNULLでいい
-	static D3DXVECTOR3 RandomDirectionVector(float fMax, bool bNormalization);
+	static D3DXVECTOR3 RandomDirectionVector(float fMax, bool bBombization);
 	// 範囲の中からランダムに値を求める
 	static uint64_t GetRandomRange(uint64_t min_value, uint64_t max_value);
 	// ランダムにカラーを求める

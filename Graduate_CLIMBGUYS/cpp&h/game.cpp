@@ -34,6 +34,8 @@
 #include "fieldblock.h"
 #include "springblock.h"
 
+#include "sound.h"
+
 /* ポーズ */
 //#include "pause.h"
 
@@ -50,6 +52,7 @@
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CGame::STAGE	CGame::m_Stage = CGame::STAGE_1;	// ステージ
+int				CGame::m_nCntTime = 0;				// カウントタイム
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ
@@ -61,6 +64,7 @@ CGame::CGame()
 	m_pGameUI		= nullptr;		// ゲームUI
 	m_nCntFinish	= 0;			// 終了のカウント
 	m_bFinishFlag	= false;		// 終了フラグ
+	m_bBgm			= false;		// 一度だけ処理を通す
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -88,7 +92,7 @@ void CGame::Init(void)
 	CBg::Create();
 	// ゲームUIの生成
 	m_pGameUI = CGameUI::Create();
-	
+
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -110,11 +114,7 @@ void CGame::Init(void)
 		10000.0f);
 		*/
 
-		// ばねブロックの生成 // 実験用
-	/*CSpringblock::Create(
-		D3DXVECTOR3(0,530,0),
-		CScene::LAYER_3DBLOCK
-	);*/
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -152,7 +152,8 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
-
+	// タイムカウント更新
+	m_nCntTime++;
 	// NULLチェック
 	if (m_pGameUI)
 	{
@@ -163,6 +164,14 @@ void CGame::Update(void)
 	// スタートの表示が出た後に生成
 	if (m_pGameUI->GetStartFlag())
 	{
+		m_bOperatable = true;
+		if (m_bOperatable && !m_bBgm)
+		{
+			// ゲームスタート
+			CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
+			m_bBgm = true;
+		}
+
 		// 結合されたブロックの更新ブロック生成
 		CConnectblock::Update_CreateBlock();
 	}
@@ -180,6 +189,14 @@ void CGame::Update(void)
 	// 終了フラグがオンになったとき
 	if (m_bFinishFlag)
 	{
+		m_bOperatable = false;
+		if (m_nCntFinish <= 0)
+		{
+			// カウントダウン
+			CManager::GetSound()->StopSound(CSound::LABEL_BGM_GAME);
+			// カウントダウン
+			CManager::GetSound()->PlaySound(CSound::LABEL_SE_FINISH);
+		}
 		// カウントアップ
 		m_nCntFinish++;
 
@@ -261,6 +278,7 @@ CGame * CGame::Create(void)
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CGame::StaticInit(void)
 {
+	m_nCntTime = 0;
 	CCharacter::InitStatic();
 	CBaseblock::BlockStaticValue();
 }

@@ -85,14 +85,9 @@ void CTutorial::Init(void)
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CGame::STAGE_1);
-	// 結合されたブロックの更新ブロック生成
-	//CConnectblock::TestCreate();
 
-	//// 床の生成
-	//CFloor::Create(D3DVECTOR3_ZERO,D3DXVECTOR3(1000.0f,0.0f, 1000.0f),D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), D3DVECTOR3_ZERO,2,2,0);
-	////// 足場の生成
-	//CStand::CreateStand_Tutorial();
-
+	// ブロックの初期配置
+	CConnectblock::Tutorial_InitArrangementBlock();
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
@@ -144,10 +139,16 @@ void CTutorial::Update(void)
 		// ゲーム遷移
 		if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_RETURN) || InpudPad[nCnt]->GetTrigger(CXInputPad::JOYPADKEY_START, 1))
 		{
-			// フェード状態が何も起こっていない状態なら
-			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+			// 全員が準備完了したとき
+			if (m_pTutorialUI->Ready(nCnt))
 			{
-				CManager::GetFade()->SetFade(CManager::MODE_GAME);
+				// フェード状態が何も起こっていない状態なら
+				if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+				{
+					// 決定音
+					CManager::GetSound()->PlaySound(CSound::LABEL_SE_DETERMINATION);
+					CManager::GetFade()->SetFade(CManager::MODE_GAME);
+				}
 			}
 		}
 	}

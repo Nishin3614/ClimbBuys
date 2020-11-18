@@ -44,7 +44,7 @@ public:
 		MOTIONTYPE_NEUTRAL = 0,		// 待機モーション
 		MOTIONTYPE_MOVE,			// 移動モーション
 		MOTIONTYPE_DASH,			// ダッシュモーション
-		MOTINOTYPE_JUMP,			// ジャンプモーション
+		MOTIONTYPE_JUMP,			// ジャンプモーション
 		MOTIONTYPE_MAX				// 最大数
 	} MOTIONTYPE;
 	// キャラクター
@@ -186,6 +186,8 @@ public:
 		int nMotionID,							// モーションID
 		int nNowKeyCnt = -1						// 現在のキーカウント
 	);
+	// 出現している人数取得
+	int GetAllCharacter(void) { return m_nAllCharacter; };
 	// キャラクター全ソースの読み込み
 	static HRESULT Load(void);
 	// キャラクターの情報読み込み

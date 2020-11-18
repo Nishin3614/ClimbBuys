@@ -147,6 +147,9 @@ public:
 
 	// 更新_ブロック生成
 	static void Update_CreateBlock(void);
+
+	// チュートリアルのブロックの初期配置
+	static void Tutorial_InitArrangementBlock(void);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);

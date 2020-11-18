@@ -419,6 +419,67 @@ void CConnectblock::Update_CreateBlock(void)
 	m_nCntTime++;
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// チュートリアルのブロックの初期配置
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnectblock::Tutorial_InitArrangementBlock(void)
+{
+	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());
+	D3DXCOLOR Col = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+
+	// 基準値
+	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue, 0, -nFeedValue);
+
+	// ブロックの生成
+	// 01
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 0, 5), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 7), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 0, 7), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 0, 7), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(2, 1, 7), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 1, 7), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 2, 7), &Col);
+
+	// 02
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(7, 0, 5), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(6, 0, 6), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(5, 0, 7), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(7, 0, 7), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(6, 1, 6), &Col);
+
+	// 03
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 0, 3), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 0, 4), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(5, 0, 4), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 0, 5), &Col);
+
+	// 04
+	CNormalblock::Create(2, BaseGrid, &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 1, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 1, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 2, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 2, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 2, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 3, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 3, 1), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 3, 0), &Col);
+	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 3, 1), &Col);
+
+	// バネ
+	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(2, 0, 1), &Col);
+	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(6, 0, 1), &Col);
+
+	// ボム
+	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 1), &D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
+	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 4), &D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
+}
+
 #ifdef _DEBUG
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デバッグ表示

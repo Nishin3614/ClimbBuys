@@ -1410,7 +1410,8 @@ void CPlayer::Die(void)
 	{
 		if (m_pPlayerUI)
 		{
-#ifdef _DEBUG
+// リリース時にのみ通る
+#ifndef _DEBUG
 			// バイブレーションの設定
 			m_pPad->StartVibration(60);
 #endif // _DEBUG

@@ -35,8 +35,8 @@
 #define RESULT_UI_DEATH_SIZE				(D3DXVECTOR2(200.0f, 80.0f))			// 死因のサイズ
 #define RESULT_UI_DEATH_MOVE_STOP_POS_Y		(685.0f)								// 死因の移動が止まる位置Y
 
-#define RESULT_SCORE_SURVIVAL_TIME_POS		(D3DXVECTOR3((260.0f + 320.0f * nCnt), 485.0f, 0.0f))				// 生存時間の位置
-#define RESULT_SCORE_PRESS_BLOCK_POS		(D3DXVECTOR3((260.0f + 320.0f * nCnt), (485.0f + 100.0f), 0.0f))	// ブロックを押した回数の位置
+#define RESULT_SCORE_SURVIVAL_TIME_POS		(D3DXVECTOR3((230.0f + 320.0f * nCnt), 485.0f, 0.0f))				// 生存時間の位置
+#define RESULT_SCORE_PRESS_BLOCK_POS		(D3DXVECTOR3((230.0f + 320.0f * nCnt), (485.0f + 100.0f), 0.0f))	// ブロックを押した回数の位置
 #define RESULT_SCORE_SIZE					(D3DXVECTOR2(35.0f, 50.0f))											// 数字のサイズ
 
 #define RESULT_UI_MOVE						(D3DXVECTOR3(0.0f, -70.0f, 0.0f))		// リザルトUIの移動量

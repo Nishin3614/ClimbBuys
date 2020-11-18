@@ -46,6 +46,33 @@
 // 画面中央の座標
 #define SCREEN_CENTER_POS	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f , SCREEN_HEIGHT * 0.5f ,0.0f))
 
+// ColorList //
+// 白
+#define COLOR_WHITE			D3DXCOLOR(1.0f,1.0f,1.0f,1.0f)
+// 赤
+#define COLOR_RED			D3DXCOLOR(1.0f,0.0f,0.0f,1.0f)
+// 緑
+#define COLOR_GREEN			D3DXCOLOR(0.0f,1.0f,0.0f,1.0f)
+// 青
+#define COLOR_BLUE			D3DXCOLOR(0.0f,0.0f,1.0f,1.0f)
+// 黄色
+#define COLOR_YELLOW		D3DXCOLOR(1.0f,1.0f,0.0f,1.0f)
+// ヴァイオレット色
+#define COLOR_VIOLET		D3DXCOLOR(1.0f,0.0f,1.0f,1.0f)
+// 水色
+#define COLOR_LIGHTBLUE		D3DXCOLOR(0.0f,1.0f,1.0f,1.0f)
+// オレンジ色
+#define COLOR_ORANGE		D3DXCOLOR(1.0f,0.5f,0.0f,1.0f)
+// 黄緑色
+#define COLOR_LIME			D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
+// 紫色
+#define COLOR_PURPURE		D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
+// ピンク色
+#define COLOR_PINK			D3DXCOLOR(1.0f,0.5f,1.0f,1.0f)
+// エメラルド色
+#define COLOR_EMERALD		D3DXCOLOR(0.0f,1.0f,0.5f,1.0f)
+
+
 /* テキスト用 */
 // 改行
 #define NEWLINE				("\n")

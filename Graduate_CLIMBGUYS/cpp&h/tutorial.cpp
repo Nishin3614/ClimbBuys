@@ -85,9 +85,9 @@ void CTutorial::Init(void)
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CGame::STAGE_1);
-	// 結合されたブロックの更新ブロック生成
-	//CConnectblock::TestCreate();
 
+	// ブロックの初期配置
+	CConnectblock::Tutorial_InitArrangementBlock();
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
 

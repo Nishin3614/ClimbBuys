@@ -34,7 +34,7 @@
 // マクロ関数
 //
 // ----------------------------------------------------------------------------------------------------
-#define STARTMODE (CManager::MODE_OPENING)
+#define STARTMODE (CManager::MODE_TITLE)
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -343,12 +343,12 @@ void CManager::SetMode(MODE const &mode)
 	case MODE_GAME:
 		// ゲーム生成
 		m_BaseMode = CGame::Create();
-		// ゲームBGM
-		CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
 
 		break;
 		// リザルト
 	case MODE_RESULT:
+		// リザルトBGM
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_RESULT);
 		// リザルト生成
 		m_BaseMode = CResult::Create();
 		// リザルトBGM

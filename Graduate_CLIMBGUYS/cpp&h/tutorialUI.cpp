@@ -16,6 +16,7 @@
 #include "scene_two.h"
 #include "tutorial.h"
 #include "XInputPad.h"
+#include "sound.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -161,6 +162,8 @@ bool CTutorialUI::Ready(int nCntPlayer)
 {
 	if (m_pScene2D[nCntPlayer])
 	{
+		// Œˆ’è‰¹
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_DETERMINATION);
 		// F‚Ìİ’è
 		switch (nCntPlayer)
 		{

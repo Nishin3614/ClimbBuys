@@ -33,7 +33,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define PLAYER_GRAVITY				(0.1f)		// プレイヤーの重力
-#define PLAYER_UPMOVELIMIT			(30.0f)		// プレイヤーの上昇移動量制限
+#define PLAYER_UPMOVELIMIT			(20.0f)		// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT		(5.0f)		// プレイヤーの下降移動量制限
 #define DASH_TIME_MAX				(30)		// ダッシュしている時間
 #define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
@@ -1012,7 +1012,7 @@ void CPlayer::SpringJump(void)
 		move = CCharacter::GetMove();	// 移動量
 
 										// バネ用ジャンプ
-		move.y += m_PlayerStatus.fJump * 2.0f;
+		move.y += m_PlayerStatus.fJump * 1.5f;
 		SetJumpAble(false);
 
 		// ジャンプしているときの慣性

@@ -1603,11 +1603,11 @@ CPlayer * CPlayer::Create(PLAYER_TAG tag,
 		break;
 	case PLAYER_TAG::PLAYER_2:
 		// メモリの生成(初め->基本クラス,後->派生クラス)
-		pPlayer = new CPlayer(CHARACTER_PLAYER_1);
+		pPlayer = new CPlayer(CHARACTER_PLAYER_2);
 		break;
 	case PLAYER_TAG::PLAYER_3:
 		// メモリの生成(初め->基本クラス,後->派生クラス)
-		pPlayer = new CPlayer(CHARACTER_PLAYER_2);
+		pPlayer = new CPlayer(CHARACTER_PLAYER_1);
 		break;
 	case PLAYER_TAG::PLAYER_4:
 		// メモリの生成(初め->基本クラス,後->派生クラス)

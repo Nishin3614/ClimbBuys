@@ -352,12 +352,14 @@ void CPlayer::MyMove(void)
 	// 試験的キーボードジャンプ
 	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
 	{
+		SetMotion(MOTIONTYPE_JUMP);
 		move.y += m_PlayerStatus.fJump;
 		SetJumpAble(false);
 	}
 	// 試験的タックル
 	if (pKeyboard->GetKeyboardTrigger(DIK_J))
 	{
+		SetMotion(MOTIONTYPE_DASH);
 		m_bDashFlag = true;
 		m_bTackleFrag = true;
 	}
@@ -380,6 +382,8 @@ void CPlayer::MyMove(void)
 			// ゲームパッド移動
 			if (fValueH != 0 || fValueV != 0)
 			{
+				SetMotion(MOTIONTYPE_MOVE);
+
 				// 角度の計算
 				fAngle = atan2f((float)fValueH, (float)fValueV);
 
@@ -401,6 +405,8 @@ void CPlayer::MyMove(void)
 			// 試験的ジャンプ ( のちに中身変わる予定 多分 )
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_A, 1) && GetJumpAble())
 			{
+				SetMotion(MOTIONTYPE_JUMP);
+
 				move.y += m_PlayerStatus.fJump;
 				SetJumpAble(false);
 			}
@@ -408,6 +414,8 @@ void CPlayer::MyMove(void)
 			// 試験的タックル ( のちに中身変わる予定 多分 )
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 			{
+				SetMotion(MOTIONTYPE_DASH);
+
 				m_bDashFlag = true;
 				m_bTackleFrag = true;
 

@@ -50,7 +50,7 @@ public:
 		SHAPE_BEARD_01,					// 髭ブロック_01
 		SHAPE_BEARD_02,					// 髭ブロック_02
 		SHAPE_BEARD_03,					// 髭ブロック_03
-		SHAPE_BEARD_04,					// 髭ブロック_04
+		SHAPE_BEARD_04,					// 髭ブロック_040
 		SHAPE_MAX						// 最大数
 	} SHAPE;
 	// フィールドタイプ情報

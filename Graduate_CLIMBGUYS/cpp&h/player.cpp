@@ -39,6 +39,9 @@
 #define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
 #define PLAYER_STATUS_TXT			("data/LOAD/STATUS/PlayerStatus.txt")	// プレイヤーのステータスのテキスト
 #define RESPAWN_POS					(D3DXVECTOR3(0.0f, 300.0f, 0.0f))		// リスポーン地点
+#define PLAYER_STANTIME				(60)									// プレイヤースタンタイム
+#define PLAYER_INVINCIBLETIME		(60)									// プレイヤー無敵タイム
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // 静的変数宣言
@@ -619,8 +622,9 @@ void CPlayer::BlockCollision(void)
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
 		// ダッシュ状態なら
-		if (m_bTackleFrag &&
-			!pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_FIELD)
+		if (pBaseBlock->GetType() != CBaseblock::TYPE::TYPE_FIELD &&
+			m_bTackleFrag &&
+			!pBaseBlock->GetPushAfter().bPushState)
 		{
 			// 方向に直線を出し
 			// 線とポリゴンで判定を取る
@@ -764,23 +768,23 @@ void CPlayer::BlockCollision(void)
 void CPlayer::CharacterCollision(void)
 {
 	// 変数宣言
-	CCharacter * pCharacter;	// キャラクター情報
+	CPlayer * pPlayer;	// キャラクター情報
 	COLLISIONDIRECTION Direct;	// 当たり判定の方向
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntBlock++)
 	{
 		// NULL代入
-		pCharacter = NULL;
+		pPlayer = NULL;
 		// 情報取得
-		pCharacter = (CCharacter *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntBlock);
+		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntBlock);
 		// NULLなら
 		// ->関数を抜ける
-		if (pCharacter == NULL)
+		if (pPlayer == NULL)
 		{
 			continue;
 		}
 		// 当たり判定
-		Direct = pCharacter->PushCollision(
+		Direct = pPlayer->PushCollision(
 			CCharacter::GetObj(),
 			&CCharacter::GetPos(),
 			&CCharacter::GetPosOld(),
@@ -788,6 +792,34 @@ void CPlayer::CharacterCollision(void)
 			&m_PlayerStatus.PlayerSize,
 			m_PlayerStatus.PlayerOffSet
 		);
+		// 相手プレイヤーが上にいるとき
+		if (Direct == COLLISIONDIRECTION::UP)
+		{
+			// 変数宣言
+			D3DXVECTOR3 move;				// 移動量
+			move = CCharacter::GetMove();	// 移動量
+
+			// プレイヤーを踏んだ時のジャンプ
+			move.y += m_PlayerStatus.fJump * 0.5f;
+			SetJumpAble(false);
+			// yの上限設定
+			if (move.y > PLAYER_UPMOVELIMIT)
+			{
+				move.y = PLAYER_UPMOVELIMIT;
+			}
+			if (move.y < -PLAYER_UNDERMOVELIMIT)
+			{
+				move.y = -PLAYER_UNDERMOVELIMIT;
+			}
+			// 移動設定
+			CCharacter::SetMove(move);
+
+			// 相手プレイヤーの処理
+			// スタン状態設定
+			pPlayer->m_Stan.Set(true, PLAYER_STANTIME);
+			// 無敵状態設定
+			pPlayer->m_Invincible.Set(true, PLAYER_INVINCIBLETIME);
+		}
 	}
 }
 

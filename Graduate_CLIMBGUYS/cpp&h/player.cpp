@@ -22,6 +22,10 @@
 #include "playerUI.h"
 #include "3Dline.h"
 #include "springblock.h"
+#include "resultUI.h"
+
+#include "sound.h"
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -124,7 +128,7 @@ void CPlayer::Uninit(void)
 	m_Record.nTime = CGame::GetSecond();
 
 	// 記録情報をリザルトに渡す
-
+	CResultUI::SetRecord(GetPlayerTag(), m_Record);
 
 	// キャラクター終了処理
 	CCharacter::Uninit();
@@ -147,8 +151,22 @@ void CPlayer::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Update(void)
 {
-	// 自キャラの行動処理
-	MyAction();
+	if (CManager::GetMode() == CManager::MODE_GAME)
+	{
+		// 行動可能状態なら行動可能
+		CGame *pGame = (CGame*)CManager::GetBaseMode();
+
+		if (pGame && pGame->GetbOperatable())
+		{
+			// 自キャラの行動処理
+			MyAction();
+		}
+	}
+	else
+	{
+		// 自キャラの行動処理
+		MyAction();
+	}
 
 	if (m_pPlayerUI)
 	{	// プレイヤーUIの位置の設定
@@ -704,6 +722,9 @@ void CPlayer::BlockCollision(void)
 	{
 		if (Pushblock.pBlock)
 		{
+			// 殴り音
+			CManager::GetSound()->PlaySound(CSound::LABEL_SE_PUNCH);
+
 			// 前
 			if (Pushblock.Direction == COLLISIONDIRECTION::FRONT)
 			{
@@ -975,6 +996,9 @@ void CPlayer::SpringJump(void)
 {
 	if (!m_bSpringFlag)
 	{
+		// バネ
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_SPRING);
+
 		// 変数宣言
 		D3DXVECTOR3 move;				// 移動量
 		move = CCharacter::GetMove();	// 移動量
@@ -1583,11 +1607,11 @@ CPlayer * CPlayer::Create(PLAYER_TAG tag,
 		break;
 	case PLAYER_TAG::PLAYER_2:
 		// メモリの生成(初め->基本クラス,後->派生クラス)
-		pPlayer = new CPlayer(CHARACTER_PLAYER_1);
+		pPlayer = new CPlayer(CHARACTER_PLAYER_2);
 		break;
 	case PLAYER_TAG::PLAYER_3:
 		// メモリの生成(初め->基本クラス,後->派生クラス)
-		pPlayer = new CPlayer(CHARACTER_PLAYER_2);
+		pPlayer = new CPlayer(CHARACTER_PLAYER_1);
 		break;
 	case PLAYER_TAG::PLAYER_4:
 		// メモリの生成(初め->基本クラス,後->派生クラス)

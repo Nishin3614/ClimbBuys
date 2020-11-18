@@ -34,6 +34,8 @@
 #include "fieldblock.h"
 #include "springblock.h"
 
+#include "sound.h"
+
 /* ポーズ */
 //#include "pause.h"
 
@@ -62,6 +64,7 @@ CGame::CGame()
 	m_pGameUI		= nullptr;		// ゲームUI
 	m_nCntFinish	= 0;			// 終了のカウント
 	m_bFinishFlag	= false;		// 終了フラグ
+	m_bBgm			= false;		// 一度だけ処理を通す
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -161,6 +164,14 @@ void CGame::Update(void)
 	// スタートの表示が出た後に生成
 	if (m_pGameUI->GetStartFlag())
 	{
+		m_bOperatable = true;
+		if (m_bOperatable && !m_bBgm)
+		{
+			// ゲームスタート
+			CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
+			m_bBgm = true;
+		}
+
 		// 結合されたブロックの更新ブロック生成
 		CConnectblock::Update_CreateBlock();
 	}
@@ -178,6 +189,14 @@ void CGame::Update(void)
 	// 終了フラグがオンになったとき
 	if (m_bFinishFlag)
 	{
+		m_bOperatable = false;
+		if (m_nCntFinish <= 0)
+		{
+			// カウントダウン
+			CManager::GetSound()->StopSound(CSound::LABEL_BGM_GAME);
+			// カウントダウン
+			CManager::GetSound()->PlaySound(CSound::LABEL_SE_FINISH);
+		}
 		// カウントアップ
 		m_nCntFinish++;
 

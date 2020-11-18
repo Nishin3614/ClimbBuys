@@ -82,7 +82,7 @@ public:
 	// Ž€‚ñ‚¾Œ´ˆö
 	typedef enum
 	{
-		LIVE = -1,			// ¶‚«‚Ä‚¢‚é
+		LIVE = 0,			// ¶‚«‚Ä‚¢‚é
 		DIECAUSE_PRESS,		// ˆ³Ž€
 		DIECAUSE_FALL,		// —Ž‰ºŽ€
 		DIECAUSEMAX			// Å‘å”

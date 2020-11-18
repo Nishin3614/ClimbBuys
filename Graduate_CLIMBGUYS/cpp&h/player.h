@@ -76,6 +76,33 @@ public:
 		D3DXVECTOR3			PushOffSet;			// 押し出し用のオフセット
 	}PLAYER_STATUS;
 
+
+
+	// 列挙
+	// 死んだ原因
+	typedef enum
+	{
+		LIVE = -1,			// 生きている
+		DIECAUSE_PRESS,		// 圧死
+		DIECAUSE_FALL,		// 落下死
+		DIECAUSEMAX			// 最大数
+	} DIECAUSE;
+	// ----- 記録 ----- //
+	typedef struct _RECORD
+	{
+		// コンストラクタ
+		_RECORD()
+		{
+			nRanking = 1;  					// ランキング
+			nTime = -1;						// タイム
+			nPushCnt = 0;					// 押した数
+			DieCause = DIECAUSE::LIVE;		// 死んだ原因
+		}
+		int			nRanking;		// ランキング
+		int			nTime;			// タイム
+		int			nPushCnt;		// 押した数
+		DIECAUSE	DieCause;		// 死んだ原因
+	} RECORD;
 	/* 関数 */
 	// コンストラクタ
 	CPlayer(CCharacter::CHARACTER const &character);
@@ -166,13 +193,14 @@ public:
 	// ダッシュしているかどうかのフラグの設定
 	void SetDashFlag(bool const &bDashFlag) { m_bDashFlag = bDashFlag; };
 	// ダッシュしているかどうかのフラグの取得
-	bool		&GetDashFlag(void) { return m_bDashFlag; };
-
+	bool		&GetDashFlag(void)			{ return m_bDashFlag; };
+	// 記録情報の取得
+	RECORD & GetRecord(void)				{ return m_Record; };
 	// バネ用ジャンプ処理
 	void SpringJump(void);
 
 	// ゲームパッドの取得
-	CXInputPad *GetPad() { return m_pPad; };
+	CXInputPad *GetPad()					{ return m_pPad; };
 protected:
 private:
 	/* 構造体 */
@@ -221,9 +249,10 @@ private:
 	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
+	//static int					m_
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 	bool						m_bSpringFlag;					// ばねの判定を一回だけ通す
-
+	RECORD						m_Record;						// 記録情報
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
 	C3DLine *	pCollisionLine;

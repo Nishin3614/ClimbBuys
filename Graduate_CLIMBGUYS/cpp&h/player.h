@@ -75,6 +75,54 @@ public:
 		float				PushSize;			// 押し出し用のサイズ
 		D3DXVECTOR3			PushOffSet;			// 押し出し用のオフセット
 	}PLAYER_STATUS;
+	// ----- スタン状態 ----- //
+	typedef struct _STAN
+	{
+		// コンストラクタ
+		_STAN()
+		{
+			bStan = false;  // スタン状態
+			nStanTime = 0;	// スタン継続時間
+		}
+		// 初期化処理
+		void Init()
+		{
+			bStan = false;  // スタン状態
+			nStanTime = 0;	// スタン継続時間
+		}
+		// スタン設定
+		void Set(bool const & bSouceStan, int const & nSouceStanTime)
+		{
+			bStan = bSouceStan;			// スタン状態
+			nStanTime = nSouceStanTime;	// スタン継続時間
+		}
+		bool		bStan;			// スタン状態
+		int			nStanTime;		// スタン継続時間
+	} STAN;
+	// ----- 無敵状態 ----- //
+	typedef struct _INVINCIBLE
+	{
+		// コンストラクタ
+		_INVINCIBLE()
+		{
+			bInvincible = false;  // スタン状態
+			nInvincibleTime = 0;	// スタン継続時間
+		}
+		// 初期化処理
+		void Init()
+		{
+			bInvincible = false;  // スタン状態
+			nInvincibleTime = 0;	// スタン継続時間
+		}
+		// スタン設定
+		void Set(bool const & bSouceInvincible, int const & nSouceInvincibleTime)
+		{
+			bInvincible = bSouceInvincible;			// スタン状態
+			nInvincibleTime = nSouceInvincibleTime;	// スタン継続時間
+		}
+		bool		bInvincible;			// スタン状態
+		int			nInvincibleTime;		// スタン継続時間
+	} INVINCIBLE;
 
 
 
@@ -249,7 +297,8 @@ private:
 	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
-	//static int					m_
+	STAN						m_Stan;							// スタン状態
+	INVINCIBLE					m_Invincible;					// 無敵状態
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 	bool						m_bSpringFlag;					// ばねの判定を一回だけ通す
 	RECORD						m_Record;						// 記録情報

@@ -100,7 +100,7 @@ void CConnectblock::SetBlockShape(void)
 	{
 		// 矩形
 	case SHAPE_RECT:
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid,&D3DXCOLOR(0.0f,0.0f,0.0f,1.0));
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, NULL);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
@@ -113,13 +113,13 @@ void CConnectblock::SetBlockShape(void)
 	case SHAPE_I:
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(2, 0, 0), &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0));
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(2, 0, 0), NULL);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(3, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(4, 0, 0), &m_col);
 		break;
 		// Jブロック
 	case SHAPE_J:
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0));
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, NULL);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
@@ -445,7 +445,7 @@ void CConnectblock::StaticDebug(void)
 		// ボムブロック生成
 		if (ImGui::Button("CreateBomb"))
 		{
-			CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+			CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]),NULL);
 		}
 		// ばねブロック生成
 		if (ImGui::Button("CreateSpring"))

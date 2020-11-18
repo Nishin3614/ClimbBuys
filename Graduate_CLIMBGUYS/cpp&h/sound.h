@@ -41,9 +41,19 @@ public:
 	// ラベル
 	typedef enum
 	{
-		LABEL_BGM_GAME = 0,		// ゲーム
-		LABEL_BGM_TUTORIAL,		// チュートリアル
-		LABEL_MAX,				// 最大数
+		LABEL_BGM_GAME = 0,				// ゲーム
+		LABEL_BGM_TUTORIAL,				// チュートリアル
+		LABEL_SE_GAMESTART,				// ゲームスタート
+		LABEL_SE_COUNTDOWN,				// カウントダウン
+		LABEL_SE_FINISH,				// フィニッシュ
+		LABEL_SE_DETERMINATION,			// 決定音0
+		LABEL_SE_SELECT,				// 選択音0
+		LABEL_SE_DIE0,					// プレイヤー死亡0
+		LABEL_SE_DIE1,					// プレイヤー死亡1
+		LABEL_SE_SPRING,				// バネ
+		LABEL_SE_PUNCH,					// 殴り音
+		LABEL_SE_RESULT,				// リザルト
+		LABEL_MAX,						// 最大数
 	} LABEL;
 	/* 関数 */
 	CSound();

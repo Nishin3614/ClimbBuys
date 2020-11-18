@@ -77,7 +77,7 @@ public:
 	// 生成処理
 	static CGame * Create(void);
 	// ステージの設定
-	static void SetStage(STAGE const & Stage)	{ m_Stage = Stage; };
+
 	// ステージの取得
 	static STAGE GetStage(void)					{ return m_Stage; };
 	// タイムの取得
@@ -86,6 +86,10 @@ public:
 	static int GetSecond(void)					{ return m_nCntTime / 60; };
 	// 終了フラグの設定
 	void SetFinishFlag(bool bFlag)				{ m_bFinishFlag = bFlag; };
+
+	void SetbOperatable(bool bFlag) { m_bOperatable = bFlag; };
+	bool GetbOperatable() { return m_bOperatable; };
+
 #ifdef _DEBUG
 	void Debug(void);
 #endif // _DEBUG
@@ -104,5 +108,7 @@ private:
 	CGameUI			*m_pGameUI;		// ゲームUI
 	int				m_nCntFinish;	// 終了カウント
 	bool			m_bFinishFlag;	// 終了フラグ
+	bool			m_bOperatable;	// 操作可能フラグ
+	bool			m_bBgm;			// 一度だけ処理を通す
 };
 #endif

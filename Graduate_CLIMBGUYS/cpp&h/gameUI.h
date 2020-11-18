@@ -73,5 +73,6 @@ private:
 	int				m_nCntTimer;							// タイマーカウント
 	int				m_nTimerNum;							// タイマーのナンバー
 	bool			m_bStart;								// スタートフラグ
+	bool			m_bSEflag;								// スタート時に一度効果音を鳴らすフラグ
 };
 #endif

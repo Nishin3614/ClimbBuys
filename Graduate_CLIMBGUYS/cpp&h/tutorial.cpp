@@ -145,6 +145,8 @@ void CTutorial::Update(void)
 				// フェード状態が何も起こっていない状態なら
 				if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
 				{
+					// 決定音
+					CManager::GetSound()->PlaySound(CSound::LABEL_SE_DETERMINATION);
 					CManager::GetFade()->SetFade(CManager::MODE_GAME);
 				}
 			}

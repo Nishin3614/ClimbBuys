@@ -15,6 +15,7 @@
 #include "debugproc.h"
 #include "scene_two.h"
 #include "number.h"
+#include "sound.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -50,6 +51,7 @@ CGameUI::CGameUI()
 	m_nCntTimer				= 0;				// タイマーカウント
 	m_nTimerNum				= TIMER_INIT_NUM;	// タイマーのナンバー
 	m_bStart				= false;			// スタートフラグ
+	m_bSEflag				= false;			// 効果音フラグ
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,6 +89,13 @@ void CGameUI::Update(void)
 	// スタートの合図が存在しているとき
 	if (m_pScene2D[(int)GAME_UI::START])
 	{
+		if (!m_bSEflag)
+		{
+			// カウントダウン
+			CManager::GetSound()->PlaySound(CSound::LABEL_SE_COUNTDOWN);
+			m_bSEflag = true;
+		}
+
 		// スタートタイマーの処理
 		StartTimer();
 	}

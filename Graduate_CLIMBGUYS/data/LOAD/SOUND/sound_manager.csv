@@ -1,2 +1,12 @@
 data/SOUND/BGM/Game.wav,-1,0
 data/SOUND/BGM/Tutorial.wav,-1,0
+data/SOUND/SE/ゲームスタート.wav,0,1
+data/SOUND/SE/カウントダウン.wav,0,1
+data/SOUND/SE/フィニッシュ.wav,0,1
+data/SOUND/SE/決定音0.wav,0,1
+data/SOUND/SE/選択音0.wav,0,1
+data/SOUND/SE/プレイヤー死亡0.wav,0,1
+data/SOUND/SE/プレイヤー死亡1.wav,0,1
+data/SOUND/SE/バネ.wav,0,1
+data/SOUND/SE/殴り音.wav,0,1
+data/SOUND/BGM/Result.wav,-1,0

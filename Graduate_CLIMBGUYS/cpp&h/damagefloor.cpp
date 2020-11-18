@@ -15,6 +15,8 @@
 #include "basemode.h"
 #include "debugproc.h"
 
+#include "sound.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // ƒ}ƒNƒ’è‹`
@@ -162,6 +164,7 @@ void CDamageFloor::ComparisonHeight()
 				// ‹L˜^XV_Ž€–SŒ´ˆö
 				pPlayer->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
 				// Ž€–SÝ’è
+				CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);				
 				pPlayer->SetDie(true);
 			}
 			pPlayer = nullptr;

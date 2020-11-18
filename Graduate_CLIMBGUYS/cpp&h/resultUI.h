@@ -13,6 +13,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "main.h"
+#include "player.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -74,18 +75,20 @@ public:
 	static HRESULT Load(void);							// 読み込み
 	static void UnLoad(void);							// 破棄
 	// 設定 //
+	static void SetRecord(PLAYER_TAG PlayerNum, CPlayer::RECORD record);
 
 	// 取得 //
 protected:
 private:
 	/* 関数 */
-	void			InitSettingFrame(void);							// 枠の初期設定
-	void			InitSettingScore(void);							// 各スコアの初期設定
-	void			UpdateSettingFrame(void);						// 枠の更新設定
-	void			UpdateSettingScore(void);						// 各スコアの更新設定
+	void					InitSettingFrame(void);							// 枠の初期設定
+	void					InitSettingScore(void);							// 各スコアの初期設定
+	void					UpdateSettingFrame(void);						// 枠の更新設定
+	void					UpdateSettingScore(void);						// 各スコアの更新設定
 	/* 変数 */
-	CScene_TWO		*m_pScene2D[(int)RESULT_UI::UI_MAX];			// シーン2D
-	RESULT_SCORE	m_ResultScore[(int)PLAYER_TAG::PLAYER_MAX];	// リザルトスコア
-	D3DXVECTOR3		m_move;											// 移動量
+	CScene_TWO				*m_pScene2D[(int)RESULT_UI::UI_MAX];			// シーン2D
+	RESULT_SCORE			m_ResultScore[(int)PLAYER_TAG::PLAYER_MAX];		// リザルトスコア
+	D3DXVECTOR3				m_move;											// 移動量
+	static CPlayer::RECORD	m_Record[(int)PLAYER_TAG::PLAYER_MAX];			// 記録情報 
 };
 #endif

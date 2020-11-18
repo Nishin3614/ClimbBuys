@@ -15,6 +15,7 @@
 #include "debugproc.h"
 #include "scene_two.h"
 #include "multinumber.h"
+#include "player.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -45,6 +46,7 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+CPlayer::RECORD		CResultUI::m_Record[(int)PLAYER_TAG::PLAYER_MAX] = {};
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // イニシャライザコンストラクタ
@@ -68,6 +70,10 @@ CResultUI::CResultUI()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 CResultUI::~CResultUI()
 {
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		m_Record[nCnt] = {};				// 記録情報
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -192,6 +198,14 @@ void CResultUI::UnLoad(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 記録情報の設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CResultUI::SetRecord(PLAYER_TAG PlayerNum, CPlayer::RECORD record)
+{
+	m_Record[(int)PlayerNum] = record;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 枠の初期設定
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::InitSettingFrame(void)
@@ -215,6 +229,8 @@ void CResultUI::InitSettingFrame(void)
 				m_pScene2D[nCnt]->SetPosition(RESULT_UI_RANK_POS);
 				// サイズの設定
 				m_pScene2D[nCnt]->SetSize(RESULT_UI_RANK_SIZE);
+				// テクスチャの設定
+				m_pScene2D[nCnt]->BindTexture(CTexture_manager::TYPE_RESULT_UI_RANK_01 + m_Record[nCnt - (int)RESULT_UI::RANK_01].nRanking - 1);
 			}
 			// 死因に共通する設定
 			else if (nCnt <= (int)RESULT_UI::DEATH_04)
@@ -223,8 +239,8 @@ void CResultUI::InitSettingFrame(void)
 				m_pScene2D[nCnt]->SetPosition(RESULT_UI_DEATH_POS);
 				// サイズの設定
 				m_pScene2D[nCnt]->SetSize(RESULT_UI_DEATH_SIZE);
-				// テクスチャの設定 試験的
-				m_pScene2D[nCnt]->BindTexture(CTexture_manager::TYPE_RESULT_UI_DEATH_01);
+				// テクスチャの設定
+				m_pScene2D[nCnt]->BindTexture(CTexture_manager::TYPE_RESULT_UI_DEATH_01 + m_Record[nCnt - (int)RESULT_UI::DEATH_01].DieCause);
 			}
 
 			// 初期化
@@ -248,8 +264,8 @@ void CResultUI::InitSettingScore(void)
 			m_ResultScore[nCnt].m_pSurvivalTime->SetPos(RESULT_SCORE_SURVIVAL_TIME_POS);
 			// サイズの設定
 			m_ResultScore[nCnt].m_pSurvivalTime->SetSize(RESULT_SCORE_SIZE);
-			// スコアの設定	( 仮設定・後にプレイヤーのスコア )
-			m_ResultScore[nCnt].m_pSurvivalTime->SetScore(25);
+			// スコアの設定
+			m_ResultScore[nCnt].m_pSurvivalTime->SetScore(m_Record[nCnt].nTime);
 		}
 		// ブロックを押した回数
 		if (m_ResultScore[nCnt].m_pPressBlock)
@@ -258,8 +274,8 @@ void CResultUI::InitSettingScore(void)
 			m_ResultScore[nCnt].m_pPressBlock->SetPos(RESULT_SCORE_PRESS_BLOCK_POS);
 			// サイズの設定
 			m_ResultScore[nCnt].m_pPressBlock->SetSize(RESULT_SCORE_SIZE);
-			// スコアの設定	( 仮設定・後にプレイヤーのスコア )
-			m_ResultScore[nCnt].m_pPressBlock->SetScore(15);
+			// スコアの設定
+			m_ResultScore[nCnt].m_pPressBlock->SetScore(m_Record[nCnt].nPushCnt);
 		}
 	}
 }

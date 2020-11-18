@@ -22,6 +22,7 @@
 #include "playerUI.h"
 #include "3Dline.h"
 #include "springblock.h"
+#include "resultUI.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -122,7 +123,7 @@ void CPlayer::Init(void)
 void CPlayer::Uninit(void)
 {
 	// 記録情報をリザルトに渡す
-
+	CResultUI::SetRecord(GetPlayerTag(), m_Record);
 
 	// キャラクター終了処理
 	CCharacter::Uninit();

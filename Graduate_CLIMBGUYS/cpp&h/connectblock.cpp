@@ -101,7 +101,7 @@ void CConnectblock::SetBlockShape(void)
 		// 矩形
 	case SHAPE_RECT:
 		m_col = COLOR_ORANGE;
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid,&D3DXCOLOR(0.0f,0.0f,0.0f,1.0));
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid,NULL);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
@@ -122,7 +122,7 @@ void CConnectblock::SetBlockShape(void)
 		// Jブロック
 	case SHAPE_J:
 		m_col = COLOR_GREEN;
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0));
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, NULL);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col);
@@ -496,8 +496,8 @@ void CConnectblock::Tutorial_InitArrangementBlock(void)
 	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(6, 0, 1), &Col);
 
 	// ボム
-	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 1), &D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
-	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 4), &D3DXCOLOR(1.0f, 0.1f, 0.1f, 1.0f));
+	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 1), NULL);
+	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 4), NULL);
 }
 
 #ifdef _DEBUG

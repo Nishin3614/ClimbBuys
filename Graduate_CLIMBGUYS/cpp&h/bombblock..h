@@ -131,7 +131,9 @@ private:
 	// 周りのブロックを削除する処理
 	void AroundDelete(void);
 	/* 変数 */
-	bool	m_bBomb;	// 爆発するかしないか状態
+	bool	m_bBomb;		// 爆発するかしないか状態
+	bool	m_bPlayerPush;	// プレイヤーに当たったら
+
 };
 
 #endif

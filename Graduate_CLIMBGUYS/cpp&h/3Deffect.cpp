@@ -132,6 +132,8 @@ void C3DEffect::Draw(void)
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	//Zバッファ　有効　無効
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_FALSE);
+	//Zバッファ　有効
+	pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
 	for (int nCount = 0; nCount < EFFECT_MAX; nCount++, pEffect++)
 	{
@@ -191,6 +193,8 @@ void C3DEffect::Draw(void)
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	//Zバッファ　有効
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, D3DZB_TRUE);
+	//Zバッファ　有効
+	pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	// ライティングモード有効
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 	// レンダーステート(通常ブレンド処理)

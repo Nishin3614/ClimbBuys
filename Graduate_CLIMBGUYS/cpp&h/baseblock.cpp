@@ -152,6 +152,12 @@ void CBaseblock::Update_Fall(void)
 	{
 		// リリース処理
 		Release();
+		// シャドウが存在しているなら
+		if (m_pShadowPolygon)
+		{
+			// シャドウをリリース
+			m_pShadowPolygon->Release();
+		}
 	}
 }
 
@@ -488,26 +494,63 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
 	CBaseblock::GRID MyGrid = this->GetGrid();					// 行列高
 	CGame::STAGE Stage = CGame::GetStage();						// ステージ
-	if (this->GetGrid().nHeight >= CBaseblock::GetHeight(this->GetGrid().nColumn, this->GetGrid().nLine))
-	{
 		// 素材のZ範囲
-		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
-			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 		{
-			// 素材のX範囲
-			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-				pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+
+				// 素材状の左に
+				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y - 3.0f;
+				//posOld->y = pos->y;
+				// 移動量の初期化
+				move->y = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+				// 素材状の左に
+				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+				//posOld->y = pos->y;
+				// 移動量の初期化
+				move->y = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+				// タイプがボムなら
+				if (m_type == TYPE::TYPE_BOMB)
+				{
+					// ボムの状態設定
+					((CBombblock *)this)->SetbBomb(true);
+				}
+			}
+			if (Direct == COLLISIONDIRECTION::NONE)
 			{
 				// 当たり判定(下)
 				if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-					posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+					pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::DOWN;
 
 					// 素材状の左に
-					pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y - 3.0f;
+					pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
 					//posOld->y = pos->y;
+
 					// 移動量の初期化
 					move->y = 0.0f;
 					// 押し出し状態がtrue
@@ -516,7 +559,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 
 				// 当たり判定(上)
 				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-					posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+					pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::UP;
@@ -532,73 +575,31 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					{
 						// 変数宣言
 						CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
-						// ボムの状態設定
+																		// ボムの状態設定
 						pBombBlock->SetbBomb(true);
 					}
 				}
-				if (Direct == COLLISIONDIRECTION::NONE)
+				// 当たり判定(下)
+				else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+					pos->y + OffsetPos.y <= BlockPos.y)
 				{
-					// 当たり判定(下)
-					if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-						pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::DOWN;
+					// めり込んでいる
+					Direct = COLLISIONDIRECTION::DOWN;
+				}
 
-						// 素材状の左に
-						pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
-						//posOld->y = pos->y;
-
-						// 移動量の初期化
-						move->y = 0.0f;
-						// 押し出し状態がtrue
-						bPush = true;
-					}
-
-					// 当たり判定(上)
-					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-						pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
+				// 当たり判定(上)
+				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+					pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+				{
+					// めり込んでいる
+					Direct = COLLISIONDIRECTION::UP;
+					// タイプがボムなら
+					if (m_type == TYPE::TYPE_BOMB)
 					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::UP;
-						// 素材状の左に
-						pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
-						//posOld->y = pos->y;
-						// 移動量の初期化
-						move->y = 0.0f;
-						// 押し出し状態がtrue
-						bPush = true;
-						// タイプがボムなら
-						if (m_type == TYPE::TYPE_BOMB)
-						{
-							// 変数宣言
-							CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
-																			// ボムの状態設定
-							pBombBlock->SetbBomb(true);
-						}
-					}
-					// 当たり判定(下)
-					else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-						pos->y + OffsetPos.y <= BlockPos.y)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::DOWN;
-					}
-
-					// 当たり判定(上)
-					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-						pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::UP;
-						// タイプがボムなら
-						if (m_type == TYPE::TYPE_BOMB)
-						{
-							// 変数宣言
-							CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
-																			// ボムの状態設定
-							pBombBlock->SetbBomb(true);
-						}
+						// 変数宣言
+						CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
+																		// ボムの状態設定
+						pBombBlock->SetbBomb(true);
 					}
 				}
 			}
@@ -980,6 +981,12 @@ bool CBaseblock::DeleteBlock(
 	CBaseblock::FallBlock_Grid(pBlock->GetGrid());
 	// 押したブロックの現在までいた行列の高さ情報を更新
 	CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(0, -1, 0));
+	// シャドウのリリース処理
+	if (pBlock->m_pShadowPolygon)
+	{
+		// シャドウをリリース
+		pBlock->m_pShadowPolygon->Release();
+	}
 	// リリース処理
 	pBlock->Release();
 	return true;
@@ -1321,11 +1328,14 @@ void CBaseblock::SetHeight(
 {
 	// 行列が0未満なら
 	// ->関数を抜ける
-	if (Grid.nColumn + m_nFeedValue[CGame::GetStage()] < 0 || Grid.nLine + m_nFeedValue[CGame::GetStage()] < 0)
+	if (Grid.nColumn + m_nFeedValue[CGame::GetStage()] < 0 ||
+		Grid.nLine + m_nFeedValue[CGame::GetStage()] < 0
+		)
 	{
 		//CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
 		return;
 	}
+	else if (m_anHeight[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]] <= Grid.nHeight) return;
 	m_anHeight[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]] = Grid.nHeight;
 }
 

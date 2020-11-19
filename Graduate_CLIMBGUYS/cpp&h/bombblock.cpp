@@ -7,6 +7,8 @@
 #include "bombblock..h"
 #include "debugproc.h"
 #include "game.h"
+#include "3dparticle.h"
+#include "sound.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -248,6 +250,15 @@ std::unique_ptr<CBombblock> CBombblock::Creat_Unique(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBombblock::AroundDelete(void)
 {
+	// パーティクル生成
+	C3DParticle::Create(
+		C3DParticle::PARTICLE_ID_EXPLOSION,
+		this->GetPos()
+	);
+
+	// 爆発音
+	CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
+
 	// ブロックのループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{

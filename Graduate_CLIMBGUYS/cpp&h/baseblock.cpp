@@ -11,6 +11,7 @@
 #include "game.h"
 #include "circleshadow.h"
 #include "bombblock..h"
+#include "3dparticle.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -969,6 +970,12 @@ bool CBaseblock::DeleteBlock(
 	CBaseblock * pBlock	// ブロック情報
 )
 {
+	// パーティクル生成
+	C3DParticle::Create(
+		C3DParticle::PARTICLE_ID_EXPLOSION,
+		pBlock->GetPos()
+	);
+
 	// 押す前のブロックの上にあったブロックを落とさせる
 	CBaseblock::FallBlock_Grid(pBlock->GetGrid());
 	// 押したブロックの現在までいた行列の高さ情報を更新

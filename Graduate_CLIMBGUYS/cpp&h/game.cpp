@@ -81,7 +81,8 @@ void CGame::Init(void)
 {
 	// モードの初期化
 	CBaseMode::Init();
-
+	// 死亡人数の初期化
+	CPlayer::InitDieCount();
 	/* 初期化 */
 	// 静的変数の初期化
 	StaticInit();

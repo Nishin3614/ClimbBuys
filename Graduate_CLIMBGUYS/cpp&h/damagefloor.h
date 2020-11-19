@@ -60,6 +60,5 @@ private:
 	float m_MoveSpeed;									// 移動量の速さ
 	int m_AscendUpToTime;								// 床の上昇が始まるまでの時間 仮
 	CPlayer *m_pPlayer[4];								// 四人分のポインタ
-	int	m_nDieCnt;										// 死亡人数 仮
 };
 #endif

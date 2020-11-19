@@ -36,7 +36,6 @@ CDamageFloor::CDamageFloor() : CScene_THREE::CScene_THREE()
 {
 	m_MoveSpeed = 0.0f;									// 移動量の初期化
 	m_AscendUpToTime = 0;
-	m_nDieCnt = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +50,6 @@ CDamageFloor::~CDamageFloor()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::Init(void)
 {
-	m_nDieCnt = 0;
 	m_pPlayer[4] = {};
 	// オフセットタイプ設定
 	CScene_THREE::SetOffsetType(OFFSET_TYPE_SIDE_CENTER);
@@ -134,8 +132,6 @@ void CDamageFloor::Update(void)
 	ComparisonHeight();
 
 	CScene_THREE::Update();
-
-	CDebugproc::Print("死亡人数%d\n", m_nDieCnt);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -216,19 +212,6 @@ void CDamageFloor::ComparisonHeight()
 	//	}
 	//}
 
-	/*int nPlayerCnt = 0;
-	int nDieCnt = 0;
-
-	while (nPlayerCnt < 4)
-	{
-		if (m_pPlayer[nPlayerCnt]->GetDie())
-		{
-			nDieCnt++;
-		}
-
-		nPlayerCnt++;
-	}*/
-
 	// プレイヤーの数分
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
@@ -238,18 +221,18 @@ void CDamageFloor::ComparisonHeight()
 			if (this->GetPos().y >= m_pPlayer[nCnt]->GetPos().y)
 			{
 				// 自分が最後の一人ではなかったら死亡フラグをtrueにする
-				if (m_nDieCnt < 3)
+				if (CPlayer::GetDieCount() < 3)
 				{
-					// 記録更新_死亡原因
-					m_pPlayer[nCnt]->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
-					// 死亡設定
-					CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
-
 					if (!m_pPlayer[nCnt]->GetDie())
 					{
-						m_nDieCnt++;
+						CPlayer::AddDieCount();
+						// 記録更新_死亡原因
+						m_pPlayer[nCnt]->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
+						// 死亡設定
+						CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
+
+						m_pPlayer[nCnt]->SetDie(true);
 					}
-					m_pPlayer[nCnt]->SetDie(true);
 				}
 			}
 		}

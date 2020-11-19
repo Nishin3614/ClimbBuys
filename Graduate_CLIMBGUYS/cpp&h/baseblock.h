@@ -126,6 +126,16 @@ public:
 		{
 			return Grid.nColumn == nColumn && Grid.nLine == nLine && Grid.nHeight == nHeight;
 		}
+		// 行列高さの<=のオペレーション
+		bool operator <= (GRID & Grid)
+		{
+			return nColumn <= Grid.nColumn && nLine <= Grid.nLine && nHeight <= Grid.nHeight;
+		}
+		// 行列高さの>=のオペレーション
+		bool operator >= (GRID & Grid)
+		{
+			return nColumn >= Grid.nColumn && nLine >= Grid.nLine && nHeight >= Grid.nHeight;
+		}
 		D3DXVECTOR3 GetPos(float const & fRange)
 		{
 			D3DXVECTOR3 pos;

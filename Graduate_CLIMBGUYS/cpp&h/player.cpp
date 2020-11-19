@@ -49,7 +49,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatus		= {};		// プレイヤーのステータス
 CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatusInit	= {};		// プレイヤーの初期ステータス
-
+int CPlayer::m_nDieCnt = 0;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -217,13 +217,6 @@ void CPlayer::Update(void)
 		}
 	}
 #endif // _DEBUG
-
-	// 死亡判定が出たらリザルトに遷移する
-	if (GetDie())
-	{
-		// 死亡関数
-		Die();
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -723,10 +716,18 @@ void CPlayer::BlockCollision(void)
 		(bRight && bLeft)
 		)
 	{
-		// 記録更新
-		m_Record.DieCause = DIECAUSE::DIECAUSE_PRESS;
-		// 死亡処理
-		Die();
+		if (!this->GetDie())
+		{
+			if (CPlayer::GetDieCount() < 3)
+			{
+				// 記録更新
+				m_Record.DieCause = DIECAUSE::DIECAUSE_PRESS;
+				// 死亡設定
+				CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE1);
+				// 死亡処理
+				Die();
+			}
+		}
 	}
 
 	// ブロックの押し出し処理
@@ -1467,48 +1468,59 @@ void CPlayer::Draw(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Die(void)
 {
-	// パーティクル生成
-	C3DParticle::Create(
-		C3DParticle::PARTICLE_ID_UNKNOWN,
-		m_pos
-	);
-
 	// チュートリアル以外のとき死ぬ
 	if (CManager::GetMode() != CManager::MODE_TUTORIAL)
 	{
-		if (m_pPlayerUI)
-		{
-// リリース時にのみ通る
+			// パーティクル生成
+			C3DParticle::Create(
+				C3DParticle::PARTICLE_ID_UNKNOWN,
+				m_pos
+			);
+
+			// 死亡人数の加算
+			m_nDieCnt++;
+
+				if (m_pPlayerUI)
+				{
+					// リリース時にのみ通る
 #ifndef _DEBUG
-			// バイブレーションの設定
-			m_pPad->StartVibration(60);
+					// バイブレーションの設定
+					m_pPad->StartVibration(60);
 #endif // _DEBUG
 
-			// プレイヤーUIを開放
-			m_pPlayerUI->Release();
-			m_pPlayerUI = nullptr;
-		}
-		// 記録更新_ランキング
-		m_Record.nRanking = CCharacter::GetAllCharacter();
-		// 記録更新_タイム
-		m_Record.nTime = CGame::GetSecond();
-		// 死亡処理
-		CCharacter::Die();
-
+					// プレイヤーUIを開放
+					m_pPlayerUI->Release();
+					m_pPlayerUI = nullptr;
+				}
+				// 記録更新_ランキング
+				m_Record.nRanking = CCharacter::GetAllCharacter();
+				// 記録更新_タイム
+				m_Record.nTime = CGame::GetSecond();
+				// 死亡を確定させる
+				CPlayer::SetDie(true);
+				// 死亡処理
+				CCharacter::Die();
 #ifdef _DEBUG
-		// 当たり判定ボックスの開放
-		for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
-		{
-			// NULLチェック
-			if (pCollisionBox[nCntCollision] == NULL) continue;
-			pCollisionBox[nCntCollision]->Release();
-			pCollisionBox[nCntCollision] = NULL;
-		}
+				// 当たり判定ボックスの開放
+				for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
+				{
+					// NULLチェック
+					if (pCollisionBox[nCntCollision] == NULL) continue;
+					pCollisionBox[nCntCollision]->Release();
+					pCollisionBox[nCntCollision] = NULL;
+				}
 #endif // _DEBUG
+
 	}
 	// チュートリアルのときリスポーンする
 	else
 	{
+		// パーティクル生成
+		C3DParticle::Create(
+			C3DParticle::PARTICLE_ID_UNKNOWN,
+			m_pos
+		);
+
 		// 死亡判定をオフにする ( 復活 )
 		SetDie(false);
 		// リスポーン位置の設定

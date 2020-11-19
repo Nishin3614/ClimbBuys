@@ -64,14 +64,15 @@
 // オレンジ色
 #define COLOR_ORANGE		D3DXCOLOR(1.0f,0.5f,0.0f,1.0f)
 // 黄緑色
-#define COLOR_LIME			D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
+#define COLOR_LIME			D3DXCOLOR(0.5f,1.0f,0.0f,1.0f)
 // 紫色
 #define COLOR_PURPURE		D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
 // ピンク色
 #define COLOR_PINK			D3DXCOLOR(1.0f,0.5f,1.0f,1.0f)
 // エメラルド色
 #define COLOR_EMERALD		D3DXCOLOR(0.0f,1.0f,0.5f,1.0f)
-
+// 薄い赤色
+#define COLOR_LIGHTRED		D3DXCOLOR(1.0f,0.2f,0.2f,1.0f)
 
 /* テキスト用 */
 // 改行

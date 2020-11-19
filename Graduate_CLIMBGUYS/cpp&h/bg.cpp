@@ -69,7 +69,7 @@ void CBg::Draw()
 //------------------------------------------------------------------------------
 // 背景の生成処理
 //------------------------------------------------------------------------------
-CBg *CBg::Create()
+CBg *CBg::Create(int nTexId)
 {
 	//メモリ確保
 	CBg *pBg = new CBg;
@@ -87,7 +87,7 @@ CBg *CBg::Create()
 	pBg->SetSize(SCREEN_SIZE);
 
 	// テクスチャの設定
-	pBg->BindTexture(CTexture_manager::TYPE_BG);
+	pBg->BindTexture(nTexId);
 
 	// 色の設定
 	pBg->SetCol(D3DXCOLOR_INI);

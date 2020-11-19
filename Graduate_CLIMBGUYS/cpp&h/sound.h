@@ -53,6 +53,7 @@ public:
 		LABEL_SE_SPRING,				// バネ
 		LABEL_SE_PUNCH,					// 殴り音
 		LABEL_SE_RESULT,				// リザルト
+		LABEL_SE_EXPLOSION,				// 爆発
 		LABEL_MAX,						// 最大数
 	} LABEL;
 	/* 関数 */

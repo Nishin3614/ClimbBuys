@@ -249,6 +249,10 @@ public:
 
 	// ゲームパッドの取得
 	CXInputPad *GetPad()					{ return m_pPad; };
+
+	static void InitDieCount() { m_nDieCnt = 0; };
+	static int GetDieCount() { return m_nDieCnt; };
+
 protected:
 private:
 	/* 構造体 */
@@ -302,6 +306,9 @@ private:
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 	bool						m_bSpringFlag;					// ばねの判定を一回だけ通す
 	RECORD						m_Record;						// 記録情報
+
+	static int					m_nDieCnt;						// 死亡人数 仮
+
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
 	C3DLine *	pCollisionLine;

@@ -63,6 +63,13 @@ public:
 		TYPE_GAME_UI_START,			// ゲームUI_START
 		TYPE_GAME_UI_FINISH,		// ゲームUI_FINISH
 		TYPE_TUTORIAL_UI_OK,		// チュートリアルUI_OKサイン
+		TYPE_EFFECT_SMOKE00,		// 煙
+		TYPE_EFFECT_SMOKE01,		// 煙
+		TYPE_EFFECT_SPARK,			// 火花
+		TYPE_EFFECT_BLOCK,			// ブロック
+		TYPE_EFFECT_FIRE,			// 火
+		TYPE_EFFECT_EXPLOSION,		// 爆発
+		TYPE_BG_TITLE,				// タイトル背景
 		TYPE_MAX					// 最大数
 	} TYPE;
 

@@ -194,8 +194,6 @@ void CGame::Update(void)
 		{
 			// カウントダウン
 			CManager::GetSound()->StopSound(CSound::LABEL_BGM_GAME);
-			// カウントダウン
-			CManager::GetSound()->PlaySound(CSound::LABEL_SE_FINISH);
 		}
 		// カウントアップ
 		m_nCntFinish++;

@@ -224,6 +224,8 @@ void CGameUI::FinishSignal()
 {
 	if (!m_pScene2D[(int)GAME_UI::FINISH])
 	{
+		// カウントダウン
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_FINISH);
 		// 終了の合図を出す
 		m_pScene2D[(int)GAME_UI::FINISH] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_FINISH));
 		m_pScene2D[(int)GAME_UI::FINISH]->SetCol(D3DXCOLOR_INI);

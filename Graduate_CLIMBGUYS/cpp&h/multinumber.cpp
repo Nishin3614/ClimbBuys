@@ -159,16 +159,16 @@ void CMultiNumber::SetScore(int nScore)
 // =====================================================================================================================================================================
 void CMultiNumber::SetPos(D3DXVECTOR3 pos)
 {
-	//位置代入
+	// 位置代入
 	m_pos = pos;
 
-	//桁数分繰り返す
+	// 桁数分繰り返す
 	for (size_t nCnt = 0; nCnt < m_pNumbers.size(); nCnt++)
 	{
-		//nullcheck
+		// nullcheck
 		if (m_pNumbers[nCnt])
 		{
-			//位置の設定
+			// 位置の設定
 			m_pNumbers[nCnt]->SetPosition(pos + D3DXVECTOR3(-m_pNumbers[nCnt]->GetSize().x * (m_pNumbers.size() - 1) * 0.5f + m_pNumbers[nCnt]->GetSize().x * nCnt, 0.0f, 0.0f));
 			m_pNumbers[nCnt]->Set_Vtx_Pos();
 		}

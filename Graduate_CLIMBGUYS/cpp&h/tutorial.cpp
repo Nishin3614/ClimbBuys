@@ -81,7 +81,7 @@ void CTutorial::Init(void)
 	C3DEffect::Create();
 
 	// 試験的背景の生成
-	CBg::Create();
+	CBg::Create(CTexture_manager::TYPE_BG);
 
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CGame::STAGE_1);

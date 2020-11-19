@@ -41,7 +41,7 @@ public:
 	void		SetPos(D3DXVECTOR3 pos);					// 位置の設定
 	void		SetSize(D3DXVECTOR2 size);					// サイズの設定
 
-	D3DXVECTOR3 GetPos() { return m_pos; };							// 位置の取得
+	D3DXVECTOR3 GetPos() { return m_pos; };						// 位置の取得
 	D3DXVECTOR2 GetSize() { return m_size; };					// サイズの取得
 
 private:

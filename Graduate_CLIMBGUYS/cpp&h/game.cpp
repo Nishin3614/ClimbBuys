@@ -89,7 +89,7 @@ void CGame::Init(void)
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
 	// 試験的背景の生成
-	CBg::Create();
+	CBg::Create(CTexture_manager::TYPE_BG);
 	// ゲームUIの生成
 	m_pGameUI = CGameUI::Create();
 
@@ -194,8 +194,6 @@ void CGame::Update(void)
 		{
 			// カウントダウン
 			CManager::GetSound()->StopSound(CSound::LABEL_BGM_GAME);
-			// カウントダウン
-			CManager::GetSound()->PlaySound(CSound::LABEL_SE_FINISH);
 		}
 		// カウントアップ
 		m_nCntFinish++;

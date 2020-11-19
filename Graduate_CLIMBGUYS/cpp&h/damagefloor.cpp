@@ -36,6 +36,7 @@ CDamageFloor::CDamageFloor() : CScene_THREE::CScene_THREE()
 {
 	m_MoveSpeed = 0.0f;									// 移動量の初期化
 	m_AscendUpToTime = 0;
+	m_nDieCnt = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,6 +51,8 @@ CDamageFloor::~CDamageFloor()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::Init(void)
 {
+	m_nDieCnt = 0;
+	m_pPlayer[4] = {};
 	// オフセットタイプ設定
 	CScene_THREE::SetOffsetType(OFFSET_TYPE_SIDE_CENTER);
 
@@ -64,6 +67,41 @@ void CDamageFloor::Init(void)
 
 	// シーン3Dの初期化
 	CScene_THREE::Init();
+
+	//通常アイテムの総数分
+	for (int nCnt = 0; nCnt < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCnt++)
+	{
+		CScene *pScene = CScene::GetScene(LAYER_CHARACTER, nCnt);
+		// オブジェクトタイプがプレイヤーなら
+		if (pScene->GetObj() == OBJ::OBJ_PLAYER)
+		{
+			CPlayer *pPlayer = (CPlayer*)pScene;
+			// プレイヤータグがプレイヤー1なら
+			if (pPlayer->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
+			{
+				// プレイヤーのポインタ取得
+				m_pPlayer[(int)PLAYER_TAG::PLAYER_1] = pPlayer;
+			}
+			// プレイヤータグがプレイヤー2なら
+			else if (pPlayer->GetPlayerTag() == PLAYER_TAG::PLAYER_2)
+			{
+				// プレイヤーのポインタ取得
+				m_pPlayer[(int)PLAYER_TAG::PLAYER_2] = pPlayer;
+			}// プレイヤータグがプレイヤ31なら
+			else if (pPlayer->GetPlayerTag() == PLAYER_TAG::PLAYER_3)
+			{
+				// プレイヤーのポインタ取得
+				m_pPlayer[(int)PLAYER_TAG::PLAYER_3] = pPlayer;
+			}// プレイヤータグがプレイヤー4なら
+			else if (pPlayer->GetPlayerTag() == PLAYER_TAG::PLAYER_4)
+			{
+				// プレイヤーのポインタ取得
+				m_pPlayer[(int)PLAYER_TAG::PLAYER_4] = pPlayer;
+			}
+
+			pPlayer = nullptr;
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,6 +134,8 @@ void CDamageFloor::Update(void)
 	ComparisonHeight();
 
 	CScene_THREE::Update();
+
+	CDebugproc::Print("死亡人数%d\n", m_nDieCnt);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -151,23 +191,67 @@ void CDamageFloor::UnLoad(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::ComparisonHeight()
 {
-	//通常アイテムの総数分
-	for (int nCnt = 0; nCnt < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCnt++)
+	////通常アイテムの総数分
+	//for (int nCnt = 0; nCnt < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCnt++)
+	//{
+	//	// プレイヤーのポインタ取得
+	//	CPlayer *pPlayer = (CPlayer*)CScene::GetScene(LAYER_CHARACTER, nCnt);
+	//	if (pPlayer != nullptr)
+	//	{
+	//		//高さを比較してプレイヤーが床より下に落ちたら死亡フラグをtrue
+	//		if (this->GetPos().y >= pPlayer->GetPos().y)
+	//		{
+	//			// 記録更新_死亡原因
+	//			pPlayer->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
+	//			// 死亡設定
+	//			CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
+
+	//			// 自分が最後の一人ではなかったら死亡フラグをtrueにする
+	//			if ()
+	//			{
+	//				pPlayer->SetDie(true);
+	//			}
+	//		}
+	//		pPlayer = nullptr;
+	//	}
+	//}
+
+	/*int nPlayerCnt = 0;
+	int nDieCnt = 0;
+
+	while (nPlayerCnt < 4)
 	{
-		// プレイヤーのポインタ取得
-		CPlayer *pPlayer = (CPlayer*)CScene::GetScene(LAYER_CHARACTER, nCnt);
-		if (pPlayer != nullptr)
+		if (m_pPlayer[nPlayerCnt]->GetDie())
 		{
-			//高さを比較してプレイヤーが床より下に落ちたら死亡フラグをtrue
-			if (this->GetPos().y >= pPlayer->GetPos().y)
+			nDieCnt++;
+		}
+
+		nPlayerCnt++;
+	}*/
+
+	// プレイヤーの数分
+	for (int nCnt = 0; nCnt < 4; nCnt++)
+	{
+		if (m_pPlayer[nCnt])
+		{
+			// 高さを比較してプレイヤーが床より下に落ちたら死亡フラグをtrue
+			if (this->GetPos().y >= m_pPlayer[nCnt]->GetPos().y)
 			{
-				// 記録更新_死亡原因
-				pPlayer->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
-				// 死亡設定
-				CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
-				pPlayer->SetDie(true);
+				// 自分が最後の一人ではなかったら死亡フラグをtrueにする
+				if (m_nDieCnt < 3)
+				{
+					// 記録更新_死亡原因
+					m_pPlayer[nCnt]->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
+					// 死亡設定
+					CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
+
+					if (!m_pPlayer[nCnt]->GetDie())
+					{
+						m_nDieCnt++;
+					}
+					m_pPlayer[nCnt]->SetDie(true);
+				}
 			}
-			pPlayer = nullptr;
 		}
 	}
 }

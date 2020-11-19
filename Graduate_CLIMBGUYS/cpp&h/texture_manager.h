@@ -69,6 +69,7 @@ public:
 		TYPE_EFFECT_BLOCK,			// ブロック
 		TYPE_EFFECT_FIRE,			// 火
 		TYPE_EFFECT_EXPLOSION,		// 爆発
+		TYPE_BG_TITLE,				// タイトル背景
 		TYPE_MAX					// 最大数
 	} TYPE;
 

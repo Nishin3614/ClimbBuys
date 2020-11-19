@@ -22,24 +22,27 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-/* D3DXVECTOR3(((サイズX / 2) + サイズXの値 * nCnt), ((サイズY / 2 + サイズY[下の画面外に出すため]) + (移動量 * ずらすフレーム数) * nCnt), 0.0f) */
-#define RESULT_UI_FRAME_POS					(D3DXVECTOR3((160.0f + 320.0f * nCnt), (1080.0f + 210.0f * nCnt), 0.0f))		// 枠の位置
-#define RESULT_UI_FRAME_SIZE				(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// 枠のサイズ
-#define RESULT_UI_FRAME_MOVE_STOP_POS_Y		(360.0f)								// 枠の移動が止まる位置Y
+/* D3DXVECTOR3((基準値 + 幅 * nCnt), ((サイズY / 2 + サイズY[下の画面外に出すため]) + (移動量 * ずらすフレーム数) * nCnt), 0.0f) */
+#define RESULT_UI_FRAME_POS								(D3DXVECTOR3((160.0f + 320.0f * nCnt), (1080.0f + 210.0f * nCnt), 0.0f))		// 枠の位置
+#define RESULT_UI_FRAME_SIZE							(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// 枠のサイズ
+#define RESULT_UI_FRAME_MOVE_STOP_POS_Y					(360.0f)								// 枠の移動が止まる位置Y
 
-#define RESULT_UI_RANK_POS					(D3DXVECTOR3((265.0f + 320.0f * (nCnt - (int)RESULT_UI::RANK_01)), (740.0f + 210.0f * (nCnt - (int)RESULT_UI::RANK_01)), 0.0f))		// 順位の位置
-#define RESULT_UI_RANK_SIZE					(D3DXVECTOR2(100.0f, 100.0f))			// 順位のサイズ
-#define RESULT_UI_RANK_MOVE_STOP_POS_Y		(55.0f)									// 順位の移動が止まる位置Y
+#define RESULT_UI_RANK_POS								(D3DXVECTOR3((265.0f + 320.0f * (nCnt - (int)RESULT_UI::RANK_01)), (740.0f + 210.0f * (nCnt - (int)RESULT_UI::RANK_01)), 0.0f))		// 順位の位置
+#define RESULT_UI_RANK_SIZE								(D3DXVECTOR2(100.0f, 100.0f))			// 順位のサイズ
+#define RESULT_UI_RANK_MOVE_STOP_POS_Y					(55.0f)									// 順位の移動が止まる位置Y
 
-#define RESULT_UI_DEATH_POS					(D3DXVECTOR3((160.0f + 320.0f * (nCnt - (int)RESULT_UI::DEATH_01)), (1080.0f + 210.0f * (nCnt - (int)RESULT_UI::DEATH_01)), 0.0f))	// 死因の位置
-#define RESULT_UI_DEATH_SIZE				(D3DXVECTOR2(200.0f, 80.0f))			// 死因のサイズ
-#define RESULT_UI_DEATH_MOVE_STOP_POS_Y		(685.0f)								// 死因の移動が止まる位置Y
+#define RESULT_UI_DEATH_POS								(D3DXVECTOR3((160.0f + 320.0f * (nCnt - (int)RESULT_UI::DEATH_01)), (1080.0f + 210.0f * (nCnt - (int)RESULT_UI::DEATH_01)), 0.0f))	// 死因の位置
+#define RESULT_UI_DEATH_SIZE							(D3DXVECTOR2(200.0f, 80.0f))			// 死因のサイズ
+#define RESULT_UI_DEATH_MOVE_STOP_POS_Y					(685.0f)								// 死因の移動が止まる位置Y
 
-#define RESULT_SCORE_SURVIVAL_TIME_POS		(D3DXVECTOR3((230.0f + 320.0f * nCnt), 485.0f, 0.0f))				// 生存時間の位置
-#define RESULT_SCORE_PRESS_BLOCK_POS		(D3DXVECTOR3((230.0f + 320.0f * nCnt), (485.0f + 100.0f), 0.0f))	// ブロックを押した回数の位置
-#define RESULT_SCORE_SIZE					(D3DXVECTOR2(35.0f, 50.0f))											// 数字のサイズ
+#define RESULT_SCORE_SURVIVAL_TIME_POS					(D3DXVECTOR3((230.0f + 320.0f * nCnt), (485.0f + SCREEN_HEIGHT), 0.0f))	// 生存時間の位置
+#define RESULT_SCORE_SURVIVAL_TIME_MOVE_STOP_POS_Y		(485.0f)																// 生存時間の移動が止まる位置Y
 
-#define RESULT_UI_MOVE						(D3DXVECTOR3(0.0f, -70.0f, 0.0f))		// リザルトUIの移動量
+#define RESULT_SCORE_PRESS_BLOCK_POS					(D3DXVECTOR3((230.0f + 320.0f * nCnt), (585.0f + SCREEN_HEIGHT), 0.0f))	// ブロックを押した回数の位置
+#define RESULT_SCORE_PRESS_BLOCK_MOVE_STOP_POS_Y		(585.0f)																// ブロックを押した回数の移動が止まる位置Y
+
+#define RESULT_SCORE_SIZE								(D3DXVECTOR2(35.0f, 50.0f))			// 数字のサイズ
+#define RESULT_UI_MOVE									(D3DXVECTOR3(0.0f, -70.0f, 0.0f))	// リザルトUIの移動量
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -343,13 +346,41 @@ void CResultUI::UpdateSettingScore(void)
 	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		/* --- リザルトスコアの更新 --- */
+		// 生存時間
 		if (m_ResultScore[nCnt].m_pSurvivalTime)
 		{
-			m_ResultScore[nCnt].m_pSurvivalTime->Update();	// 生存時間
+			// 位置
+			D3DXVECTOR3 SurvivalTimePos = m_ResultScore[nCnt].m_pSurvivalTime->GetPos();
+			SurvivalTimePos.y += m_move.y;
+
+			// 移動を止める
+			if (SurvivalTimePos.y <= RESULT_SCORE_SURVIVAL_TIME_MOVE_STOP_POS_Y)
+			{
+				SurvivalTimePos.y = RESULT_SCORE_SURVIVAL_TIME_MOVE_STOP_POS_Y;
+			}
+			// 位置の設定
+			m_ResultScore[nCnt].m_pSurvivalTime->SetPos(SurvivalTimePos);
+
+			// 更新
+			m_ResultScore[nCnt].m_pSurvivalTime->Update();
 		}
+		// ブロックを押した回数
 		if (m_ResultScore[nCnt].m_pPressBlock)
 		{
-			m_ResultScore[nCnt].m_pPressBlock->Update();	// ブロックを押した回数
+			// 位置
+			D3DXVECTOR3 PressBlockPos = m_ResultScore[nCnt].m_pPressBlock->GetPos();
+			PressBlockPos.y += m_move.y;
+
+			// 移動を止める
+			if (PressBlockPos.y <= RESULT_SCORE_PRESS_BLOCK_MOVE_STOP_POS_Y)
+			{
+				PressBlockPos.y = RESULT_SCORE_PRESS_BLOCK_MOVE_STOP_POS_Y;
+			}
+			// 位置の設定
+			m_ResultScore[nCnt].m_pPressBlock->SetPos(PressBlockPos);
+
+			// 更新
+			m_ResultScore[nCnt].m_pPressBlock->Update();
 		}
 	}
 }

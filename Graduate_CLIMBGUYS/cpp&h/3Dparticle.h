@@ -40,6 +40,7 @@ public:
 		PARTICLE_ID_SPARK,				// 火花 アニメーション
 		PARTICLE_ID_BLOCK,				// 噴火用ブロック
 		PARTICLE_ID_FIRE,				// 火
+		PARTICLE_ID_EXPLOSION,			// 爆発
 		PARTICLE_ID_MAX,
 	} PARTICLE_ID;
 	/* 構造体 */

@@ -238,7 +238,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// ëŒäpê¸ÉuÉçÉbÉN_01
 	case SHAPE_DIAGONAL_01:
-		m_col = COLOR_EMERALD;
+		m_col = COLOR_LIGHTRED;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col);

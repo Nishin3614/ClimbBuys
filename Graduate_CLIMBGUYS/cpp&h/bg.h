@@ -26,12 +26,12 @@ public:
 	CBg();
 	~CBg();
 
-	void Init();						//初期化
-	void Uninit();						//終了
-	void Update();						//更新
-	void Draw();						//描画
+	void Init();							//初期化
+	void Uninit();							//終了
+	void Update();							//更新
+	void Draw();							//描画
 
-	static CBg *Create();				//生成処理
+	static CBg *Create(int nTexId);	//生成処理
 
 private:
 	/* メンバ変数 */

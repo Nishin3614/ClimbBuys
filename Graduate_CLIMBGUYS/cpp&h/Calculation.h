@@ -64,7 +64,7 @@
 // オレンジ色
 #define COLOR_ORANGE		D3DXCOLOR(1.0f,0.5f,0.0f,1.0f)
 // 黄緑色
-#define COLOR_LIME			D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
+#define COLOR_LIME			D3DXCOLOR(0.5f,1.0f,0.0f,1.0f)
 // 紫色
 #define COLOR_PURPURE		D3DXCOLOR(0.5f,0.0f,1.0f,1.0f)
 // ピンク色

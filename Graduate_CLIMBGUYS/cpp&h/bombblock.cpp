@@ -63,10 +63,21 @@ void CBombblock::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBombblock::Update(void)
 {
+	// ベースブロックの更新処理
 	CBaseblock::Update();
-
+	// プレイヤーに押し出されている状態
+	if (!m_bPlayerPush &&
+		CBaseblock::GetPushAfter().bPushState)
+	{
+		m_bPlayerPush = true;
+	}
+	else if (m_bPlayerPush &&
+		!CBaseblock::GetPushAfter().bPushState)
+	{
+		m_bBomb = true;
+	}
 	// やること
-	// プレイヤーが上に乗った時に爆発
+	// 爆発状態がtrueなら
 	if (m_bBomb)
 	{
 		// 押す前のブロックの上にあったブロックを落とさせる
@@ -78,7 +89,6 @@ void CBombblock::Update(void)
 		// リリース
 		Release();
 	}
-	// プレイヤーがそのブロックをタックルして、他のプレイヤーに当たったら爆発
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -255,7 +265,6 @@ void CBombblock::AroundDelete(void)
 		C3DParticle::PARTICLE_ID_EXPLOSION,
 		this->GetPos()
 	);
-
 	// 爆発音
 	CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
 
@@ -264,46 +273,19 @@ void CBombblock::AroundDelete(void)
 	{
 		// 情報取得
 		CBaseblock * pBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);	// ブロック情報
+
 		// フィールドブロックなら
-		if (pBlock->GetType() == CBaseblock::TYPE_FIELD) continue;
-		// 右にブロックが存在しているなら
-		else if (this->GetGrid() + CBaseblock::GRID(1, 0, 0) == pBlock->GetGrid())
-		{
-			// 指定したベースブロックを削除する処理
-			DeleteBlock(pBlock);
-		}
-		// 左にブロックが存在しているなら
-		else if (this->GetGrid() + CBaseblock::GRID(-1, 0, 0) == pBlock->GetGrid())
-		{
-			// 指定したベースブロックを削除する処理
-			DeleteBlock(pBlock);
-		}
+		if (this == pBlock ||
+			pBlock->GetType() == CBaseblock::TYPE_FIELD) continue;
 
-		// 奥にブロックが存在しているなら
-		else if (this->GetGrid() + CBaseblock::GRID(0, 0, -1) == pBlock->GetGrid())
+		// 範囲内にブロックが存在しているなら
+		if (this->GetGrid() + CBaseblock::GRID(-1, -1, -1) <= pBlock->GetGrid() &&
+			this->GetGrid() + CBaseblock::GRID(1, 0, 1) >= pBlock->GetGrid()
+			)
 		{
 			// 指定したベースブロックを削除する処理
 			DeleteBlock(pBlock);
 		}
-		// 前にブロックが存在しているなら
-		else if (this->GetGrid() + CBaseblock::GRID(0, 0, 1) == pBlock->GetGrid())
-		{
-			// 指定したベースブロックを削除する処理
-			DeleteBlock(pBlock);
-		}
-		// 上にブロックが存在しているなら
-		else if (this->GetGrid() + CBaseblock::GRID(0, 1, 0) == pBlock->GetGrid())
-		{
-			// 指定したベースブロックを削除する処理
-			DeleteBlock(pBlock);
-		}
-		// 下にブロックが存在しているなら
-		else if (this->GetGrid() + CBaseblock::GRID(0, -1, 0) == pBlock->GetGrid())
-		{
-			// 指定したベースブロックを削除する処理
-			DeleteBlock(pBlock);
-		}
-
 	}
 }
 

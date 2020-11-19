@@ -9,7 +9,7 @@ STATUS_SET
 	Dash			= 0.0
 	NormalInertia	= 0.70
 	JumpInertia		= 1.00
-	PlayerSize		= 20.0	30.0	20.0
+	PlayerSize		= 12.0	20.0	12.0
 	PlayerOffSet	= 0.0	15.0	0.0
 	PushSize		= 30.0
 	PushOffSet		= 0.0	15.0	0.0

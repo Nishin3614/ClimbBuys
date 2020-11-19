@@ -154,6 +154,7 @@ public:
 	// デバッグ処理
 	virtual void  Debug(void);
 	static void StaticDebug(void);
+	//static void BombConnectBlock(CBaseblock::GRID Grid);
 #endif // _DEBUG
 protected:
 	/* 関数 */

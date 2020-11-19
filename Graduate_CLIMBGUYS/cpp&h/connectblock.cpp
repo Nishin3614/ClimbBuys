@@ -112,7 +112,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// Iブロック
 	case SHAPE_I:
-		m_col = COLOR_RED;
+		m_col = COLOR_LIGHTRED;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(2, 0, 0), NULL);
@@ -121,7 +121,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// Jブロック
 	case SHAPE_J:
-		m_col = COLOR_GREEN;
+		m_col = COLOR_EMERALD;
 		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, NULL);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
@@ -129,7 +129,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// Lブロック
 	case SHAPE_L:
-		m_col = COLOR_BLUE;
+		m_col = COLOR_LIGHTBLUE;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col);
@@ -146,7 +146,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// Tブロック
 	case SHAPE_T:
-		m_col = COLOR_VIOLET;
+		m_col = COLOR_LIGHTBLUE;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
@@ -196,7 +196,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// 中空きプラスブロック_1段
 	case SHAPE_PLUS_CENTER_HOLE_STEP_01:
-		m_col = COLOR_PURPURE;
+		m_col = COLOR_LIGHTBLUE;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col);
@@ -204,7 +204,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// 中空きプラスブロック_2段
 	case SHAPE_PLUS_CENTER_HOLE_STEP_02:
-		m_col = COLOR_PURPURE;
+		m_col = COLOR_LIGHTBLUE;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col);
@@ -246,7 +246,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// 対角線ブロック_02
 	case SHAPE_DIAGONAL_02:
-		m_col = COLOR_PINK;
+		m_col = COLOR_LIME;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &m_col);
@@ -262,7 +262,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// 髭ブロック_02
 	case SHAPE_BEARD_02:
-		m_col = COLOR_EMERALD;
+		m_col = COLOR_LIGHTRED;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
@@ -283,7 +283,7 @@ void CConnectblock::SetBlockShape(void)
 		break;
 		// 髭ブロック_04
 	case SHAPE_BEARD_04:
-		m_col = COLOR_ORANGE;
+		m_col = COLOR_LIGHTRED;
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col);

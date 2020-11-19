@@ -250,7 +250,6 @@ public:
 	// ゲームパッドの取得
 	CXInputPad *GetPad()					{ return m_pPad; };
 
-	static void AddDieCount() { m_nDieCnt++;};
 	static void InitDieCount() { m_nDieCnt = 0; };
 	static int GetDieCount() { return m_nDieCnt; };
 

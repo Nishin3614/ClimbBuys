@@ -50,7 +50,6 @@ CDamageFloor::~CDamageFloor()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::Init(void)
 {
-	m_pPlayer[4] = {};
 	// オフセットタイプ設定
 	CScene_THREE::SetOffsetType(OFFSET_TYPE_SIDE_CENTER);
 
@@ -187,31 +186,6 @@ void CDamageFloor::UnLoad(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::ComparisonHeight()
 {
-	////通常アイテムの総数分
-	//for (int nCnt = 0; nCnt < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCnt++)
-	//{
-	//	// プレイヤーのポインタ取得
-	//	CPlayer *pPlayer = (CPlayer*)CScene::GetScene(LAYER_CHARACTER, nCnt);
-	//	if (pPlayer != nullptr)
-	//	{
-	//		//高さを比較してプレイヤーが床より下に落ちたら死亡フラグをtrue
-	//		if (this->GetPos().y >= pPlayer->GetPos().y)
-	//		{
-	//			// 記録更新_死亡原因
-	//			pPlayer->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
-	//			// 死亡設定
-	//			CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
-
-	//			// 自分が最後の一人ではなかったら死亡フラグをtrueにする
-	//			if ()
-	//			{
-	//				pPlayer->SetDie(true);
-	//			}
-	//		}
-	//		pPlayer = nullptr;
-	//	}
-	//}
-
 	// プレイヤーの数分
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
@@ -220,18 +194,15 @@ void CDamageFloor::ComparisonHeight()
 			// 高さを比較してプレイヤーが床より下に落ちたら死亡フラグをtrue
 			if (this->GetPos().y >= m_pPlayer[nCnt]->GetPos().y)
 			{
-				// 自分が最後の一人ではなかったら死亡フラグをtrueにする
-				if (CPlayer::GetDieCount() < 3)
+				if (!m_pPlayer[nCnt]->GetDie())
 				{
-					if (!m_pPlayer[nCnt]->GetDie())
+					if (CPlayer::GetDieCount() < 3)
 					{
-						CPlayer::AddDieCount();
 						// 記録更新_死亡原因
 						m_pPlayer[nCnt]->GetRecord().DieCause = CPlayer::DIECAUSE::DIECAUSE_FALL;
 						// 死亡設定
 						CManager::GetSound()->PlaySound(CSound::LABEL_SE_DIE0);
-
-						m_pPlayer[nCnt]->SetDie(true);
+						m_pPlayer[nCnt]->Die();
 					}
 				}
 			}

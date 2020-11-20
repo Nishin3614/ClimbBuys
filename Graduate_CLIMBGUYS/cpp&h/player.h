@@ -74,6 +74,8 @@ public:
 		D3DXVECTOR3			PlayerOffSet;		// プレイヤーオフセット
 		float				PushSize;			// 押し出し用のサイズ
 		D3DXVECTOR3			PushOffSet;			// 押し出し用のオフセット
+		int					nMaxStanTime;		// 最大スタンタイム
+		int					nMaxInvincibleTime;	// 最大無敵タイム
 	}PLAYER_STATUS;
 	// ----- スタン状態 ----- //
 	typedef struct _STAN
@@ -123,8 +125,30 @@ public:
 		bool		bInvincible;			// スタン状態
 		int			nInvincibleTime;		// スタン継続時間
 	} INVINCIBLE;
-
-
+	// 共用体
+	// 死亡状態
+	union DIESTATUS
+	{
+		DIESTATUS() {}
+		// 初期化処理
+		void Init(void)
+		{
+			for (int nStatus = 0; nStatus < 6; nStatus++)
+			{
+				bStatus[nStatus] = false;
+			}
+		}
+		struct
+		{
+			bool	bUp;		// 上の当たり判定
+			bool	bDown;		// 下の当たり判定
+			bool	bRight;		// 右の当たり判定
+			bool	bLeft;		// 左の当たり判定
+			bool	bFront;		// 前の当たり判定
+			bool	bBack;		// 後の当たり判定
+		};
+		bool	bStatus[6];
+	};
 
 	// 列挙
 	// 死んだ原因
@@ -252,7 +276,10 @@ public:
 
 	static void InitDieCount() { m_nDieCnt = 0; };
 	static int GetDieCount() { return m_nDieCnt; };
-
+	// プレイヤーのステータス情報取得
+	static PLAYER_STATUS GetPlayerStatus(void) { return m_PlayerStatus; };
+	// プレイヤーの死亡状態の取得
+	DIESTATUS &GetPlayerDieStatus(void) { return m_DieStatus; };
 protected:
 private:
 	/* 構造体 */
@@ -292,7 +319,12 @@ private:
 	void PlayerStatusSave(void);
 	// プレイヤーのステータスの初期値のロード
 	void PlayerStatusInitLoad(void);
-
+	// プレイヤーの状態更新
+	void StateUpdate(void);
+	// スタン状態の更新
+	void StanUpdate(void);
+	// 無敵状態の更新
+	void InvincibleUpdate(void);
 	/* 変数 */
 	CXInputPad					*m_pPad;						// パッドのポインタ
 	bool						m_bDieFlag;						// 死亡フラグ
@@ -308,7 +340,7 @@ private:
 	RECORD						m_Record;						// 記録情報
 
 	static int					m_nDieCnt;						// 死亡人数 仮
-
+	DIESTATUS					m_DieStatus;					// 死亡状態
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
 	C3DLine *	pCollisionLine;

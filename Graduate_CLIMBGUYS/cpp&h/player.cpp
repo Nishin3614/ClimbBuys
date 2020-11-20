@@ -1582,7 +1582,7 @@ void CPlayer::Die(void)
 
 	}
 	// チュートリアルのときリスポーンする
-	else
+	if (CManager::GetMode() == CManager::MODE_TUTORIAL)
 	{
 		// パーティクル生成
 		C3DParticle::Create(

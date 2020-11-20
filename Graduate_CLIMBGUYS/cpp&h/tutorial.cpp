@@ -68,6 +68,9 @@ CTutorial::~CTutorial()
 // ------------------------------------------
 void CTutorial::Init(void)
 {
+	// 静的変数の初期化
+	CPlayer::InitDieCount();
+
 	// モード初期化
 	CBaseMode::Init();
 	// ブロックの静的変数の初期化処理

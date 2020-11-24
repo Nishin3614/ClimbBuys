@@ -12,6 +12,7 @@
 #include "circleshadow.h"
 #include "bombblock..h"
 #include "3dparticle.h"
+#include "player.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -90,7 +91,7 @@ void CBaseblock::Init()
 	}
 	*/
 }
-
+// 0x14721D80
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 終了処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,6 +131,62 @@ void CBaseblock::Update(void)
 		Collision(pBlock);
 		// ブロックのステンシルシャドウの更新
 		Update_OtherShadow(pBlock);
+	}
+
+	// プッシュされている状態ではないなら
+	if (!m_PushAfeter.bPushState) return;
+	COLLISIONDIRECTION		Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
+	// プレイヤーのループ
+	for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
+	{
+		// 情報取得
+		CPlayer * pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);	// プレイヤー情報
+		// 取得したブロックのNULLチェック ||
+		// 取得したブロックと現在ブロックが同じ
+		// ->ループスキップ
+		if (pPlayer == NULL) continue;
+		D3DXVECTOR3 PlayerSize = CPlayer::GetPlayerStatus().PlayerSize;
+		CPlayer::DIESTATUS &PlayerDieStatus = pPlayer->GetPlayerDieStatus();
+		Direct = CBaseblock::PushCollision(
+			CScene::OBJ_PLAYER,
+			&pPlayer->GetPos(),
+			&pPlayer->GetPosOld(),
+			&pPlayer->GetMove(),
+			&PlayerSize,
+			CPlayer::GetPlayerStatus().PlayerOffSet
+		);
+
+		// ブロックの判定
+		// 前
+		if (Direct == COLLISIONDIRECTION::FRONT)
+		{
+			PlayerDieStatus.bFront = true;
+		}
+		// 後
+		else if (Direct == COLLISIONDIRECTION::BACK)
+		{
+			PlayerDieStatus.bBack = true;
+		}
+		// 左
+		else if (Direct == COLLISIONDIRECTION::LEFT)
+		{
+			PlayerDieStatus.bLeft = true;
+		}
+		// 右
+		else if (Direct == COLLISIONDIRECTION::RIGHT)
+		{
+			PlayerDieStatus.bRight = true;
+		}
+		// 上
+		else if (Direct == COLLISIONDIRECTION::UP)
+		{
+			PlayerDieStatus.bUp = true;
+		}
+		// 下
+		else if (Direct == COLLISIONDIRECTION::DOWN)
+		{
+			PlayerDieStatus.bDown = true;
+		}
 	}
 }
 
@@ -178,7 +235,7 @@ void CBaseblock::Update_PushState(void)
 		// z位置の更新
 		pos.z += m_BlockStatus.fMove * m_PushAfeter.PushGrid.nLine;
 		if (m_PushAfeter.PushGrid.nLine < 0 &&	// 列が0未満
-			pos.z < m_PushAfeter.GoalPos.z + 2.0f)			// z位置が規定値未満なら
+			pos.z < m_PushAfeter.GoalPos.z)			// z位置が規定値未満なら
 		{
 			// 位置設定
 			pos.z = m_PushAfeter.GoalPos.z;
@@ -195,7 +252,7 @@ void CBaseblock::Update_PushState(void)
 
 		}
 		else if (m_PushAfeter.PushGrid.nLine > 0 &&	// 列が0超過
-			pos.z > m_PushAfeter.GoalPos.z - 2.0f)				// z位置が規定値超過なら
+			pos.z > m_PushAfeter.GoalPos.z)				// z位置が規定値超過なら
 		{
 			// 位置設定
 			pos.z = m_PushAfeter.GoalPos.z;
@@ -217,7 +274,7 @@ void CBaseblock::Update_PushState(void)
 		// x位置の更新
 		pos.x += m_BlockStatus.fMove * m_PushAfeter.PushGrid.nColumn;
 		if (m_PushAfeter.PushGrid.nColumn < 0 &&	// 列が0未満
-			pos.x < m_PushAfeter.GoalPos.x + 2.0f)			// z位置が規定値未満なら
+			pos.x < m_PushAfeter.GoalPos.x)			// z位置が規定値未満なら
 		{
 			// 位置設定
 			pos.x = m_PushAfeter.GoalPos.x;
@@ -233,7 +290,7 @@ void CBaseblock::Update_PushState(void)
 			m_PushAfeter.Init();
 		}
 		else if (m_PushAfeter.PushGrid.nColumn > 0 &&	// 列が0超過
-			pos.x > m_PushAfeter.GoalPos.x - 2.0f)				// z位置が規定値超過なら
+			pos.x > m_PushAfeter.GoalPos.x)				// z位置が規定値超過なら
 		{
 			// 位置設定
 			pos.x = m_PushAfeter.GoalPos.x;
@@ -535,7 +592,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				if (m_type == TYPE::TYPE_BOMB)
 				{
 					// ボムの状態設定
-					((CBombblock *)this)->SetbBomb(true);
+					CBombblock * pBombBlock = (CBombblock *)this;
+					pBombBlock->SetbBomb(true);
 				}
 			}
 			if (Direct == COLLISIONDIRECTION::NONE)
@@ -573,9 +631,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					// タイプがボムなら
 					if (m_type == TYPE::TYPE_BOMB)
 					{
-						// 変数宣言
-						CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
-																		// ボムの状態設定
+						// ボムの状態設定
+						CBombblock * pBombBlock = (CBombblock *)this;
 						pBombBlock->SetbBomb(true);
 					}
 				}
@@ -596,9 +653,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					// タイプがボムなら
 					if (m_type == TYPE::TYPE_BOMB)
 					{
-						// 変数宣言
-						CBombblock * pBombBlock = (CBombblock *)this;	// ボムブロック情報
-																		// ボムの状態設定
+						// ボムの状態設定
+						CBombblock * pBombBlock = (CBombblock *)this;
 						pBombBlock->SetbBomb(true);
 					}
 				}

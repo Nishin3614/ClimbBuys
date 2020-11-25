@@ -60,7 +60,19 @@ public:
 		STAGE_2,		// ステージ2
 		STAGE_MAX		// 最大ステージ数
 	} STAGE;
+	// float3型
 
+	/*
+	//struct D3DXVECTOR3 Float3;
+	typedef struct _FLOAT3 : public D3DXVECTOR3
+	{
+		union
+		{
+			D3DXVECTOR3 Float3;
+			float fFloat[3];
+		};
+	} FLOAT3;
+	*/
 	/* 関数 */
 	// コンストラクタ
 	CGame();

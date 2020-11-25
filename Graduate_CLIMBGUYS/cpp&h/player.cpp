@@ -1147,8 +1147,6 @@ void CPlayer::PushBlock(
 
 	// ノックバック処理
 	this->SetPos(this->GetPos() + D3DXVECTOR3(0.0f, 10.0f, 0.0f));
-
-
 	// 落ちている状態なら
 	if (pBlock->GetFall() ||
 		pBlock->GetType() == CBaseblock::TYPE_FIELD) return;

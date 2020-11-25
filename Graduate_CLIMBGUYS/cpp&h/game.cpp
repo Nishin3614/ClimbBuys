@@ -142,6 +142,7 @@ void CGame::Uninit(void)
 	{
 		// ƒQ[ƒ€UI‚ÌI—¹
 		m_pGameUI->Uninit();
+		delete m_pGameUI;
 		m_pGameUI = nullptr;
 	}
 

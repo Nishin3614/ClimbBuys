@@ -327,7 +327,7 @@ public:
 	static CBaseblock * Create_Self(
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId								// モデル番号
-		);
+	);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
 	//	pos			: 位置

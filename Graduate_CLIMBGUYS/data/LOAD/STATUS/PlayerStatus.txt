@@ -10,9 +10,9 @@ STATUS_SET
 	NormalInertia	= 0.70
 	JumpInertia		= 1.00
 	PlayerSize		= 12.0	20.0	12.0
-	PlayerOffSet	= 0.0	15.0	0.0
+	PlayerOffSet	= 0.0	10.0	0.0
 	PushSize		= 30.0
-	PushOffSet		= 0.0	15.0	0.0
+	PushOffSet		= 0.0	10.0	0.0
 END_STATUS_SET
 
 END_SCRIPT

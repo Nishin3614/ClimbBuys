@@ -116,6 +116,7 @@ void CTutorial::Uninit(void)
 	{
 		// チュートリアルUIの終了
 		m_pTutorialUI->Uninit();
+		delete m_pTutorialUI;
 		m_pTutorialUI = nullptr;
 	}
 }

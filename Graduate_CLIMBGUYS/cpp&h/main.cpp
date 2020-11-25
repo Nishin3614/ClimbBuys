@@ -58,12 +58,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 	//_CrtSetBreakAlloc(99);
 #endif
 	// メモリリーク検出
-	//_CrtDumpMemoryLeaks();
-	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-	//_CrtSetBreakAlloc(101);
-	// メモリリーク検索設定
+	_CrtDumpMemoryLeaks();
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+	//_CrtSetBreakAlloc(40474);
+	// メモリリーク検索設定
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	//_CrtSetBreakAlloc(39110);
 
 	// シード値を時間にする

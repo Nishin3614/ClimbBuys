@@ -188,12 +188,12 @@ bool CSpringblock::PushCollision(CPlayer * pplayer,D3DXVECTOR3 const & OffsetPos
 	if (this->GetGrid().nHeight >= CBaseblock::GetHeight(this->GetGrid().nColumn + m_nFeedValue[Stage], this->GetGrid().nLine + m_nFeedValue[Stage]))
 	{
 		// ‘fÞ‚ÌZ”ÍˆÍ
-		if (pplayer->GetPos().z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
-			pplayer->GetPos().z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+		if (pplayer->GetPos().z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.3f&&
+			pplayer->GetPos().z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.3f)
 		{
 			// ‘fÞ‚ÌX”ÍˆÍ
-			if (pplayer->GetPos().x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-				pplayer->GetPos().x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
+			if (pplayer->GetPos().x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.3f&&
+				pplayer->GetPos().x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.3f)
 			{
 				// “–‚½‚è”»’è(ã)
 				if (pplayer->GetPos().y + OffsetPos.y - size->y * 0.5f <= BlockPos.y + m_fSizeRange&&

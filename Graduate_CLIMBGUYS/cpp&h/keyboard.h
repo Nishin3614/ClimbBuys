@@ -59,12 +59,14 @@ public:
 	void Uninit(void);
 	void Update(void);
 	bool GetKeyboardPress(int nKey);	// 押されている情報取得
+	bool GetKeyboardRelease(int nKey);	// 離したときの情報取得
 	bool GetKeyboardTrigger(int nKey);	// 押した情報取得
 
 protected:
 private:
 	LPDIRECTINPUTDEVICE8 m_pDevice;	// 入力デバイスへのポインタ
 	BYTE m_aState[NUM_KEY_MAX];		// 入力している情報
+	BYTE m_aRelease[NUM_KEY_MAX];	// 離したときの情報
 	BYTE m_aTrigger[NUM_KEY_MAX];	// 入力時情報
 };
 #endif

@@ -10,11 +10,26 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#include "title.h"
 #include "scene_x.h"
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define MAX_STAGINGBLOCK (9)
+
+// 仮
+#define SPACE_Y (500)
+// タイトルロゴ形成用 ブロック座標
+// CLIMBGUYS
+#define STAGINGBLOCK_POS_C (D3DXVECTOR3(-600.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_L (D3DXVECTOR3(-450.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_I (D3DXVECTOR3(-300.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_M (D3DXVECTOR3(-150.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_B (D3DXVECTOR3(0.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_G (D3DXVECTOR3(150.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_U (D3DXVECTOR3(300.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_Y (D3DXVECTOR3(450.0f, 0.0f + SPACE_Y, 0));
+#define STAGINGBLOCK_POS_S (D3DXVECTOR3(600.0f, 0.0f + SPACE_Y, 0));
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -104,6 +119,12 @@ public:
 	// ブロックの停止状態を取得
 	bool GetMoveStop() { return m_bStopMove; };
 
+	// 演出終了フラグの設定
+	static void SetEnd(bool end) { m_bEnd = end; };
+	// 演出終了フラグの取得
+	static bool GetEnd() { return m_bEnd; };
+
+
 	// ブロックの移動処理
 	void BlockFall();
 	// ブロックの破裂
@@ -112,13 +133,19 @@ public:
 protected:
 private:
 	/* 関数 */
+	void				Levitating();							// 空中浮遊 タイトルで使う
 	/* 変数 */
+	static bool			m_bEnd;									// 演出終了フラグ
+
 	float				m_fSpeed;								// 移動量
 	float				m_fBurstSpeed;							// 移動量
 
 	D3DXVECTOR3			m_Vector;								// ブロックが飛んでいく方向ベクトル
 	int					m_nBlockNun;							// ブロックの番号
 	bool				m_bStopMove;							// 座標の更新を止める
+	int					m_nAngle;								// 角度
+	int					m_nTime;								// パーティクルの出現時間カウント
+	CTitle				*m_pTitle;								// タイトルのポインタ
 };
 
 #endif

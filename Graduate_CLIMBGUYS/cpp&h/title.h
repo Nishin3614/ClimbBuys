@@ -34,6 +34,13 @@
 class CTitle : public CBaseMode
 {
 public:
+	// タイトルの段階
+	enum class TITLE_PHASE
+	{
+		PHASE_ONE,
+		PHASE_TWO
+	};
+
 	/* 関数 */
 	// コンストラクタ
 	CTitle();
@@ -49,7 +56,15 @@ public:
 	void Draw(void);
 	// 生成処理
 	static CTitle * Create(void);
+
+	// 演出終了フラグの設定
+	void SetPhase(TITLE_PHASE phase) { m_Phase = phase; };
+	// 演出終了フラグの取得
+	TITLE_PHASE GetPhase() { return m_Phase; };
+
+
 protected:
 private:
+	TITLE_PHASE m_Phase = TITLE_PHASE::PHASE_ONE;
 };
 #endif

@@ -41,6 +41,7 @@ public:
 		PARTICLE_ID_BLOCK,				// 噴火用ブロック
 		PARTICLE_ID_FIRE,				// 火
 		PARTICLE_ID_EXPLOSION,			// 爆発
+		PARTICLE_ID_AIRLINE,			// 空気の線
 		PARTICLE_ID_MAX,
 	} PARTICLE_ID;
 	/* 構造体 */

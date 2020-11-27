@@ -606,7 +606,8 @@ void CPlayer::BlockCollision(void)
 		// ->ŠÖ”‚ð”²‚¯‚é
 		if (pBaseBlock == NULL) continue;
 		// ƒ_ƒbƒVƒ…ó‘Ô‚È‚ç
-		if (pBaseBlock->GetType() != CBaseblock::TYPE::TYPE_FIELD &&
+		if (!(pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_FIELD ||
+			pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_STEEL) &&
 			m_Power.bTackleFrag &&
 			!pBaseBlock->GetPushAfter().bPushState)
 		{

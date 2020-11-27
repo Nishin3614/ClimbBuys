@@ -44,6 +44,7 @@ public:
 		TYPE_FIELD,			// フィールドブロック
 		TYPE_BOMB,			// ボムブロック
 		TYPE_SPRING,		// スプリングブロック
+		TYPE_STEEL,			// 鋼鉄ブロック
 		TYPE_MAX,			// タイプ全体数
 	} TYPE;
 
@@ -52,7 +53,8 @@ public:
 	{
 		NORMAL,
 		SPRING,
-		BOMB
+		BOMB,
+		STEEL
 	};
 
 	// 上下左右前後

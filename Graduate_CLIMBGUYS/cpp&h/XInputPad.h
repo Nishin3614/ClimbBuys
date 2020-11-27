@@ -51,6 +51,7 @@ public:
 	void Update(void);								// 更新
 
 	bool GetTrigger(XINPUT_KEY Button, size_t Frame);		// ボタンを押したとき ( 単発 )
+	bool GetRelease(XINPUT_KEY Button, size_t Frame);		// ボタンを離したとき
 	bool GetPress(XINPUT_KEY Button);						// ボタンを押し続けるとき ( 長押し )
 	void GetStickLeft(float *pValueX, float *pValueZ);		// 左スティック値取得
 	void GetStickRight(float *pValueX, float *pValueZ);		// 右スティック値取得

@@ -57,9 +57,9 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
 	m_nCntState			= 0;					// ステートカウント
 	m_bDieFlag			= false;				// 死亡フラグ
-	m_bDashFlag			= false;				// ダッシュフラグ
-	m_bTackleFrag		= false;				// タックルフラグ
-	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
+	m_Power.bDashFlag			= false;				// ダッシュフラグ
+	m_Power.bTackleFrag		= false;				// タックルフラグ
+	m_Power.nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
 	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
 	m_Record			= RECORD();				// 記録
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
@@ -176,6 +176,8 @@ void CPlayer::Update(void)
 		m_pPlayerUI->SetPos(GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));
 	}
 
+	// 状態更新
+	StateUpdate();
 	// モーション設定処理
 	StatusMotion();
 	// キャラクター更新
@@ -228,19 +230,19 @@ void CPlayer::MyAction(void)
 	MyMove();
 
 	// 試験的ダッシュの切り替え
-	if (m_bDashFlag)
+	if (m_Power.bDashFlag)
 	{
-		m_nCntDashTime++;
+		m_Power.nCntDashTime++;
 
-		if (m_nCntDashTime > DASH_TIME_MAX)
+		if (m_Power.nCntDashTime > DASH_TIME_MAX)
 		{
 			// 初期化
-			m_nCntDashTime	= 0;
-			m_bDashFlag		= false;
-			m_bTackleFrag	= false;
+			m_Power.nCntDashTime	= 0;
+			m_Power.bDashFlag		= false;
+			m_Power.bTackleFrag		= false;
 		}
 	}
-	CDebugproc::Print("\nPlayerダッシュ %d\n", m_bDashFlag);
+	CDebugproc::Print("\nPlayerダッシュ %d\n", m_Power.bDashFlag);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -261,105 +263,107 @@ void CPlayer::MyMove(void)
 	CKeyboard *pKeyboard = CManager::GetKeyboard();
 
 	// 移動 //
-	/* キーボード */
-	// 左
-	if (pKeyboard->GetKeyboardPress(DIK_A))
+	if (!m_Power.bDashFlag &&
+		!m_Power.bCharge)
 	{
-		// 奥
-		if (pKeyboard->GetKeyboardPress(DIK_W))
-		{
-			rot.y = -D3DX_PI * 0.25f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
-		// 手前
-		else if (pKeyboard->GetKeyboardPress(DIK_S))
-		{
-			rot.y = -D3DX_PI * 0.75f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
+		/* キーボード */
 		// 左
-		else
+		if (pKeyboard->GetKeyboardPress(DIK_A))
 		{
-			rot.y = -D3DX_PI * 0.5f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
-	}
-	// 右
-	else if (pKeyboard->GetKeyboardPress(DIK_D))
-	{
-
-		// 奥
-		if (pKeyboard->GetKeyboardPress(DIK_W))
-		{
-			rot.y = D3DX_PI * 0.25f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
-		// 手前
-		else if (pKeyboard->GetKeyboardPress(DIK_S))
-		{
-			rot.y = D3DX_PI * 0.75f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-
-
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
+			// 奥
+			if (pKeyboard->GetKeyboardPress(DIK_W))
+			{
+				rot.y = -D3DX_PI * 0.25f + fRot;
+				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
+				move.x -= vec.x * m_PlayerStatus.fMove;
+				move.z -= vec.z * m_PlayerStatus.fMove;
+			}
+			// 手前
+			else if (pKeyboard->GetKeyboardPress(DIK_S))
+			{
+				rot.y = -D3DX_PI * 0.75f + fRot;
+				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
+				move.x -= vec.x * m_PlayerStatus.fMove;
+				move.z -= vec.z * m_PlayerStatus.fMove;
+			}
+			// 左
+			else
+			{
+				rot.y = -D3DX_PI * 0.5f + fRot;
+				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
+				move.x -= vec.x * m_PlayerStatus.fMove;
+				move.z -= vec.z * m_PlayerStatus.fMove;
+			}
 		}
 		// 右
-		else
+		else if (pKeyboard->GetKeyboardPress(DIK_D))
 		{
-			rot.y = D3DX_PI * 0.5f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
 
+			// 奥
+			if (pKeyboard->GetKeyboardPress(DIK_W))
+			{
+				rot.y = D3DX_PI * 0.25f + fRot;
+				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
+
+				move.x -= vec.x * m_PlayerStatus.fMove;
+				move.z -= vec.z * m_PlayerStatus.fMove;
+			}
+			// 手前
+			else if (pKeyboard->GetKeyboardPress(DIK_S))
+			{
+				rot.y = D3DX_PI * 0.75f + fRot;
+				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
+
+
+				move.x -= vec.x * m_PlayerStatus.fMove;
+				move.z -= vec.z * m_PlayerStatus.fMove;
+			}
+			// 右
+			else
+			{
+				rot.y = D3DX_PI * 0.5f + fRot;
+				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
+
+				move.x -= vec.x * m_PlayerStatus.fMove;
+				move.z -= vec.z * m_PlayerStatus.fMove;
+			}
+		}
+		// 奥に行く
+		else if (pKeyboard->GetKeyboardPress(DIK_W))
+		{
+			rot.y = D3DX_PI * 0.0f + fRot;
+			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
 			move.x -= vec.x * m_PlayerStatus.fMove;
 			move.z -= vec.z * m_PlayerStatus.fMove;
 		}
-	}
-	// 奥に行く
-	else if (pKeyboard->GetKeyboardPress(DIK_W))
-	{
-		rot.y = D3DX_PI * 0.0f + fRot;
-		vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-		move.x -= vec.x * m_PlayerStatus.fMove;
-		move.z -= vec.z * m_PlayerStatus.fMove;
-	}
-	// 手前に行く
-	else if (pKeyboard->GetKeyboardPress(DIK_S))
-	{
-		rot.y = D3DX_PI * 1.0f + fRot;
-		vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-		move.x -= vec.x * m_PlayerStatus.fMove;
-		move.z -= vec.z * m_PlayerStatus.fMove;
-	}
-	// それ以外
-	else
-	{
+		// 手前に行く
+		else if (pKeyboard->GetKeyboardPress(DIK_S))
+		{
+			rot.y = D3DX_PI * 1.0f + fRot;
+			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
+			move.x -= vec.x * m_PlayerStatus.fMove;
+			move.z -= vec.z * m_PlayerStatus.fMove;
+		}
+		// それ以外
+		else
+		{
 
-	}
+		}
 
-	// 試験的キーボードジャンプ
-	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
-	{
-		SetMotion(MOTIONTYPE_JUMP);
-		move.y += m_PlayerStatus.fJump;
-		SetJumpAble(false);
+		// 試験的キーボードジャンプ
+		if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
+		{
+			SetMotion(MOTIONTYPE_JUMP);
+			move.y += m_PlayerStatus.fJump;
+			SetJumpAble(false);
+		}
+		// 試験的タックル
+		if (pKeyboard->GetKeyboardTrigger(DIK_J))
+		{
+			SetMotion(MOTIONTYPE_DASH);
+			m_Power.bCharge = true;
+		}
 	}
-	// 試験的タックル
-	if (pKeyboard->GetKeyboardTrigger(DIK_J))
-	{
-		SetMotion(MOTIONTYPE_DASH);
-		m_bDashFlag = true;
-		m_bTackleFrag = true;
-	}
-
 	/* ゲームパッド */
 	// パッド用 //
 	float fValueH, fValueV;		// ゲームパッドのスティック情報の取得用
@@ -371,8 +375,8 @@ void CPlayer::MyMove(void)
 		// ゲームパッドのスティック情報を取得
 		m_pPad->GetStickLeft(&fValueH, &fValueV);
 
-		// ダッシュしていないとき
-		if (!m_bDashFlag)
+		if (!m_Power.bDashFlag &&	// ダッシュ時
+			!m_Power.bCharge)		// チャージ時
 		{
 			// プレイヤー移動
 			// ゲームパッド移動
@@ -411,20 +415,7 @@ void CPlayer::MyMove(void)
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 			{
 				SetMotion(MOTIONTYPE_DASH);
-
-				m_bDashFlag = true;
-				m_bTackleFrag = true;
-
-				switch (CCalculation::CheckPadStick())
-				{
-				case DIRECTION::LEFT:
-				case DIRECTION::RIGHT:
-				case DIRECTION::UP:
-				case DIRECTION::DOWN:
-					move.x -= vec.x * m_PlayerStatus.fDash;
-					move.z -= vec.z * m_PlayerStatus.fDash;
-					break;
-				}
+				m_Power.bCharge = true;
 			}
 		}
 	}
@@ -615,8 +606,9 @@ void CPlayer::BlockCollision(void)
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
 		// ダッシュ状態なら
-		if (pBaseBlock->GetType() != CBaseblock::TYPE::TYPE_FIELD &&
-			m_bTackleFrag &&
+		if (!(pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_FIELD ||
+			pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_STEEL) &&
+			m_Power.bTackleFrag &&
 			!pBaseBlock->GetPushAfter().bPushState)
 		{
 			// 方向に直線を出し
@@ -732,7 +724,7 @@ void CPlayer::BlockCollision(void)
 	m_DieStatus.Init();
 
 	// ブロックの押し出し処理
-	if (m_bTackleFrag)
+	if (m_Power.bTackleFrag)
 	{
 		if (Pushblock.pBlock)
 		{
@@ -742,25 +734,29 @@ void CPlayer::BlockCollision(void)
 			// 前
 			if (Pushblock.Direction == COLLISIONDIRECTION::FRONT)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, -1));
+				// キーボードとパッドのボタンを離したときの反応処理
+				// 押した瞬間から話したときの時間
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, -m_Power.nPushPower));
 			}
 			// 後
 			else if (Pushblock.Direction == COLLISIONDIRECTION::BACK)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, 1));
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, m_Power.nPushPower));
 			}
 			// 左
 			else if (Pushblock.Direction == COLLISIONDIRECTION::LEFT)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(1, 0, 0));
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(m_Power.nPushPower, 0, 0));
 			}
 			// 右
 			else if (Pushblock.Direction == COLLISIONDIRECTION::RIGHT)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-1, 0, 0));
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-m_Power.nPushPower, 0, 0));
 			}
-			m_bTackleFrag = false;
+			// 力溜めの初期化処理
+			m_Power.Init();
 		}
+		m_Power.bTackleFrag = false;
 	}
 }
 
@@ -918,11 +914,6 @@ void CPlayer::PlayerStatusLoad(void)
 						{
 							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fJump);
 						}
-						// Dashが来たら
-						else if (strcmp(cHeadText, "Dash") == 0)
-						{
-							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fDash);
-						}
 						// NormalInertiaが来たら
 						else if (strcmp(cHeadText, "NormalInertia") == 0)
 						{
@@ -952,6 +943,11 @@ void CPlayer::PlayerStatusLoad(void)
 						else if (strcmp(cHeadText, "PushOffSet") == 0)
 						{
 							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushOffSet.x, &m_PlayerStatus.PushOffSet.y, &m_PlayerStatus.PushOffSet.z);
+						}
+						// PowerTimeが来たら
+						else if (strcmp(cHeadText, "PowerTime") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxPowerTime);
 						}
 						// StanTimeが来たら
 						else if (strcmp(cHeadText, "StanTime") == 0)
@@ -1007,13 +1003,13 @@ void CPlayer::PlayerStatusSave(void)
 		fprintf(pFile, "STATUS_SET\n");
 		fprintf(pFile, "	Move			= %.1f\n", m_PlayerStatus.fMove);
 		fprintf(pFile, "	Jump			= %.1f\n", m_PlayerStatus.fJump);
-		fprintf(pFile, "	Dash			= %.1f\n", m_PlayerStatus.fDash);
 		fprintf(pFile, "	NormalInertia	= %.2f\n", m_PlayerStatus.fNormalInertia);
 		fprintf(pFile, "	JumpInertia		= %.2f\n", m_PlayerStatus.fJumpInertia);
 		fprintf(pFile, "	PlayerSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerSize.x, m_PlayerStatus.PlayerSize.y, m_PlayerStatus.PlayerSize.z);
 		fprintf(pFile, "	PlayerOffSet	= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, m_PlayerStatus.PlayerOffSet.z);
 		fprintf(pFile, "	PushSize		= %.1f\n", m_PlayerStatus.PushSize);
 		fprintf(pFile, "	PushOffSet		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushOffSet.x, m_PlayerStatus.PushOffSet.y, m_PlayerStatus.PushOffSet.z);
+		fprintf(pFile, "	PowerTime		= %d\n", m_PlayerStatus.nMaxPowerTime);
 		fprintf(pFile, "	StanTime		= %d\n", m_PlayerStatus.nMaxStanTime);
 		fprintf(pFile, "	InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime);
 
@@ -1048,10 +1044,46 @@ void CPlayer::PlayerStatusInitLoad(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::StateUpdate(void)
 {
+	// 力溜めの更新
+	PowerUpdate();
 	// スタン状態の更新
 	StanUpdate();
 	// 無敵状態の更新
 	InvincibleUpdate();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 力溜めの更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PowerUpdate(void)
+{
+	if (!m_Power.bCharge) return;
+	if (m_Power.nCntTime == m_PlayerStatus.nMaxStanTime)
+	{
+		m_Power.nPushPower++;
+	}
+	// ボタンが離されたら
+	if (CManager::GetKeyboard()->GetKeyboardRelease(DIK_J))
+	{
+		m_Power.bCharge = false;
+		m_Power.bDashFlag = true;
+		m_Power.bTackleFrag = true;
+		m_Power.nCntTime = 0;
+	}
+	// パッド
+	if (m_pPad)
+	{
+		// 試験的タックル ( のちに中身変わる予定 多分 )
+		if (m_pPad->GetRelease(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
+		{
+			m_Power.bCharge = false;
+			m_Power.bDashFlag = true;
+			m_Power.bTackleFrag = true;
+			m_Power.nCntTime = 0;
+		}
+	}
+	// 力溜めカウントアップ
+	m_Power.nCntTime++;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1151,20 +1183,78 @@ void CPlayer::PushBlock(
 	if (pBlock->GetFall() ||
 		pBlock->GetType() == CBaseblock::TYPE_FIELD) return;
 	CBaseblock::GRID NextGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
-	int nHeight;													// 高さ
-	// 行列高さの方向を押し出しブロックの行列高さに加算
-	NextGrid += Grid;
-	// その行列の積み重なっている高さを取得
-	nHeight = CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine);
-	// 押し出し方向にブロックが置かれていないかをチェック
-	if (NextGrid.nHeight <= CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine))
+	CBaseblock::GRID PushGrid = CBaseblock::GRID(0,0,0);
+
+	for (int nCntColumn = 0; nCntColumn < abs(Grid.nColumn); nCntColumn++)
 	{
-		return;
+		// 列が0超過
+		if (Grid.nColumn > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			NextGrid.nColumn++;
+		}
+		// 列が0未満
+		else if (Grid.nColumn < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			NextGrid.nColumn--;
+		}
+		// 押し出し方向にブロックが置かれていないかをチェック
+		if (NextGrid.nHeight <= CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine))
+		{
+			if (!PushGrid.nColumn) return;
+			break;
+		}
+		// 列が0超過
+		if (Grid.nColumn > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			PushGrid.nColumn++;
+		}
+		// 列が0未満
+		else if (Grid.nColumn < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			PushGrid.nColumn--;
+		}
+	}
+	for (int nCntLine = 0; nCntLine < abs(Grid.nLine); nCntLine++)
+	{
+		// 行が0超過
+		if (Grid.nLine > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			NextGrid.nLine++;
+		}
+		// 行が0未満
+		else if (Grid.nLine < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			NextGrid.nLine--;
+		}
+		// 押し出し方向にブロックが置かれていないかをチェック
+		if (NextGrid.nHeight <= CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine))
+		{
+			if (!PushGrid.nLine) return;
+			break;
+		}
+		// 行が0超過
+		if (Grid.nLine > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			PushGrid.nLine++;
+		}
+		// 行が0未満
+		else if (Grid.nLine < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			PushGrid.nLine--;
+		}
 	}
 	// 記録更新_押し出し回数
 	m_Record.nPushCnt++;
 	// 押し出し後の設定
-	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, Grid));
+	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, PushGrid));
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1666,8 +1756,6 @@ void CPlayer::Debug(void)
 				ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
 				// ジャンプ力
 				ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0f, 1.0f, 50.0f);						/* 10.0f */
-				// ダッシュの移動量
-				ImGui::DragFloat(u8"ダッシュの移動量", &m_PlayerStatus.fDash, 1.0f, 1.0f, 100.0f);				/* 30.0f */
 				// 通常時の慣性
 				ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
 				// ジャンプ時の慣性
@@ -1680,7 +1768,12 @@ void CPlayer::Debug(void)
 				ImGui::DragFloat(u8"押し出し用のサイズ", &m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
 				// 押し出し用のオフセット
 				ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
-
+				// 押し出す時間
+				ImGui::DragInt(u8"押し出す時間", &m_PlayerStatus.nMaxPowerTime, 1.0f, 0);
+				// スタン時間
+				ImGui::DragInt(u8"スタン時間", &m_PlayerStatus.nMaxStanTime, 1.0f, 0);
+				// 無敵時間
+				ImGui::DragInt(u8"無敵時間", &m_PlayerStatus.nMaxInvincibleTime, 1.0f, 0);
 				// セーブボタン
 				if (ImGui::Button(u8"保存"))
 				{

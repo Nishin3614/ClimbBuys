@@ -7,6 +7,8 @@
 #include "title.h"
 #include "keyboard.h"
 #include "sound.h"
+#include "manager.h"
+#include "camera.h"
 
 /* 描画 */
 #include "fade.h"
@@ -22,6 +24,7 @@
 #include "bg.h"
 #include "connectblock.h"
 #include "stagingblock.h"
+#include "damagefloor.h"
 //#include "3Deffect.h"
 //#include "2Deffect.h"
 
@@ -42,7 +45,6 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CTitle::CTitle()
 {
-	m_Phase = TITLE_PHASE::PHASE_ONE;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,6 +98,9 @@ void CTitle::Init(void)
 
 	// 背景生成
 	CBg::Create(CTexture_manager::TYPE_BG_TITLE);
+
+	// 床生成
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -116,6 +121,17 @@ void CTitle::Update(void)
 	// モード更新
 	CBaseMode::Update();
 
+	if (CCalculation::PressAnyButton())
+	{
+		// フェード状態が何も起こっていない状態なら
+		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+		{
+			// 決定音
+			CManager::GetSound()->PlaySound(CSound::LABEL_SE_DETERMINATION);
+			CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
+		}
+	}
+
 	// 一定時間操作していなったら自動でオープニングへ移行する
 	//if (CBaseMode::GetTransitionCnt() <= 0)
 	//{
@@ -129,27 +145,6 @@ void CTitle::Update(void)
 	//{
 	//	CBaseMode::SetTransitionCnt(CBaseMode::GetTransitionCnt()-1);
 	//}
-
-	switch (m_Phase)
-	{
-	case CTitle::TITLE_PHASE::PHASE_ONE:
-		// ゲーム遷移
-		if (CCalculation::PressAnyButton())
-		{
-			m_Phase = TITLE_PHASE::PHASE_TWO;
-		}
-		break;
-	case CTitle::TITLE_PHASE::PHASE_TWO:
-		// フェード状態が何も起こっていない状態なら
-		if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-		{
-			// 決定音
-			CManager::GetSound()->PlaySound(CSound::LABEL_SE_DETERMINATION);
-			CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
-		}
-
-		break;
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -45,6 +45,11 @@ public:
 		MOTIONTYPE_MOVE,			// 移動モーション
 		MOTIONTYPE_DASH,			// ダッシュモーション
 		MOTIONTYPE_JUMP,			// ジャンプモーション
+		MOTIONTYPE_BANZAI,			// バンザイモーション
+		MOTIONTYPE_VICTORY_01,		// 勝利モーション_01
+		MOTIONTYPE_VICTORY_02,		// 勝利モーション_02
+		MOTIONTYPE_VICTORY_03,		// 勝利モーション_03
+		MOTIONTYPE_VICTORY_04,		// 勝利モーション_04
 		MOTIONTYPE_MAX				// 最大数
 	} MOTIONTYPE;
 	// キャラクター

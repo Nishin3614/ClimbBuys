@@ -583,12 +583,6 @@ void CPlayer::BlockCollision(void)
 	CBaseblock *			pBaseBlock;							// シーンX情報
 	COLLISIONDIRECTION		Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
 	CBaseblock::PUSHBLOCK	Pushblock;							// プッシュブロック情報
-	bool					bUp = false;						// 上の当たり判定
-	bool					bDown = false;						// 下の当たり判定
-	bool					bRight = false;						// 右の当たり判定
-	bool					bLeft = false;						// 左の当たり判定
-	bool					bFront = false;						// 前の当たり判定
-	bool					bBack = false;						// 後の当たり判定
 	float					fDistance = -1.0f;					// 距離
 	D3DXVECTOR3				PredictionPoint;					// 予測点
 	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet - D3DXVECTOR3(CCharacter::GetDirectionVec().x * m_PlayerStatus.PushSize, 0.0f, CCharacter::GetDirectionVec().z * m_PlayerStatus.PushSize);
@@ -605,11 +599,12 @@ void CPlayer::BlockCollision(void)
 		// NULLなら
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
-		// ダッシュ状態なら
-		if (!(pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_FIELD ||
-			pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_STEEL) &&
-			m_Power.bTackleFrag &&
-			!pBaseBlock->GetPushAfter().bPushState)
+		if (!(pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_FIELD ||	// フィールドブロックではない
+			pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_STEEL) &&	// 鋼鉄ブロックではない
+			m_Power.bTackleFrag &&										// 自身がタックルしている状態
+			!pBaseBlock->GetPushAfter().bPushState &&					// ブロックが押されている状態ではない
+			!pBaseBlock->GetFall()										// 落ちている状態ではない
+			)
 		{
 			// 方向に直線を出し
 			// 線とポリゴンで判定を取る

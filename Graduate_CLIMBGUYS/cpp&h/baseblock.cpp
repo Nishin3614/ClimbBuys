@@ -948,11 +948,6 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 	{
 		Direct = COLLISIONDIRECTION::LEFT;
 	}
-	// やること
-	// 右、奥、手前の判定を取る
-	// 結果どうなるか試す
-
-
 	// 右のポリゴンの判定
 	if (CCalculation::PolygonToLineCollision(
 		D3DXVECTOR3(BlockPos.x + m_fSizeRange * 0.5f, BlockPos.y + m_fSizeRange, BlockPos.z - m_fSizeRange * 0.5f),
@@ -1596,6 +1591,8 @@ void CBaseblock::BlockStaticValue(void)
 	{
 		*nHeight = -1;
 	}
+
+	m_nPhase = 0;
 }
 
 #ifdef _DEBUG

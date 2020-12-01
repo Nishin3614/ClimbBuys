@@ -94,7 +94,7 @@ void CGame::Init(void)
 	// ゲームUIの生成
 	m_pGameUI = CGameUI::Create();
 	// オブジェクト生成
-	CScene_X::Create(D3DXVECTOR3(0.0f,-500.0f,0.0f),
+	CScene_X::Create(D3DXVECTOR3(0.0f,0.0f,0.0f),
 		D3DVECTOR3_ZERO,
 		CScene_X::TYPE_OBJECT_VOLCANO);
 	// プレイヤー

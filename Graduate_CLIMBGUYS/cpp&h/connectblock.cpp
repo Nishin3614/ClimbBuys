@@ -587,7 +587,7 @@ void CConnectblock::StaticDebug(void)
 		// ç|ìSÉuÉçÉbÉNê∂ê¨
 		if (ImGui::Button("CreateSteel"))
 		{
-			CSteelblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), 1.0f);
+			CSteelblock::Create(CScene_X::TYPE_BLOCKS_HARD, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), 1.0f);
 		}
 	}
 	ImGui::End();

@@ -57,7 +57,7 @@ void CDamageFloor::Init(void)
 	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f));
 
 	m_MoveSpeed = 0.5f;
-	m_AscendUpToTime = 3600;
+	m_AscendUpToTime = DERAY_TIME(60);
 
 	// デバッグ時のみ赤く表示
 	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));

@@ -13,6 +13,9 @@ STATUS_SET
 	PlayerOffSet	= 0.0	10.0	0.0
 	PushSize		= 30.0
 	PushOffSet		= 0.0	10.0	0.0
+	PowerTime		= 30
+	StanTime		= 30
+	InvincibleTime	= 30
 END_STATUS_SET
 
 END_SCRIPT

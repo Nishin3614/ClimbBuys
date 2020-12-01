@@ -227,6 +227,7 @@
     <ClCompile Include="cpp&amp;h\springblock.cpp" />
     <ClCompile Include="cpp&amp;h\stagingblock.cpp" />
     <ClCompile Include="cpp&amp;h\stand.cpp" />
+    <ClCompile Include="cpp&amp;h\steelblock.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
     <ClCompile Include="cpp&amp;h\title.cpp" />
@@ -312,6 +313,7 @@
     <ClInclude Include="cpp&amp;h\springblock.h" />
     <ClInclude Include="cpp&amp;h\stagingblock.h" />
     <ClInclude Include="cpp&amp;h\stand.h" />
+    <ClInclude Include="cpp&amp;h\steelblock.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />
     <ClInclude Include="cpp&amp;h\texture_manager.h" />
     <ClInclude Include="cpp&amp;h\title.h" />

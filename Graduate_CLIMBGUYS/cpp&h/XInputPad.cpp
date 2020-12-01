@@ -131,6 +131,11 @@ void CXInputPad::Update(void)
 // =====================================================================================================================================================================
 bool CXInputPad::GetTrigger(XINPUT_KEY Button, size_t Frame)
 {
+	//m_abStateTrigger[nCntPad][nCntJoy] =
+	//	(aJoyState[nCntJoy] ^ m_abState[nCntPad][nCntJoy]) & m_abState[nCntPad][nCntJoy];
+	//m_abStateRelease[nCntPad][nCntJoy] =
+		//(aJoyState[nCntJoy] ^ m_abState[nCntPad][nCntJoy]) & !m_abState[nCntPad][nCntJoy];
+
 	//1F前は入力されておらず今入力されている時
 	if (m_pState.Gamepad.wButtons & Button && !(m_OldState & Button))
 	{
@@ -157,6 +162,22 @@ bool CXInputPad::GetTrigger(XINPUT_KEY Button, size_t Frame)
 	}
 
 	//false
+	return false;
+}
+
+// =====================================================================================================================================================================
+//
+// ボタンを離したとき
+//
+// =====================================================================================================================================================================
+bool CXInputPad::GetRelease(XINPUT_KEY Button, size_t Frame)
+{
+	//1F前は入力されておらず今入力されている時
+	if (!(m_pState.Gamepad.wButtons & Button) && m_OldState & Button)
+	{
+		//true
+		return true;
+	}
 	return false;
 }
 

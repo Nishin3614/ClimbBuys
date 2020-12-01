@@ -67,16 +67,46 @@ public:
 	{
 		float				fMove;				// 移動量
 		float				fJump;				// ジャンプ力
-		float				fDash;				// ダッシュの移動量
 		float				fNormalInertia;		// 通常時の慣性
 		float				fJumpInertia;		// ジャンプ時の慣性
 		D3DXVECTOR3			PlayerSize;			// プレイヤーサイズ
 		D3DXVECTOR3			PlayerOffSet;		// プレイヤーオフセット
 		float				PushSize;			// 押し出し用のサイズ
 		D3DXVECTOR3			PushOffSet;			// 押し出し用のオフセット
+		int					nMaxPowerTime;		// 最大パワータイム
 		int					nMaxStanTime;		// 最大スタンタイム
 		int					nMaxInvincibleTime;	// 最大無敵タイム
 	}PLAYER_STATUS;
+	// ----- 力溜め状態 ----- //
+	typedef struct _POWER
+	{
+		// コンストラクタ
+		_POWER()
+		{
+			bCharge = false;		// チャージ状態
+			bDashFlag = false;		// ダッシュフラグ
+			bTackleFrag = false;	// タックルフラグ
+			nCntDashTime = 0;		// ダッシュ中の切り替えカウント
+			nPushPower = 1;			// 押す力
+			nCntTime = 0;			// 力溜めカウント
+		}
+		// 初期化処理
+		void Init()
+		{
+			bCharge = false;		// チャージ状態
+			bDashFlag = false;		// ダッシュフラグ
+			bTackleFrag = false;	// タックルフラグ
+			nCntDashTime = 0;		// ダッシュ中の切り替えカウント
+			nPushPower = 1;			// 押す力
+			nCntTime = 0;			// 力溜めカウント
+		}
+		bool		bCharge;		// チャージ状態
+		bool		bDashFlag;		// ダッシュフラグ
+		bool		bTackleFrag;	// タックルフラグ
+		int			nCntDashTime;	// ダッシュ中の切り替えカウント
+		int			nPushPower;		// 押す力
+		int			nCntTime;		// 力溜めカウント
+	} POWER;
 	// ----- スタン状態 ----- //
 	typedef struct _STAN
 	{
@@ -263,9 +293,9 @@ public:
 	// リソースの開放処理
 	static void UnLoad(void);
 	// ダッシュしているかどうかのフラグの設定
-	void SetDashFlag(bool const &bDashFlag) { m_bDashFlag = bDashFlag; };
+	void SetDashFlag(bool const &bDashFlag) { m_Power.bDashFlag = bDashFlag; };
 	// ダッシュしているかどうかのフラグの取得
-	bool		&GetDashFlag(void)			{ return m_bDashFlag; };
+	bool		&GetDashFlag(void)			{ return m_Power.bDashFlag; };
 	// 記録情報の取得
 	RECORD & GetRecord(void)				{ return m_Record; };
 	// バネ用ジャンプ処理
@@ -321,6 +351,8 @@ private:
 	void PlayerStatusInitLoad(void);
 	// プレイヤーの状態更新
 	void StateUpdate(void);
+	// 力溜めの更新
+	void PowerUpdate(void);
 	// スタン状態の更新
 	void StanUpdate(void);
 	// 無敵状態の更新
@@ -328,11 +360,9 @@ private:
 	/* 変数 */
 	CXInputPad					*m_pPad;						// パッドのポインタ
 	bool						m_bDieFlag;						// 死亡フラグ
-	bool						m_bDashFlag;					// ダッシュフラグ
-	bool						m_bTackleFrag;					// タックルフラグ
-	int							m_nCntDashTime;					// ダッシュ中の切り替えカウント
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
+	POWER						m_Power;						// 力溜め
 	STAN						m_Stan;							// スタン状態
 	INVINCIBLE					m_Invincible;					// 無敵状態
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI

@@ -315,6 +315,9 @@
     <ClCompile Include="cpp&amp;h\tutorialUI.cpp">
       <Filter>Texture_UI</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\steelblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -565,6 +568,9 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\tutorialUI.h">
       <Filter>Texture_UI</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\steelblock.h">
+      <Filter>Model\Block</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

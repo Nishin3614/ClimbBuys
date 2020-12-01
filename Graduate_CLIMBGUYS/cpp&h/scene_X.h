@@ -98,6 +98,8 @@ public:
 		TYPE_OBJECT_BLOCK_S,			// 当たり判定無し演出用ブロック
 		TYPE_BLOCK_SPRING,				// 特殊ブロック_バネ
 		TYPE_BLOCK_BOMB,				// 特殊ブロック_ボム
+		TYPE_OBJECT_VOLCANO,			// 火山
+		TYPE_BLOCKS_INVERTER,			// 電気ブロック
 		TYPE_MAX						// 最大数
 	} TYPE;
 

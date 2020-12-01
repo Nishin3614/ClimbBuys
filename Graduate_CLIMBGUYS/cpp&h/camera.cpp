@@ -227,22 +227,11 @@ void CCamera::Init_Title(void)
 	m_posV.z =
 		m_posR.z + cosf(m_rot.y) * m_fLength;
 
-	m_rot.x = 1.5f;
+	m_rot.x = -1.5f;
 	// 注視点位置
-	m_posR = D3DXVECTOR3(0.0f, 40.0f, -350.0f);
+	m_posR = D3DXVECTOR3(0.0f, 500.0f, -300.0f);
 	m_fLength = 750.0f;
 	m_fHeight = 1000.0f;
-	// 回転回数
-	m_Turn.nSpin = 1;
-	// 一度の回転にかかるタイム
-	m_Turn.nOneTime = 240;
-	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
-	// 一度の回転にかかるタイムカウント
-	m_Turn.nCntTime = 0;
-	// スピンカウント
-	m_Turn.nCntSpin = 0;
-	// 360°回転を再開させる
-	m_Turn.bSpin = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

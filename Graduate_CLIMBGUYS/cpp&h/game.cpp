@@ -93,10 +93,12 @@ void CGame::Init(void)
 	CBg::Create(CTexture_manager::TYPE_BG);
 	// ゲームUIの生成
 	m_pGameUI = CGameUI::Create();
-
+	// オブジェクト生成
+	CScene_X::Create(D3DXVECTOR3(0.0f,-500.0f,0.0f),
+		D3DVECTOR3_ZERO,
+		CScene_X::TYPE_OBJECT_VOLCANO);
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
-
 	// プレイヤーの生成	試験的
 	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0, 300.0f, -50.0f));
 	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0, 300.0f, -50.0f));

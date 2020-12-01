@@ -16,13 +16,13 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define CAMERA_FILE ("data/LOAD/camerainfo.txt")
+#define CAMERA_STATUS_TXT ("data/LOAD/STATUS/CameraStatus.txt")
 #define CAMERA_INIT (1.0f)
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 静的変数宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CCamera::LOAD	CCamera::m_load[TYPE_MAX] = {};	// 情報保存
+CCamera::LOAD	CCamera::m_load = {};	// 情報保存
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
@@ -57,13 +57,6 @@ CCamera::CCamera()
 		m_posR.y + cosf(m_rot.x) * m_fHeight;
 	m_posV.z =
 		m_posR.z + cosf(m_rot.y) * m_fLength;
-	// 360°回転
-	m_Turn.nSpin = 2;
-	m_Turn.nCntSpin = 0;
-	m_Turn.nOneTime = 60;
-	m_Turn.nCntTime = 0;
-	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
-	m_Turn.bSpin = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -128,24 +121,6 @@ void CCamera::Update_Play(void)
 		m_posR.y + cosf(m_rot.x) * m_fHeight;
 	m_posV.z =
 		m_posR.z + cosf(m_rot.y) * m_fLength;
-
-	/*
-	// 目的の角度から現在の角度の差
-	m_rotDiff =
-		m_rotDest - m_rot;
-	// 回転上限
-	CCalculation::Rot_One_Limit(m_rotDiff.x);
-	CCalculation::Rot_One_Limit(m_rotDiff.y);
-	CCalculation::Rot_One_Limit(m_rotDiff.z);
-
-	// 角度に慣性
-	m_rot +=
-		m_rotDiff * m_fIntertia;
-	// 回転上限
-	CCalculation::Rot_One_Limit(m_rot.x);
-	CCalculation::Rot_One_Limit(m_rot.y);
-	CCalculation::Rot_One_Limit(m_rot.z);
-	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -201,11 +176,6 @@ void CCamera::Init_Tutorial(void)
 	m_posR = D3DXVECTOR3(200.0f, 0.0f, -50.0f);
 	m_fLength = 420.0f;
 	m_fHeight = 700.0f;
-	// 一度の回転にかかるタイム
-	m_Turn.nOneTime = 10000;
-	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
-	// 一度の回転にかかるタイムカウント
-	m_Turn.nCntTime = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -245,6 +215,10 @@ void CCamera::Init_Game(void)
 	m_rotDiff = D3DVECTOR3_ZERO;
 	m_rotOrigin = D3DVECTOR3_ZERO;
 	m_bSet = false;
+	m_fLength = m_load.fLengh;
+	m_fHeight = m_load.fHeight;
+	// 注視点位置
+	m_posR = m_load.offset;
 	// 目的の視点
 	m_posV.x =
 		m_posR.x + sinf(m_rot.y) * m_fLength;
@@ -253,21 +227,6 @@ void CCamera::Init_Game(void)
 	m_posV.z =
 		m_posR.z + cosf(m_rot.y) * m_fLength;
 	m_rot.x = 0.0f;
-	// 注視点位置
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_fLength = 400.0f;
-	m_fHeight = 400.0f;
-	// 回転回数
-	m_Turn.nSpin = 1;
-	// 一度の回転にかかるタイム
-	m_Turn.nOneTime = 10000;
-	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
-	// 一度の回転にかかるタイムカウント
-	m_Turn.nCntTime = 0;
-	// スピンカウント
-	m_Turn.nCntSpin = 0;
-	// 360°回転を再開させる
-	m_Turn.bSpin = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -293,17 +252,6 @@ void CCamera::Init_Result(void)
 	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_fLength = 400.0f;
 	m_fHeight = 400.0f;
-	// 回転回数
-	m_Turn.nSpin = 1;
-	// 一度の回転にかかるタイム
-	m_Turn.nOneTime = 10000;
-	m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
-	// 一度の回転にかかるタイムカウント
-	m_Turn.nCntTime = 0;
-	// スピンカウント
-	m_Turn.nCntSpin = 0;
-	// 360°回転を再開させる
-	m_Turn.bSpin = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -319,31 +267,9 @@ void CCamera::Update_Tutorial(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Update_Title(void)
 {
-	//// 回転状態がfalseなら
-	//// ->関数を抜ける
-	//if (!m_Turn.bSpin) return;
-	//// 回転回数カウントが回転数を超えていたら
-	//// ->関数を抜ける
-	//if (m_Turn.nCntSpin >= m_Turn.nSpin)
-	//{
-	//	m_Turn.bSpin = false;
-	//	InitCamera();
-	//	return;
-	//}
-	//// タイムカウントが1週にかかる時間と同じになったら
-	//if (m_Turn.nCntTime == m_Turn.nOneTime)
-	//{
-	//	// カウントタイムの初期化
-	//	m_Turn.nCntTime = 0;
-	//	// 回転回数カウントアップ
-	//	m_Turn.nCntSpin++;
-	//	return;
-	//}
-	//// カウントタイム
-	//m_Turn.nCntTime++;
-	//// 回転更新
-	//m_rot.y -= m_Turn.fTrunRot;
+
 }
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // プレイ時の更新処理
@@ -369,18 +295,8 @@ void CCamera::Update_Game(void)
 		// ポインターエラー防止用にnull
 		pDamageFloor = nullptr;
 	}
-
-	// タイムカウントが1週にかかる時間と同じになったら
-	if (m_Turn.nCntTime == m_Turn.nOneTime)
-	{
-		// カウントタイムの初期化
-		m_Turn.nCntTime = 0;
-		return;
-	}
-	// カウントタイム
-	m_Turn.nCntTime++;
 	// 回転更新
-	m_rot.y -= m_Turn.fTrunRot;
+	m_rot.y -= m_load.fTrunSpeed;
 
 }
 
@@ -403,9 +319,6 @@ void CCamera::InitCamera(void)
 		m_posR.y + cosf(m_rot.x) * m_fHeight;
 	m_posV.z =
 		m_posR.z + cosf(m_rot.y) * m_fLength;
-	// 360°回転
-	m_Turn.nCntSpin = 0;
-	m_Turn.nCntTime = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -440,28 +353,26 @@ void CCamera::Debug(void)
 			ImGui::Text("PosV(%.3f,%.3f,%.3f)\n", m_posV.x, m_posV.y, m_posV.z);
 			ImGui::TreePop();
 		}
-		// 回転回数
-		ImGui::DragInt("Spin", &m_Turn.nSpin);
-		// 一度の回転にかかるタイム
-		if (ImGui::DragInt("OneTime", &m_Turn.nOneTime))
-		{
-			m_Turn.fTrunRot = D3DX_PI * 2 / m_Turn.nOneTime;
-		}
-		// 一度の回転にかかるタイムカウント
-		ImGui::Text("nCntOneTime(%d)", m_Turn.nCntTime);
-		// スピンカウント
-		ImGui::Text("nCntSpin(%d)", m_Turn.nCntSpin);
 
 		// カメラの初期化処理
 		if (ImGui::Button("CameraInit"))
 		{
 			InitCamera();
 		}
-		// 360°回転を再開させる
-		if (ImGui::Button("SPIN"))
+		// モードがゲームなら
+		if (CManager::GetMode() == CManager::MODE_GAME)
 		{
-			InitCamera();
-			m_Turn.bSpin = !m_Turn.bSpin;
+			// 回転スピード
+			ImGui::DragFloat("TrunSpeed", &m_load.fTrunSpeed, 0.001f, 0.001f, 1.0f);
+
+			// カメラの初期化処理
+			if (ImGui::Button("Save"))
+			{
+				m_load.fHeight = m_fHeight;
+				m_load.fLengh = m_fLength;
+				m_load.offset = m_posR;
+				Save();
+			}
 		}
 		// 区切り線
 		ImGui::Separator();
@@ -494,6 +405,83 @@ CCamera * CCamera::Create(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 HRESULT CCamera::Load(void)
 {
+	// ファイルポイント
+	FILE *pFile = nullptr;
+
+	char cReadText[128];			// 文字として読み取る
+	char cHeadText[128];			// 比較用
+	char cDie[128];					// 不要な文字
+	int nCntDropSprit = 0;			// 落とすカメラ数カウント
+	int nCntCameraGravity = 0;		// 重力カウント
+
+									// ファイルを開く
+	pFile = fopen(CAMERA_STATUS_TXT, "r");
+
+	// 開いているとき
+	if (pFile)
+	{
+		// SCRIPTが来るまでループ
+		while (strcmp(cHeadText, "SCRIPT") != 0)
+		{
+			fgets(cReadText, sizeof(cReadText), pFile); // 一文読み込み
+			sscanf(cReadText, "%s", &cHeadText);		// 比較用テキストに文字を代入
+		}
+
+		// SCRIPTが来たら
+		if (strcmp(cHeadText, "SCRIPT") == 0)
+		{
+			// END_SCRIPTが来るまでループ
+			while (strcmp(cHeadText, "END_SCRIPT") != 0)
+			{
+				fgets(cReadText, sizeof(cReadText), pFile);
+				sscanf(cReadText, "%s", &cHeadText);
+
+				// STATUS_SETが来たら
+				if (strcmp(cHeadText, "STATUS_SET") == 0)
+				{
+					// END_STATUS_SETが来るまでループ
+					while (strcmp(cHeadText, "END_STATUS_SET") != 0)
+					{
+						fgets(cReadText, sizeof(cReadText), pFile);
+						sscanf(cReadText, "%s", &cHeadText);
+
+						// Offsetが来たら
+						if (strcmp(cHeadText, "Offset") == 0)
+						{
+							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie,
+								&m_load.offset.x,
+								&m_load.offset.y,
+								&m_load.offset.z);
+						}
+						// Lenghが来たら
+						else if (strcmp(cHeadText, "Lengh") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_load.fLengh);
+						}
+						// Heightが来たら
+						else if (strcmp(cHeadText, "Height") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_load.fHeight);
+						}
+						// TrunSpeedが来たら
+						else if (strcmp(cHeadText, "TrunSpeed") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_load.fTrunSpeed);
+						}
+
+					}
+				}
+			}
+		}
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{
+		// 読み込み失敗時の警告表示
+		MessageBox(NULL, "カメラのステータス読み込み失敗", CAMERA_STATUS_TXT, MB_ICONWARNING);
+	}
+
 	return S_OK;
 }
 
@@ -502,6 +490,54 @@ HRESULT CCamera::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Unload(void)
 {
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 書き込み処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CCamera::Save(void)
+{
+	// ファイルポイント
+	FILE	*pFile = nullptr;
+	int nCntDropSprit = 0;			// 落とすカメラ数カウント
+	int nCntCameraGravity = 0;		// 重力カウント
+
+									// ファイルを開く
+	pFile = fopen(CAMERA_STATUS_TXT, "w");
+
+	// 開いているとき
+	if (pFile)
+	{
+		fprintf(pFile, COMMENT02);
+		fprintf(pFile, "// カメラのステータス\n");
+		fprintf(pFile, COMMENT02);
+
+		fprintf(pFile, "SCRIPT\n");
+		fprintf(pFile, NEWLINE);
+
+		// セーブするモデルの情報
+		fprintf(pFile, "STATUS_SET\n");
+		fprintf(pFile, "	Offset			= %.3f %.3f %.3f\n", m_load.offset.x, m_load.offset.y, m_load.offset.z);
+		fprintf(pFile, "	Lengh			= %.3f\n", m_load.fLengh);
+		fprintf(pFile, "	Height			= %.3f\n", m_load.fHeight);
+		fprintf(pFile, "	TrunSpeed		= %.3f\n", m_load.fTrunSpeed);
+		fprintf(pFile, "END_STATUS_SET\n\n");
+
+		fprintf(pFile, "END_SCRIPT\n");
+
+		// ファイルを閉じる
+		fclose(pFile);
+
+		// 読み込み成功時の結果表示
+		MessageBox(NULL, "セーブしました", CAMERA_STATUS_TXT, MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		// 読み込み失敗時の警告表示
+		MessageBox(NULL, "読み込み失敗", CAMERA_STATUS_TXT, MB_ICONWARNING);
+	}
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

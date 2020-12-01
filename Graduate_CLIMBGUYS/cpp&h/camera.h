@@ -7,8 +7,6 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#define _CRT_SECURE_NO_WARNINGS
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,23 +37,11 @@ public:
 	// 読み込み用
 	typedef struct
 	{
-		D3DXVECTOR3 rot;	// 回転量
-		D3DXVECTOR3 offset;	// 注視点のオフセット
-		float fLengh;		// 注視点と視点の長さ
-		float fHeight;		// 注視点と視点の高さ
-		int nType;			// タイプ
+		D3DXVECTOR3 offset;		// 注視点のオフセット
+		float		fTrunSpeed;	// 回転スピード
+		float		fLengh;		// 注視点と視点の長さ
+		float		fHeight;	// 注視点と視点の高さ
 	} LOAD;
-	// 360度回転
-	typedef struct TURN
-	{
-		int		nSpin;					// 回る回数
-		int		nCntSpin;				// 回った回数
-		int		nOneTime;				// 一周回転にかかる時間
-		int		nCntTime;				// タイムカウント
-		float	fTrunRot;				// 回転量
-		bool	bSpin;					// 回転状態
-	} TURN;
-
 	// 振動情報
 	struct SHAKE
 	{
@@ -93,6 +79,8 @@ public:
 	static HRESULT Load(void);
 	// 破棄
 	static void Unload(void);
+	// 書き込み処理
+	static void Save(void);
 	// 各モードのカメラの初期設定
 	void ModeCameraInit(void);
 	// カメラの情報初期化
@@ -179,7 +167,7 @@ private:
 	// 初期時のカメラ設定
 	void InitCamera(void);
 	/* 変数 */
-	static	LOAD	m_load[TYPE_MAX];			// 情報保存
+	static	LOAD	m_load;						// 情報保存
 	D3DXVECTOR3		m_posV;						// 視点
 	D3DXVECTOR3		m_posVDest;					// 目的視点
 	D3DXVECTOR3		m_posVDiff;					// 目的視点から視点
@@ -203,7 +191,6 @@ private:
 	float			m_fLength;					// 視点と注視点の距離
 	float			m_fIntertia;				// 慣性の比率
 	bool			m_bSet;						// カメラ設定
-	TURN			m_Turn;						// 360°回転
 	SHAKE			m_Shake;					// 振動情報
 };
 

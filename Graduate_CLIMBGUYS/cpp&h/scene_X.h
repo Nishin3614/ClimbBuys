@@ -100,6 +100,7 @@ public:
 		TYPE_BLOCK_BOMB,				// 特殊ブロック_ボム
 		TYPE_OBJECT_VOLCANO,			// 火山
 		TYPE_BLOCKS_INVERTER,			// 電気ブロック
+		TYPE_BLOCKS_HARD,				// 硬いブロック
 		TYPE_MAX						// 最大数
 	} TYPE;
 

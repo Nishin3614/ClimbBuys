@@ -33,6 +33,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 試験用
 CBaseblock::BLOCK_STATUS CBaseblock::m_BlockStatus = {};
+int	CBaseblock::m_nPhase = 0;					// フェーズ
 int CBaseblock::m_anHeight[20][20] = {};		// 1つ1つの行列の高さ
 
 float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
@@ -51,6 +52,7 @@ CBaseblock::CBaseblock() : CScene_X::CScene_X()
 	m_PushAfeter.PushGrid = GRID(0,0,0);				// 押し出し力
 	m_bShadow = true;									// シャドウの使用状態
 	m_BlockType = BlockType::NORMAL;
+	m_fGravity = 0.0f;									// 重力
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -78,18 +80,10 @@ void CBaseblock::Init()
 		m_pShadowPolygon->SetCol(D3DXCOLOR(0.0f,0.0f,0.0f,1.0f));
 		m_pShadowPolygon->Set_Vtx_Col();
 	}
-	/*
-	if (m_type == TYPE_FIELD)
-	{
-		// 当たり判定の設定
-		CScene_X::SetCollision(CShape::SHAPETYPE_RECT, CCollision::OBJTYPE_BLOCK, false, true, NULL, D3DXVECTOR3(0.0, 50.0f, 0.0));
-	}
 	else
 	{
-		// 当たり判定の設定
-		CScene_X::SetCollision(CShape::SHAPETYPE_RECT, CCollision::OBJTYPE_BLOCK, false, true, NULL, D3DXVECTOR3(0.0, 50.0f, 0.0));
+		m_fGravity = 1.0f;									// 重力
 	}
-	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -201,7 +195,7 @@ void CBaseblock::Update_Fall(void)
 	// 位置情報取得
 	D3DXVECTOR3 pos = CScene_X::GetPos();
 	// y位置更新
-	pos.y -= m_BlockStatus.fGravity;
+	pos.y -= m_fGravity;
 	// 位置設定
 	CScene_X::SetPos(pos);
 	// ブロックの上限
@@ -369,8 +363,8 @@ void CBaseblock::Update_MyShadow(void)
 void CBaseblock::Collision(CBaseblock * pBlock)
 {
 	// 落ちいない状態なら
-	// ->関数を抜ける
-	if (!this->GetFall()) return;
+	if (!this->GetFall() ||
+		this->GetType() == CBaseblock::TYPE_FIELD) return;
 	// 変数宣言
 	COLLISIONDIRECTION Direct;	// 当たり判定方向
 	// 当たり判定
@@ -390,8 +384,8 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		// ->関数を抜ける
 		if (pBlock->GetFall()) return;
 		// 変数宣言
-		CBaseblock::GRID MyGrid = this->GetGrid();	// 自分の行列高
-		CBaseblock::GRID OppGrid = pBlock->GetGrid();		// 相手の行列高
+		CBaseblock::GRID MyGrid = this->GetGrid();		// 自分の行列高
+		CBaseblock::GRID OppGrid = pBlock->GetGrid();	// 相手の行列高
 		// 同じ行列ではないなら
 		// ->関数を抜ける
 		if (!(MyGrid.nColumn == OppGrid.nColumn &&
@@ -1066,6 +1060,12 @@ void CBaseblock::UnLoad(void)
 	// フェードの値の開放
 	m_nFeedValue.clear();
 	m_nFeedValue.shrink_to_fit();
+	// 落ちるブロック数の開放
+	m_BlockStatus.v_nDropBlock.clear();
+	m_BlockStatus.v_nDropBlock.shrink_to_fit();
+	// 落ちる速度の開放
+	m_BlockStatus.v_nBlockGravity.clear();
+	m_BlockStatus.v_nBlockGravity.shrink_to_fit();
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1406,6 +1406,8 @@ void CBaseblock::BlockStatusLoad(void)
 	char cReadText[128];			// 文字として読み取る
 	char cHeadText[128];			// 比較用
 	char cDie[128];					// 不要な文字
+	int nCntDropSprit = 0;			// 落とすブロック数カウント
+	int nCntBlockGravity = 0;		// 重力カウント
 
 									// ファイルを開く
 	pFile = fopen(BLOCK_STATUS_TXT, "r");
@@ -1438,10 +1440,10 @@ void CBaseblock::BlockStatusLoad(void)
 						fgets(cReadText, sizeof(cReadText), pFile);
 						sscanf(cReadText, "%s", &cHeadText);
 
-						// Gravityが来たら
-						if (strcmp(cHeadText, "Gravity") == 0)
+						// AppBlockが来たら
+						if (strcmp(cHeadText, "AppBlock") == 0)
 						{
-							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_BlockStatus.fGravity);
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_BlockStatus.nAppBlock);
 						}
 						// Moveが来たら
 						else if (strcmp(cHeadText, "Move") == 0)
@@ -1452,6 +1454,52 @@ void CBaseblock::BlockStatusLoad(void)
 						else if (strcmp(cHeadText, "App") == 0)
 						{
 							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_BlockStatus.nAppearance);
+						}
+						// MaxSpritが来たら
+						else if (strcmp(cHeadText, "MaxSprit") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_BlockStatus.nMaxSprit);
+
+							// 分割数分配列確保する
+							std::vector<INTEGER2> v_nSprit(m_BlockStatus.nMaxSprit);
+							for (size_t CntSprit = 0; CntSprit < v_nSprit.size(); CntSprit++)
+							{
+								v_nSprit[CntSprit] = INTEGER2(0, 0);
+							}
+							m_BlockStatus.v_nDropBlock = v_nSprit;
+							m_BlockStatus.v_nBlockGravity = v_nSprit;
+
+						}
+						// ChangeTimeが来たら
+						else if (strcmp(cHeadText, "ChangeTime") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_BlockStatus.nChangeTime);
+						}
+						// DropBlockが来たら
+						else if (strcmp(cHeadText, "DropBlock") == 0)
+						{
+							if (nCntDropSprit >= (int)m_BlockStatus.v_nDropBlock.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_nDropBlock[nCntDropSprit].nMax,
+								&m_BlockStatus.v_nDropBlock[nCntDropSprit].nMin);
+							nCntDropSprit++;
+						}
+						// BlockGravityが来たら
+						else if (strcmp(cHeadText, "BlockGravity") == 0)
+						{
+							if (nCntBlockGravity >= (int)m_BlockStatus.v_nBlockGravity.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMax,
+								&m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMin);
+							nCntBlockGravity++;
 						}
 					}
 				}
@@ -1478,6 +1526,8 @@ void CBaseblock::BlockStatusSave(void)
 {
 	// ファイルポイント
 	FILE	*pFile = nullptr;
+	int nCntDropSprit = 0;			// 落とすブロック数カウント
+	int nCntBlockGravity = 0;		// 重力カウント
 
 	// ファイルを開く
 	pFile = fopen(BLOCK_STATUS_TXT, "w");
@@ -1494,9 +1544,29 @@ void CBaseblock::BlockStatusSave(void)
 
 		// セーブするモデルの情報
 		fprintf(pFile, "STATUS_SET\n");
-		fprintf(pFile, "	Gravity			= %.1f\n", m_BlockStatus.fGravity);
+		fprintf(pFile, "	AppBlock		= %d\n", m_BlockStatus.nAppBlock);
 		fprintf(pFile, "	Move			= %.1f\n", m_BlockStatus.fMove);
 		fprintf(pFile, "	App				= %d\n", m_BlockStatus.nAppearance);
+		fprintf(pFile, "	MaxSprit		= %d\n", m_BlockStatus.nMaxSprit);
+		fprintf(pFile, "	ChangeTime		= %d\n", m_BlockStatus.nChangeTime);
+		for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+		{
+			fprintf(pFile, "	Phase %zd\n",nCntDropSprit);
+
+			fprintf(pFile, "		DropBlock		= %d %d\n",
+				m_BlockStatus.v_nDropBlock[nCntDropSprit].nMax,
+				m_BlockStatus.v_nDropBlock[nCntDropSprit].nMin
+			);
+		}
+		for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_nBlockGravity.size(); nCntBlockGravity++)
+		{
+			fprintf(pFile, "	Phase %zd\n", nCntBlockGravity);
+
+			fprintf(pFile, "		BlockGravity	= %d %d\n",
+				m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMax,
+				m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMin
+			);
+		}
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
 		fprintf(pFile, "END_SCRIPT\n");
@@ -1537,12 +1607,70 @@ void CBaseblock::AllDebug(void)
 {
 	if (ImGui::Begin(u8"ブロックのステータス"))
 	{
-		// 重力
-		ImGui::DragFloat(u8"重力", &m_BlockStatus.fGravity, 0.1f, 0.1f, 100.0f);						/* 3.0f */
+		// 出現する時間
+		ImGui::DragInt(u8"出現する時間", &m_BlockStatus.nAppBlock, 1.0f,1,1000);					/* 10.0f */
 		// 移動量
-		ImGui::DragFloat(u8"移動量", &m_BlockStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
+		ImGui::DragFloat(u8"移動量", &m_BlockStatus.fMove, 0.1f, 0.1f, 100.0f);
 		// 落ちる高さ
 		ImGui::DragInt(u8"落ちる高さ", &m_BlockStatus.nAppearance, 1.0f);						/* 10.0f */
+		// 最大分割数
+		if (ImGui::DragInt(u8"変化する回数", &m_BlockStatus.nMaxSprit, 1.0f,1,100))						/* 10.0f */
+		{
+			// 分割数に合わせ、数値を更新
+			std::vector<INTEGER2> v_Sprit(m_BlockStatus.nMaxSprit);
+			// 初期化
+			for (int nCntSprit = 0; nCntSprit < m_BlockStatus.nMaxSprit; nCntSprit++)
+			{
+				v_Sprit[nCntSprit] = INTEGER2(0, 0);
+			}
+
+			// 落ちるブロック数
+			for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+			{
+				if (nCntDropSprit >= (size_t)m_BlockStatus.nMaxSprit) break;
+				v_Sprit[nCntDropSprit] = m_BlockStatus.v_nDropBlock[nCntDropSprit];
+			}
+			m_BlockStatus.v_nDropBlock.clear();
+			m_BlockStatus.v_nDropBlock.shrink_to_fit();
+			m_BlockStatus.v_nDropBlock = v_Sprit;
+			// 落ちる速度
+			for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_nBlockGravity.size(); nCntBlockGravity++)
+			{
+				if (nCntBlockGravity >= (size_t)m_BlockStatus.nMaxSprit) break;
+				v_Sprit[nCntBlockGravity] = m_BlockStatus.v_nBlockGravity[nCntBlockGravity];
+			}
+			m_BlockStatus.v_nBlockGravity.clear();
+			m_BlockStatus.v_nBlockGravity.shrink_to_fit();
+			m_BlockStatus.v_nBlockGravity = v_Sprit;
+		}
+		// 変化させる時間
+		ImGui::DragInt(u8"変化させる時間", &m_BlockStatus.nChangeTime, 1.0f);					/* 10.0f */
+		// 落ちるブロック数
+		if (ImGui::TreeNode(u8"落ちるブロック数(最大値、最小値)"))
+		{
+			for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+			{
+				ImGui::Text("Phase %d", nCntDropSprit);
+				std::string sName = " (";
+				sName += std::to_string(nCntDropSprit * m_BlockStatus.nChangeTime) + u8"秒)";
+				// 落とすブロックの数
+				ImGui::DragInt2(sName.c_str(), (int *)m_BlockStatus.v_nDropBlock[nCntDropSprit], 1.0f);					/* 10.0f */
+			}
+			ImGui::TreePop();
+		}
+		// 落ちる速度
+		if (ImGui::TreeNode(u8"落ちる速度(最大値、最小値)"))
+		{
+			for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_nBlockGravity.size(); nCntBlockGravity++)
+			{
+				ImGui::Text("Phase %d", nCntBlockGravity);
+				std::string sName = " (";
+				sName += std::to_string(nCntBlockGravity * m_BlockStatus.nChangeTime) + u8"秒)";
+				// 落ちる速度
+				ImGui::DragInt2(sName.c_str(), (int *)m_BlockStatus.v_nBlockGravity[nCntBlockGravity], 1.0f);					/* 10.0f */
+			}
+			ImGui::TreePop();
+		}
 
 		// セーブボタン
 		if (ImGui::Button(u8"保存"))
@@ -1550,18 +1678,6 @@ void CBaseblock::AllDebug(void)
 			// ブロックのステータスのセーブ
 			BlockStatusSave();
 		}
-
-		// 改行キャンセル
-		ImGui::SameLine();
-
-		// 初期化
-		if (ImGui::Button(u8"初期化"))
-		{
-			// ブロックの初期ステータス代入
-			//BlockStatusInitLoad();
-		}
-		// 区切り線
-		ImGui::Separator();
 	}
 	// End
 	ImGui::End();

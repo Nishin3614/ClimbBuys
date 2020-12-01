@@ -298,6 +298,7 @@ CSpringblock * CSpringblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
 	D3DXCOLOR		* pCol,				// 色
+	float			const & fGravity,	// 重力
 	CScene::LAYER	const & layer		// レイヤー
 )
 {
@@ -311,6 +312,7 @@ CSpringblock * CSpringblock::Create(
 	pSpringblock->SetGrid(Grid);			// 行列高さ
 	pSpringblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange + 30, Grid.nLine * m_fSizeRange));
+	pSpringblock->SetGravity(fGravity);		// 重力
 	pSpringblock->SetModelId(TYPE_BLOCK_SPRING);	// モデル番号
 
 	//// 色がNULLではないなら

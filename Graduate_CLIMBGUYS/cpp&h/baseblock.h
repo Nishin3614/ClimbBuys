@@ -184,13 +184,26 @@ public:
 
 
 	// ----- ブロックのステータス ----- //
-	typedef struct
+	typedef struct _BLOCK_STATUS
 	{
-		float				fGravity;			// 重力
-		float				fMove;				// 移動力
-		int					nAppearance;		// 出現する高さ
-		float				fBasicShadowSize;	// シャドウサイズ
-	}BLOCK_STATUS;
+		_BLOCK_STATUS()
+		{
+			fMove = 0;				// 移動力
+			nAppearance = 0;		// 出現する高さ
+			fBasicShadowSize = 0;	// シャドウサイズ
+			nMaxSprit = 0;			// 最大分割数
+			nChangeTime = 0;		// 変化させる時間(変化するタイミング)
+			nAppBlock = 0;			// ブロックが出現するタイミング
+		}
+		float					fMove;				// 移動力
+		int						nAppearance;		// 出現する高さ
+		float					fBasicShadowSize;	// シャドウサイズ
+		int						nMaxSprit;			// 最大分割数
+		int						nChangeTime;		// 変化させる時間(変化するタイミング)
+		int						nAppBlock;			// ブロックが出現するタイミング
+		std::vector<INTEGER2>	v_nDropBlock;		// 落とすブロックの数
+		std::vector<INTEGER2>	v_nBlockGravity;	// 落ちる速度
+	} BLOCK_STATUS;
 
 	/* 関数 */
 	// コンストラクタ
@@ -305,6 +318,10 @@ public:
 	void SetBaseBlockType(BlockType type)			{ m_BlockType = type; };
 	// ベースブロックの種類取得
 	BlockType GetBaseBlockType()					{ return m_BlockType; };
+	// ベースブロックの種類設定
+	void SetGravity(float fGravity)					{ m_fGravity = fGravity; };
+	// ベースブロックの種類取得
+	float GetGravity()								{ return m_fGravity; };
 	// 指定したベースブロックを削除する処理
 	//	pBlock	: ブロック情報
 	static bool DeleteBlock(
@@ -392,6 +409,10 @@ public:
 	static void BlockStatusSave(void);
 	// ブロックの静的変数を初期化する
 	static void BlockStaticValue(void);
+	// フェーズの取得
+	static int GetPhase(void)					{ return m_nPhase; };
+	// フェーズの設定
+	static void SetPhase(int const & nPhase)	{ m_nPhase = nPhase; };
 #ifdef _DEBUG
 	// 全体のデバッグ処理
 	static void AllDebug(void);
@@ -402,7 +423,7 @@ public:
 
 protected:
 	/* 関数 */
-	//D3DXVECTOR3 & GetGridToGrid(GRID const & Grid) {}
+
 	// 設定 //
 	/* 変数宣言 */
 	static float			m_fSizeRange;	// サイズ範囲
@@ -427,8 +448,10 @@ private:
 	BlockType				m_BlockType;		// ベースブロックの種類
 	GRID					m_grid;				// 盤面情報
 	PUSHAFTER				m_PushAfeter;		// 押し出した後要の変数
+	float					m_fGravity;			// 重力
 	bool					m_bFall;			// 落ちる状態
 	bool					m_bShadow;			// シャドウの使用状態
+	static int				m_nPhase;			// フェーズ
 	// 試験用
 	static int m_anHeight[20][20];
 };

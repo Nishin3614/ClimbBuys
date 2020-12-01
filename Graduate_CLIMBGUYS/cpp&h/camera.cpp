@@ -319,30 +319,30 @@ void CCamera::Update_Tutorial(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCamera::Update_Title(void)
 {
-	// 回転状態がfalseなら
-	// ->関数を抜ける
-	if (!m_Turn.bSpin) return;
-	// 回転回数カウントが回転数を超えていたら
-	// ->関数を抜ける
-	if (m_Turn.nCntSpin >= m_Turn.nSpin)
-	{
-		m_Turn.bSpin = false;
-		InitCamera();
-		return;
-	}
-	// タイムカウントが1週にかかる時間と同じになったら
-	if (m_Turn.nCntTime == m_Turn.nOneTime)
-	{
-		// カウントタイムの初期化
-		m_Turn.nCntTime = 0;
-		// 回転回数カウントアップ
-		m_Turn.nCntSpin++;
-		return;
-	}
-	// カウントタイム
-	m_Turn.nCntTime++;
-	// 回転更新
-	m_rot.y -= m_Turn.fTrunRot;
+	//// 回転状態がfalseなら
+	//// ->関数を抜ける
+	//if (!m_Turn.bSpin) return;
+	//// 回転回数カウントが回転数を超えていたら
+	//// ->関数を抜ける
+	//if (m_Turn.nCntSpin >= m_Turn.nSpin)
+	//{
+	//	m_Turn.bSpin = false;
+	//	InitCamera();
+	//	return;
+	//}
+	//// タイムカウントが1週にかかる時間と同じになったら
+	//if (m_Turn.nCntTime == m_Turn.nOneTime)
+	//{
+	//	// カウントタイムの初期化
+	//	m_Turn.nCntTime = 0;
+	//	// 回転回数カウントアップ
+	//	m_Turn.nCntSpin++;
+	//	return;
+	//}
+	//// カウントタイム
+	//m_Turn.nCntTime++;
+	//// 回転更新
+	//m_rot.y -= m_Turn.fTrunRot;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -260,6 +260,7 @@ CNormalblock * CNormalblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
 	D3DXCOLOR		* pCol,				// 色
+	float			const & fGravity,	// 重力
 	CScene::LAYER	const & layer		// レイヤー
 )
 {
@@ -273,6 +274,7 @@ CNormalblock * CNormalblock::Create(
 	pNormalblock->SetGrid(Grid);			// 行列高さ
 	pNormalblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
+	pNormalblock->SetGravity(fGravity);		// 重力
 	pNormalblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)

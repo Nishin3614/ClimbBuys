@@ -161,21 +161,32 @@ private:
 typedef struct INTEGER2
 {
 	INTEGER2() {}
+	// 引数ありコンストラクタ
 	INTEGER2(int X, int Y)
 	{
 		nMax = X;
 		nMin = Y;
 	}
-	int nMax;
-	int	nMin;
-
-	union INTEGER2_UNION
+	// int*型で返す
+	int * GetInteger(void)
 	{
-		struct INTEGER2
+		return (int *)this;
+	}
+	// キャスト
+	inline operator int * ()
+	{
+		return (int *)this;
+	}
+	union
+	{
+		struct
 		{
-			int nInteger[2];
+			int nMax;
+			int	nMin;
 		};
 	};
+
+	int nInteger[2];
 }INTEGER2, *PINTEGER2;
 
 // 整数型3個
@@ -192,9 +203,6 @@ public:
 	// キャスト
 	inline operator int* ()
 	{
-		(int *)nX;
-		(int *)nY;
-		(int *)nX;
 		return *this;
 	}
 	inline operator CONST int* () const

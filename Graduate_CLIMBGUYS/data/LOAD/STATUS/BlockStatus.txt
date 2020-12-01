@@ -4,9 +4,39 @@
 SCRIPT
 
 STATUS_SET
-	Gravity			= 1.0
+	AppBlock		= 5
 	Move			= 1.0
 	App				= 10
+	MaxSprit		= 7
+	ChangeTime		= 40
+	Phase 0
+		DropBlock		= 2 1
+	Phase 1
+		DropBlock		= 3 2
+	Phase 2
+		DropBlock		= 4 3
+	Phase 3
+		DropBlock		= 5 4
+	Phase 4
+		DropBlock		= 6 5
+	Phase 5
+		DropBlock		= 7 5
+	Phase 6
+		DropBlock		= 8 6
+	Phase 0
+		BlockGravity	= 0 1
+	Phase 1
+		BlockGravity	= 2 1
+	Phase 2
+		BlockGravity	= 3 1
+	Phase 3
+		BlockGravity	= 4 1
+	Phase 4
+		BlockGravity	= 4 2
+	Phase 5
+		BlockGravity	= 5 2
+	Phase 6
+		BlockGravity	= 6 2
 END_STATUS_SET
 
 END_SCRIPT

@@ -162,6 +162,7 @@ CBombblock * CBombblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
 	D3DXCOLOR		* pCol,				// 色
+	float			const & fGravity,	// 重力
 	CScene::LAYER	const & layer		// レイヤー
 )
 {
@@ -175,6 +176,7 @@ CBombblock * CBombblock::Create(
 	pBombblock->SetGrid(Grid);			// 行列高さ
 	pBombblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
+	pBombblock->SetGravity(fGravity);		// 重力
 	pBombblock->SetModelId(nModelId);		// モデル番号
 											// 色がNULLではないなら
 	if (pCol != NULL)

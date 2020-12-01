@@ -157,6 +157,14 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
+	// ブロックのフェーズ状態設定
+	if (m_nCntTime > 0 &&
+		m_nCntTime % DERAY_TIME(CBaseblock::GetBlockStatus().nChangeTime) == 0)
+	{
+		int nPhase = CBaseblock::GetPhase();
+		nPhase++;
+		CBaseblock::SetPhase(nPhase);
+	}
 	// タイムカウント更新
 	m_nCntTime++;
 	// NULLチェック

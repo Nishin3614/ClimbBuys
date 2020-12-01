@@ -116,7 +116,7 @@ private:
 	/* 変数 */
 	CPause *		m_pause;		// ポーズ
 	static STAGE	m_Stage;		// ステージ
-	static int		m_nCntTime;			// タイム
+	static int		m_nCntTime;		// タイム
 	CGameUI			*m_pGameUI;		// ゲームUI
 	int				m_nCntFinish;	// 終了カウント
 	bool			m_bFinishFlag;	// 終了フラグ

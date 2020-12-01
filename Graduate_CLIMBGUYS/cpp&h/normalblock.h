@@ -95,6 +95,7 @@ public:
 		int				const & nModelId,							// モデル番号
 		GRID			const & Grid,								// 行列高さ番号
 		D3DXCOLOR		* pCol,										// 色情報
+		float			const & fGravity,							// 重力
 		CScene::LAYER	const & layer = CScene::LAYER_3DBLOCK		// レイヤー
 	);
 	// 作成(個人管理)

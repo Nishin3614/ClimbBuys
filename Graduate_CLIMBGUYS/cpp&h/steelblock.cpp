@@ -134,6 +134,7 @@ CSteelblock * CSteelblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
 	D3DXCOLOR		* pCol,				// 色
+	float			const & fGravity,	// 重力
 	CScene::LAYER	const & layer		// レイヤー
 )
 {
@@ -147,6 +148,7 @@ CSteelblock * CSteelblock::Create(
 	pSteelblock->SetGrid(Grid);				// 行列高さ
 	pSteelblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
+	pSteelblock->SetGravity(fGravity);		// 重力
 	pSteelblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)

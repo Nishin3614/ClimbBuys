@@ -358,6 +358,7 @@ private:
 	/* 変数 */
 	CXInputPad					*m_pPad;						// パッドのポインタ
 	bool						m_bDieFlag;						// 死亡フラグ
+	bool						m_bGravity;						// 重力を適用するフラグ
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
 	POWER						m_Power;						// 力溜め

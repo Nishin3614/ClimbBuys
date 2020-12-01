@@ -55,13 +55,14 @@ int CPlayer::m_nDieCnt = 0;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
-	m_nCntState			= 0;					// ステートカウント
-	m_bDieFlag			= false;				// 死亡フラグ
-	m_Power.bDashFlag			= false;				// ダッシュフラグ
+	m_nCntState				= 0;					// ステートカウント
+	m_bDieFlag				= false;				// 死亡フラグ
+	m_bGravity				= true;					// 重力を適用するフラグ
+	m_Power.bDashFlag		= false;				// ダッシュフラグ
 	m_Power.bTackleFrag		= false;				// タックルフラグ
-	m_Power.nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
-	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
-	m_Record			= RECORD();				// 記録
+	m_Power.nCntDashTime	= 0;					// ダッシュ中の切り替えカウント
+	m_pPlayerUI				= nullptr;				// プレイヤーUIのポインタ
+	m_Record				= RECORD();				// 記録
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
 #ifdef _DEBUG
@@ -455,8 +456,12 @@ void CPlayer::MyMove(void)
 	}
 	CCharacter::SetMove(move);
 
-	// キャラクターの重力加算処理
-	CCharacter::AddGravity(PLAYER_GRAVITY);
+	// 重力を適用する
+	if (m_bGravity)
+	{
+		// キャラクターの重力加算処理
+		CCharacter::AddGravity(PLAYER_GRAVITY);
+	}
 	CCharacter::SetRotDest(rot);
 
 	//if (pKeyboard->GetKeyboardTrigger(DIK_C))
@@ -1770,6 +1775,9 @@ void CPlayer::Debug(void)
 				ImGui::DragInt(u8"スタン時間", &m_PlayerStatus.nMaxStanTime, 1.0f, 0);
 				// 無敵時間
 				ImGui::DragInt(u8"無敵時間", &m_PlayerStatus.nMaxInvincibleTime, 1.0f, 0);
+				// 重力を適用するフラグの切り替え
+				ImGui::Checkbox(u8"重力", &m_bGravity);
+
 				// セーブボタン
 				if (ImGui::Button(u8"保存"))
 				{

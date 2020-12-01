@@ -1591,6 +1591,8 @@ void CBaseblock::BlockStaticValue(void)
 	{
 		*nHeight = -1;
 	}
+
+	m_nPhase = 0;
 }
 
 #ifdef _DEBUG

@@ -39,6 +39,7 @@ CStagingBlock::CStagingBlock() : CScene_X::CScene_X()
 	m_nAngle = 0;
 	m_nTime = 0;
 	m_pTitle = nullptr;
+	m_Vector = D3DVECTOR3_ZERO;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +61,7 @@ void CStagingBlock::Init()
 	SetBurstVector(CCalculation::RandomDirectionVector(NULL, true));
 	// シーンxの初期化
 	CScene_X::Init();
-
+	m_Vector.y = -1.0f;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,7 +82,7 @@ void CStagingBlock::Update(void)
 	{
 		m_pTitle = (CTitle*)CManager::GetBaseMode();
 
-		if (m_pTitle && m_pTitle->GetPhase() == CTitle::TITLE_PHASE::PHASE_ONE)
+		if (m_pTitle)
 		{
 			// 一定時間毎にエフェクトを出現
 			if (m_nTime++ % 60 == 0)
@@ -94,17 +95,10 @@ void CStagingBlock::Update(void)
 				);
 			}
 
-			// 空中移動処理
+			// 空中浮遊処理
 			Levitating();
 		}
-
-		if (m_pTitle && m_pTitle->GetPhase() == CTitle::TITLE_PHASE::PHASE_TWO)
-		{
-			//CCalculation::DoubleValue(m_fSpeed, m_fSpeed);
-			GetPos().y -= m_fSpeed;
-		}
 	}
-
 
 	CScene_X::Update();
 }

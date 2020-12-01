@@ -141,6 +141,8 @@ public:
 	);
 	// ƒJƒƒ‰‚Ì‹“_æ“¾
 	D3DXVECTOR3 &GetPosV(void) { return m_posV; };
+	//
+	D3DXVECTOR3 &GetPosR(void) { return m_posR; };
 
 	// ƒJƒƒ‰‚ÌU“®
 	void CameraShake();

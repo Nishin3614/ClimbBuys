@@ -158,7 +158,6 @@
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp" />
     <ClCompile Include="cpp&amp;h\3Deffect.cpp" />
     <ClCompile Include="cpp&amp;h\3Dline.cpp" />
-    <ClCompile Include="cpp&amp;h\3Dmap.cpp" />
     <ClCompile Include="cpp&amp;h\3Dparticle.cpp" />
     <ClCompile Include="cpp&amp;h\baseblock.cpp" />
     <ClCompile Include="cpp&amp;h\basemode.cpp" />
@@ -168,12 +167,9 @@
     <ClCompile Include="cpp&amp;h\camera.cpp" />
     <ClCompile Include="cpp&amp;h\character.cpp" />
     <ClCompile Include="cpp&amp;h\circleshadow.cpp" />
-    <ClCompile Include="cpp&amp;h\collision.cpp" />
-    <ClCompile Include="cpp&amp;h\columncollision.cpp" />
     <ClCompile Include="cpp&amp;h\connectblock.cpp" />
     <ClCompile Include="cpp&amp;h\connect_fieldblock.cpp" />
     <ClCompile Include="cpp&amp;h\damagefloor.cpp" />
-    <ClCompile Include="cpp&amp;h\debugcollision.cpp" />
     <ClCompile Include="cpp&amp;h\debugproc.cpp" />
     <ClCompile Include="cpp&amp;h\effect.cpp" />
     <ClCompile Include="cpp&amp;h\enemy.cpp" />
@@ -210,7 +206,6 @@
     <ClCompile Include="cpp&amp;h\openingmanager.cpp" />
     <ClCompile Include="cpp&amp;h\player.cpp" />
     <ClCompile Include="cpp&amp;h\playerUI.cpp" />
-    <ClCompile Include="cpp&amp;h\rectcollision.cpp" />
     <ClCompile Include="cpp&amp;h\renderer.cpp" />
     <ClCompile Include="cpp&amp;h\result.cpp" />
     <ClCompile Include="cpp&amp;h\resultUI.cpp" />
@@ -220,13 +215,10 @@
     <ClCompile Include="cpp&amp;h\scene_two.cpp" />
     <ClCompile Include="cpp&amp;h\scene_X.cpp" />
     <ClCompile Include="cpp&amp;h\shadow_mapping.cpp" />
-    <ClCompile Include="cpp&amp;h\shape.cpp" />
     <ClCompile Include="cpp&amp;h\signboard.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
-    <ClCompile Include="cpp&amp;h\spherecollision.cpp" />
     <ClCompile Include="cpp&amp;h\springblock.cpp" />
     <ClCompile Include="cpp&amp;h\stagingblock.cpp" />
-    <ClCompile Include="cpp&amp;h\stand.cpp" />
     <ClCompile Include="cpp&amp;h\steelblock.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
@@ -242,7 +234,6 @@
     <ClInclude Include="cpp&amp;h\2Dpresents.h" />
     <ClInclude Include="cpp&amp;h\3Deffect.h" />
     <ClInclude Include="cpp&amp;h\3Dline.h" />
-    <ClInclude Include="cpp&amp;h\3Dmap.h" />
     <ClInclude Include="cpp&amp;h\3Dparticle.h" />
     <ClInclude Include="cpp&amp;h\baseblock.h" />
     <ClInclude Include="cpp&amp;h\basemode.h" />
@@ -252,12 +243,9 @@
     <ClInclude Include="cpp&amp;h\camera.h" />
     <ClInclude Include="cpp&amp;h\character.h" />
     <ClInclude Include="cpp&amp;h\circleshadow.h" />
-    <ClInclude Include="cpp&amp;h\collision.h" />
-    <ClInclude Include="cpp&amp;h\columncollision.h" />
     <ClInclude Include="cpp&amp;h\connectblock.h" />
     <ClInclude Include="cpp&amp;h\connect_fieldblock.h" />
     <ClInclude Include="cpp&amp;h\damagefloor.h" />
-    <ClInclude Include="cpp&amp;h\debugcollision.h" />
     <ClInclude Include="cpp&amp;h\debugproc.h" />
     <ClInclude Include="cpp&amp;h\effect.h" />
     <ClInclude Include="cpp&amp;h\enemy.h" />
@@ -296,7 +284,6 @@
     <ClInclude Include="cpp&amp;h\openingmanager.h" />
     <ClInclude Include="cpp&amp;h\player.h" />
     <ClInclude Include="cpp&amp;h\playerUI.h" />
-    <ClInclude Include="cpp&amp;h\rectcollision.h" />
     <ClInclude Include="cpp&amp;h\renderer.h" />
     <ClInclude Include="cpp&amp;h\result.h" />
     <ClInclude Include="cpp&amp;h\resultUI.h" />
@@ -306,13 +293,10 @@
     <ClInclude Include="cpp&amp;h\scene_two.h" />
     <ClInclude Include="cpp&amp;h\scene_X.h" />
     <ClInclude Include="cpp&amp;h\shadow_mapping.h" />
-    <ClInclude Include="cpp&amp;h\shape.h" />
     <ClInclude Include="cpp&amp;h\signboard.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
-    <ClInclude Include="cpp&amp;h\spherecollision.h" />
     <ClInclude Include="cpp&amp;h\springblock.h" />
     <ClInclude Include="cpp&amp;h\stagingblock.h" />
-    <ClInclude Include="cpp&amp;h\stand.h" />
     <ClInclude Include="cpp&amp;h\steelblock.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />
     <ClInclude Include="cpp&amp;h\texture_manager.h" />

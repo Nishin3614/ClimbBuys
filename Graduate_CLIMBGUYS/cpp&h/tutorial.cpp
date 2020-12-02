@@ -10,7 +10,6 @@
 #include "camera.h"
 #include "sound.h"
 #include "scene.h"
-#include "collision.h"
 #include "XInputPad.h"
 
 /* •`‰æ */
@@ -24,8 +23,6 @@
 #include "meshwall.h"
 #include "player.h"
 #include "ui_group.h"
-#include "3Dmap.h"
-#include "stand.h"
 #include "debugproc.h"
 #include "meshbox.h"
 #include "connect_fieldblock.h"
@@ -169,11 +166,6 @@ void CTutorial::Update(void)
 		{
 			CManager::GetFade()->SetFade(CManager::MODE_GAME);
 		}
-	}
-
-	if (CStand::GetDetermination() && m_nDeterminationCnt >= 0)
-	{
-		m_nDeterminationCnt--;
 	}
 	else
 	{

@@ -16,9 +16,6 @@
 #include "mouse.h"
 #include "connectblock.h"
 
-// テスト
-#include "3Dmap.h"
-
 // ------------------------------------------
 //
 // マクロ関数
@@ -577,9 +574,6 @@ void CRenderer::UpdateImGui(void)
 	m_pLight->Debug();
 	// 結合ブロックの静的なデバッグ処理
 	CConnectblock::StaticDebug();
-	// テスト 3Dマップの情報設定
-	C3DMap::Debug();
-
 
 	// ImGuiの更新終了
 	ImGui::End();

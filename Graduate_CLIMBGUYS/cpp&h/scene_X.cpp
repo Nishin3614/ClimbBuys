@@ -15,13 +15,9 @@
 #include "debugproc.h"
 #include "floor.h"
 #include "shadow_mapping.h"
-#include "collision.h"
 #include "scene_three.h"
 #include "3Dparticle.h"
 #include "camera.h"
-#include "spherecollision.h"
-#include "rectcollision.h"
-#include "columncollision.h"
 #include "stencilshadow.h"
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,7 +48,6 @@ CScene_X::CScene_X() : CScene::CScene()
 	m_bShadowMap = false;					// シャドウマッピングにするかしないか
 	m_pParentMtx = NULL;					// 親マトリックス
 	m_pShadow = NULL;						// シャドウ
-	m_Collision = NULL;						// 当たり判定
 	m_pModelCol = NULL;						// モデルカラー情報
 	m_pStencilshadow = NULL;				// ステンシルシャドウ
 	// ワールドマトリックスの初期化
@@ -109,13 +104,6 @@ void CScene_X::Uninit(void)
 		m_pShadow->Release();
 		m_pShadow = NULL;
 	}
-	// 当たり判定情報の開放
-	if (m_Collision != NULL)
-	{
-		//m_Collision->CompulsionScene();
-		//m_Collision->Release();
-		m_Collision = NULL;
-	}
 	// モデルカラー情報がNULLなら
 	if (m_pModelCol != NULL)
 	{
@@ -150,14 +138,6 @@ void CScene_X::Update(void)
 		D3DXVECTOR3 pos = m_pos;
 		// ステンシルシャドウの位置設定
 		m_pStencilshadow->SetPos(pos);
-	}
-	// 当たり判定がNULLではないなら
-	// 更新
-	if (m_Collision != NULL)
-	{
-		// 位置情報の更新(行列渡し)
-		m_Collision->GetShape()->PassMatrix(m_mtxWorld);
-		return;
 	}
 }
 
@@ -276,13 +256,6 @@ void CScene_X::Debug(void)
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CScene_X::CollisionDelete(void)
 {
-	// 当たり判定情報の開放
-	if (m_Collision != NULL)
-	{
-		m_Collision->CompulsionScene();
-		m_Collision->Release();
-		m_Collision = NULL;
-	}
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -625,87 +598,6 @@ bool CScene_X::GetUseStencillShadow(void)
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 当たり判定設定
-//	nShapeType	: 0:矩形、1:球、2:円柱
-//	Obj			: オブジェクトタイプ
-//	bPush		: 押し出し処理
-//	pParent		: 親情報
-//	Offset_pos	: オフセット位置
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CScene_X::SetCollision(
-	int const & nShapeType,
-	int const &obj,
-	bool const &bPush,
-	bool const &bOpponent,
-	CScene * pParent,
-	D3DXVECTOR3 const &offset_pos
-)
-{
-	// 当たり判定がNULLではないなら
-	// ->関数を抜ける
-	if (m_Collision != NULL)
-	{
-#ifdef _DEBUG
-		CCalculation::Messanger("CScene_X::SetCollisionの中->既にあたり判定のデータが入っています");
-#endif // _DEBUG
-		return;
-	}
-	// 形のタイプ
-	switch (nShapeType)
-	{
-		// 矩形
-	case CShape::SHAPETYPE_RECT:
-		// 矩形の当たり判定生成
-		m_Collision = CRectCollision::Create(
-			m_pModelLoad[m_nModelId]->size,
-			offset_pos,
-			(CCollision::OBJTYPE)obj,
-			this,
-			pParent,
-			bPush,
-			bOpponent,
-			&m_pos
-		);
-		// 位置情報の更新(行列渡し)
-		m_Collision->GetShape()->PassMatrix(m_mtxWorld);
-		break;
-		// 球
-	case CShape::SHAPETYPE_SPHERE:
-		// 球の当たり判定生成
-		m_Collision = CSphereCollision::Create(
-			m_pModelLoad[m_nModelId]->size.x,
-			offset_pos,
-			(CCollision::OBJTYPE)obj,
-			this,
-			pParent,
-			bPush,
-			bOpponent
-		);
-		// 位置情報の更新(行列渡し)
-		m_Collision->GetShape()->PassMatrix(m_mtxWorld);
-		break;
-		// 円柱
-	case CShape::SHAPETYPE_COLUMN:
-		// 球の当たり判定生成
-		m_Collision = CColumnCollision::Create(
-			m_pModelLoad[m_nModelId]->size.x,
-			m_pModelLoad[m_nModelId]->size.y,
-			offset_pos,
-			(CCollision::OBJTYPE)obj,
-			this,
-			pParent,
-			bPush,
-			bOpponent
-		);
-		// 位置情報の更新(行列渡し)
-		m_Collision->GetShape()->PassMatrix(m_mtxWorld);
-		break;
-	default:
-		break;
-	}
-}
-
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // モデルカラー情報の設定
 //	col	: カラー
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -729,25 +621,6 @@ void CScene_X::SetModelColor(
 CScene_X::MODEL_LOAD * CScene_X::GetModel(void)
 {
 	return m_pModelLoad[m_nModelId].get();
-}
-
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 当たり判定状態取得処理
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool const CScene_X::GetbCollision(void)
-{
-	// 当たり判定情報がNULLなら
-	// ->関数を抜ける
-	if (m_Collision == NULL) return false;
-	return m_Collision->GetbCollision();
-}
-
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 当たり判定情報取得処理
-// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CCollision * CScene_X::GetCollision(void)
-{
-	return m_Collision;
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

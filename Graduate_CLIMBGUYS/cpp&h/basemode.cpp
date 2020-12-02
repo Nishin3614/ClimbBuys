@@ -12,7 +12,6 @@
 #include "fade.h"
 #include "renderer.h"
 #include "manager.h"
-#include "collision.h"
 #include "stencilshadow.h"
 #include "camera.h"
 #include "baseblock.h"
@@ -70,7 +69,7 @@ void CBaseMode::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseMode::Update(void)
 {
-	CCollision::CollisionDetection();
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -144,7 +143,7 @@ void CBaseMode::Debug(void)
 	//“–‚½‚è”»’è‚Ì‰ÂŽ‹ó‘Ô
 	if (key->GetKeyboardTrigger(DIK_F5))
 	{
-		CCollision::SetDispCollision(!CCollision::GetDispCollision());
+
 	}
 	// ƒXƒeƒ“ƒVƒ‹•`‰æó‘Ô‚ÌÝ’è
 	if (key->GetKeyboardTrigger(DIK_F6))

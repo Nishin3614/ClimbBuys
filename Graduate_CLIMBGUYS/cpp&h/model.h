@@ -29,6 +29,10 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+#ifdef _DEBUG
+	void Debug(void);
+#endif // _DEBUG
+
 	// 当たった後の処理
 	//	nObjType	: オブジェクトタイプ
 	//	pScene		: 相手のシーン情報

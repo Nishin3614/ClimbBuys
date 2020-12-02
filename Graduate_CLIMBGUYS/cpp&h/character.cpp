@@ -7,15 +7,10 @@
 #include "character.h"
 #include "floor.h"
 #include "input.h"
-#include "collision.h"
 #include "3Dparticle.h"
 #include "camera.h"
 #include "meshobit.h"
 #include "ui.h"
-
-#include "rectcollision.h"
-#include "spherecollision.h"
-#include "columncollision.h"
 #include "circleshadow.h"
 #include "stencilshadow.h"
 #include "debugproc.h"
@@ -338,6 +333,14 @@ void CCharacter::ModelUpdate(void)
 		{
 			// 更新
 			m_pModel[nCntModel].Update();
+
+#ifdef _DEBUG
+			if (m_character == CHARACTER::CHARACTER_PLAYER_0)
+			{
+				//CDebugproc::Print("キャラクター番号(%d)\n", m_character);
+				//m_pModel[nCntModel].Debug();
+			}
+#endif // _DEBUG
 		}
 	}
 }

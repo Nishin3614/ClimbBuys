@@ -7,6 +7,7 @@
 #include "model.h"
 #include "light.h"
 #include "shadow_mapping.h"
+#include "debugproc.h"
 
 //=============================================================================
 // マクロ定義
@@ -39,15 +40,6 @@ CModel::~CModel()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CModel::Init(void)
 {
-	/*
-	m_Xmodel.pos = D3DVECTOR3_ZERO;
-	m_Xmodel.posDest = D3DVECTOR3_ZERO;
-	m_Xmodel.posDiff = D3DVECTOR3_ZERO;
-	m_Xmodel.rot = D3DVECTOR3_ZERO;
-	m_Xmodel.rotDest = D3DVECTOR3_ZERO;
-	m_Xmodel.rotDiff = D3DVECTOR3_ZERO;
-	m_Xmodel.nParent = 0;
-	*/
 	m_nFrame = 0;
 	// シーンXの初期化
 	CScene_X::Init();
@@ -82,91 +74,22 @@ void CModel::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CModel::Draw(void)
 {
-	//// 変数宣言
-	//LPDIRECT3DDEVICE9	pDevice = CManager::GetRenderer()->GetDevice();
-
-	//D3DXMATRIX			mtxRot, mtxTrans;		// 計算用マトリックス
-	//D3DXMATERIAL		*pMat;					// 現在のマテリアル保存
-	//D3DMATERIAL9		matDef;					// マテリアルデータのポインタ
-	//// ワールドマトリックスの初期化
-	//D3DXMatrixIdentity(&m_mtxWorld);
-	//// 回転を反映
-	//D3DXMatrixRotationYawPitchRoll(&mtxRot,
-	//	m_Xmodel.rot.y,
-	//	m_Xmodel.rot.x,
-	//	m_Xmodel.rot.z);
-
-	//// 行列の積(1:ワールド行列 = 2:ワールド行列 * 3:回転行列)
-	//D3DXMatrixMultiply(&m_mtxWorld,
-	//	&m_mtxWorld, &mtxRot);
-
-	//// 位置を反映 //
-	//// 平行移動行列作成(オフセット)
-	//D3DXMatrixTranslation(&mtxTrans,	// 総合の入れ物
-	//	m_Xmodel.pos.x,
-	//	m_Xmodel.pos.y,
-	//	m_Xmodel.pos.z);
-
-	//// 行列の積(1:ワールド行列 = 2:ワールド行列 * 3:移動行列)
-	//D3DXMatrixMultiply(&m_mtxWorld,	// 1
-	//	&m_mtxWorld,				// 2
-	//	&mtxTrans);					// 3
-
-	//// 親情報を持っているとき
-	//if (m_Parent != NULL)
-	//{
-	//	// 親と子の行列の積(1:ワールド行列 = 2:ワールド行列 * 3:体[親]行列)
-	//	D3DXMatrixMultiply(&m_mtxWorld,
-	//		&m_mtxWorld,
-	//		&m_Parent->m_mtxWorld);
-	//}
-	//// すべての親の場合
-	//else
-	//{
-	//	// 親と子の行列の積(1:ワールド行列 = 2:ワールド行列 * 3:体[親]行列)
-	//	D3DXMatrixMultiply(&m_mtxWorld,
-	//		&m_mtxWorld,
-	//		&mtx);
-	//}
-
-	//// シャドウがonかどうか
-	//if (m_bShadow)
-	//{
-	//	// やること
-	//	// モデル情報もXで
-	//	/*
-	//	// シャドウマッピング
-	//	CShadowmapping::Draw(
-	//		pDevice,	// デバイス情報
-	//		m_Xmodel,	// モデル情報
-	//		m_mtxWorld	// マトリックス情報
-	//	);
-	//	*/
-	//}
-	//// ワールドマトリックスの設定
-	//pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
-	//// 現在のマテリアルを取得
-	//pDevice->GetMaterial(&matDef);
-	//// マテリアル情報に対するポインタを取得
-	//pMat = (D3DXMATERIAL*)m_Xmodel.pBuffMat->GetBufferPointer();
-
-	//// カウントマテリアル
-	//for (int nCntMat = 0; nCntMat < (int)m_Xmodel.nNumMat; nCntMat++, pMat++)
-	//{
-	//	pMat->MatD3D.Diffuse.a = fAlpha;
-	//	// マテリアルの設定
-	//	pDevice->SetMaterial(&pMat->MatD3D);
-	//	// テクスチャー設定
-	//	pDevice->SetTexture(0, m_Xmodel.ppTexture[nCntMat]);
-	//	// 描画
-	//	m_Xmodel.pMesh->DrawSubset(nCntMat);
-	//}
-	//// マテリアルをデフォルトに戻す
-	//pDevice->SetMaterial(&matDef);
 	// シーンXの描画
 	CScene_X::Draw();
 	SetModelAlpha(m_fAlpha);
 }
+
+#ifdef _DEBUG
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// デバッグ表示
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CModel::Debug(void)
+{
+	CDebugproc::Print("	pos(%.3f,%.3f,%.3f)\n", CScene_X::GetPos().x, CScene_X::GetPos().y, CScene_X::GetPos().z);
+	CDebugproc::Print("	rot(%.3f,%.3f,%.3f)\n", CScene_X::GetRot().x, CScene_X::GetRot().y, CScene_X::GetRot().z);
+}
+#endif // _DEBUG
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 生成処理

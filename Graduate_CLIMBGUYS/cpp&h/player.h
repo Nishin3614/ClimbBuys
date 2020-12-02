@@ -318,11 +318,6 @@ private:
 	void MyAction(void);
 	// 状態によってのモーション設定処理
 	void StatusMotion(void);
-	// 足場に乗っている判定
-	void StandJudg(
-		CScene_X * pScene_X,
-		bool const & bJudg
-	);
 	// ブロックの押し出し処理
 	void PushBlock(
 		CBaseblock * pBlock,			// ブロック情報
@@ -330,8 +325,6 @@ private:
 	);
 	// 当たり判定処理
 	void Collision(void);
-	// 足場ブロックとの判定
-	void StandCollision(void);
 	// ブロックとの当たり判定
 	void BlockCollision(void);
 	// キャラクター同士の当たり判定

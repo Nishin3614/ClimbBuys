@@ -40,9 +40,6 @@
     <Filter Include="Model\Enemy">
       <UniqueIdentifier>{8e3d00de-c2cd-4fb2-8d98-5ab7368b643e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Collision">
-      <UniqueIdentifier>{6206a8de-091a-4fd5-8397-ffe51ef59b30}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Debug">
       <UniqueIdentifier>{b9a827ae-656c-4b48-8301-8bf9b94eb3e9}</UniqueIdentifier>
     </Filter>
@@ -76,9 +73,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\3Dline.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\3Dmap.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\ImGui\imgui.cpp">
@@ -165,15 +159,6 @@
     <ClCompile Include="cpp&amp;h\enemy.cpp">
       <Filter>Model\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\collision.cpp">
-      <Filter>Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\columncollision.cpp">
-      <Filter>Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\debugcollision.cpp">
-      <Filter>Debug</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\debugproc.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
@@ -213,9 +198,6 @@
     <ClCompile Include="cpp&amp;h\XInputPad.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\spherecollision.cpp">
-      <Filter>Collision</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\shadow_mapping.cpp">
       <Filter>Shadow</Filter>
     </ClCompile>
@@ -237,14 +219,8 @@
     <ClCompile Include="cpp&amp;h\sound.cpp">
       <Filter>Option</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\rectcollision.cpp">
-      <Filter>Collision</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\Calculation.cpp">
       <Filter>Option</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\shape.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\character.cpp">
       <Filter>Model</Filter>
@@ -269,9 +245,6 @@
     </ClCompile>
     <ClCompile Include="cpp&amp;h\normalblock.cpp">
       <Filter>Model\Block</Filter>
-    </ClCompile>
-    <ClCompile Include="cpp&amp;h\stand.cpp">
-      <Filter>Map</Filter>
     </ClCompile>
     <ClCompile Include="cpp&amp;h\bg.cpp">
       <Filter>Texture_UI</Filter>
@@ -324,12 +297,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\3Dline.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\3Dmap.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\shape.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\ImGui\imconfig.h">
@@ -422,15 +389,6 @@
     <ClInclude Include="cpp&amp;h\enemy.h">
       <Filter>Model\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\columncollision.h">
-      <Filter>Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\collision.h">
-      <Filter>Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\debugcollision.h">
-      <Filter>Debug</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\debugproc.h">
       <Filter>Debug</Filter>
     </ClInclude>
@@ -470,9 +428,6 @@
     <ClInclude Include="cpp&amp;h\XInputPad.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\spherecollision.h">
-      <Filter>Collision</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\circleshadow.h">
       <Filter>Shadow</Filter>
     </ClInclude>
@@ -493,9 +448,6 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\sound.h">
       <Filter>Option</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\rectcollision.h">
-      <Filter>Collision</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\Calculation.h">
       <Filter>Option</Filter>
@@ -523,9 +475,6 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\normalblock.h">
       <Filter>Model\Block</Filter>
-    </ClInclude>
-    <ClInclude Include="cpp&amp;h\stand.h">
-      <Filter>Map</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\bg.h">
       <Filter>Texture_UI</Filter>

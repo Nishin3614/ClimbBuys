@@ -18,7 +18,6 @@
 #include "3Dparticle.h"
 #include "debugproc.h"
 #include "meshbox.h"
-#include "stand.h"
 #include "playerUI.h"
 #include "3Dline.h"
 #include "springblock.h"
@@ -154,7 +153,6 @@ void CPlayer::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Update(void)
 {
-	CCharacter::SetMotion(CCharacter::MOTIONTYPE_MOVE);
 	if (CManager::GetMode() == CManager::MODE_GAME)
 	{
 		// 行動可能状態なら行動可能
@@ -497,26 +495,6 @@ void CPlayer::StatusMotion(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 足場判定
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CPlayer::StandJudg(
-	CScene_X * pScene_X,
-	bool const & bJudg
-)
-{
-	// 足場オブジェクトなら
-	if (pScene_X->GetObj() == CScene::OBJ_STAND)
-	{
-		// プレイヤータグが1プレイヤーなら
-		if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-		{
-			CStand * pStand = (CStand *)pScene_X;
-			pStand->SetDetermination(bJudg);
-		}
-	}
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 当たり判定の処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Collision(void)
@@ -525,60 +503,6 @@ void CPlayer::Collision(void)
 	CharacterCollision();
 	// ブロックの当たり判定
 	BlockCollision();
-	// 足場の当たり判定
-	StandCollision();
-}
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 足場ブロックとの判定
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CPlayer::StandCollision(void)
-{
-	// 変数宣言
-	CStand * pStand;									// シーンX情報
-	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
-	bool bOn = false;										// 上の当たり判定
-	bool bUnder = false;									// 下の当たり判定
-															// ブロックループ
-	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DSTAND); nCntBlock++)
-	{
-		// 当たり判定の初期化
-		Direct = COLLISIONDIRECTION::NONE;
-		// NULL代入
-		pStand = NULL;
-		// 情報取得
-		pStand = (CStand *)CScene::GetScene(CScene::LAYER_3DSTAND, nCntBlock);
-		// NULLなら
-		// ->関数を抜ける
-		if (pStand == NULL)
-		{
-			continue;
-		}
-		// 当たり判定
-		Direct = pStand->PushCollision(
-			CCharacter::GetObj(),
-			&CCharacter::GetPos(),
-			&CCharacter::GetPosOld(),
-			&CCharacter::GetMove(),
-			&m_PlayerStatus.PlayerSize,
-			m_PlayerStatus.PlayerOffSet
-		);
-		// ブロックの判定
-		// 上
-		if (Direct == COLLISIONDIRECTION::UP)
-		{
-			// ジャンプ可能設定
-			SetJumpAble(true);
-			// 足場判定
-			StandJudg(pStand, true);
-			// プレイヤーが下のブロックに当たっている
-			bOn ^= true;
-		}
-		else
-		{
-			// 足場判定
-			StandJudg(pStand, false);
-		}
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -301,54 +301,6 @@ void  CModel_info::TextLoad(
 						// 軌跡詳細カウントアップ
 						nCntObit_Detail++;
 					}
-					// 当たり判定詳細情報読み込み
-					else if (strcmp(cHeadText, "COLLISION_DETAIL") == 0)
-					{
-						// 当たり判定詳細の格納
-						pmodelAll->pMotion[nCntMotion]->v_Collision.push_back(COLLISION_DETAILS());
-						sscanf(cRaedText, "%s %d",
-							&cDie,
-							&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nCollisionID
-						);
-						// エンド当たり判定詳細が来るまでループ
-						while (strcmp(cHeadText, "END_COLLISION_DETAIL") != 0)
-						{
-							// 初期化
-							cHeadText[0] = '\0';
-							cRaedText[0] = '\0';
-							fgets(cRaedText, sizeof(cRaedText), pFile);
-							sscanf(cRaedText, "%s", &cHeadText);
-
-
-							// 倍率情報読み込み
-							if (strcmp(cHeadText, "DOUBLE") == 0)
-							{
-								sscanf(cRaedText, "%s %s %f",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).fDouble
-								);
-							}
-							// フレーム情報読み込み
-							else if (strcmp(cHeadText, "FRAME") == 0)
-							{
-								sscanf(cRaedText, "%s %s %d %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nBeginFrame,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nEndFrame
-								);
-							}
-							// ダメージ情報読み込み
-							else if (strcmp(cHeadText, "DAMAGE") == 0)
-							{
-								sscanf(cRaedText, "%s %s %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nDamage
-								);
-							}
-						}
-						// 軌跡詳細カウントアップ
-						nCntCollision++;
-					}
 					// キー情報読み込み
 					else if (strcmp(cHeadText, "KEYSET") == 0)
 					{
@@ -360,8 +312,6 @@ void  CModel_info::TextLoad(
 						nCntCollision = 0;
 						// モデル数生成
 						pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].Key = new KEY[nMaxkey];
-						// 吹っ飛び方初期設定
-						pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nBlust = nBeginBlust;
 						// エンドキーセットが来るまでループ
 						while (strcmp(cHeadText, "END_KEYSET") != 0)
 						{
@@ -371,16 +321,8 @@ void  CModel_info::TextLoad(
 							fgets(cRaedText, sizeof(cRaedText), pFile);
 							sscanf(cRaedText, "%s", &cHeadText);
 
-							// 攻撃当たり判定の頻度情報読み込み
-							if (strcmp(cHeadText, "NUMCOLLISION") == 0)
-							{
-								// フレーム数
-								sscanf(cRaedText, "%s %s %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nNumCollision);
-							}
 							// カメラ情報読み取り
-							else if (strcmp(cHeadText, "CAMERA") == 0)
+							if (strcmp(cHeadText, "CAMERA") == 0)
 							{
 								pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].pMotionCamera = new MOTION_CAMERA;
 								// エンドキーが来るまでループ
@@ -482,15 +424,6 @@ void  CModel_info::TextLoad(
 								pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].v_MotionEffect.push_back(motion_effect);
 							}
 
-							// 吹っ飛び方情報読み込み
-							else if (strcmp(cHeadText, "BLUST") == 0)
-							{
-								// フレーム数
-								sscanf(cRaedText, "%s %s %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nBlust);
-							}
-
 							// フレーム情報読み込み
 							else if (strcmp(cHeadText, "FRAME") == 0)
 							{
@@ -501,19 +434,6 @@ void  CModel_info::TextLoad(
 								// モーション全体のフレーム数加算
 								pmodelAll->pMotion[nCntMotion]->nAllFrame +=
 									pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nFrame;
-								// 当たり判定の回数がない場合関数を抜ける
-								if (pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nNumCollision > 0)
-								{
-									// 攻撃判定頻度
-									pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nMaxCollisiontime =
-										pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nFrame /
-										pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nNumCollision;
-								}
-								else
-								{
-									pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nMaxCollisiontime = pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nFrame;
-								}
-
 							}
 							// キー情報読み込み
 							else if (strcmp(cHeadText, "KEY") == 0)
@@ -607,11 +527,8 @@ void  CModel_info::TextLoad(
 	char cHeadText[128];			// 比較するよう
 	char cDie[128];					// 不必要な文字
 	int nCameraType = 0;			// カメラタイプ
-	int nBeginBlust = 0;			// 初期の吹っ飛び方
 	int nCntObit_Basic = 0;			// 軌跡基本カウント
 	int nCntObit_Detail = 0;		// 軌跡詳細カウント
-	int nCntAttackCollision = 0;	// 攻撃当たり判定カウント
-	int nCntCollision = 0;			// 当たり判定カウント
 	MOTION_EFFECT motion_effect;	// モーションエフェクト情報格納
 
 	// ファイル開
@@ -790,11 +707,6 @@ void  CModel_info::TextLoad(
 					{
 						sscanf(cRaedText, "%s %s %d", &cDie, &cDie, &nCameraType);
 					}
-					// 吹っ飛び方情報読み込み
-					else if (strcmp(cHeadText, "BEGINBLUST") == 0)
-					{
-						sscanf(cRaedText, "%s %s %d", &cDie, &cDie, &nBeginBlust);
-					}
 					// 軌跡の詳細情報読み込み
 					else if (strcmp(cHeadText, "OBIT_DETAIL") == 0)
 					{
@@ -848,54 +760,6 @@ void  CModel_info::TextLoad(
 						// 軌跡詳細カウントアップ
 						nCntObit_Detail++;
 					}
-					// 当たり判定詳細情報読み込み
-					else if (strcmp(cHeadText, "COLLISION_DETAIL") == 0)
-					{
-						// 当たり判定詳細の格納
-						pmodelAll->pMotion[nCntMotion]->v_Collision.push_back(COLLISION_DETAILS());
-						sscanf(cRaedText, "%s %d",
-							&cDie,
-							&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nCollisionID
-						);
-						// エンド当たり判定詳細が来るまでループ
-						while (strcmp(cHeadText, "END_COLLISION_DETAIL") != 0)
-						{
-							// 初期化
-							cHeadText[0] = '\0';
-							cRaedText[0] = '\0';
-							fgets(cRaedText, sizeof(cRaedText), pFile);
-							sscanf(cRaedText, "%s", &cHeadText);
-
-
-							// 倍率情報読み込み
-							if (strcmp(cHeadText, "DOUBLE") == 0)
-							{
-								sscanf(cRaedText, "%s %s %f",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).fDouble
-								);
-							}
-							// フレーム情報読み込み
-							else if (strcmp(cHeadText, "FRAME") == 0)
-							{
-								sscanf(cRaedText, "%s %s %d %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nBeginFrame,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nEndFrame
-								);
-							}
-							// ダメージ情報読み込み
-							else if (strcmp(cHeadText, "DAMAGE") == 0)
-							{
-								sscanf(cRaedText, "%s %s %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->v_Collision.at(nCntCollision).nDamage
-								);
-							}
-						}
-						// 軌跡詳細カウントアップ
-						nCntCollision++;
-					}
 					// キー情報読み込み
 					else if (strcmp(cHeadText, "KEYSET") == 0)
 					{
@@ -903,12 +767,8 @@ void  CModel_info::TextLoad(
 						nCntKey = 0;
 						// 軌跡の詳細の初期化
 						nCntObit_Detail = 0;
-						// 当たり判定カウントの初期化
-						nCntCollision = 0;
 						// モデル数生成
 						pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].Key = new KEY[nMaxkey];
-						// 吹っ飛び方初期設定
-						pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nBlust = nBeginBlust;
 						// エンドキーセットが来るまでループ
 						while (strcmp(cHeadText, "END_KEYSET") != 0)
 						{
@@ -918,16 +778,8 @@ void  CModel_info::TextLoad(
 							fgets(cRaedText, sizeof(cRaedText), pFile);
 							sscanf(cRaedText, "%s", &cHeadText);
 
-							// 攻撃当たり判定の頻度情報読み込み
-							if (strcmp(cHeadText, "NUMCOLLISION") == 0)
-							{
-								// フレーム数
-								sscanf(cRaedText, "%s %s %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nNumCollision);
-							}
 							// カメラ情報読み取り
-							else if (strcmp(cHeadText, "CAMERA") == 0)
+							if (strcmp(cHeadText, "CAMERA") == 0)
 							{
 								pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].pMotionCamera = new MOTION_CAMERA;
 								// エンドキーが来るまでループ
@@ -1029,15 +881,6 @@ void  CModel_info::TextLoad(
 								pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].v_MotionEffect.push_back(motion_effect);
 							}
 
-							// 吹っ飛び方情報読み込み
-							else if (strcmp(cHeadText, "BLUST") == 0)
-							{
-								// フレーム数
-								sscanf(cRaedText, "%s %s %d",
-									&cDie, &cDie,
-									&pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nBlust);
-							}
-
 							// フレーム情報読み込み
 							else if (strcmp(cHeadText, "FRAME") == 0)
 							{
@@ -1048,19 +891,6 @@ void  CModel_info::TextLoad(
 								// モーション全体のフレーム数加算
 								pmodelAll->pMotion[nCntMotion]->nAllFrame +=
 									pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nFrame;
-								// 当たり判定の回数がない場合関数を抜ける
-								if (pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nNumCollision > 0)
-								{
-									// 攻撃判定頻度
-									pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nMaxCollisiontime =
-										pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nFrame /
-										pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nNumCollision;
-								}
-								else
-								{
-									pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nMaxCollisiontime = pmodelAll->pMotion[nCntMotion]->KeyInfo[nCntKeySet].nFrame;
-								}
-
 							}
 							// キー情報読み込み
 							else if (strcmp(cHeadText, "KEY") == 0)
@@ -1171,12 +1001,6 @@ void CModel_info::TextUnload(
 			{
 				// 軌跡の詳細情報の開放
 				std::vector<MESHOBIT_DETAILS>().swap(pmodelAll->pMotion[nCntMotion]->v_MeshObit_detail);
-			}
-			// 攻撃の当たり判定情報の開放
-			if (pmodelAll->pMotion[nCntMotion]->v_Collision.empty() == false)
-			{
-				// 当たり判定情報の開放
-				std::vector<COLLISION_DETAILS>().swap(pmodelAll->pMotion[nCntMotion]->v_Collision);
 			}
 			// モーションの破棄
 			delete pmodelAll->pMotion[nCntMotion];

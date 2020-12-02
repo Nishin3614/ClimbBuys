@@ -30,7 +30,7 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define CHARACTER_KEYMOVE (1)													// キー移動
-#define CHARACTER_G (0.5f)														// 重力
+#define CHARACTER_G (0.6f)														// 重力
 #define CHARACTER_RESISTANCE (0.5f)												// 抵抗力
 #define CHARACTER_INFO_FILE ("data/LOAD/CHARACTER/CHARACTER_MANAGER.txt")		// キャラクターファイル名
 #define CIRCLESHADOW (true)														// 円形のシャドウにするかしないか
@@ -41,46 +41,47 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-MODEL_ALL	*CCharacter::m_modelAll[CHARACTER_MAX] = {};		// キャラクター全体の情報
-CModel_info	*CCharacter::m_model_info[CHARACTER_MAX] = {};		// キャラクター情報
-std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX] = {};		// キャラクター番号
-D3DXVECTOR3	CCharacter::m_CharacterSize[CHARACTER_MAX] = {};	// キャラクターのサイズ
-int			CCharacter::m_NumParts[CHARACTER_MAX] = {};			// 動かすキャラクター数
-int			CCharacter::m_NumModel[CHARACTER_MAX] = {};			// 最大キャラクター数
-int			CCharacter::m_nAllCharacter = 0;					// 出現しているキャラクター人数
-float		CCharacter::m_fAlpha = 0.0f;						// 透明度
+MODEL_ALL			*CCharacter::m_modelAll[CHARACTER_MAX]		= {};		// キャラクター全体の情報
+CModel_info			*CCharacter::m_model_info[CHARACTER_MAX]	= {};		// キャラクター情報
+std::vector<int>	CCharacter::m_modelId[CHARACTER_MAX]		= {};		// キャラクター番号
+D3DXVECTOR3			CCharacter::m_CharacterSize[CHARACTER_MAX]	= {};		// キャラクターのサイズ
+int					CCharacter::m_NumParts[CHARACTER_MAX]		= {};		// 動かすキャラクター数
+int					CCharacter::m_NumModel[CHARACTER_MAX]		= {};		// 最大キャラクター数
+int					CCharacter::m_nAllCharacter					= 0;		// 出現しているキャラクター人数
+float				CCharacter::m_fAlpha						= 0.0f;		// 透明度
+bool				CCharacter::m_bGravity						= true;		// 重力を適用するフラグ
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CCharacter::CCharacter(CHARACTER const &character) : CScene::CScene()
 {
-	m_pMeshobit = NULL;								// 軌跡
-	m_pModel = NULL;								// モデル
-	m_character = CHARACTER_PLAYER_0;				// キャラクター
-	m_pos = D3DXVECTOR3(0.0f,0.0f,0.0f);			// 位置
-	m_posold = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 前の位置
-	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 移動量
-	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 現在回転量
-	m_rotLast = m_rot;								// 向きたい方向
-	m_rotbetween = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 回転の差分
-	m_nMotiontypeOld = 0;							// 前回のモーションタイプ
-	m_nMotiontype = 0;								// モーションタイプ
-	m_keyinfoCnt = 0;								// キー情報のカウント
-	m_nFrame = 0;									// フレームカウント
-	m_nMotionFrame = 0;								// モーション一つののフレームカウント
-	m_nMaxMotion = 0;								// 最大モーション数
-	m_State = STATE_NORMAL;							// 現状のステータス
-	m_nCntState = 0;								// カウントステータス
-	m_fLength = 0;									// 攻撃の当たり範囲
-	m_bJumpable = false;							// ジャンプ可能かどうか
-	m_bDie = false;									// 死亡しているかどうか
-	m_fAlpha = 1.0f;								// アルファ値
-	m_Directvector = D3DVECTOR3_ONE;				// 方向ベクトル
-	m_pStencilshadow = NULL;						// ステンシルシャドウ
+	m_pMeshobit			= NULL;								// 軌跡
+	m_pModel			= NULL;								// モデル
+	m_character			= CHARACTER_PLAYER_0;				// キャラクター
+	m_pos				= D3DXVECTOR3(0.0f,0.0f,0.0f);		// 位置
+	m_posold			= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 前の位置
+	m_move				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 移動量
+	m_rot				= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 現在回転量
+	m_rotLast			= m_rot;							// 向きたい方向
+	m_rotbetween		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// 回転の差分
+	m_nMotiontypeOld	= 0;								// 前回のモーションタイプ
+	m_nMotiontype		= 0;								// モーションタイプ
+	m_keyinfoCnt		= 0;								// キー情報のカウント
+	m_nFrame			= 0;								// フレームカウント
+	m_nMotionFrame		= 0;								// モーション一つののフレームカウント
+	m_nMaxMotion		= 0;								// 最大モーション数
+	m_State				= STATE_NORMAL;						// 現状のステータス
+	m_nCntState			= 0;								// カウントステータス
+	m_fLength			= 0;								// 攻撃の当たり範囲
+	m_bJumpable			= false;							// ジャンプ可能かどうか
+	m_bDie				= false;							// 死亡しているかどうか
+	m_fAlpha			= 1.0f;								// アルファ値
+	m_Directvector		= D3DVECTOR3_ONE;					// 方向ベクトル
+	m_pStencilshadow	= NULL;								// ステンシルシャドウ
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
-	m_character = character;						// キャラクター設定
+	m_character			= character;						// キャラクター設定
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -220,8 +221,12 @@ void CCharacter::Update_Normal(void)
 {
 	// 移動
 	Move();
-	// 重力
-	FagGravity();
+	// 重力を適用する
+	if (m_bGravity)
+	{
+		// 重力
+		FagGravity();
+	}
 	// 高さ
 	GetFloorHeight();
 	// モーション

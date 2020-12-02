@@ -169,7 +169,7 @@ void CScene_X::Draw(void)
 	// 変数宣言
 	LPDIRECT3DDEVICE9	pDevice = CManager::GetRenderer()->GetDevice();
 
-	D3DXMATRIX			mtxRot, mtxTrans;		// 計算用マトリックス
+	D3DXMATRIX			mtxRot, mtxTrans,mtxSize;		// 計算用マトリックス
 	D3DXMATERIAL		*pMat;					// 現在のマテリアル保存
 	D3DMATERIAL9		matDef;					// マテリアルデータのポインタ
 
@@ -194,8 +194,13 @@ void CScene_X::Draw(void)
 		m_pos.y,
 		m_pos.z);
 
+	// 行列の積(1:ワールド行列 = 2:ワールド行列 * 3:移動行列)
+	D3DXMatrixMultiply(&m_mtxWorld,	// 1
+		&m_mtxWorld,				// 2
+		&mtxTrans);					// 3
+
 	// モデルの拡大縮小
-	D3DXMatrixScaling(&m_mtxWorld,
+	D3DXMatrixScaling(&mtxSize,
 		m_size.x,
 		m_size.y,
 		m_size.z);
@@ -203,7 +208,7 @@ void CScene_X::Draw(void)
 	// 行列の積(1:ワールド行列 = 2:ワールド行列 * 3:移動行列)
 	D3DXMatrixMultiply(&m_mtxWorld,	// 1
 		&m_mtxWorld,				// 2
-		&mtxTrans);					// 3
+		&mtxSize);					// 3
 
 	// 親情報を持っているとき
 	// ->自分のマトリックス情報 * 親のマトリックス情報
@@ -217,25 +222,12 @@ void CScene_X::Draw(void)
 	// シャドウマッピングがオンなら
 	if (m_bShadowMap)
 	{
-		//// ステンシルバッファを有効にする
-		//pDevice->SetRenderState(D3DRS_STENCILREF, 1);
-		//pDevice->SetRenderState(D3DRS_STENCILENABLE, true);
-		//// ステンシル対象を設定
-		//pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NOTEQUAL);
-		//// ステンシルテスト、Zテスト両方とも合格の場合の判定
-		//pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
-		//// ステンシルテスト合格、Zテスト不合格の場合の判定
-		//pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
-		//// ステンシルテスト不合格、Zテスト不合格の場合の判定
-		//pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
 		// シャドウマッピング
 		CShadowmapping::Draw(
 			pDevice,	// デバイス情報
 			m_pModelLoad[m_nModelId].get(),	// プレイヤー(雷)情報
 			m_mtxWorld	// マトリックス情報
 		);
-		// ステンシルバッファを有効にする
-		//pDevice->SetRenderState(D3DRS_STENCILENABLE, false);
 	}
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);

@@ -333,6 +333,14 @@ void CCharacter::ModelUpdate(void)
 		{
 			// 更新
 			m_pModel[nCntModel].Update();
+
+#ifdef _DEBUG
+			if (m_character == CHARACTER::CHARACTER_PLAYER_0)
+			{
+				//CDebugproc::Print("キャラクター番号(%d)\n", m_character);
+				//m_pModel[nCntModel].Debug();
+			}
+#endif // _DEBUG
 		}
 	}
 }

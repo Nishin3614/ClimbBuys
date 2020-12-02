@@ -155,7 +155,6 @@ void CPlayer::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Update(void)
 {
-	CCharacter::SetMotion(CCharacter::MOTIONTYPE_MOVE);
 	if (CManager::GetMode() == CManager::MODE_GAME)
 	{
 		// 行動可能状態なら行動可能

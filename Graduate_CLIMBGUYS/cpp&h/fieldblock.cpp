@@ -40,7 +40,7 @@ CFieldblock::~CFieldblock()
 void CFieldblock::Init()
 {
 	// ブロックタイプの設定
-	CBaseblock::SetType(CBaseblock::TYPE_FIELD);	// フィールドのブロックタイプ
+	CBaseblock::SetType(CBaseblock::BLOCKTYPE_FIELD);	// フィールドのブロックタイプ
 	// 落ちる設定
 	CBaseblock::SetFall(false);
 	// ベースブロックの初期化処理

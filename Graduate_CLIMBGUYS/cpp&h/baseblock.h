@@ -40,22 +40,15 @@ public:
 	// ベースブロック
 	typedef enum
 	{
-		TYPE_NORMAL = 0,	// 通常
-		TYPE_FIELD,			// フィールドブロック
-		TYPE_BOMB,			// ボムブロック
-		TYPE_SPRING,		// スプリングブロック
-		TYPE_STEEL,			// 鋼鉄ブロック
-		TYPE_MAX,			// タイプ全体数
-	} TYPE;
-
-	// ベースブロックの種類
-	enum class BlockType
-	{
-		NORMAL,
-		SPRING,
-		BOMB,
-		STEEL
-	};
+		BLOCKTYPE_NORMAL = 0,	// 通常
+		BLOCKTYPE_FIELD,		// フィールドブロック
+		BLOCKTYPE_BOMB,			// ボムブロック
+		BLOCKTYPE_SPRING,		// スプリングブロック
+		BLOCKTYPE_STEEL,		// 鋼鉄ブロック
+		BLOCKTYPE_PANIC,		// 混乱ブロック
+		BLOCKTYPE_ELECTRIC,		// 電気ブロック
+		BLOCKTYPE_MAX			// タイプ全体数
+	} BLOCKTYPE;
 
 	// 上下左右前後
 	typedef enum
@@ -293,9 +286,9 @@ public:
 	);
 
 	// ベースブロック
-	void SetType(TYPE const type)					{ m_type = type; };
+	void SetType(BLOCKTYPE const Blocktype)			{ m_BlockType = Blocktype; };
 	// ベースブロック
-	TYPE GetType(void) const						{ return m_type; };
+	BLOCKTYPE GetType(void) const					{ return m_BlockType; };
 	// 落ちる状態設定
 	void SetFall(bool const & bFall)				{ m_bFall = bFall; };
 	// 落ちる状態取得
@@ -314,10 +307,7 @@ public:
 	void SetPushAfter(PUSHAFTER const &PushAfter);
 	// 前回の位置取得
 	D3DXVECTOR3 & GetPosOld(void)					{ return m_posOld; };
-	// ベースブロックの種類設定
-	void SetBaseBlockType(BlockType type)			{ m_BlockType = type; };
-	// ベースブロックの種類取得
-	BlockType GetBaseBlockType()					{ return m_BlockType; };
+
 	// ベースブロックの種類設定
 	void SetGravity(float fGravity)					{ m_fGravity = fGravity; };
 	// ベースブロックの種類取得
@@ -444,8 +434,7 @@ private:
 	static BLOCK_STATUS		m_BlockStatus;		// ブロックのステータス
 	CCircleshadow *			m_pShadowPolygon;	// シャドウポリゴン
 	D3DXVECTOR3				m_posOld;			// 前回の位置
-	TYPE					m_type;				// ベースブロック
-	BlockType				m_BlockType;		// ベースブロックの種類
+	BLOCKTYPE				m_BlockType;		// ベースブロック
 	GRID					m_grid;				// 盤面情報
 	PUSHAFTER				m_PushAfeter;		// 押し出した後要の変数
 	float					m_fGravity;			// 重力

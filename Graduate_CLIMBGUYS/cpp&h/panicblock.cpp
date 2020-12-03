@@ -1,10 +1,10 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// 普通ブロック処理 [normalblock.cpp]
+// 混乱ブロック処理 [panicblock.cpp]
 // Author : KOKI NISHIYAMA
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#include "normalblock.h"
+#include "panicblock.h"
 #include "debugproc.h"
 #include "game.h"
 
@@ -23,7 +23,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock::CNormalblock() : CBaseblock::CBaseblock()
+CPanicblock::CPanicblock() : CBaseblock::CBaseblock()
 {
 
 }
@@ -31,17 +31,17 @@ CNormalblock::CNormalblock() : CBaseblock::CBaseblock()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock::~CNormalblock()
+CPanicblock::~CPanicblock()
 {
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 初期化処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Init()
+void CPanicblock::Init()
 {
 	// ブロックタイプの設定
-	CBaseblock::SetType(BLOCKTYPE_NORMAL);	// 普通のブロックタイプ
+	CBaseblock::SetType(BLOCKTYPE_PANIC);	// 普通のブロックタイプ
 	// 落ちる設定
 	CBaseblock::SetFall(true);
 	// ベースブロック初期化処理
@@ -51,7 +51,7 @@ void CNormalblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 終了処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Uninit(void)
+void CPanicblock::Uninit(void)
 {
 	CBaseblock::Uninit();
 }
@@ -59,7 +59,7 @@ void CNormalblock::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 更新処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Update(void)
+void CPanicblock::Update(void)
 {
 	CBaseblock::Update();
 }
@@ -67,7 +67,7 @@ void CNormalblock::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 描画処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Draw(void)
+void CPanicblock::Draw(void)
 {
 	CBaseblock::Draw();
 }
@@ -77,7 +77,7 @@ void CNormalblock::Draw(void)
 //	nObjType	: 相手オブジェクトタイプ
 //	pScene		: 相手のシーン情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Scene_MyCollision(
+void CPanicblock::Scene_MyCollision(
 	int const & nObjType,
 	CScene * pScene
 )
@@ -89,7 +89,7 @@ void CNormalblock::Scene_MyCollision(
 //	nObjType	: 相手オブジェクトタイプ
 //	pScene		: 相手のシーン情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
+void CPanicblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 {
 }
 
@@ -98,7 +98,7 @@ void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene
 //	Obj		: オブジェタイプ
 //	pScene	: シーン情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::HitCollision(
+void CPanicblock::HitCollision(
 	COLLISIONDIRECTION const &Direct,	// 前後左右上下
 	CScene::OBJ const & Obj,			// オブジェタイプ
 	CScene * pScene						// シーン情報
@@ -121,8 +121,8 @@ void CNormalblock::HitCollision(
 			// 変数宣言
 			CBaseblock::GRID MyGrid = CBaseblock::GetGrid();	// 自分の行列高
 			CBaseblock::GRID OppGrid = pBaseBlock->GetGrid();	// 相手の行列高
-																// 同じ行列ではないなら
-																// ->関数を抜ける
+			// 同じ行列ではないなら
+			// ->関数を抜ける
 			if (!(MyGrid.nColumn == OppGrid.nColumn &&
 				MyGrid.nLine == OppGrid.nLine)) return;
 			// 変数宣言
@@ -158,9 +158,9 @@ void CNormalblock::HitCollision(
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 普通ブロック全ソースの読み込み
+// 混乱ブロック全ソースの読み込み
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT CNormalblock::Load(void)
+HRESULT CPanicblock::Load(void)
 {
 	return S_OK;
 }
@@ -168,7 +168,7 @@ HRESULT CNormalblock::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 読み込んだ情報を破棄処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::UnLoad(void)
+void CPanicblock::UnLoad(void)
 {
 
 }
@@ -180,7 +180,7 @@ void CNormalblock::UnLoad(void)
 //	pCol		: 色情報
 //	layer		: レイヤー
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock * CNormalblock::Create(
+CPanicblock * CPanicblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
 	D3DXCOLOR		* pCol,				// 色
@@ -189,27 +189,27 @@ CNormalblock * CNormalblock::Create(
 )
 {
 	// 変数宣言
-	CNormalblock * pNormalblock;		// シーン2Dクラス
+	CPanicblock * pPanicblock;		// シーン2Dクラス
 	// メモリの生成(初め->基本クラス,後->派生クラス)
-	pNormalblock = new CNormalblock();
+	pPanicblock = new CPanicblock();
 	// 設定
 	// シーン管理設定
-	pNormalblock->ManageSetting(layer);
-	pNormalblock->SetGrid(Grid);			// 行列高さ
-	pNormalblock->SetPos(					// 位置
+	pPanicblock->ManageSetting(layer);
+	pPanicblock->SetGrid(Grid);			// 行列高さ
+	pPanicblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
-	pNormalblock->SetGravity(fGravity);		// 重力
-	pNormalblock->SetModelId(nModelId);		// モデル番号
+	pPanicblock->SetGravity(fGravity);		// 重力
+	pPanicblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)
 	{
 		// モデルの色を変える
-		pNormalblock->SetModelColor(*pCol);
+		pPanicblock->SetModelColor(*pCol);
 	}
 	// 初期化処理
-	pNormalblock->Init();
+	pPanicblock->Init();
 	// 生成したオブジェクトを返す
-	return pNormalblock;
+	return pPanicblock;
 	D3DXVECTOR3;
 }
 
@@ -219,32 +219,32 @@ CNormalblock * CNormalblock::Create(
 //	nModelId	: モデル番号
 //	pCol		: 色情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock * CNormalblock::Create_Self(
+CPanicblock * CPanicblock::Create_Self(
 	int				const & nModelId,								// モデル番号
 	GRID			const & Grid,									// 行列高さ番号
 	D3DXCOLOR		* pCol											// 色
 )
 {
 	// 変数宣言
-	CNormalblock * pNormalblock;		// シーン2Dクラス
+	CPanicblock * pPanicblock;		// シーン2Dクラス
 	// メモリの生成(初め->基本クラス,後->派生クラス)
-	pNormalblock = new CNormalblock;
+	pPanicblock = new CPanicblock;
 	// 設定
-	pNormalblock->SetGrid(Grid);			// 行列高さ
-	pNormalblock->SetPos(					// 位置
+	pPanicblock->SetGrid(Grid);			// 行列高さ
+	pPanicblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
-	pNormalblock->SetModelId(nModelId);		// モデル番号
+	pPanicblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)
 	{
 		// モデルの色を変える
-		pNormalblock->SetModelColor(*pCol);
+		pPanicblock->SetModelColor(*pCol);
 	}
 
 	// 初期化処理
-	pNormalblock->Init();
+	pPanicblock->Init();
 	// 生成したオブジェクトを返す
-	return pNormalblock;
+	return pPanicblock;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -254,29 +254,29 @@ CNormalblock * CNormalblock::Create_Self(
 //	nModelId	: モデル番号
 //	pCol		: 色情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
+std::unique_ptr<CPanicblock> CPanicblock::Creat_Unique(
 	int				const & nModelId,								// モデル番号
 	GRID			const & Grid,									// 行列高さ番号
 	D3DXCOLOR		* pCol											// 色
 )
 {
 	// 変数宣言
-	std::unique_ptr<CNormalblock> pNormalblock(new CNormalblock);		// シーン2Dクラス
+	std::unique_ptr<CPanicblock> pPanicblock(new CPanicblock);		// シーン2Dクラス
 	// 設定
-	pNormalblock->SetGrid(Grid);			// 行列高さ
-	pNormalblock->SetPos(					// 位置
+	pPanicblock->SetGrid(Grid);			// 行列高さ
+	pPanicblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
-	pNormalblock->SetModelId(nModelId);		// モデル番号
+	pPanicblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)
 	{
 		// モデルの色を変える
-		pNormalblock->SetModelColor(*pCol);
+		pPanicblock->SetModelColor(*pCol);
 	}
 	// 初期化処理
-	pNormalblock->Init();
+	pPanicblock->Init();
 	// 生成したオブジェクトを返す
-	return pNormalblock;
+	return pPanicblock;
 }
 
 
@@ -284,7 +284,7 @@ std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デバッグ表示
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Debug(void)
+void CPanicblock::Debug(void)
 {
 	/*
 	// 落ちる状態でなければ

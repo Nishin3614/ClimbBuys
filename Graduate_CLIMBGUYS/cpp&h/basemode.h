@@ -54,12 +54,16 @@ public:
 	virtual void Debug(void);
 #endif // _DEBUG
 
-	void SetTransitionCnt(int nCnt) { m_TransitionCnt = nCnt; };
-	int  GetTransitionCnt() const{ return m_TransitionCnt; };
-
+	void SetTransitionCnt(int nCnt)						{ m_TransitionCnt = nCnt; };
+	int  GetTransitionCnt() const						{ return m_TransitionCnt; };
+	// 当たり判定の可視化設定
+	static void SetCollisionDisp(bool const & bDisp)	{ m_bCollisionDisp = bDisp; };
+	// 当たり判定の可視化取得
+	static bool const & GetCollisionDisp(void)			{ return m_bCollisionDisp; };
 protected:
 private:
 	bool	m_bSceneStop;						// シーンを止めるフラグ
 	int		m_TransitionCnt = TRANSTION_TIME;	// 自動で画面遷移までのカウント
+	static bool	m_bCollisionDisp;				// 当たり判定の可視化状態
 };
 #endif

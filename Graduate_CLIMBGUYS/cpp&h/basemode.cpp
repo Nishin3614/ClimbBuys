@@ -27,6 +27,7 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool	CBaseMode::m_bCollisionDisp = true;				// 当たり判定の可視化状態
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ
@@ -92,7 +93,7 @@ void CBaseMode::Debug(void)
 	CDebugproc::Print(NEWLINE);
 	CDebugproc::Print("--------- Debug Command ----------\n");
 	CDebugproc::Print("[F3] : 一時停止 [ %d ] : [ OFF : 0 / ON : 1 ]\n", m_bSceneStop);
-	CDebugproc::Print("[F4] : 1Fだけ更新\n");
+	CDebugproc::Print("[F4] : 1フレームだけ更新\n");
 	CDebugproc::Print("[F5] : 当たり判定の可視状態\n");
 	CDebugproc::Print(NEWLINE);
 	CDebugproc::Print("[Ctrl] + テンキー [0] : 現在のModeに遷移\n");
@@ -143,7 +144,7 @@ void CBaseMode::Debug(void)
 	//当たり判定の可視状態
 	if (key->GetKeyboardTrigger(DIK_F5))
 	{
-
+		m_bCollisionDisp = !m_bCollisionDisp;
 	}
 	// ステンシル描画状態の設定
 	if (key->GetKeyboardTrigger(DIK_F6))

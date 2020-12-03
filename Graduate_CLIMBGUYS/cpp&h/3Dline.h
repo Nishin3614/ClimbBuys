@@ -86,6 +86,10 @@ public:
 		D3DXVECTOR3 &pos1,
 		D3DXVECTOR3 &pos2
 	);
+	// 可視化状態設定
+	void SetDisp(bool const & bDisp) { m_bDisp = bDisp; };
+	// 可視化状態取得
+	bool const & GetDisp(void)		{ return m_bDisp; };
 	static C3DLine * Create(	// 作成
 		D3DXVECTOR3 *pos,
 		D3DXVECTOR3 &rot,
@@ -101,6 +105,7 @@ private:
 	D3DXMATRIX  m_mtxWorld;				// ワールドマトリックス
 	D3DXVECTOR3 *m_ppos;					// 位置
 	D3DXVECTOR3 m_rot;					// 回転
+	bool		m_bDisp;				// 可視化状態
 };
 
 #endif

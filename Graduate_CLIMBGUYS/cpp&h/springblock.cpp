@@ -41,7 +41,7 @@ CSpringblock::~CSpringblock()
 void CSpringblock::Init()
 {
 	// ブロックタイプの設定
-	CBaseblock::SetType(TYPE_NORMAL);	// 普通のブロックタイプ
+	CBaseblock::SetType(BLOCKTYPE_NORMAL);	// 普通のブロックタイプ
 										// 落ちる設定
 	CBaseblock::SetFall(true);
 	// ベースブロック初期化処理

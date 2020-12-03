@@ -59,21 +59,48 @@ public:
 		DIESTATE_BACK	= 0b100000,	// 後ろ
 		DIESTATE_MAX
 	} DIESTATE;
+	// ステータスタイプ
+	typedef enum
+	{
+		STATUSTYPE_BLOCK,		// ブロックに押されたとき
+		STATUSTYPE_JUMP,		// 踏まれたとき
+		STATUSTYPE_ELECTRIC,	// 電気を食らったとき
+		STATUSTYPE_MAX
+	} STATUSTYPE;
 
 	// ----- プレイヤーのステータス ----- //
-	typedef struct
+	typedef struct _PLAYER_STATUS
 	{
-		float				fMove;				// 移動量
-		float				fJump;				// ジャンプ力
-		float				fNormalInertia;		// 通常時の慣性
-		float				fJumpInertia;		// ジャンプ時の慣性
-		D3DXVECTOR3			PlayerSize;			// プレイヤーサイズ
-		D3DXVECTOR3			PlayerOffSet;		// プレイヤーオフセット
-		float				PushSize;			// 押し出し用のサイズ
-		D3DXVECTOR3			PushOffSet;			// 押し出し用のオフセット
-		int					nMaxPowerTime;		// 最大パワータイム
-		int					nMaxStanTime;		// 最大スタンタイム
-		int					nMaxInvincibleTime;	// 最大無敵タイム
+		_PLAYER_STATUS()
+		{
+			fMove				= 0;				// 移動量
+			fJump				= 0;				// ジャンプ力
+			fNormalInertia		= 0;				// 通常時の慣性
+			fJumpInertia		= 0;				// ジャンプ時の慣性
+			PlayerSize			= D3DVECTOR3_ZERO;	// プレイヤーサイズ
+			PlayerOffSet		= D3DVECTOR3_ZERO;	// プレイヤーオフセット
+			PushSize			= 0;				// 押し出し用のサイズ
+			PushOffSet			= D3DVECTOR3_ZERO;	// 押し出し用のオフセット
+			nMaxPowerTime		= 0;				// 最大パワータイム
+			nMaxPanicTime		= 0;				// 最大パニックタイム
+			for (int nCnt = 0; nCnt < STATUSTYPE_MAX; nCnt++)
+			{
+				nMaxStanTime[nCnt]		 = 0;		// 最大スタンタイム
+				nMaxInvincibleTime[nCnt] = 0;		// 最大無敵タイム
+			}
+		}
+		float				fMove;								// 移動量
+		float				fJump;								// ジャンプ力
+		float				fNormalInertia;						// 通常時の慣性
+		float				fJumpInertia;						// ジャンプ時の慣性
+		D3DXVECTOR3			PlayerSize;							// プレイヤーサイズ
+		D3DXVECTOR3			PlayerOffSet;						// プレイヤーオフセット
+		float				PushSize;							// 押し出し用のサイズ
+		D3DXVECTOR3			PushOffSet;							// 押し出し用のオフセット
+		int					nMaxPowerTime;						// 最大パワータイム
+		int					nMaxStanTime[STATUSTYPE_MAX];		// 最大スタンタイム
+		int					nMaxInvincibleTime[STATUSTYPE_MAX];	// 最大無敵タイム
+		int					nMaxPanicTime;						// 最大パニックタイム
 	}PLAYER_STATUS;
 	// ----- 力溜め状態 ----- //
 	typedef struct _POWER
@@ -105,54 +132,33 @@ public:
 		int			nPushPower;		// 押す力
 		int			nCntTime;		// 力溜めカウント
 	} POWER;
-	// ----- スタン状態 ----- //
-	typedef struct _STAN
+
+	typedef struct _STATUSCHANGE
 	{
 		// コンストラクタ
-		_STAN()
+		_STATUSCHANGE()
 		{
-			bStan = false;  // スタン状態
-			nStanTime = 0;	// スタン継続時間
+			bChange = false;  // ステータス変動状態
+			nChangeTime = 0;	// ステータス変動継続時間
+			nMaxTime = 0;		// 最大継続時間
 		}
 		// 初期化処理
 		void Init()
 		{
-			bStan = false;  // スタン状態
-			nStanTime = 0;	// スタン継続時間
+			bChange = false;	// ステータス変動状態
+			nChangeTime = 0;	// ステータス変動継続時間
+			nMaxTime = 0;		// 最大継続時間
 		}
-		// スタン設定
-		void Set(bool const & bSouceStan, int const & nSouceStanTime)
+		// ステータス変動設定
+		void Set(bool const & bSouceChange,int const & nSouceMaxTime)
 		{
-			bStan = bSouceStan;			// スタン状態
-			nStanTime = nSouceStanTime;	// スタン継続時間
+			bChange = bSouceChange;			// ステータス変動状態
+			nMaxTime = nSouceMaxTime;		// 最大継続時間
 		}
-		bool		bStan;			// スタン状態
-		int			nStanTime;		// スタン継続時間
-	} STAN;
-	// ----- 無敵状態 ----- //
-	typedef struct _INVINCIBLE
-	{
-		// コンストラクタ
-		_INVINCIBLE()
-		{
-			bInvincible = false;  // スタン状態
-			nInvincibleTime = 0;	// スタン継続時間
-		}
-		// 初期化処理
-		void Init()
-		{
-			bInvincible = false;  // スタン状態
-			nInvincibleTime = 0;	// スタン継続時間
-		}
-		// スタン設定
-		void Set(bool const & bSouceInvincible, int const & nSouceInvincibleTime)
-		{
-			bInvincible = bSouceInvincible;			// スタン状態
-			nInvincibleTime = nSouceInvincibleTime;	// スタン継続時間
-		}
-		bool		bInvincible;			// スタン状態
-		int			nInvincibleTime;		// スタン継続時間
-	} INVINCIBLE;
+		bool		bChange;			// ステータス変動状態
+		int			nChangeTime;		// ステータス変動継続時間
+		int			nMaxTime;			// 最大継続時間
+	} STATUSCHANGE;
 	// 共用体
 	// 死亡状態
 	union DIESTATUS
@@ -340,6 +346,14 @@ private:
 	void PlayerStatusSave(void);
 	// プレイヤーのステータスの初期値のロード
 	void PlayerStatusInitLoad(void);
+
+	// プレイヤーの移動方向設定
+	void PlayerMoveSet(
+		D3DXVECTOR3 & Vec,
+		D3DXVECTOR3 const & Rot,
+		D3DXVECTOR3 & Move
+	);
+
 	// プレイヤーの状態更新
 	void StateUpdate(void);
 	// 力溜めの更新
@@ -348,6 +362,11 @@ private:
 	void StanUpdate(void);
 	// 無敵状態の更新
 	void InvincibleUpdate(void);
+	// パニック状態の更新
+	void PanicUpdate(void);
+	// 電気ブロック使用時
+	void ElectricUse(void);
+
 	/* 変数 */
 	CXInputPad					*m_pPad;						// パッドのポインタ
 	bool						m_bDieFlag;						// 死亡フラグ
@@ -355,16 +374,18 @@ private:
 	static PLAYER_STATUS		m_PlayerStatus;					// プレイヤーのステータス
 	static PLAYER_STATUS		m_PlayerStatusInit;				// プレイヤーの初期ステータス
 	POWER						m_Power;						// 力溜め
-	STAN						m_Stan;							// スタン状態
-	INVINCIBLE					m_Invincible;					// 無敵状態
+	STATUSCHANGE				m_Stan;							// スタン状態
+	STATUSCHANGE				m_Invincible;					// 無敵状態
+	STATUSCHANGE				m_Panic;						// パニック状態
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 	bool						m_bSpringFlag;					// ばねの判定を一回だけ通す
 	RECORD						m_Record;						// 記録情報
 
 	static int					m_nDieCnt;						// 死亡人数 仮
 	DIESTATUS					m_DieStatus;					// 死亡状態
+
 #ifdef _DEBUG
-	CMeshBox * pCollisionBox[COLLISIONTYPE_MAX];
+	CMeshBox * pCollisionBox;
 	C3DLine *	pCollisionLine;
 #endif // _DEBUG
 

@@ -291,6 +291,12 @@
     <ClCompile Include="cpp&amp;h\steelblock.cpp">
       <Filter>Model\Block</Filter>
     </ClCompile>
+    <ClCompile Include="cpp&amp;h\panicblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\electricblock.cpp">
+      <Filter>Model\Block</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpp&amp;h\2Dpresents.h">
@@ -519,6 +525,12 @@
       <Filter>Texture_UI</Filter>
     </ClInclude>
     <ClInclude Include="cpp&amp;h\steelblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\panicblock.h">
+      <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\electricblock.h">
       <Filter>Model\Block</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,12 +1,14 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// 普通ブロック処理 [normalblock.cpp]
+// 混乱ブロック処理 [electricblock.cpp]
 // Author : KOKI NISHIYAMA
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#include "normalblock.h"
+#include "electricblock.h"
 #include "debugproc.h"
 #include "game.h"
+#include "3Dparticle.h"
+#include "sound.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -23,25 +25,26 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock::CNormalblock() : CBaseblock::CBaseblock()
+CElectricblock::CElectricblock() : CBaseblock::CBaseblock()
 {
-
+	m_bElect = false;
+	m_bPlayerPush = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock::~CNormalblock()
+CElectricblock::~CElectricblock()
 {
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 初期化処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Init()
+void CElectricblock::Init()
 {
 	// ブロックタイプの設定
-	CBaseblock::SetType(BLOCKTYPE_NORMAL);	// 普通のブロックタイプ
+	CBaseblock::SetType(BLOCKTYPE_ELECTRIC);	// 電気のブロックタイプ
 	// 落ちる設定
 	CBaseblock::SetFall(true);
 	// ベースブロック初期化処理
@@ -51,7 +54,7 @@ void CNormalblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 終了処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Uninit(void)
+void CElectricblock::Uninit(void)
 {
 	CBaseblock::Uninit();
 }
@@ -59,15 +62,43 @@ void CNormalblock::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 更新処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Update(void)
+void CElectricblock::Update(void)
 {
 	CBaseblock::Update();
+	// プレイヤーに押し出されている状態
+	if (!m_bPlayerPush &&
+		CBaseblock::GetPushAfter().bPushState)
+	{
+		m_bPlayerPush = true;
+	}
+	else if (m_bPlayerPush &&
+		!CBaseblock::GetPushAfter().bPushState)
+	{
+		m_bElect = true;
+	}
+	// Electric状態なら
+	if (m_bElect)
+	{
+		// 押す前のブロックの上にあったブロックを落とさせる
+		CBaseblock::FallBlock_Grid(CBaseblock::GetGrid());
+		// 押したブロックの現在までいた行列の高さ情報を更新
+		CBaseblock::SetHeight(CBaseblock::GetGrid() + CBaseblock::GRID(0, -1, 0));
+		// パーティクル生成
+		C3DParticle::Create(
+			C3DParticle::PARTICLE_ID_EXPLOSION,
+			this->GetPos()
+		);
+		// 爆発音
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
+		// リリース
+		Release();
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 描画処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Draw(void)
+void CElectricblock::Draw(void)
 {
 	CBaseblock::Draw();
 }
@@ -77,7 +108,7 @@ void CNormalblock::Draw(void)
 //	nObjType	: 相手オブジェクトタイプ
 //	pScene		: 相手のシーン情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Scene_MyCollision(
+void CElectricblock::Scene_MyCollision(
 	int const & nObjType,
 	CScene * pScene
 )
@@ -89,7 +120,7 @@ void CNormalblock::Scene_MyCollision(
 //	nObjType	: 相手オブジェクトタイプ
 //	pScene		: 相手のシーン情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
+void CElectricblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 {
 }
 
@@ -98,7 +129,7 @@ void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene
 //	Obj		: オブジェタイプ
 //	pScene	: シーン情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::HitCollision(
+void CElectricblock::HitCollision(
 	COLLISIONDIRECTION const &Direct,	// 前後左右上下
 	CScene::OBJ const & Obj,			// オブジェタイプ
 	CScene * pScene						// シーン情報
@@ -121,8 +152,8 @@ void CNormalblock::HitCollision(
 			// 変数宣言
 			CBaseblock::GRID MyGrid = CBaseblock::GetGrid();	// 自分の行列高
 			CBaseblock::GRID OppGrid = pBaseBlock->GetGrid();	// 相手の行列高
-																// 同じ行列ではないなら
-																// ->関数を抜ける
+			// 同じ行列ではないなら
+			// ->関数を抜ける
 			if (!(MyGrid.nColumn == OppGrid.nColumn &&
 				MyGrid.nLine == OppGrid.nLine)) return;
 			// 変数宣言
@@ -158,9 +189,9 @@ void CNormalblock::HitCollision(
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 普通ブロック全ソースの読み込み
+// 混乱ブロック全ソースの読み込み
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT CNormalblock::Load(void)
+HRESULT CElectricblock::Load(void)
 {
 	return S_OK;
 }
@@ -168,7 +199,7 @@ HRESULT CNormalblock::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 読み込んだ情報を破棄処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::UnLoad(void)
+void CElectricblock::UnLoad(void)
 {
 
 }
@@ -180,7 +211,7 @@ void CNormalblock::UnLoad(void)
 //	pCol		: 色情報
 //	layer		: レイヤー
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock * CNormalblock::Create(
+CElectricblock * CElectricblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
 	D3DXCOLOR		* pCol,				// 色
@@ -189,27 +220,27 @@ CNormalblock * CNormalblock::Create(
 )
 {
 	// 変数宣言
-	CNormalblock * pNormalblock;		// シーン2Dクラス
+	CElectricblock * pElectricblock;		// シーン2Dクラス
 	// メモリの生成(初め->基本クラス,後->派生クラス)
-	pNormalblock = new CNormalblock();
+	pElectricblock = new CElectricblock();
 	// 設定
 	// シーン管理設定
-	pNormalblock->ManageSetting(layer);
-	pNormalblock->SetGrid(Grid);			// 行列高さ
-	pNormalblock->SetPos(					// 位置
+	pElectricblock->ManageSetting(layer);
+	pElectricblock->SetGrid(Grid);			// 行列高さ
+	pElectricblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
-	pNormalblock->SetGravity(fGravity);		// 重力
-	pNormalblock->SetModelId(nModelId);		// モデル番号
+	pElectricblock->SetGravity(fGravity);		// 重力
+	pElectricblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)
 	{
 		// モデルの色を変える
-		pNormalblock->SetModelColor(*pCol);
+		pElectricblock->SetModelColor(*pCol);
 	}
 	// 初期化処理
-	pNormalblock->Init();
+	pElectricblock->Init();
 	// 生成したオブジェクトを返す
-	return pNormalblock;
+	return pElectricblock;
 	D3DXVECTOR3;
 }
 
@@ -219,32 +250,32 @@ CNormalblock * CNormalblock::Create(
 //	nModelId	: モデル番号
 //	pCol		: 色情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CNormalblock * CNormalblock::Create_Self(
+CElectricblock * CElectricblock::Create_Self(
 	int				const & nModelId,								// モデル番号
 	GRID			const & Grid,									// 行列高さ番号
 	D3DXCOLOR		* pCol											// 色
 )
 {
 	// 変数宣言
-	CNormalblock * pNormalblock;		// シーン2Dクラス
+	CElectricblock * pElectricblock;		// シーン2Dクラス
 	// メモリの生成(初め->基本クラス,後->派生クラス)
-	pNormalblock = new CNormalblock;
+	pElectricblock = new CElectricblock;
 	// 設定
-	pNormalblock->SetGrid(Grid);			// 行列高さ
-	pNormalblock->SetPos(					// 位置
+	pElectricblock->SetGrid(Grid);			// 行列高さ
+	pElectricblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
-	pNormalblock->SetModelId(nModelId);		// モデル番号
+	pElectricblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)
 	{
 		// モデルの色を変える
-		pNormalblock->SetModelColor(*pCol);
+		pElectricblock->SetModelColor(*pCol);
 	}
 
 	// 初期化処理
-	pNormalblock->Init();
+	pElectricblock->Init();
 	// 生成したオブジェクトを返す
-	return pNormalblock;
+	return pElectricblock;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -254,29 +285,29 @@ CNormalblock * CNormalblock::Create_Self(
 //	nModelId	: モデル番号
 //	pCol		: 色情報
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
+std::unique_ptr<CElectricblock> CElectricblock::Creat_Unique(
 	int				const & nModelId,								// モデル番号
 	GRID			const & Grid,									// 行列高さ番号
 	D3DXCOLOR		* pCol											// 色
 )
 {
 	// 変数宣言
-	std::unique_ptr<CNormalblock> pNormalblock(new CNormalblock);		// シーン2Dクラス
+	std::unique_ptr<CElectricblock> pElectricblock(new CElectricblock);		// シーン2Dクラス
 	// 設定
-	pNormalblock->SetGrid(Grid);			// 行列高さ
-	pNormalblock->SetPos(					// 位置
+	pElectricblock->SetGrid(Grid);			// 行列高さ
+	pElectricblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
-	pNormalblock->SetModelId(nModelId);		// モデル番号
+	pElectricblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)
 	{
 		// モデルの色を変える
-		pNormalblock->SetModelColor(*pCol);
+		pElectricblock->SetModelColor(*pCol);
 	}
 	// 初期化処理
-	pNormalblock->Init();
+	pElectricblock->Init();
 	// 生成したオブジェクトを返す
-	return pNormalblock;
+	return pElectricblock;
 }
 
 
@@ -284,7 +315,7 @@ std::unique_ptr<CNormalblock> CNormalblock::Creat_Unique(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デバッグ表示
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CNormalblock::Debug(void)
+void CElectricblock::Debug(void)
 {
 	/*
 	// 落ちる状態でなければ

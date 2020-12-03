@@ -22,7 +22,7 @@
 #include "3Dline.h"
 #include "springblock.h"
 #include "resultUI.h"
-
+#include "Calculation.h"
 #include "sound.h"
 
 
@@ -38,8 +38,6 @@
 #define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
 #define PLAYER_STATUS_TXT			("data/LOAD/STATUS/PlayerStatus.txt")	// プレイヤーのステータスのテキスト
 #define RESPAWN_POS					(D3DXVECTOR3(0.0f, 300.0f, 0.0f))		// リスポーン地点
-#define PLAYER_STANTIME				(60)									// プレイヤースタンタイム
-#define PLAYER_INVINCIBLETIME		(60)									// プレイヤー無敵タイム
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -62,14 +60,15 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_Power.nCntDashTime	= 0;					// ダッシュ中の切り替えカウント
 	m_pPlayerUI				= nullptr;				// プレイヤーUIのポインタ
 	m_Record				= RECORD();				// 記録
+	m_Invincible			= _STATUSCHANGE();		// 無敵
+	m_Stan					= _STATUSCHANGE();		// スタン
+	m_Panic					= _STATUSCHANGE();		// パニック
+
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
-	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX;nCntCollision++)
-	{
-		pCollisionBox[nCntCollision] = NULL;
-	}
+	pCollisionBox = NULL;
 	// 当たり判定線の初期化
 	pCollisionLine = NULL;
 #endif // _DEBUG
@@ -91,7 +90,7 @@ void CPlayer::Init(void)
 	CCharacter::Init();
 
 	// パッドのポインタ取得
-	m_pPad = CManager::CManager::GetPad(GetPlayerTag());
+	m_pPad = CManager::GetPad(GetPlayerTag());
 
 	// プレイヤーUIの生成
 	m_pPlayerUI = CPlayerUI::Create(GetPlayerTag());
@@ -104,9 +103,9 @@ void CPlayer::Init(void)
 		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
 		{
 			// メッシュボックスの生成
-			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos + m_PlayerStatus.PlayerOffSet, m_PlayerStatus.PlayerSize, CMeshBox::COLLISION_TYPE::TYPE_CENTER);
+			pCollisionBox = CMeshBox::Create(m_pos + m_PlayerStatus.PlayerOffSet, m_PlayerStatus.PlayerSize, CMeshBox::COLLISION_TYPE::TYPE_CENTER);
 			// 薄青色に
-			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+			pCollisionBox->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 		}
 
 		// 当たり判定のタイプが押し出しなら
@@ -140,11 +139,7 @@ void CPlayer::Uninit(void)
 	m_pPlayerUI = nullptr;
 
 #ifdef _DEBUG
-	// 当たり判定ボックスの初期化
-	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
-	{
-		pCollisionBox[nCntCollision] = NULL;
-	}
+	pCollisionBox = NULL;
 	pCollisionLine = NULL;
 #endif // _DEBUG
 }
@@ -193,18 +188,23 @@ void CPlayer::Update(void)
 		// 当たり判定のタイプがキャラクターなら
 		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
 		{
-			// NULLチェック
-			if (pCollisionBox[nCntCollision] == NULL) continue;
+			if (!pCollisionBox) continue;
 			// 位置設定
-			pCollisionBox[nCntCollision]->SetPos(m_pos + m_PlayerStatus.PlayerOffSet);
+			pCollisionBox->SetPos(m_pos + m_PlayerStatus.PlayerOffSet);
 			// サイズ設定
-			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PlayerSize);
+			pCollisionBox->SetSize(m_PlayerStatus.PlayerSize);
 			// 頂点座標の設定
-			pCollisionBox[nCntCollision]->SetVtxPos();
+			pCollisionBox->SetVtxPos();
+			// 当たり判定の可視化設定
+			if (CBaseMode::GetCollisionDisp() != pCollisionBox->GetDisp())
+			{
+				pCollisionBox->SetDisp(CBaseMode::GetCollisionDisp());
+			}
 		}
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
+			if (!pCollisionLine) continue;
 			D3DXVECTOR3 DirectVec = CCharacter::GetDirectionVec();
 #ifdef _DEBUG
 			CDebugproc::Print("方向:(%.2f,%.2f,%.2f)\n", DirectVec.x, DirectVec.y, DirectVec.z);
@@ -216,6 +216,11 @@ void CPlayer::Update(void)
 			pCollisionLine->SetPos(
 				m_pos + m_PlayerStatus.PushOffSet,
 				m_pos + m_PlayerStatus.PushOffSet - D3DXVECTOR3(CCharacter::GetDirectionVec().x * m_PlayerStatus.PushSize, 0.0f, CCharacter::GetDirectionVec().z * m_PlayerStatus.PushSize));
+			// 当たり判定の可視化設定
+			if (CBaseMode::GetCollisionDisp() != pCollisionLine->GetDisp())
+			{
+				pCollisionLine->SetDisp(CBaseMode::GetCollisionDisp());
+			}
 		}
 	}
 #endif // _DEBUG
@@ -226,6 +231,7 @@ void CPlayer::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::MyAction(void)
 {
+	if (m_Stan.bChange) return;
 	// 自キャラの移動処理
 	MyMove();
 
@@ -273,26 +279,59 @@ void CPlayer::MyMove(void)
 			// 奥
 			if (pKeyboard->GetKeyboardPress(DIK_W))
 			{
-				rot.y = -D3DX_PI * 0.25f + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-				move.x -= vec.x * m_PlayerStatus.fMove;
-				move.z -= vec.z * m_PlayerStatus.fMove;
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_AW_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_SD_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 			// 手前
 			else if (pKeyboard->GetKeyboardPress(DIK_S))
 			{
-				rot.y = -D3DX_PI * 0.75f + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-				move.x -= vec.x * m_PlayerStatus.fMove;
-				move.z -= vec.z * m_PlayerStatus.fMove;
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_AS_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_WD_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 			// 左
 			else
 			{
-				rot.y = -D3DX_PI * 0.5f + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-				move.x -= vec.x * m_PlayerStatus.fMove;
-				move.z -= vec.z * m_PlayerStatus.fMove;
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_A_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_D_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 		}
 		// 右
@@ -302,47 +341,98 @@ void CPlayer::MyMove(void)
 			// 奥
 			if (pKeyboard->GetKeyboardPress(DIK_W))
 			{
-				rot.y = D3DX_PI * 0.25f + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-
-				move.x -= vec.x * m_PlayerStatus.fMove;
-				move.z -= vec.z * m_PlayerStatus.fMove;
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_WD_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_AS_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 			// 手前
 			else if (pKeyboard->GetKeyboardPress(DIK_S))
 			{
-				rot.y = D3DX_PI * 0.75f + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-
-
-				move.x -= vec.x * m_PlayerStatus.fMove;
-				move.z -= vec.z * m_PlayerStatus.fMove;
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_SD_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_AW_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 			// 右
 			else
 			{
-				rot.y = D3DX_PI * 0.5f + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-
-				move.x -= vec.x * m_PlayerStatus.fMove;
-				move.z -= vec.z * m_PlayerStatus.fMove;
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_D_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_A_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 		}
 		// 奥に行く
 		else if (pKeyboard->GetKeyboardPress(DIK_W))
 		{
-			rot.y = D3DX_PI * 0.0f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
+			// パニック状態なら
+			if (!m_Panic.bChange)
+			{
+				rot.y = ROT_KEY_W_ON_CAMERA(fRot);
+			}
+			// それ以外
+			else
+			{
+				rot.y = ROT_KEY_S_ON_CAMERA(fRot);
+			}
+			PlayerMoveSet(
+				vec,
+				rot,
+				move
+			);
 		}
 		// 手前に行く
 		else if (pKeyboard->GetKeyboardPress(DIK_S))
 		{
-			rot.y = D3DX_PI * 1.0f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
+			// パニック状態なら
+			if (!m_Panic.bChange)
+			{
+				rot.y = ROT_KEY_S_ON_CAMERA(fRot);
+			}
+			// それ以外
+			else
+			{
+				rot.y = ROT_KEY_W_ON_CAMERA(fRot);
+			}
+			PlayerMoveSet(
+				vec,
+				rot,
+				move
+			);
 		}
 		// それ以外
 		else
@@ -385,8 +475,14 @@ void CPlayer::MyMove(void)
 				SetMotion(MOTIONTYPE_MOVE);
 
 				// 角度の計算
-				fAngle = atan2f((float)fValueH, (float)fValueV);
-
+				if (m_Panic.bChange)
+				{
+					fAngle = atan2f(-fValueH, -fValueV);
+				}
+				else
+				{
+					fAngle = atan2f(fValueH, fValueV);
+				}
 				if (fAngle > D3DX_PI)
 				{
 					fAngle -= D3DX_PI * 2;
@@ -396,10 +492,11 @@ void CPlayer::MyMove(void)
 					fAngle += D3DX_PI * 2;
 				}
 				rot.y = fAngle + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-				// スティックの角度によってプレイヤー移動
-				move.x -= sinf(fAngle + fRot) * (m_PlayerStatus.fMove);
-				move.z -= cosf(fAngle + fRot) * (m_PlayerStatus.fMove);
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 
 			// 試験的ジャンプ ( のちに中身変わる予定 多分 )
@@ -461,11 +558,17 @@ void CPlayer::MyMove(void)
 		CCharacter::AddGravity(PLAYER_GRAVITY);
 	}
 	CCharacter::SetRotDest(rot);
+}
 
-	//if (pKeyboard->GetKeyboardTrigger(DIK_C))
-	//{
-	//	CGame::GetPlayer(1)->SetRotDest(D3DXVECTOR3(0.0f, D3DX_PI / 2, 0.0f));
-	//}
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// プレイヤーの移動方向設定処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PlayerMoveSet(D3DXVECTOR3 & Vec, D3DXVECTOR3 const & Rot,D3DXVECTOR3 & Move)
+{
+	Vec = D3DXVECTOR3(sinf(Rot.y), 0.0f, cosf(Rot.y));
+	// スティックの角度によってプレイヤー移動
+	Move.x -= Vec.x * (m_PlayerStatus.fMove);
+	Move.z -= Vec.z * (m_PlayerStatus.fMove);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -529,8 +632,8 @@ void CPlayer::BlockCollision(void)
 		// NULLなら
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
-		if (!(pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_FIELD ||	// フィールドブロックではない
-			pBaseBlock->GetType() == CBaseblock::TYPE::TYPE_STEEL) &&	// 鋼鉄ブロックではない
+		if (!(pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD ||	// フィールドブロックではない
+			pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_STEEL) &&	// 鋼鉄ブロックではない
 			m_Power.bTackleFrag &&										// 自身がタックルしている状態
 			!pBaseBlock->GetPushAfter().bPushState &&					// ブロックが押されている状態ではない
 			!pBaseBlock->GetFall()										// 落ちている状態ではない
@@ -617,6 +720,16 @@ void CPlayer::BlockCollision(void)
 		// 上
 		else if (Direct == COLLISIONDIRECTION::UP)
 		{
+			// パニックブロックなら
+			if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
+			{
+				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+			}
+			// 電気ブロックなら
+			else if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
+			{
+				ElectricUse();
+			}
 			// ジャンプ可能設定
 			SetJumpAble(true);
 			m_DieStatus.bUp = true;
@@ -678,8 +791,19 @@ void CPlayer::BlockCollision(void)
 			{
 				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-m_Power.nPushPower, 0, 0));
 			}
-			// 力溜めの初期化処理
-			m_Power.Init();
+			// ブロックがパニックブロックなら
+			if (Pushblock.pBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
+			{
+				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+			}
+			// ブロックが電気ブロックなら
+			else if (Pushblock.pBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
+			{
+				ElectricUse();
+			}
+
+			// 押し出す力を初期化
+			m_Power.nPushPower = 1;
 		}
 		m_Power.bTackleFrag = false;
 	}
@@ -694,18 +818,20 @@ void CPlayer::CharacterCollision(void)
 	CPlayer * pPlayer;	// キャラクター情報
 	COLLISIONDIRECTION Direct;	// 当たり判定の方向
 	// ブロックループ
-	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntBlock++)
+	for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
 	{
 		// NULL代入
 		pPlayer = NULL;
 		// 情報取得
-		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntBlock);
+		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);
 		// NULLなら
 		// ->関数を抜ける
 		if (pPlayer == NULL)
 		{
 			continue;
 		}
+		// 無敵状態なら
+		else if (pPlayer->m_Invincible.bChange) continue;
 		// 当たり判定
 		Direct = pPlayer->PushCollision(
 			CCharacter::GetObj(),
@@ -739,9 +865,9 @@ void CPlayer::CharacterCollision(void)
 
 			// 相手プレイヤーの処理
 			// スタン状態設定
-			pPlayer->m_Stan.Set(true, PLAYER_STANTIME);
+			pPlayer->m_Stan.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
 			// 無敵状態設定
-			pPlayer->m_Invincible.Set(true, PLAYER_INVINCIBLETIME);
+			pPlayer->m_Invincible.Set(true, m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP] + m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
 		}
 	}
 }
@@ -797,7 +923,7 @@ void CPlayer::PlayerStatusLoad(void)
 	char cReadText[128];			// 文字として読み取る
 	char cHeadText[128];			// 比較用
 	char cDie[128];					// 不要な文字
-
+	int nCntStatus = 0;				// ステータスカウント
 	// ファイルを開く
 	pFile = fopen(PLAYER_STATUS_TXT, "r");
 
@@ -877,12 +1003,18 @@ void CPlayer::PlayerStatusLoad(void)
 						// StanTimeが来たら
 						else if (strcmp(cHeadText, "StanTime") == 0)
 						{
-							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxStanTime);
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxStanTime[nCntStatus]);
 						}
 						// InvincibleTimeが来たら
 						else if (strcmp(cHeadText, "InvincibleTime") == 0)
 						{
-							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxInvincibleTime);
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxInvincibleTime[nCntStatus]);
+							nCntStatus++;
+						}
+						// PanicTimeが来たら
+						else if (strcmp(cHeadText, "PanicTime") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxPanicTime);
 						}
 						else if (strcmp(cHeadText, "END_STATUS_SET") == 0)
 						{
@@ -935,8 +1067,18 @@ void CPlayer::PlayerStatusSave(void)
 		fprintf(pFile, "	PushSize		= %.1f\n", m_PlayerStatus.PushSize);
 		fprintf(pFile, "	PushOffSet		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushOffSet.x, m_PlayerStatus.PushOffSet.y, m_PlayerStatus.PushOffSet.z);
 		fprintf(pFile, "	PowerTime		= %d\n", m_PlayerStatus.nMaxPowerTime);
-		fprintf(pFile, "	StanTime		= %d\n", m_PlayerStatus.nMaxStanTime);
-		fprintf(pFile, "	InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime);
+
+		fprintf(pFile, "	StatusType_Block\n");
+		fprintf(pFile, "		StanTime		= %d\n", m_PlayerStatus.nMaxStanTime[STATUSTYPE_BLOCK]);
+		fprintf(pFile, "		InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_BLOCK]);
+		fprintf(pFile, "	StatusType_Jump\n");
+		fprintf(pFile, "		StanTime		= %d\n", m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
+		fprintf(pFile, "		InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP]);
+		fprintf(pFile, "	StatusType_Electric\n");
+		fprintf(pFile, "		StanTime		= %d\n", m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
+		fprintf(pFile, "		InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_ELECTRIC]);
+
+		fprintf(pFile, "	PanicTime		= %d\n", m_PlayerStatus.nMaxPanicTime);
 
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
@@ -975,6 +1117,8 @@ void CPlayer::StateUpdate(void)
 	StanUpdate();
 	// 無敵状態の更新
 	InvincibleUpdate();
+	// パニック状態の更新
+	PanicUpdate();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -983,7 +1127,7 @@ void CPlayer::StateUpdate(void)
 void CPlayer::PowerUpdate(void)
 {
 	if (!m_Power.bCharge) return;
-	if (m_Power.nCntTime == m_PlayerStatus.nMaxStanTime)
+	if (m_Power.nCntTime == m_PlayerStatus.nMaxPowerTime)
 	{
 		m_Power.nPushPower++;
 	}
@@ -1017,15 +1161,15 @@ void CPlayer::PowerUpdate(void)
 void CPlayer::StanUpdate(void)
 {
 	// スタン状態ではないなら
-	if (!m_Stan.bStan) return;
+	if (!m_Stan.bChange) return;
 	// 規定値を超えたら
-	else if (m_Stan.nStanTime >= m_PlayerStatus.nMaxStanTime)
+	else if (m_Stan.nChangeTime >= m_Stan.nMaxTime)
 	{
 		// スタン状態の初期化処理
 		m_Stan.Init();
 	}
 	// スタンカウント更新
-	m_Stan.nStanTime++;
+	m_Stan.nChangeTime++;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1034,15 +1178,60 @@ void CPlayer::StanUpdate(void)
 void CPlayer::InvincibleUpdate(void)
 {
 	// 無敵状態ではないなら
-	if (!m_Invincible.bInvincible) return;
+	if (!m_Invincible.bChange) return;
 	// 規定値を超えたら
-	else if (m_Invincible.nInvincibleTime >= m_PlayerStatus.nMaxInvincibleTime)
+	else if (m_Invincible.nChangeTime >= m_Invincible.nMaxTime)
 	{
 		// 無敵状態の初期化処理
 		m_Invincible.Init();
 	}
 	// 無敵カウント更新
-	m_Invincible.nInvincibleTime++;
+	m_Invincible.nChangeTime++;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// パニック状態の更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PanicUpdate(void)
+{
+	// 無敵状態ではないなら
+	if (!m_Panic.bChange) return;
+	// 規定値を超えたら
+	else if (m_Panic.nChangeTime >= m_Panic.nMaxTime)
+	{
+		// 無敵状態の初期化処理
+		m_Panic.Init();
+	}
+	// 無敵カウント更新
+	m_Panic.nChangeTime++;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 電気ブロック使用時
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::ElectricUse(void)
+{
+	// 変数宣言
+	CPlayer * pPlayer;	// キャラクター情報
+	// プレイヤーループ
+	for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
+	{
+		// NULL代入
+		pPlayer = NULL;
+		// 情報取得
+		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);
+		// NULLなら
+		// ->関数を抜ける
+		if (pPlayer == NULL ||
+			this == pPlayer)
+		{
+			continue;
+		}
+		// 無敵状態なら
+		else if (pPlayer->m_Invincible.bChange) continue;
+		pPlayer->m_Stan.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
+		pPlayer->m_Invincible.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC] + m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1106,7 +1295,7 @@ void CPlayer::PushBlock(
 	this->SetPos(this->GetPos() + D3DXVECTOR3(0.0f, 10.0f, 0.0f));
 	// 落ちている状態なら
 	if (pBlock->GetFall() ||
-		pBlock->GetType() == CBaseblock::TYPE_FIELD) return;
+		pBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD) return;
 	CBaseblock::GRID NextGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
 	CBaseblock::GRID PushGrid = CBaseblock::GRID(0,0,0);
 
@@ -1584,12 +1773,18 @@ void CPlayer::Die(void)
 				CCharacter::Die();
 #ifdef _DEBUG
 				// 当たり判定ボックスの開放
-				for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
-				{
 					// NULLチェック
-					if (pCollisionBox[nCntCollision] == NULL) continue;
-					pCollisionBox[nCntCollision]->Release();
-					pCollisionBox[nCntCollision] = NULL;
+				if (pCollisionBox != NULL)
+				{
+					pCollisionBox->Release();
+					pCollisionBox = NULL;
+				}
+				// 当たり判定線の開放
+				// NULLチェック
+				if (pCollisionLine != NULL)
+				{
+					pCollisionLine->Release();
+					pCollisionLine = NULL;
 				}
 #endif // _DEBUG
 
@@ -1695,10 +1890,36 @@ void CPlayer::Debug(void)
 				ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
 				// 押し出す時間
 				ImGui::DragInt(u8"押し出す時間", &m_PlayerStatus.nMaxPowerTime, 1.0f, 0);
-				// スタン時間
-				ImGui::DragInt(u8"スタン時間", &m_PlayerStatus.nMaxStanTime, 1.0f, 0);
-				// 無敵時間
-				ImGui::DragInt(u8"無敵時間", &m_PlayerStatus.nMaxInvincibleTime, 1.0f, 0);
+				// ブロックに押し出されたとき
+				if (ImGui::TreeNode(u8"ブロックに押し出されたときのステータス設定"))
+				{
+					// スタン時間
+					ImGui::DragInt(u8"(b)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_BLOCK], 1.0f, 0);
+					// 無敵時間
+					ImGui::DragInt(u8"(b)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_BLOCK], 1.0f, 0);
+					ImGui::TreePop();
+				}
+				// ジャンプで踏み倒されたとき
+				if (ImGui::TreeNode(u8"ジャンプで踏み倒されたときのステータス設定"))
+				{
+					// スタン時間
+					ImGui::DragInt(u8"(j)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP], 1.0f, 0);
+					// 無敵時間
+					ImGui::DragInt(u8"(j)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP], 1.0f, 0);
+					ImGui::TreePop();
+				}
+				// 電気で感電したとき
+				if (ImGui::TreeNode(u8"電気で感電したときのステータス設定"))
+				{
+					// スタン時間
+					ImGui::DragInt(u8"(e)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
+					// 無敵時間
+					ImGui::DragInt(u8"(e)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
+					ImGui::TreePop();
+				}
+
+				// パニック時間
+				ImGui::DragInt(u8"パニック時間", &m_PlayerStatus.nMaxPanicTime, 1.0f, 0);
 				// 重力を適用するフラグの切り替え
 				ImGui::Checkbox(u8"重力", &m_bGravity);
 

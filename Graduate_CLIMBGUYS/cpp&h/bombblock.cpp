@@ -43,7 +43,7 @@ CBombblock::~CBombblock()
 void CBombblock::Init()
 {
 	// ブロックタイプの設定
-	CBaseblock::SetType(CBaseblock::TYPE::TYPE_BOMB);	// 爆発のブロックタイプ
+	CBaseblock::SetType(CBaseblock::BLOCKTYPE_BOMB);	// 爆発のブロックタイプ
 	// 落ちる設定
 	CBaseblock::SetFall(true);
 	// ベースブロック初期化処理
@@ -86,6 +86,13 @@ void CBombblock::Update(void)
 		CBaseblock::SetHeight(CBaseblock::GetGrid() + CBaseblock::GRID(0, -1, 0));
 		// 周りのブロックを消す処理
 		AroundDelete();
+		// パーティクル生成
+		C3DParticle::Create(
+			C3DParticle::PARTICLE_ID_EXPLOSION,
+			this->GetPos()
+		);
+		// 爆発音
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
 		// リリース
 		Release();
 	}
@@ -262,14 +269,6 @@ std::unique_ptr<CBombblock> CBombblock::Creat_Unique(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBombblock::AroundDelete(void)
 {
-	// パーティクル生成
-	C3DParticle::Create(
-		C3DParticle::PARTICLE_ID_EXPLOSION,
-		this->GetPos()
-	);
-	// 爆発音
-	CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
-
 	// ブロックのループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{
@@ -278,7 +277,7 @@ void CBombblock::AroundDelete(void)
 
 		// フィールドブロックなら
 		if (this == pBlock ||
-			pBlock->GetType() == CBaseblock::TYPE_FIELD) continue;
+			pBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD) continue;
 
 		// 範囲内にブロックが存在しているなら
 		if (this->GetGrid() + CBaseblock::GRID(-1, -1, -1) <= pBlock->GetGrid() &&

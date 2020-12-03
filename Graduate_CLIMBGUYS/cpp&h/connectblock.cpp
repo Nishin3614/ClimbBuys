@@ -11,6 +11,8 @@
 #include "game.h"
 #include "springblock.h"
 #include "steelblock.h"
+#include "electricblock.h"
+#include "panicblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -53,12 +55,6 @@ void CConnectblock::Init()
 {
 	// ブロック設定
 	SetBlockShape();
-	/*
-	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
-	{
-		m_vec_pBaseBlock[nCntBlock]->SetModelColor(m_col);
-	}
-	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -66,16 +62,6 @@ void CConnectblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::Uninit(void)
 {
-	/*
-	// NULL代入
-	for (size_t nCntBlock = 0; nCntBlock < m_vec_pBaseBlock.size(); nCntBlock++)
-	{
-		m_vec_pBaseBlock[nCntBlock] = NULL;
-	}
-	// ベースブロック情報の格納情報開放
-	m_vec_pBaseBlock.clear();
-	m_vec_pBaseBlock.shrink_to_fit();
-	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -582,12 +568,22 @@ void CConnectblock::StaticDebug(void)
 		// ばねブロック生成
 		if (ImGui::Button("CreateSpring"))
 		{
-			CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
+			CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), NULL, 1.0f);
 		}
 		// 鋼鉄ブロック生成
 		if (ImGui::Button("CreateSteel"))
 		{
-			CSteelblock::Create(CScene_X::TYPE_BLOCKS_HARD, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f), 1.0f);
+			CSteelblock::Create(CScene_X::TYPE_BLOCKS_HARD, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), NULL, 1.0f);
+		}
+		// パニックブロック生成
+		if (ImGui::Button("CreatePanic"))
+		{
+			CPanicblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), 1.0f);
+		}
+		// 電気ブロック生成
+		if (ImGui::Button("CreateElectric"))
+		{
+			CElectricblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 1.0f);
 		}
 	}
 	ImGui::End();

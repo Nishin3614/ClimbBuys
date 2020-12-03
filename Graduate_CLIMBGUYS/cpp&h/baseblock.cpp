@@ -10,6 +10,7 @@
 #include "game.h"
 #include "circleshadow.h"
 #include "bombblock..h"
+#include "electricblock.h"
 #include "3dparticle.h"
 #include "player.h"
 
@@ -44,13 +45,12 @@ std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
 CBaseblock::CBaseblock() : CScene_X::CScene_X()
 {
 	m_pShadowPolygon = NULL;							// シャドウポリゴン
-	m_type = TYPE_NORMAL;								// タイプ
+	m_BlockType = BLOCKTYPE_NORMAL;								// タイプ
 	m_bFall = false;									// 落ちる状態
 	CScene::SetObj(CScene::OBJ::OBJ_BLOCK);				// オブジェクトタイプの設定
 	m_PushAfeter.bPushState = false;					// 当たった方向
 	m_PushAfeter.PushGrid = GRID(0,0,0);				// 押し出し力
 	m_bShadow = true;									// シャドウの使用状態
-	m_BlockType = BlockType::NORMAL;
 	m_fGravity = 0.0f;									// 重力
 }
 
@@ -69,7 +69,7 @@ void CBaseblock::Init()
 	// シーンXの初期化処理
 	CScene_X::Init();
 	// フィールドブロック以外なら
-	if (m_type != TYPE_FIELD)
+	if (m_BlockType != BLOCKTYPE_FIELD)
 	{
 		// シャドウポリゴンの生成
 		m_pShadowPolygon = CCircleshadow::Create(CScene_X::GetPos(),
@@ -315,7 +315,7 @@ void CBaseblock::Update_PushState(void)
 void CBaseblock::Update_MyShadow(void)
 {
 	// フィールドブロックなら
-	if (m_type == TYPE_FIELD)
+	if (m_BlockType == BLOCKTYPE_FIELD)
 	{
 		m_bShadow = false;
 		return;
@@ -363,7 +363,7 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 {
 	// 落ちいない状態なら
 	if (!this->GetFall() ||
-		this->GetType() == CBaseblock::TYPE_FIELD) return;
+		this->GetType() == CBaseblock::BLOCKTYPE_FIELD) return;
 	// 変数宣言
 	COLLISIONDIRECTION Direct;	// 当たり判定方向
 	// 当たり判定
@@ -582,12 +582,20 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				// 押し出し状態がtrue
 				bPush = true;
 				// タイプがボムなら
-				if (m_type == TYPE::TYPE_BOMB)
+				if (m_BlockType == BLOCKTYPE_BOMB)
 				{
 					// ボムの状態設定
 					CBombblock * pBombBlock = (CBombblock *)this;
 					pBombBlock->SetbBomb(true);
 				}
+				// タイプが電気なら
+				else if (m_BlockType == BLOCKTYPE_ELECTRIC)
+				{
+					// 電気の状態設定
+					CElectricblock * pElectBlock = (CElectricblock *)this;
+					pElectBlock->SetElectric(true);
+				}
+
 			}
 			if (Direct == COLLISIONDIRECTION::NONE)
 			{
@@ -622,7 +630,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					// 押し出し状態がtrue
 					bPush = true;
 					// タイプがボムなら
-					if (m_type == TYPE::TYPE_BOMB)
+					if (m_BlockType == BLOCKTYPE_BOMB)
 					{
 						// ボムの状態設定
 						CBombblock * pBombBlock = (CBombblock *)this;
@@ -644,7 +652,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::UP;
 					// タイプがボムなら
-					if (m_type == TYPE::TYPE_BOMB)
+					if (m_BlockType == BLOCKTYPE_BOMB)
 					{
 						// ボムの状態設定
 						CBombblock * pBombBlock = (CBombblock *)this;
@@ -928,7 +936,7 @@ COLLISIONDIRECTION CBaseblock::PushBlock(
 )
 {
 	// プレイヤーと別のオブジェクトに当たり判定
-	if (this->m_type == TYPE_FIELD) return COLLISIONDIRECTION::NONE;
+	if (this->m_BlockType == BLOCKTYPE_FIELD) return COLLISIONDIRECTION::NONE;
 	// 変数宣言
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
 	D3DXVECTOR3 BlockPos = CScene_X::GetPos();

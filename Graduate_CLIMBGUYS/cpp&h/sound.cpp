@@ -13,6 +13,7 @@
 /* •`‰æ */
 #include "sound.h"
 #include "manager.h"
+#include "Calculation.h"
 
 // ----------------------------------------
 //

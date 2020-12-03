@@ -41,7 +41,7 @@ CSteelblock::~CSteelblock()
 void CSteelblock::Init()
 {
 	// ブロックタイプの設定
-	CBaseblock::SetType(TYPE_STEEL);	// 鋼鉄のブロックタイプ
+	CBaseblock::SetType(BLOCKTYPE_STEEL);	// 鋼鉄のブロックタイプ
 	// 落ちる設定
 	CBaseblock::SetFall(true);
 	// ベースブロック初期化処理

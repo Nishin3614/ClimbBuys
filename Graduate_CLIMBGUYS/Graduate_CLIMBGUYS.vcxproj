@@ -172,6 +172,7 @@
     <ClCompile Include="cpp&amp;h\damagefloor.cpp" />
     <ClCompile Include="cpp&amp;h\debugproc.cpp" />
     <ClCompile Include="cpp&amp;h\effect.cpp" />
+    <ClCompile Include="cpp&amp;h\electricblock.cpp" />
     <ClCompile Include="cpp&amp;h\enemy.cpp" />
     <ClCompile Include="cpp&amp;h\fade.cpp" />
     <ClCompile Include="cpp&amp;h\fieldblock.cpp" />
@@ -204,6 +205,7 @@
     <ClCompile Include="cpp&amp;h\number.cpp" />
     <ClCompile Include="cpp&amp;h\opening.cpp" />
     <ClCompile Include="cpp&amp;h\openingmanager.cpp" />
+    <ClCompile Include="cpp&amp;h\panicblock.cpp" />
     <ClCompile Include="cpp&amp;h\player.cpp" />
     <ClCompile Include="cpp&amp;h\playerUI.cpp" />
     <ClCompile Include="cpp&amp;h\renderer.cpp" />
@@ -248,6 +250,7 @@
     <ClInclude Include="cpp&amp;h\damagefloor.h" />
     <ClInclude Include="cpp&amp;h\debugproc.h" />
     <ClInclude Include="cpp&amp;h\effect.h" />
+    <ClInclude Include="cpp&amp;h\electricblock.h" />
     <ClInclude Include="cpp&amp;h\enemy.h" />
     <ClInclude Include="cpp&amp;h\fade.h" />
     <ClInclude Include="cpp&amp;h\fieldblock.h" />
@@ -282,6 +285,7 @@
     <ClInclude Include="cpp&amp;h\number.h" />
     <ClInclude Include="cpp&amp;h\opening.h" />
     <ClInclude Include="cpp&amp;h\openingmanager.h" />
+    <ClInclude Include="cpp&amp;h\panicblock.h" />
     <ClInclude Include="cpp&amp;h\player.h" />
     <ClInclude Include="cpp&amp;h\playerUI.h" />
     <ClInclude Include="cpp&amp;h\renderer.h" />

@@ -83,6 +83,32 @@
 // テキスト用　イコール
 #define EQUAL				("=")
 
+/* キーボード移動処理 */
+// 奥
+static float const	ROT_KEY_W =	D3DX_PI * 0.0f;						// 奥
+#define				ROT_KEY_W_ON_CAMERA(fRot)	(ROT_KEY_W + fRot)	// 奥(カメラあり)
+// 右奥
+static float const	ROT_KEY_WD = D3DX_PI * 0.25f;					// 右奥
+#define				ROT_KEY_WD_ON_CAMERA(fRot)	(ROT_KEY_WD + fRot)	// 右奥(カメラあり)
+// 右
+static float const	ROT_KEY_D = D3DX_PI * 0.5f;						// 右
+#define				ROT_KEY_D_ON_CAMERA(fRot)	(ROT_KEY_D + fRot)	// 右(カメラあり)
+// 右前
+static float const	ROT_KEY_SD = D3DX_PI * 0.75f;					// 右前
+#define				ROT_KEY_SD_ON_CAMERA(fRot)	(ROT_KEY_SD + fRot)	// 右前(カメラあり)
+// 前
+static float const	ROT_KEY_S = D3DX_PI * 1.0f;						// 前
+#define				ROT_KEY_S_ON_CAMERA(fRot)	(ROT_KEY_S + fRot)	// 前(カメラあり)
+// 左前
+static float const	ROT_KEY_AS = -D3DX_PI * 0.75f;					// 左前
+#define				ROT_KEY_AS_ON_CAMERA(fRot)	(ROT_KEY_AS + fRot)	// 左前(カメラあり)
+// 左
+static float const	ROT_KEY_A = -D3DX_PI * 0.5f;					// 左
+#define				ROT_KEY_A_ON_CAMERA(fRot)	(ROT_KEY_A + fRot)	// 左(カメラあり)
+// 左奥
+static float const	ROT_KEY_AW = -D3DX_PI * 0.25f;					// 左奥
+#define				ROT_KEY_AW_ON_CAMERA(fRot)	(ROT_KEY_AW + fRot)	// 左奥(カメラあり)
+
 // ----------------------------------------------------------------------------------------------------
 //
 // Calculation種類

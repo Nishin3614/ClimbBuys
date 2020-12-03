@@ -43,6 +43,7 @@ public:
 		MOTIONTYPE_NEUTRAL = 0,		// 待機モーション
 		MOTIONTYPE_MOVE,			// 移動モーション
 		MOTIONTYPE_DASH,			// ダッシュモーション
+		MOTIONTYPE_TACKLE,			// タックルモーション
 		MOTIONTYPE_JUMP,			// ジャンプモーション
 		MOTIONTYPE_BANZAI,			// バンザイモーション
 		MOTIONTYPE_VICTORY_01,		// 勝利モーション_01
@@ -206,6 +207,8 @@ public:
 	void SetRotDest(D3DXVECTOR3 const &rotDest)		{ m_rotLast = rotDest; };
 	// 目標回転量取得
 	D3DXVECTOR3 GetRotDest(void) const				{ return m_rotLast; };
+	// モーション設定
+	void SetMotion(int const nMotiontype);
 #ifdef _DEBUG
 	virtual void  Debug(void);
 	static void AllDebug(void);
@@ -215,8 +218,6 @@ protected:
 	// 設定 //
 	// キャラクター
 	void SetCharacter(CHARACTER const character)	{ m_character = character; };
-	// モーション設定
-	void SetMotion(int const nMotiontype);
 	// 強制モーション設定
 	void ComplusionSetMotion(int const nMotiontype);
 	// 重力

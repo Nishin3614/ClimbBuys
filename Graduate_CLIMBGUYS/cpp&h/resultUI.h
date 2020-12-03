@@ -75,9 +75,10 @@ public:
 	static HRESULT Load(void);							// “Ç‚İ‚İ
 	static void UnLoad(void);							// ”jŠü
 	// İ’è //
-	static void SetRecord(PLAYER_TAG PlayerNum, CPlayer::RECORD record);
+	static void SetRecord(PLAYER_TAG PlayerNum, CPlayer::RECORD record);		// ‹L˜^î•ñ‚Ìİ’è
 
 	// æ“¾ //
+	static CPlayer::RECORD GetRecord(int nCnt) { return m_Record[nCnt]; };		// ‹L˜^î•ñ‚Ìæ“¾
 protected:
 private:
 	/* ŠÖ” */

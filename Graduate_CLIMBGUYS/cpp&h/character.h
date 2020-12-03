@@ -190,6 +190,8 @@ public:
 		int nMotionID,							// モーションID
 		int nNowKeyCnt = -1						// 現在のキーカウント
 	);
+	// 重力適用フラグの取得
+	bool &GetGravity(void) { return m_bGravity; }
 	// 出現している人数取得
 	int GetAllCharacter(void) { return m_nAllCharacter; };
 	// キャラクター全ソースの読み込み
@@ -277,6 +279,8 @@ private:
 	float										m_fLength;						// 攻撃の当たり範囲
 	bool										m_bJumpable;					// ジャンプ可能かどうか
 	bool										m_bDie;							// 死亡フラグ
+	static bool									m_bGravity;						// 重力を適用するフラグ
+
 	D3DXVECTOR3									m_Directvector;					// 方向のベクトル
 	std::vector<std::unique_ptr<CMeshobit>>		m_vec_pMeshObit;				// 奇跡
 	CStencilshadow								* m_pStencilshadow;				// ステンシルシャドウ

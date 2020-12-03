@@ -54,7 +54,6 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
 	m_nCntState				= 0;					// ステートカウント
 	m_bDieFlag				= false;				// 死亡フラグ
-	m_bGravity				= true;					// 重力を適用するフラグ
 	m_Power.bDashFlag		= false;				// ダッシュフラグ
 	m_Power.bTackleFrag		= false;				// タックルフラグ
 	m_Power.nCntDashTime	= 0;					// ダッシュ中の切り替えカウント
@@ -551,12 +550,14 @@ void CPlayer::MyMove(void)
 	}
 	CCharacter::SetMove(move);
 
-	// 重力を適用する
-	if (m_bGravity)
-	{
-		// キャラクターの重力加算処理
-		CCharacter::AddGravity(PLAYER_GRAVITY);
-	}
+	//// 重力を適用する
+	//if (m_bGravity)
+	//{
+	//	// キャラクターの重力加算処理
+	//	CCharacter::AddGravity(PLAYER_GRAVITY);
+	//}
+
+	// 目標回転量の設定
 	CCharacter::SetRotDest(rot);
 }
 
@@ -1921,7 +1922,7 @@ void CPlayer::Debug(void)
 				// パニック時間
 				ImGui::DragInt(u8"パニック時間", &m_PlayerStatus.nMaxPanicTime, 1.0f, 0);
 				// 重力を適用するフラグの切り替え
-				ImGui::Checkbox(u8"重力", &m_bGravity);
+				ImGui::Checkbox(u8"重力", &GetGravity());
 
 				// セーブボタン
 				if (ImGui::Button(u8"保存"))

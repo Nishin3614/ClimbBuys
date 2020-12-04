@@ -55,5 +55,6 @@ private:
 	CResultUI			*m_pResultUI;								// リザルトUI
 	CPlayer				*m_pPlayer[(int)PLAYER_TAG::PLAYER_MAX];	// プレイヤー
 	int					m_nCntPressButton;							// ボタンを押した回数
+	int					m_nCntLoser;								// 敗者のカウント
 };
 #endif

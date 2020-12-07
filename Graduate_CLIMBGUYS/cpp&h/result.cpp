@@ -18,12 +18,13 @@
 #include "bg.h"
 #include "connect_fieldblock.h"
 #include "resultUI.h"
+#include "3Dparticle.h"
 
 //=============================================================================
 // マクロ定義
 //=============================================================================
 #define PLAYER_VICTORY_POS	(D3DXVECTOR3(0.0f, 25.0f, 0.0f))		// 勝者の位置
-#define PLAYER_LOSER_POS	(D3DXVECTOR3(40.0f + (10.0f * nCntLoser), 25.0f, 50.0f + (-25.0f * nCntLoser)))		// 敗者の位置
+#define PLAYER_LOSER_POS	(D3DXVECTOR3(40.0f + (10.0f * m_nCntLoser), 25.0f, 50.0f + (-25.0f * m_nCntLoser)))		// 敗者の位置
 
 //=============================================================================
 //
@@ -35,6 +36,8 @@ CResult::CResult()
 	// 初期化
 	m_pResultUI				= nullptr;		// リザルトUI
 	m_nCntPressButton		= 0;			// ボタンを押した回数
+	m_nCntLoser				= 0;			// 敗者のカウント
+
 	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		m_pPlayer[nCnt] = nullptr;			// プレイヤー
@@ -210,8 +213,8 @@ void CResult::ResultMotion(void)
 		{
 			if (m_pPlayer[nCnt])
 			{
-				static int nCntLoser = 0;
-				nCntLoser++;
+				// 敗者のカウントアップ
+				m_nCntLoser++;
 
 				// バンザイモーション
 				m_pPlayer[nCnt]->SetMotion(CCharacter::MOTIONTYPE_BANZAI);

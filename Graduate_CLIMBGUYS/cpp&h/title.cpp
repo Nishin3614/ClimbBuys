@@ -45,6 +45,8 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CTitle::CTitle()
 {
+	m_nTime = 0;
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,14 +95,16 @@ void CTitle::Init(void)
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f),
 			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
 			CScene_X::TYPE_OBJECT_BLOCK_C + nCnt,
-			false);
+			false,
+			CStagingBlock::STAGING_BLOCKTYPE::LEVITATION
+		);
 	}
 
 	// 背景生成
 	CBg::Create(CTexture_manager::TYPE_BG_TITLE);
 
-	// 床生成
-
+	//
+	CStagingBlock::SetCondition(30, 6000, 1, CStagingBlock::STAGING_BLOCKTYPE::DESCENT);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -121,6 +125,21 @@ void CTitle::Update(void)
 	// モード更新
 	CBaseMode::Update();
 
+	// 一定時間毎にエフェクトを出現
+	if (m_nTime++ % 10 == 0)
+	{
+		// パーティクル生成
+		C3DParticle::Create(
+			C3DParticle::PARTICLE_ID_AIRLINE,
+			SCREEN_CENTER_POS,
+			true
+		);
+	}
+
+	// 演出用オブジェクトの生成
+	CStagingBlock::Create_Block(SCREEN_CENTER_POS, D3DXVECTOR3(1280 * 0.5f, 0.0f,0.0f), CScene_X::TYPE_BLOCK_SPRING, CStagingBlock::STAGING_BLOCKTYPE::DESCENT);
+
+	// チュートリアルに画面遷移
 	if (CCalculation::PressAnyButton())
 	{
 		// フェード状態が何も起こっていない状態なら
@@ -131,20 +150,6 @@ void CTitle::Update(void)
 			CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
 		}
 	}
-
-	// 一定時間操作していなったら自動でオープニングへ移行する
-	//if (CBaseMode::GetTransitionCnt() <= 0)
-	//{
-	//	// フェード状態が何も起こっていない状態なら
-	//	if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-	//	{
-	//		CManager::GetFade()->SetFade(CManager::MODE_OPENING);
-	//	}
-	//}
-	//else
-	//{
-	//	CBaseMode::SetTransitionCnt(CBaseMode::GetTransitionCnt()-1);
-	//}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -168,3 +173,17 @@ CTitle * CTitle::Create(void)
 	// 生成したオブジェクトを返す
 	return pTitle;
 }
+
+// 一定時間操作していなったら自動でオープニングへ移行する
+//if (CBaseMode::GetTransitionCnt() <= 0)
+//{
+//	// フェード状態が何も起こっていない状態なら
+//	if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+//	{
+//		CManager::GetFade()->SetFade(CManager::MODE_OPENING);
+//	}
+//}
+//else
+//{
+//	CBaseMode::SetTransitionCnt(CBaseMode::GetTransitionCnt()-1);
+//}

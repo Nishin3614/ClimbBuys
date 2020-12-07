@@ -192,7 +192,7 @@ void COpeningManager::CreateAll()
 		false);								// シャドウマッピング状態
 
 	// ブロックの最大数分生成しポインタを保存
-	for (int nCnt = 0; nCnt < MAX_STAGINGBLOCK; nCnt++)
+	/*for (int nCnt = 0; nCnt < MAX_STAGINGBLOCK; nCnt++)
 	{
 		m_pStagingBlock[nCnt] = CStagingBlock::Create(
 			D3DXVECTOR3(0.0f, 1500.0f, 0.0f),
@@ -200,8 +200,9 @@ void COpeningManager::CreateAll()
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f),
 			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
 			CScene_X::TYPE_OBJECT_BLOCK_C + nCnt,
-			false);
+			false,
+			);
 
 		m_pStagingBlock[nCnt]->SetBlockNum(nCnt);
-	}
+	}*/
 }

@@ -11,6 +11,7 @@
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "scene_x.h"
+#include <random>
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
@@ -20,6 +21,8 @@
 // 行列のフィード値を格闘
 
 //#define BASEBLOCK_RANGE			(50.0f)				// ブロックの範囲
+
+#define BASEBLOCK_FIELDMAX			(14)				// フィールドのブロック数
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -181,21 +184,34 @@ public:
 	{
 		_BLOCK_STATUS()
 		{
+			// ブロック用
 			fMove = 0;				// 移動力
 			nAppearance = 0;		// 出現する高さ
 			fBasicShadowSize = 0;	// シャドウサイズ
 			nMaxSprit = 0;			// 最大分割数
 			nChangeTime = 0;		// 変化させる時間(変化するタイミング)
 			nAppBlock = 0;			// ブロックが出現するタイミング
+
+			// ダメージ床用
+			fInitFloor = -100.0f;	// ダメージ床の初期位置
+			fFloorMove = 0;			// ダメージ床の移動速度
+			nFloorPhase = 0;		// ダメージ床の上がるフェーズタイミング
 		}
-		float					fMove;				// 移動力
-		int						nAppearance;		// 出現する高さ
-		float					fBasicShadowSize;	// シャドウサイズ
-		int						nMaxSprit;			// 最大分割数
-		int						nChangeTime;		// 変化させる時間(変化するタイミング)
-		int						nAppBlock;			// ブロックが出現するタイミング
-		std::vector<INTEGER2>	v_nDropBlock;		// 落とすブロックの数
-		std::vector<INTEGER2>	v_nBlockGravity;	// 落ちる速度
+		// ブロック用
+		float					fMove;					// 移動力
+		int						nAppearance;			// 出現する高さ
+		float					fBasicShadowSize;		// シャドウサイズ
+		int						nMaxSprit;				// 最大分割数
+		int						nChangeTime;			// 変化させる時間(変化するタイミング)
+		int						nAppBlock;				// ブロックが出現するタイミング
+		std::vector<INTEGER2>	v_nDropBlock;			// 落とすブロックの数
+		std::vector<FLOAT2>		v_fBlockGravity;		// 落ちる速度
+
+		// ダメージ床用
+		std::vector<int>		v_nDamageFloorHight;	// ダメージ床の高さ
+		float					fInitFloor;				// ダメージ床の初期位置
+		float					fFloorMove;				// ダメージ床の移動速度
+		int						nFloorPhase;			// ダメージ床の上がるフェーズタイミング
 	} BLOCK_STATUS;
 
 	/* 関数 */
@@ -399,6 +415,10 @@ public:
 	static void BlockStatusSave(void);
 	// ブロックの静的変数を初期化する
 	static void BlockStaticValue(void);
+	// ブロックの最大高さを取得
+	static int GetMaxHeight(void) { return m_nMaxHeight; };
+	// ブロックの最大高さを再設定
+	static void SetMaxHeight(void);
 	// フェーズの取得
 	static int GetPhase(void)					{ return m_nPhase; };
 	// フェーズの設定
@@ -442,7 +462,8 @@ private:
 	bool					m_bShadow;			// シャドウの使用状態
 	static int				m_nPhase;			// フェーズ
 	// 試験用
-	static int m_anHeight[20][20];
+	static int				m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
+	static int				m_nMaxHeight;		// 最大高さ
 };
 
 #endif

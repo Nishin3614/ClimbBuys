@@ -109,6 +109,11 @@ void CGame::Init(void)
 	//CConnectblock::TestCreate();
 	// ダメージ床の生成
 	CDamageFloor::Create();
+	// ダメージ床の開始フェーズが超えていたら
+	if (CBaseblock::GetBlockStatus().nFloorPhase <= CBaseblock::GetPhase())
+	{
+		CDamageFloor::SetUp(true);
+	}
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),
@@ -157,11 +162,20 @@ void CGame::Update(void)
 	CBaseMode::Update();
 	// ブロックのフェーズ状態設定
 	if (m_nCntTime > 0 &&
+		!CBaseblock::GetBlockStatus().nChangeTime == 0 &&
 		m_nCntTime % DERAY_TIME(CBaseblock::GetBlockStatus().nChangeTime) == 0)
 	{
 		int nPhase = CBaseblock::GetPhase();
-		nPhase++;
-		CBaseblock::SetPhase(nPhase);
+		if (nPhase < CBaseblock::GetBlockStatus().nMaxSprit - 1)
+		{
+			nPhase++;
+			CBaseblock::SetPhase(nPhase);
+			// ダメージ床の開始フェーズが超えていたら
+			if (CBaseblock::GetBlockStatus().nFloorPhase <= nPhase)
+			{
+				CDamageFloor::SetUp(true);
+			}
+		}
 	}
 	// タイムカウント更新
 	m_nCntTime++;

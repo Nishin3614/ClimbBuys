@@ -154,7 +154,7 @@ void CCharacter::Init()
 		// ステンシルシャドウの生成
 		m_pStencilshadow = CStencilshadow::Create(
 			m_pos,
-			D3DXVECTOR3(10.0f, 10000.0f, 10.0f),
+			D3DXVECTOR3(10.0f, 1000.0f, 10.0f),
 			CStencilshadow::TYPE_CYLINDER,
 			CScene::LAYER_3DCHARACTERSHADOW
 		);
@@ -203,6 +203,7 @@ void CCharacter::Update(void)
 	{
 		// 位置取得
 		D3DXVECTOR3 pos = m_pos;
+		pos.y += 10.0f;
 		// ステンシルシャドウの位置設定
 		m_pStencilshadow->SetPos(m_pos);
 	}

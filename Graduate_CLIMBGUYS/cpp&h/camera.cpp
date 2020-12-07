@@ -288,7 +288,7 @@ void CCamera::Update_Game(void)
 			// ダメージ床との距離が一定値より狭くなったら床と平行に高さを上げる
 			if (CCalculation::Range_Absolute(pDamageFloor->GetPos().y, m_posR.y) <= 100)
 			{
-				m_posR.y += pDamageFloor->GetDamageFloorMoveSpeed()/4;
+				m_posR.y += CBaseblock::GetBlockStatus().fFloorMove * 0.25f;
 			}
 		}
 

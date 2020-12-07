@@ -44,6 +44,23 @@
 class CStagingBlock : public CScene_X
 {
 public:
+
+	enum class STAGING_BLOCKTYPE
+	{
+		NORMAL,			// 通常
+		LEVITATION,		// 空中浮遊
+		ASCENT,			// 上昇
+		DESCENT,		// 下降
+		MAX
+	};
+
+	struct Block_Condition
+	{
+		int	nPerFrame[static_cast<int>(STAGING_BLOCKTYPE::MAX)];		// 何フレーム実行するか
+		int	nFrameBetween[static_cast<int>(STAGING_BLOCKTYPE::MAX)];	// 何フレーム枚に出現させるか
+		int	nToOnes[static_cast<int>(STAGING_BLOCKTYPE::MAX)];			// 一回にいくつ出現させるか
+	};
+
 	/* 関数 */
 	// コンストラクタ
 	CStagingBlock();
@@ -69,8 +86,9 @@ public:
 		D3DXVECTOR3 const &rot,						// 回転
 		D3DXVECTOR3 const &size,					// サイズ倍率
 		D3DXCOLOR color,							// カラー
-		int const &nModelId = 0,					// モデル番号
-		bool const &bShadowMap = false				// シャドウマッピング状態
+		int const &nModelId,						// モデル番号
+		bool const &bShadowMap,						// シャドウマッピング状態
+		STAGING_BLOCKTYPE type
 	);
 
 	void Scene_MyCollision(
@@ -124,6 +142,15 @@ public:
 	// 演出終了フラグの取得
 	static bool GetEnd() { return m_bEnd; };
 
+	/////// 二つセット ///////
+	// 生成するブロックの条件の設定
+	static void SetCondition(const int PerFrame, const int FrameBetween, const int ToOnes , STAGING_BLOCKTYPE type);
+	// 一定時間毎に演出ブロックを生成
+	static void Create_Block(D3DXVECTOR3 Originpos,D3DXVECTOR3 Range, int const &nModelId, STAGING_BLOCKTYPE type);
+	// 条件の初期化
+	static void InitCondition();
+
+	////////////////////////////
 
 	// ブロックの移動処理
 	void BlockFall();
@@ -134,8 +161,16 @@ protected:
 private:
 	/* 関数 */
 	void				Levitating();							// 空中浮遊 タイトルで使う
-	/* 変数 */
+	void				Descent();								// 下降		タイトルで使う
+
+
+
+	/* 静的変数 */
 	static bool			m_bEnd;									// 演出終了フラグ
+
+	/* 変数 */
+	STAGING_BLOCKTYPE	m_BlockType = STAGING_BLOCKTYPE::NORMAL;// 演出ブロックの種類
+	static Block_Condition m_Condition;							// 条件の情報
 
 	float				m_fSpeed;								// 移動量
 	float				m_fBurstSpeed;							// 移動量
@@ -144,8 +179,7 @@ private:
 	int					m_nBlockNun;							// ブロックの番号
 	bool				m_bStopMove;							// 座標の更新を止める
 	int					m_nAngle;								// 角度
-	int					m_nTime;								// パーティクルの出現時間カウント
-	CTitle				*m_pTitle;								// タイトルのポインタ
+	static int			m_nFrame;
 };
 
 #endif

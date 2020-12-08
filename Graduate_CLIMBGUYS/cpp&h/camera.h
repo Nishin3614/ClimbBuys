@@ -69,10 +69,12 @@ public:
 	void Update(void);
 	// 描画処理
 	void Draw(void);
-#ifdef _DEBUG
+#if ERROW_ACTION
+
 	// デバッグ処理
 	void Debug(void);
-#endif // _DEBUG
+
+#endif // ERROW_ACTION
 	// 生成処理
 	static CCamera * Create(void);	// 作成
 	// 読み込み

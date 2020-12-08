@@ -15,12 +15,6 @@
 
 // ----------------------------------------
 //
-// マクロ定義
-//
-// ----------------------------------------
-
-// ----------------------------------------
-//
 // グローバル変数
 //
 // ----------------------------------------
@@ -32,6 +26,7 @@
 // ----------------------------------------
 LPD3DXFONT CDebugproc::m_pFont = NULL;
 char CDebugproc::m_aStr[STRING_MAX] = {};
+
 
 // ----------------------------------------
 // コンストラクタ処理
@@ -52,13 +47,15 @@ CDebugproc::~CDebugproc()
 // ----------------------------------------
 void CDebugproc::Init(LPDIRECT3DDEVICE9 m_pDevice)
 {
-#ifdef _DEBUG
 
+#ifdef _DEBUG
 
 	// デバッグ表示用フォントを設定
 	D3DXCreateFont(m_pDevice, 12, 6, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "ＭＳ ゴシック", &m_pFont);
+
 #endif // _DEBUG
+
 }
 
 // ----------------------------------------

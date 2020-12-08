@@ -41,9 +41,11 @@ public:
 	void Init(void);
 	void Uninit(void);
 	void Update(void);
-#ifdef _DEBUG
+#if ERROW_ACTION
+
 	void Debug(void);
-#endif // _DEBUG
+
+#endif // IMGUI_DEBUG
 
 	static CLight * Create(void);	// ì¬
 	D3DLIGHT9 &GetLight(TYPE type);		// ƒ‰ƒCƒgî•ñ

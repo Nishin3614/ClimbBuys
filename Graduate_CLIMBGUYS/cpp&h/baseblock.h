@@ -16,11 +16,11 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//#define BASEBLOCK_MINUSTOPLUS	(4)						// 行列をプラスに
-// やること
-// 行列のフィード値を格闘
+#if ERROW_ACTION
 
-//#define BASEBLOCK_RANGE			(50.0f)				// ブロックの範囲
+#define BASEBLOCK_DEBUG				(0)					// デバッグ処理状態
+
+#endif // ERROW_ACTION
 
 #define BASEBLOCK_FIELDMAX			(14)				// フィールドのブロック数
 
@@ -309,6 +309,10 @@ public:
 	void SetFall(bool const & bFall)				{ m_bFall = bFall; };
 	// 落ちる状態取得
 	bool & GetFall(void)							{ return m_bFall; };
+	// 使用状態設定
+	void SetUse(bool const & bUse)					{ m_bUse = bUse; };
+	// 使用状態取得
+	bool & GetUse(void)								{ return m_bUse; };
 	// シャドウの使用状態状態設定
 	void SetShadow(bool const & bShadow)			{ m_bShadow = bShadow; };
 	// シャドウの使用状態状態取得
@@ -423,13 +427,22 @@ public:
 	static int GetPhase(void)					{ return m_nPhase; };
 	// フェーズの設定
 	static void SetPhase(int const & nPhase)	{ m_nPhase = nPhase; };
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
 	// 全体のデバッグ処理
 	static void AllDebug(void);
+
+#endif // ERROW_ACTION
+
+#ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
 #endif // _DEBUG
+#if BASEBLOCK_DEBUG
+	static void NumAllDebug(void);				// 全体個数を表示するデバッグ処理
+#endif // BASEBLOCK_DEBUG
 	/* 変数宣言 */
+
 
 protected:
 	/* 関数 */
@@ -446,6 +459,8 @@ private:
 	void Update_PushState(void);
 	// 自身のシャドウの出現条件処理
 	void Update_MyShadow(void);
+	// 上限処理
+	void Update_Limit(void);
 	// 当たり判定処理
 	void Collision(CBaseblock * pBlock);
 	// 自信と他のブロックの比較し、シャドウを更新させる処理
@@ -460,10 +475,15 @@ private:
 	float					m_fGravity;			// 重力
 	bool					m_bFall;			// 落ちる状態
 	bool					m_bShadow;			// シャドウの使用状態
+	bool					m_bUse;				// 表示状態
 	static int				m_nPhase;			// フェーズ
 	// 試験用
 	static int				m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
 	static int				m_nMaxHeight;		// 最大高さ
+#if BASEBLOCK_DEBUG
+	static int				m_nAll;				// 全体個数
+#endif // BASEBLOCK_DEBUG
+
 };
 
 #endif

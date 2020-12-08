@@ -20,6 +20,11 @@
 // マクロ関数
 //
 // ------------------------------------------
+#if ERROW_ACTION
+
+#define IMGUI_DEBUG	(1)	// ImGuiのデバッグ処理
+
+#endif // ERROW_ACTION
 
 // ------------------------------------------
 //
@@ -101,10 +106,13 @@ public:
 	void Draw(void);
 	// ロード中の描画処理
 	void LoadDraw(void);
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
 	void CleanupDeviceD3D();
 	void ResetDevice();
-#endif // _DEBUG
+
+#endif // IMGUI_DEBUG
+
 	// 描画状態
 	void SetType(TYPE type = TYPE_NORMAL);
 	// 合成処理
@@ -127,16 +135,22 @@ private:
 	CLight * m_pLight;					// ライト情報
 	static bool m_bDebug;				// デバッグモード
 	D3DPRESENT_PARAMETERS    m_d3dpp;
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
 	// ImGuiのセットアップ
 	void ImGui_SetUp(HWND hWnd);
 	// ImGuiの更新
 	void UpdateImGui(void);
 	ImVec4 m_clear_color;
+
+#endif // IMGUI_DEBUG
+#ifdef _DEBUG
+
 	void DrawFPS(void);					// FPS関数
+#endif // _DEBUG
+
 	// 変数宣言 //
 	static CDebugproc * m_debugproc;
-#endif
 };
 
 #endif // !_RENDERER_H_

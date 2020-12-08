@@ -48,17 +48,18 @@ public:
 	static HRESULT Load(void);							// 読み込み
 	static void UnLoad(void);							// 破棄
 	// 設定 //
-
+	// 上昇状態設定
+	static void SetUp(bool const bUp) { m_bUp = bUp; };
 	// 取得 //
-	float GetDamageFloorMoveSpeed() { return m_MoveSpeed; };// 床の移動速度の取得
 protected:
 private:
 	/* 関数 */
 	void ComparisonHeight();							// 高さを比較
 	void Move();										// 床の移動
 	/* 変数 */
-	float m_MoveSpeed;									// 移動量の速さ
-	int m_AscendUpToTime;								// 床の上昇が始まるまでの時間 仮
-	CPlayer *m_pPlayer[4];								// 四人分のポインタ
+	CPlayer		*m_pPlayer[4];							// 四人分のポインタ
+	static bool	m_bUp;									// 上昇状態
+	// やること
+	// buseでの設定
 };
 #endif

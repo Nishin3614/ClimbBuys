@@ -249,9 +249,9 @@ void CCamera::Init_Result(void)
 		m_posR.z + cosf(m_rot.y) * m_fLength;
 	m_rot.x = 0.0f;
 	// 注視点位置
-	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_fLength = 400.0f;
-	m_fHeight = 400.0f;
+	m_posR = D3DXVECTOR3(0.0f, 55.0f, 0.0f);
+	m_fLength = 220.0f;
+	m_fHeight = 0.0f;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -288,7 +288,7 @@ void CCamera::Update_Game(void)
 			// ダメージ床との距離が一定値より狭くなったら床と平行に高さを上げる
 			if (CCalculation::Range_Absolute(pDamageFloor->GetPos().y, m_posR.y) <= 100)
 			{
-				m_posR.y += pDamageFloor->GetDamageFloorMoveSpeed()/4;
+				m_posR.y += CBaseblock::GetBlockStatus().fFloorMove * 0.25f;
 			}
 		}
 

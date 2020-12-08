@@ -34,7 +34,8 @@
 // 試験用
 CBaseblock::BLOCK_STATUS CBaseblock::m_BlockStatus = {};
 int	CBaseblock::m_nPhase = 0;					// フェーズ
-int CBaseblock::m_anHeight[20][20] = {};		// 1つ1つの行列の高さ
+int CBaseblock::m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX] = {};		// 1つ1つの行列の高さ
+int CBaseblock::m_nMaxHeight = 0;				// 最大高さ
 
 float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
 std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
@@ -1066,8 +1067,11 @@ void CBaseblock::UnLoad(void)
 	m_BlockStatus.v_nDropBlock.clear();
 	m_BlockStatus.v_nDropBlock.shrink_to_fit();
 	// 落ちる速度の開放
-	m_BlockStatus.v_nBlockGravity.clear();
-	m_BlockStatus.v_nBlockGravity.shrink_to_fit();
+	m_BlockStatus.v_fBlockGravity.clear();
+	m_BlockStatus.v_fBlockGravity.shrink_to_fit();
+	// ダメージ床の開放
+	m_BlockStatus.v_nDamageFloorHight.clear();
+	m_BlockStatus.v_nDamageFloorHight.shrink_to_fit();
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1373,6 +1377,7 @@ void CBaseblock::SetHeight(
 		//CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
 		return;
 	}
+	// 高さを設定
 	m_anHeight[nColumn + m_nFeedValue[CGame::GetStage()]][nLine + m_nFeedValue[CGame::GetStage()]] = nHeight;
 }
 
@@ -1398,6 +1403,23 @@ void CBaseblock::SetHeight(
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 現在の最大の高さを再設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::SetMaxHeight(void)
+{
+	// 変数宣言
+	int * pnHeight = &m_anHeight[0][0];	// 高さポインタ
+	int nHeight = 0;						// 代入用の高さ
+	// 最大高さを代入
+	for (int nCntHeight = 0; nCntHeight < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntHeight++, pnHeight++)
+	{
+		if (nHeight >= *pnHeight) continue;
+		nHeight = *pnHeight;
+	}
+	m_nMaxHeight = nHeight;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ブロックのステータスのロード
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::BlockStatusLoad(void)
@@ -1410,7 +1432,7 @@ void CBaseblock::BlockStatusLoad(void)
 	char cDie[128];					// 不要な文字
 	int nCntDropSprit = 0;			// 落とすブロック数カウント
 	int nCntBlockGravity = 0;		// 重力カウント
-
+	int nCntFloor = 0;				// 床カウント
 									// ファイルを開く
 	pFile = fopen(BLOCK_STATUS_TXT, "r");
 
@@ -1463,14 +1485,18 @@ void CBaseblock::BlockStatusLoad(void)
 							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_BlockStatus.nMaxSprit);
 
 							// 分割数分配列確保する
-							std::vector<INTEGER2> v_nSprit(m_BlockStatus.nMaxSprit);
+							std::vector<INTEGER2>	v_nSprit(m_BlockStatus.nMaxSprit);
+							std::vector<FLOAT2>		v_fSprit(m_BlockStatus.nMaxSprit);
+							std::vector<int>		v_nFloorSprit(m_BlockStatus.nMaxSprit);
 							for (size_t CntSprit = 0; CntSprit < v_nSprit.size(); CntSprit++)
 							{
 								v_nSprit[CntSprit] = INTEGER2(0, 0);
+								v_fSprit[CntSprit] = FLOAT2(0, 0);
+								v_nFloorSprit[CntSprit] = 0;
 							}
 							m_BlockStatus.v_nDropBlock = v_nSprit;
-							m_BlockStatus.v_nBlockGravity = v_nSprit;
-
+							m_BlockStatus.v_fBlockGravity = v_fSprit;
+							m_BlockStatus.v_nDamageFloorHight = v_nFloorSprit;
 						}
 						// ChangeTimeが来たら
 						else if (strcmp(cHeadText, "ChangeTime") == 0)
@@ -1493,15 +1519,42 @@ void CBaseblock::BlockStatusLoad(void)
 						// BlockGravityが来たら
 						else if (strcmp(cHeadText, "BlockGravity") == 0)
 						{
-							if (nCntBlockGravity >= (int)m_BlockStatus.v_nBlockGravity.size())
+							if (nCntBlockGravity >= (int)m_BlockStatus.v_fBlockGravity.size())
 							{
 								continue;
 							}
-							sscanf(cReadText, "%s %s %d %d",
+							sscanf(cReadText, "%s %s %f %f",
 								&cDie, &cDie,
-								&m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMax,
-								&m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMin);
+								&m_BlockStatus.v_fBlockGravity[nCntBlockGravity].fMax,
+								&m_BlockStatus.v_fBlockGravity[nCntBlockGravity].fMin);
 							nCntBlockGravity++;
+						}
+						// ダメージ床の初期位置が来たら
+						else if (strcmp(cHeadText, "InitFloor") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_BlockStatus.fInitFloor);
+						}
+						// FloorMoveが来たら
+						else if (strcmp(cHeadText, "FloorMove") == 0)
+						{
+							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_BlockStatus.fFloorMove);
+						}
+						// FloorPhaseが来たら
+						else if (strcmp(cHeadText, "FloorPhase") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_BlockStatus.nFloorPhase);
+						}
+						// DamegeFloorが来たら
+						else if (strcmp(cHeadText, "DamegeFloor") == 0)
+						{
+							if (nCntFloor >= (int)m_BlockStatus.v_nDamageFloorHight.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_nDamageFloorHight[nCntFloor]);
+							nCntFloor++;
 						}
 					}
 				}
@@ -1538,7 +1591,7 @@ void CBaseblock::BlockStatusSave(void)
 	if (pFile)
 	{
 		fprintf(pFile, COMMENT02);
-		fprintf(pFile, "// ブロックのステータス\n");
+		fprintf(pFile, "// ブロックとダメージ床のステータス\n");
 		fprintf(pFile, COMMENT02);
 
 		fprintf(pFile, "SCRIPT\n");
@@ -1546,6 +1599,7 @@ void CBaseblock::BlockStatusSave(void)
 
 		// セーブするモデルの情報
 		fprintf(pFile, "STATUS_SET\n");
+		fprintf(pFile, "// ブロックのステータス\n");
 		fprintf(pFile, "	AppBlock		= %d\n", m_BlockStatus.nAppBlock);
 		fprintf(pFile, "	Move			= %.1f\n", m_BlockStatus.fMove);
 		fprintf(pFile, "	App				= %d\n", m_BlockStatus.nAppearance);
@@ -1560,15 +1614,29 @@ void CBaseblock::BlockStatusSave(void)
 				m_BlockStatus.v_nDropBlock[nCntDropSprit].nMin
 			);
 		}
-		for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_nBlockGravity.size(); nCntBlockGravity++)
+		for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_fBlockGravity.size(); nCntBlockGravity++)
 		{
 			fprintf(pFile, "	Phase %zd\n", nCntBlockGravity);
 
-			fprintf(pFile, "		BlockGravity	= %d %d\n",
-				m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMax,
-				m_BlockStatus.v_nBlockGravity[nCntBlockGravity].nMin
+			fprintf(pFile, "		BlockGravity	= %f %f\n",
+				m_BlockStatus.v_fBlockGravity[nCntBlockGravity].fMax,
+				m_BlockStatus.v_fBlockGravity[nCntBlockGravity].fMin
 			);
 		}
+
+		fprintf(pFile, "\n// ダメージ床のステータス\n");
+		fprintf(pFile, "	InitFloor		= %.2f\n", m_BlockStatus.fInitFloor);
+		fprintf(pFile, "	FloorMove		= %.2f\n", m_BlockStatus.fFloorMove);
+		fprintf(pFile, "	FloorPhase		= %d\n", m_BlockStatus.nFloorPhase);
+		for (size_t nCntFloor = 0; nCntFloor < m_BlockStatus.v_nDamageFloorHight.size(); nCntFloor++)
+		{
+			fprintf(pFile, "	Phase %zd\n", nCntFloor);
+
+			fprintf(pFile, "		DamegeFloor		= %d\n",
+				m_BlockStatus.v_nDamageFloorHight[nCntFloor]
+			);
+		}
+
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
 		fprintf(pFile, "END_SCRIPT\n");
@@ -1609,69 +1677,114 @@ void CBaseblock::BlockStaticValue(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::AllDebug(void)
 {
-	if (ImGui::Begin(u8"ブロックのステータス"))
-	{
-		// 出現する時間
-		ImGui::DragInt(u8"出現する時間", &m_BlockStatus.nAppBlock, 1.0f,1,1000);					/* 10.0f */
-		// 移動量
-		ImGui::DragFloat(u8"移動量", &m_BlockStatus.fMove, 0.1f, 0.1f, 100.0f);
-		// 落ちる高さ
-		ImGui::DragInt(u8"落ちる高さ", &m_BlockStatus.nAppearance, 1.0f);						/* 10.0f */
-		// 最大分割数
-		if (ImGui::DragInt(u8"変化する回数", &m_BlockStatus.nMaxSprit, 1.0f,1,100))						/* 10.0f */
-		{
-			// 分割数に合わせ、数値を更新
-			std::vector<INTEGER2> v_Sprit(m_BlockStatus.nMaxSprit);
-			// 初期化
-			for (int nCntSprit = 0; nCntSprit < m_BlockStatus.nMaxSprit; nCntSprit++)
-			{
-				v_Sprit[nCntSprit] = INTEGER2(0, 0);
-			}
 
-			// 落ちるブロック数
-			for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
-			{
-				if (nCntDropSprit >= (size_t)m_BlockStatus.nMaxSprit) break;
-				v_Sprit[nCntDropSprit] = m_BlockStatus.v_nDropBlock[nCntDropSprit];
-			}
-			m_BlockStatus.v_nDropBlock.clear();
-			m_BlockStatus.v_nDropBlock.shrink_to_fit();
-			m_BlockStatus.v_nDropBlock = v_Sprit;
-			// 落ちる速度
-			for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_nBlockGravity.size(); nCntBlockGravity++)
-			{
-				if (nCntBlockGravity >= (size_t)m_BlockStatus.nMaxSprit) break;
-				v_Sprit[nCntBlockGravity] = m_BlockStatus.v_nBlockGravity[nCntBlockGravity];
-			}
-			m_BlockStatus.v_nBlockGravity.clear();
-			m_BlockStatus.v_nBlockGravity.shrink_to_fit();
-			m_BlockStatus.v_nBlockGravity = v_Sprit;
-		}
-		// 変化させる時間
-		ImGui::DragInt(u8"変化させる時間", &m_BlockStatus.nChangeTime, 1.0f);					/* 10.0f */
+	// やること
+	// ブロックを出現させる処理と合わせる
+	if (ImGui::Begin(u8"ブロックとダメージ床のステータス"))
+	{
+		// 変数宣言
+		std::vector<int>		v_nFloorSprit(m_BlockStatus.nMaxSprit);
 		// 落ちるブロック数
-		if (ImGui::TreeNode(u8"落ちるブロック数(最大値、最小値)"))
+		if (ImGui::TreeNode(u8"ブロックのステータス"))
 		{
-			for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+			// 出現する時間
+			ImGui::DragInt(u8"出現する時間", &m_BlockStatus.nAppBlock, 1.0f, 1, 1000);					/* 10.0f */
+			// 移動量
+			ImGui::DragFloat(u8"移動量", &m_BlockStatus.fMove, 0.1f, 0.1f, 100.0f);
+			// 落ちる高さ
+			ImGui::DragInt(u8"落ちる高さ", &m_BlockStatus.nAppearance, 1.0f);						/* 10.0f */
+			// 最大分割数
+			if (ImGui::DragInt(u8"変化する回数", &m_BlockStatus.nMaxSprit, 1.0f, 1, 100))						/* 10.0f */
 			{
-				ImGui::Text("Phase %d", nCntDropSprit);
-				std::string sName = " (";
-				sName += std::to_string(nCntDropSprit * m_BlockStatus.nChangeTime) + u8"秒)";
-				// 落とすブロックの数
-				ImGui::DragInt2(sName.c_str(), (int *)m_BlockStatus.v_nDropBlock[nCntDropSprit], 1.0f);					/* 10.0f */
+				// 分割数に合わせ、数値を更新
+				std::vector<INTEGER2>	v_Sprit(m_BlockStatus.nMaxSprit);
+				std::vector<FLOAT2>		v_fSprit(m_BlockStatus.nMaxSprit);
+				// 初期化
+				for (int nCntSprit = 0; nCntSprit < m_BlockStatus.nMaxSprit; nCntSprit++)
+				{
+					v_Sprit[nCntSprit] = INTEGER2(0, 0);
+					v_fSprit[nCntSprit] = FLOAT2(0, 0);
+				}
+
+				// 落ちるブロック数
+				for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+				{
+					if (nCntDropSprit >= (size_t)m_BlockStatus.nMaxSprit) break;
+					v_Sprit[nCntDropSprit] = m_BlockStatus.v_nDropBlock[nCntDropSprit];
+				}
+				m_BlockStatus.v_nDropBlock.clear();
+				m_BlockStatus.v_nDropBlock.shrink_to_fit();
+				m_BlockStatus.v_nDropBlock = v_Sprit;
+				// 落ちる速度
+				for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_fBlockGravity.size(); nCntBlockGravity++)
+				{
+					if (nCntBlockGravity >= (size_t)m_BlockStatus.nMaxSprit) break;
+					v_fSprit[nCntBlockGravity] = m_BlockStatus.v_fBlockGravity[nCntBlockGravity];
+				}
+				m_BlockStatus.v_fBlockGravity.clear();
+				m_BlockStatus.v_fBlockGravity.shrink_to_fit();
+				m_BlockStatus.v_fBlockGravity = v_fSprit;
+				// ダメージ床
+				for (size_t nCntFloor = 0; nCntFloor < m_BlockStatus.v_nDamageFloorHight.size(); nCntFloor++)
+				{
+					if (nCntFloor >= (size_t)m_BlockStatus.nMaxSprit) break;
+					v_nFloorSprit[nCntFloor] = m_BlockStatus.v_nDamageFloorHight[nCntFloor];
+				}
+				m_BlockStatus.v_nDamageFloorHight.clear();
+				m_BlockStatus.v_nDamageFloorHight.shrink_to_fit();
+				m_BlockStatus.v_nDamageFloorHight = v_nFloorSprit;
+			}
+			// 変化させる時間
+			ImGui::DragInt(u8"変化させる時間", &m_BlockStatus.nChangeTime, 1.0f);					/* 10.0f */
+			// 落ちるブロック数
+			if (ImGui::TreeNode(u8"落ちるブロック数(最大値、最小値)"))
+			{
+				for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+				{
+					ImGui::Text("Phase %d", nCntDropSprit);
+					std::string sName = " (";
+					sName += std::to_string(nCntDropSprit * m_BlockStatus.nChangeTime) + u8"秒)";
+					// 落とすブロックの数
+					ImGui::DragInt2(sName.c_str(), (int *)m_BlockStatus.v_nDropBlock[nCntDropSprit], 1.0f);					/* 10.0f */
+				}
+				ImGui::TreePop();
+			}
+			// 落ちる速度
+			if (ImGui::TreeNode(u8"落ちる速度(最大値、最小値)"))
+			{
+				for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_fBlockGravity.size(); nCntBlockGravity++)
+				{
+					ImGui::Text("Phase %d", nCntBlockGravity);
+					std::string sName = " (";
+					sName += std::to_string(nCntBlockGravity * m_BlockStatus.nChangeTime) + u8"秒)";
+					// 落ちる速度
+					ImGui::DragFloat2(sName.c_str(), (float *)m_BlockStatus.v_fBlockGravity[nCntBlockGravity], 1.0f);					/* 10.0f */
+				}
+				ImGui::TreePop();
 			}
 			ImGui::TreePop();
 		}
-		// 落ちる速度
-		if (ImGui::TreeNode(u8"落ちる速度(最大値、最小値)"))
+		// 落ちるブロック数
+		if (ImGui::TreeNode(u8"ダメージのステータス"))
 		{
-			for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_nBlockGravity.size(); nCntBlockGravity++)
+			// ダメージ床の初期位置
+			ImGui::DragFloat(u8"ダメージ床の初期位置", &m_BlockStatus.fInitFloor, 0.1f);
+			// ダメージ床の移動速度
+			ImGui::DragFloat(u8"ダメージ床の移動速度", &m_BlockStatus.fFloorMove, 0.1f, 0.1f, 100.0f);
+			// ダメージ床の上がるフェーズタイミング
+			ImGui::DragInt(u8"ダメージ床の上がるPhase", &m_BlockStatus.nFloorPhase, 1.0f,0,m_BlockStatus.nMaxSprit);						/* 10.0f */
+			// ダメージ床の高さ
+			if (ImGui::TreeNode(u8"ダメージ床の高さ"))
 			{
-				ImGui::Text("Phase %d", nCntBlockGravity);
-				std::string sName = " (";
-				sName += std::to_string(nCntBlockGravity * m_BlockStatus.nChangeTime) + u8"秒)";
-				// 落ちる速度
-				ImGui::DragInt2(sName.c_str(), (int *)m_BlockStatus.v_nBlockGravity[nCntBlockGravity], 1.0f);					/* 10.0f */
+				for (size_t nCntFloor = 0; nCntFloor < m_BlockStatus.v_nDamageFloorHight.size(); nCntFloor++)
+				{
+					ImGui::Text("Phase %d", nCntFloor);
+					std::string sName = " (";
+					sName += std::to_string(nCntFloor * m_BlockStatus.nChangeTime) + u8"秒)";
+					// ダメージ床の高さ
+					ImGui::DragInt(sName.c_str(), &m_BlockStatus.v_nDamageFloorHight[nCntFloor], 1.0f);					/* 10.0f */
+				}
+				ImGui::TreePop();
 			}
 			ImGui::TreePop();
 		}

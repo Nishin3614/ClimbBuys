@@ -31,7 +31,6 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define PLAYER_GRAVITY				(0.1f)		// プレイヤーの重力
 #define PLAYER_UPMOVELIMIT			(20.0f)		// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT		(5.0f)		// プレイヤーの下降移動量制限
 #define DASH_TIME_MAX				(30)		// ダッシュしている時間
@@ -449,7 +448,7 @@ void CPlayer::MyMove(void)
 		// 試験的タックル
 		if (pKeyboard->GetKeyboardTrigger(DIK_J))
 		{
-			SetMotion(MOTIONTYPE_DASH);
+			SetMotion(MOTIONTYPE_TACKLE);
 			m_Power.bCharge = true;
 		}
 	}
@@ -549,13 +548,6 @@ void CPlayer::MyMove(void)
 		move.y = -PLAYER_UNDERMOVELIMIT;
 	}
 	CCharacter::SetMove(move);
-
-	//// 重力を適用する
-	//if (m_bGravity)
-	//{
-	//	// キャラクターの重力加算処理
-	//	CCharacter::AddGravity(PLAYER_GRAVITY);
-	//}
 
 	// 目標回転量の設定
 	CCharacter::SetRotDest(rot);

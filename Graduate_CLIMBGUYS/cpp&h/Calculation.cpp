@@ -1589,6 +1589,17 @@ void CCalculation::CalcRotation_XYZ(D3DXVECTOR3 & rot)
 	CCalculation::CalcRotation(rot.z);
 }
 
+//------------------------------------------------------------------------------
+// ランダムな浮動小数点数を生成
+//------------------------------------------------------------------------------
+float CCalculation::RandamFloat(int nMax, int nMin)
+{
+	std::random_device rd;
+	std::default_random_engine eng(rd());
+	std::uniform_real_distribution<float> distr((float)nMin, (float)nMax);
+	return distr(eng);
+}
+
 /*
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // XInputのパッド用関数

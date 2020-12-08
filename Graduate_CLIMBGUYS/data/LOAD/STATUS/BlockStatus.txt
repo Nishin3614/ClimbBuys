@@ -1,9 +1,10 @@
 //------------------------------------------------------------
-// ブロックのステータス
+// ブロックとダメージ床のステータス
 //------------------------------------------------------------
 SCRIPT
 
 STATUS_SET
+// ブロックのステータス
 	AppBlock		= 5
 	Move			= 1.0
 	App				= 10
@@ -37,6 +38,25 @@ STATUS_SET
 		BlockGravity	= 5 2
 	Phase 6
 		BlockGravity	= 6 2
+
+// ダメージ床のステータス
+	InitFloor		= -100.00
+	FloorMove		= 1.00
+	FloorPhase		= 1
+	Phase 0
+		DamegeFloor		= 0
+	Phase 1
+		DamegeFloor		= 4
+	Phase 2
+		DamegeFloor		= 4
+	Phase 3
+		DamegeFloor		= 4
+	Phase 4
+		DamegeFloor		= 3
+	Phase 5
+		DamegeFloor		= 3
+	Phase 6
+		DamegeFloor		= 2
 END_STATUS_SET
 
 END_SCRIPT

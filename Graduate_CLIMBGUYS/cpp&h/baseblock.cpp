@@ -13,6 +13,7 @@
 #include "electricblock.h"
 #include "3dparticle.h"
 #include "player.h"
+#include "damagefloor.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -25,6 +26,7 @@
 #define BLOCK_SIZE_RANGE		(25.0f)									// ブロックのサイズの範囲
 #define BLOCK_SHADOWSIZE		(25.0f)									// ステンシルシャドウのサイズ
 #define BLOCK_STATUS_TXT		("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
+#define BLOCK_LIMIT_Y			(-500.0f)								// ブロックの制限区域
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -36,9 +38,15 @@ CBaseblock::BLOCK_STATUS CBaseblock::m_BlockStatus = {};
 int	CBaseblock::m_nPhase = 0;					// フェーズ
 int CBaseblock::m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX] = {};		// 1つ1つの行列の高さ
 int CBaseblock::m_nMaxHeight = 0;				// 最大高さ
-
 float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
 std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
+
+#if BASEBLOCK_DEBUG
+
+int CBaseblock::m_nAll = 0;						// 個数の総数
+
+#endif // BASEBLOCK_DEBUG
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
@@ -52,7 +60,13 @@ CBaseblock::CBaseblock() : CScene_X::CScene_X()
 	m_PushAfeter.bPushState = false;					// 当たった方向
 	m_PushAfeter.PushGrid = GRID(0,0,0);				// 押し出し力
 	m_bShadow = true;									// シャドウの使用状態
+	m_bUse = true;										// 使用状態
 	m_fGravity = 0.0f;									// 重力
+#if BASEBLOCK_DEBUG
+
+	m_nAll++;
+
+#endif
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +74,10 @@ CBaseblock::CBaseblock() : CScene_X::CScene_X()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CBaseblock::~CBaseblock()
 {
+#if BASEBLOCK_DEBUG
+
+	m_nAll--;
+#endif
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -99,6 +117,7 @@ void CBaseblock::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Update(void)
 {
+	if (!m_bUse) return;
 	// 前回の位置を代入
 	m_posOld = CScene_X::GetPos();
 	// シーンX更新処理
@@ -109,6 +128,8 @@ void CBaseblock::Update(void)
 	Update_PushState();
 	// 自身のシャドウの出現条件処理
 	Update_MyShadow();
+	// 上限処理
+	Update_Limit();
 	// ブロックのループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK);nCntBlock++)
 	{
@@ -198,18 +219,6 @@ void CBaseblock::Update_Fall(void)
 	pos.y -= m_fGravity;
 	// 位置設定
 	CScene_X::SetPos(pos);
-	// ブロックの上限
-	if (pos.y < -500.0f)
-	{
-		// リリース処理
-		Release();
-		// シャドウが存在しているなら
-		if (m_pShadowPolygon)
-		{
-			// シャドウをリリース
-			m_pShadowPolygon->Release();
-		}
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -358,6 +367,45 @@ void CBaseblock::Update_MyShadow(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 上限処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::Update_Limit(void)
+{
+	// 位置情報取得
+	D3DXVECTOR3 pos = CScene_X::GetPos();
+	// 下限より下に落ちていったら
+	if (pos.y < BLOCK_LIMIT_Y)
+	{
+		// リリース処理
+		Release();
+		// シャドウが存在しているなら
+		if (m_pShadowPolygon)
+		{
+			// シャドウをリリース
+			m_pShadowPolygon->Release();
+		}
+	}
+	if (m_bFall) return;
+	// ダメージ床のループ
+	for (int nCntDamageFloor = 0; nCntDamageFloor < CScene::GetMaxLayer(CScene::LAYER_FLOOR); nCntDamageFloor++)
+	{
+		// 情報取得
+		CDamageFloor * pDamageFloor = (CDamageFloor *)CScene::GetScene(CScene::LAYER_FLOOR, nCntDamageFloor);	// ダメージ床情報
+		// 取得したダメージ床のNULLチェック ||
+		// 取得したダメージ床と現在ダメージ床が同じ
+		// ->ループスキップ
+		if (pDamageFloor == NULL) continue;
+
+		// ブロックがダメージ床に取り込まれたら
+		if (pos.y + m_fSizeRange < pDamageFloor->GetPos().y)
+		{
+			// 使用状態をfalseに
+			m_bUse = false;
+		}
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 当たり判定処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Collision(CBaseblock * pBlock)
@@ -491,11 +539,22 @@ void CBaseblock::Update_OtherShadow(CBaseblock * pBlock)
 	}
 }
 
+#if BASEBLOCK_DEBUG
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 全体個数を表示するデバッグ処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::NumAllDebug(void)
+{
+	CDebugproc::Print("ブロックの総数(%d)\n", m_nAll);
+}
+#endif // BASEBLOCK_DEBUG
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 描画処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Draw(void)
 {
+	if (!m_bUse) return;
 	CScene_X::Draw();
 }
 
@@ -545,64 +604,23 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
 	CBaseblock::GRID MyGrid = this->GetGrid();					// 行列高
 	CGame::STAGE Stage = CGame::GetStage();						// ステージ
-		// 素材のZ範囲
-	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
-		pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+
+	// やること
+	// 落ちるところの優先順位を付ける
+	// 上下の突っかかりをなくす
+//	if (CBaseblock::GetHeight(MyGrid.nColumn, MyGrid.nLine) <= MyGrid.nHeight)
 	{
-		// 素材のX範囲
-		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
 		{
-			// 当たり判定(下)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
-			{
-				// めり込んでいる
-				Direct = COLLISIONDIRECTION::DOWN;
-
-				// 素材状の左に
-				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y - 3.0f;
-				//posOld->y = pos->y;
-				// 移動量の初期化
-				move->y = 0.0f;
-				// 押し出し状態がtrue
-				bPush = true;
-			}
-
-			// 当たり判定(上)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
-			{
-				// めり込んでいる
-				Direct = COLLISIONDIRECTION::UP;
-				// 素材状の左に
-				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
-				//posOld->y = pos->y;
-				// 移動量の初期化
-				move->y = 0.0f;
-				// 押し出し状態がtrue
-				bPush = true;
-				// タイプがボムなら
-				if (m_BlockType == BLOCKTYPE_BOMB)
-				{
-					// ボムの状態設定
-					CBombblock * pBombBlock = (CBombblock *)this;
-					pBombBlock->SetbBomb(true);
-				}
-				// タイプが電気なら
-				else if (m_BlockType == BLOCKTYPE_ELECTRIC)
-				{
-					// 電気の状態設定
-					CElectricblock * pElectBlock = (CElectricblock *)this;
-					pElectBlock->SetElectric(true);
-				}
-
-			}
-			if (Direct == COLLISIONDIRECTION::NONE)
+			// 素材のX範囲
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 			{
 				// 当たり判定(下)
 				if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-					pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
+					posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::DOWN;
@@ -610,16 +628,15 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					// 素材状の左に
 					pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
 					//posOld->y = pos->y;
-
 					// 移動量の初期化
-					move->y = 0.0f;
+					move->y = -1.0f;
 					// 押し出し状態がtrue
 					bPush = true;
 				}
 
 				// 当たり判定(上)
 				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-					pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
+					posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::UP;
@@ -637,27 +654,76 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 						CBombblock * pBombBlock = (CBombblock *)this;
 						pBombBlock->SetbBomb(true);
 					}
-				}
-				// 当たり判定(下)
-				else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-					pos->y + OffsetPos.y <= BlockPos.y)
-				{
-					// めり込んでいる
-					Direct = COLLISIONDIRECTION::DOWN;
-				}
-
-				// 当たり判定(上)
-				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-					pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
-				{
-					// めり込んでいる
-					Direct = COLLISIONDIRECTION::UP;
-					// タイプがボムなら
-					if (m_BlockType == BLOCKTYPE_BOMB)
+					// タイプが電気なら
+					else if (m_BlockType == BLOCKTYPE_ELECTRIC)
 					{
-						// ボムの状態設定
-						CBombblock * pBombBlock = (CBombblock *)this;
-						pBombBlock->SetbBomb(true);
+						// 電気の状態設定
+						CElectricblock * pElectBlock = (CElectricblock *)this;
+						pElectBlock->SetElectric(true);
+					}
+
+				}
+				if (Direct == COLLISIONDIRECTION::NONE)
+				{
+					// 当たり判定(下)
+					if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+						pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
+					{
+						// めり込んでいる
+						Direct = COLLISIONDIRECTION::DOWN;
+
+						// 素材状の左に
+						pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
+						//posOld->y = pos->y;
+
+						// 移動量の初期化
+						move->y = 0.0f;
+						// 押し出し状態がtrue
+						bPush = true;
+					}
+
+					// 当たり判定(上)
+					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+						pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
+					{
+						// めり込んでいる
+						Direct = COLLISIONDIRECTION::UP;
+						// 素材状の左に
+						pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+						//posOld->y = pos->y;
+						// 移動量の初期化
+						move->y = 0.0f;
+						// 押し出し状態がtrue
+						bPush = true;
+						// タイプがボムなら
+						if (m_BlockType == BLOCKTYPE_BOMB)
+						{
+							// ボムの状態設定
+							CBombblock * pBombBlock = (CBombblock *)this;
+							pBombBlock->SetbBomb(true);
+						}
+					}
+					// 当たり判定(下)
+					else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+						pos->y + OffsetPos.y <= BlockPos.y)
+					{
+						// めり込んでいる
+						Direct = COLLISIONDIRECTION::DOWN;
+					}
+
+					// 当たり判定(上)
+					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+						pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+					{
+						// めり込んでいる
+						Direct = COLLISIONDIRECTION::UP;
+						// タイプがボムなら
+						if (m_BlockType == BLOCKTYPE_BOMB)
+						{
+							// ボムの状態設定
+							CBombblock * pBombBlock = (CBombblock *)this;
+							pBombBlock->SetbBomb(true);
+						}
 					}
 				}
 			}
@@ -1670,7 +1736,7 @@ void CBaseblock::BlockStaticValue(void)
 	m_nPhase = 0;
 }
 
-#ifdef _DEBUG
+#if IMGUI_DEBUG
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 全てのデバッグ表示
@@ -1678,7 +1744,6 @@ void CBaseblock::BlockStaticValue(void)
 void CBaseblock::AllDebug(void)
 {
 
-	// やること
 	// ブロックを出現させる処理と合わせる
 	if (ImGui::Begin(u8"ブロックとダメージ床のステータス"))
 	{
@@ -1758,7 +1823,7 @@ void CBaseblock::AllDebug(void)
 					std::string sName = " (";
 					sName += std::to_string(nCntBlockGravity * m_BlockStatus.nChangeTime) + u8"秒)";
 					// 落ちる速度
-					ImGui::DragFloat2(sName.c_str(), (float *)m_BlockStatus.v_fBlockGravity[nCntBlockGravity], 1.0f);					/* 10.0f */
+					ImGui::DragFloat2(sName.c_str(), (float *)m_BlockStatus.v_fBlockGravity[nCntBlockGravity], 0.1f);					/* 10.0f */
 				}
 				ImGui::TreePop();
 			}
@@ -1799,11 +1864,16 @@ void CBaseblock::AllDebug(void)
 	// End
 	ImGui::End();
 }
+
+#endif // IMGUI_DEBUG
+
+#ifdef _DEBUG
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デバッグ表示
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Debug(void)
 {
-	CDebugproc::Print("pos(%.2f,%.2f,%.2f)\n", CScene_X::GetMatrix()._41, CScene_X::GetMatrix()._42, CScene_X::GetMatrix()._43);
+
 }
 #endif // _DEBUG

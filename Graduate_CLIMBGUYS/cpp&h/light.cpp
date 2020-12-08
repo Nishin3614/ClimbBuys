@@ -65,7 +65,9 @@ void CLight::Uninit(void)
 void CLight::Update(void)
 {
 }
-#ifdef _DEBUG
+
+#if IMGUI_DEBUG
+
 // ----------------------------------------
 // デバッグ処理
 // ----------------------------------------
@@ -158,7 +160,7 @@ void CLight::Debug(void)
 		pDevice->SetLight(nCntLight, &m_light[nCntLight]);
 	}
 }
-#endif // _DEBUG
+#endif // IMGUI_DEBUG
 
 // ----------------------------------------
 // 生成処理

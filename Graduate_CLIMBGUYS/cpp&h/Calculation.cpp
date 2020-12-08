@@ -1592,11 +1592,11 @@ void CCalculation::CalcRotation_XYZ(D3DXVECTOR3 & rot)
 //------------------------------------------------------------------------------
 // ÉâÉìÉ_ÉÄÇ»ïÇìÆè¨êîì_êîÇê∂ê¨
 //------------------------------------------------------------------------------
-float CCalculation::RandamFloat(int nMax, int nMin)
+float CCalculation::RandamFloat(float fMax, float fMin)
 {
 	std::random_device rd;
 	std::default_random_engine eng(rd());
-	std::uniform_real_distribution<float> distr((float)nMin, (float)nMax);
+	std::uniform_real_distribution<float> distr((float)fMin, (float)fMax);
 	return distr(eng);
 }
 
@@ -1773,6 +1773,8 @@ bool CCalculation::PadMoveInput(D3DXVECTOR3 & rMove, DIRECTION & direction, bool
 	return bInput;
 }
 
+#if IMGUI_DEBUG
+
 /*
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ImGuiópä÷êî
@@ -1840,6 +1842,8 @@ bool CCalculation::ImGui_Combobox(std::vector<std::string> aItemNameList, std::s
 #endif //DEBUG
 	return bChange;
 }
+
+#endif // IMGUI_DEBUG
 
 
 

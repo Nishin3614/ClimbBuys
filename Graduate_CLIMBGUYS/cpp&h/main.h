@@ -62,10 +62,10 @@
 #define FVF_VERTEX_2D (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX2)
 // 3Ｄポリゴン頂点フォーマット( 頂点座標[3D] / 法線ベクトル /頂点カラー / テクスチャ座標 )
 #define	FVF_VERTEX_3D	(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-#define SCREEN_WIDTH (1280)			// 横
-#define SCREEN_HEIGHT (720)			// 縦
-#define INTERVAL_TIME (60 * 10)		// インターバル時間
-#define ERROW_ACTION (0)			// デバッグ状態
+#define SCREEN_WIDTH	(1280)			// 横
+#define SCREEN_HEIGHT	(720)			// 縦
+#define INTERVAL_TIME	(60 * 10)		// インターバル時間
+#define ERROW_ACTION	(1)				// デバッグ状態
 #define SAFE_RELEASE(pObj) { if(pObj != NULL) { (pObj)->Release(); (pObj) = NULL; }}
 
 // ------------------------------------------

@@ -859,7 +859,7 @@ public:
 	// 回転を360度以内にする計算
 	static void CalcRotation_XYZ(D3DXVECTOR3 &rot);
 	// ランダムな浮動小数点数を生成
-	static float RandamFloat(int nMax, int nMin);
+	static float RandamFloat(float fMax, float fMin);
 	// 取得した値を倍にして返す
 	template<typename T> static T DoubleValue(T &Return, T Get);
 
@@ -885,6 +885,8 @@ public:
 	static PAD_STICK	m_PadStick[(int)PLAYER_TAG::PLAYER_MAX];		// コントローラーのスティック情報
 	static DIRECTION	m_direction;					//方向
 
+#if ERROW_ACTION
+
 	/* ImGui用関数 */
 	// ImGuiによるデバッグ情報
 	static void ImG_DebugInfo(void);
@@ -894,6 +896,8 @@ public:
 
 	// ImGuiのコンボボックス
 	static bool ImGui_Combobox(std::vector<std::string> aItemNameList, std::string aTitle, int &nValue);
+
+#endif // ERROW_ACTION
 
 protected:
 

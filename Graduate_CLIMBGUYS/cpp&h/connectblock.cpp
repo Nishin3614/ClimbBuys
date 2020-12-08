@@ -151,7 +151,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 0), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col, fGravity);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
 		break;
 		// Tブロック
 	case SHAPE_T:
@@ -160,7 +160,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col, fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col, fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, -1, 0), &m_col, fGravity);
-		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col, fGravity);
+		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
 
 		break;
 		// Zブロック
@@ -170,7 +170,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col,fGravity);
-		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col, fGravity);
+		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
 		break;
 		// バネブロック
 	case SHAPE_SPRING:
@@ -178,7 +178,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col, fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col, fGravity);
-		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col, fGravity);
+		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 0), NULL, fGravity);
 		break;
 		// クロスブロック_1段
 	case SHAPE_CROSS_STEP_01:
@@ -251,7 +251,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col, fGravity);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
 		break;
 		// 対角線ブロック_02
 	case SHAPE_DIAGONAL_02:
@@ -277,7 +277,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col, fGravity);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
 		break;
 		// 髭ブロック_03
 	case SHAPE_BEARD_03:
@@ -287,7 +287,7 @@ void CConnectblock::SetBlockShape(void)
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col, fGravity);
+		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
 
 		break;
 		// 髭ブロック_04
@@ -539,14 +539,8 @@ void CConnectblock::Tutorial_InitArrangementBlock(void)
 	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 4), NULL, 1.0f);
 }
 
-#ifdef _DEBUG
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// デバッグ表示
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CConnectblock::Debug(void)
-{
+#if IMGUI_DEBUG
 
-}
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 静的なデバッグ表示
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -565,7 +559,7 @@ void CConnectblock::StaticDebug(void)
 		// ボムブロック生成
 		if (ImGui::Button("CreateBomb"))
 		{
-			CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]),NULL, 1.0f);
+			CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), NULL, 1.0f);
 		}
 		// ばねブロック生成
 		if (ImGui::Button("CreateSpring"))
@@ -589,6 +583,17 @@ void CConnectblock::StaticDebug(void)
 		}
 	}
 	ImGui::End();
+}
+
+#endif // IMGUI_DEBUG
+
+#ifdef _DEBUG
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// デバッグ表示
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CConnectblock::Debug(void)
+{
+
 }
 #endif // _DEBUG
 

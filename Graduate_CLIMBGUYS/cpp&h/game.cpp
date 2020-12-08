@@ -20,14 +20,13 @@
 #include "keyboard.h"
 #include "ui_group.h"
 #include "player.h"
-#include "baseblock.h"
 #include "connectblock.h"
 #include "connect_fieldblock.h"
 #include "damagefloor.h"
 #include "bg.h"
 #include "XInputPad.h"
 #include "gameUI.h"
-
+#include "baseblock.h"
 #include "normalblock.h"
 #include "fieldblock.h"
 #include "springblock.h"
@@ -236,6 +235,10 @@ void CGame::Update(void)
 			}
 		}
 	}
+#if BASEBLOCK_DEBUG
+	CBaseblock::NumAllDebug();
+#endif // BASEBLOCK_DEBUG
+
 #ifdef _DEBUG
 
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};

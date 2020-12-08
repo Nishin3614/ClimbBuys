@@ -153,9 +153,14 @@ public:
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
-	static void StaticDebug(void);
 	//static void BombConnectBlock(CBaseblock::GRID Grid);
 #endif // _DEBUG
+#if IMGUI_DEBUG
+
+	static void StaticDebug(void);
+
+#endif // IMGUI_DEBUG
+
 protected:
 	/* 関数 */
 	// 設定 //

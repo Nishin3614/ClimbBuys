@@ -146,6 +146,33 @@ public:
 		int nLine;		// 行
 		int nHeight;	// 高さ
 	} GRID;
+	// 高さにより優先順位を設定する
+	typedef struct _HEIGHT_PRIORITY
+	{
+		_HEIGHT_PRIORITY() {}
+		// 引数ありコンストラクタ
+		_HEIGHT_PRIORITY(int X, int Y)
+		{
+			nHeight = X;
+			nWeight = Y;
+		}
+		// キャスト
+		inline operator int * ()
+		{
+			return (int *)this;
+		}
+		union
+		{
+			struct
+			{
+				int nHeight;
+				int	nWeight;
+			};
+		};
+
+		int nInteger[2];
+	}HEIGHT_PRIORITY, *PHEIGHT_PRIORITY;
+
 	// ブロック全体に対しての距離の比較とブロック情報とどっち方向なら押されたか情報
 	typedef struct PUSHBLOCK
 	{
@@ -389,7 +416,6 @@ public:
 	//static D3DXVECTOR3 CaluBlockPos(GRID const & Grid)
 	//{ return D3DXVECTOR3() }
 
-	/* 試験用 */
 	// 現在積み重なっているブロックの高さを取得
 	//	nColumn	: 列
 	//	nLine	: 行
@@ -478,7 +504,8 @@ private:
 	bool					m_bUse;				// 表示状態
 	static int				m_nPhase;			// フェーズ
 	// 試験用
-	static int				m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
+	static HEIGHT_PRIORITY	m_Priority[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];			// 優先順位
+	//static int				m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
 	static int				m_nMaxHeight;		// 最大高さ
 #if BASEBLOCK_DEBUG
 	static int				m_nAll;				// 全体個数

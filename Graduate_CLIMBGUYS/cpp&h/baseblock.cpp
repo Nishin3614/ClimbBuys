@@ -36,7 +36,7 @@
 // 試験用
 CBaseblock::BLOCK_STATUS CBaseblock::m_BlockStatus = {};
 int	CBaseblock::m_nPhase = 0;					// フェーズ
-int CBaseblock::m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX] = {};		// 1つ1つの行列の高さ
+CBaseblock::HEIGHT_PRIORITY	CBaseblock::m_Priority[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX] = {};			// 優先順位
 int CBaseblock::m_nMaxHeight = 0;				// 最大高さ
 float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
 std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
@@ -1421,7 +1421,7 @@ int CBaseblock::GetHeight(
 		//CCalculation::Messanger("CBaseblock::GetHeight関数->行列が上限下限が超えている");
 		return -1;
 	}
-	return m_anHeight[nColumn + m_nFeedValue[CGame::GetStage()]][nLine + m_nFeedValue[CGame::GetStage()]];
+	return m_Priority[nColumn + m_nFeedValue[CGame::GetStage()]][nLine + m_nFeedValue[CGame::GetStage()]].nHeight;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1444,7 +1444,7 @@ void CBaseblock::SetHeight(
 		return;
 	}
 	// 高さを設定
-	m_anHeight[nColumn + m_nFeedValue[CGame::GetStage()]][nLine + m_nFeedValue[CGame::GetStage()]] = nHeight;
+	m_Priority[nColumn + m_nFeedValue[CGame::GetStage()]][nLine + m_nFeedValue[CGame::GetStage()]].nHeight = nHeight;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1464,8 +1464,8 @@ void CBaseblock::SetHeight(
 		//CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
 		return;
 	}
-	else if (m_anHeight[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]] <= Grid.nHeight) return;
-	m_anHeight[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]] = Grid.nHeight;
+	else if (m_Priority[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]].nHeight <= Grid.nHeight) return;
+	m_Priority[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]].nHeight = Grid.nHeight;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1474,13 +1474,13 @@ void CBaseblock::SetHeight(
 void CBaseblock::SetMaxHeight(void)
 {
 	// 変数宣言
-	int * pnHeight = &m_anHeight[0][0];	// 高さポインタ
+	HEIGHT_PRIORITY * pPriority = &m_Priority[0][0];	// 高さポインタ
 	int nHeight = 0;						// 代入用の高さ
 	// 最大高さを代入
-	for (int nCntHeight = 0; nCntHeight < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntHeight++, pnHeight++)
+	for (int nCntHeight = 0; nCntHeight < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntHeight++, pPriority++)
 	{
-		if (nHeight >= *pnHeight) continue;
-		nHeight = *pnHeight;
+		if (nHeight >= pPriority->nHeight) continue;
+		nHeight = pPriority->nHeight;
 	}
 	m_nMaxHeight = nHeight;
 }
@@ -1726,11 +1726,11 @@ void CBaseblock::BlockStatusSave(void)
 void CBaseblock::BlockStaticValue(void)
 {
 	// 変数宣言
-	int * nHeight = &m_anHeight[0][0];								// 冒頭のアドレスを取得
-	int nCntMax = sizeof(m_anHeight) / sizeof(m_anHeight[0][0]);	// 配列の個数
-	for (int nCntHeight = 0; nCntHeight < nCntMax; nCntHeight++,nHeight++)
+	HEIGHT_PRIORITY * pPriority = &m_Priority[0][0];								// 冒頭のアドレスを取得
+	int nCntMax = sizeof(m_Priority) / sizeof(m_Priority[0][0]);	// 配列の個数
+	for (int nCntHeight = 0; nCntHeight < nCntMax; nCntHeight++,pPriority++)
 	{
-		*nHeight = -1;
+		pPriority->nHeight = -1;
 	}
 
 	m_nPhase = 0;
@@ -1747,6 +1747,9 @@ void CBaseblock::AllDebug(void)
 	// ブロックを出現させる処理と合わせる
 	if (ImGui::Begin(u8"ブロックとダメージ床のステータス"))
 	{
+		// 必要情報表示
+		ImGui::Text(u8"経過時間(%d)\n", CGame::GetTime());
+		ImGui::Text(u8"フェーズ状態(%d)\n", m_nPhase);
 		// 変数宣言
 		std::vector<int>		v_nFloorSprit(m_BlockStatus.nMaxSprit);
 		// 落ちるブロック数

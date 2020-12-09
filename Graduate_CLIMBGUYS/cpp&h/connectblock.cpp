@@ -80,8 +80,7 @@ void CConnectblock::SetBlockShape(void)
 	// 変数宣言
 	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());
 	// 形
-	CBaseblock::GRID BaseGrid =
-		CBaseblock::GRID(-nFeedValue + rand() % (nFeedValue * 2), CBaseblock::GetBlockStatus().nAppearance + CBaseblock::GetMaxHeight(), -nFeedValue + rand() % (nFeedValue * 2));
+	CBaseblock::GRID BaseGrid = CBaseblock::SetFallPos();
 	// 重力設定
 	int nPhase = CBaseblock::GetPhase();											// フェーズ
 	float fGravity;																	// 重力
@@ -464,9 +463,9 @@ void CConnectblock::Update_CreateBlock(void)
 		{
 			nDropBlock += rand() % (nRange + 1);
 		}
+		// 最大の高さと重さを再設定
+		CBaseblock::SetMaxPriority();
 
-		// 最大の高さを再設定
-		CBaseblock::SetMaxHeight();
 		// ブロックを落とす数
 		for (int nCnt = 0; nCnt < nDropBlock; nCnt++)
 		{

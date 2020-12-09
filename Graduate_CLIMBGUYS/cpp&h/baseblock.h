@@ -22,7 +22,7 @@
 
 #endif // ERROW_ACTION
 
-#define BASEBLOCK_FIELDMAX			(14)				// フィールドのブロック数
+#define BASEBLOCK_FIELDMAX			(10)				// フィールドのブロック数
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -446,13 +446,15 @@ public:
 	// ブロックの静的変数を初期化する
 	static void BlockStaticValue(void);
 	// ブロックの最大高さを取得
-	static int GetMaxHeight(void) { return m_nMaxHeight; };
+	static int GetMaxHeight(void)				{ return m_nMaxHeight; };
 	// ブロックの最大高さを再設定
-	static void SetMaxHeight(void);
+	static void SetMaxPriority(void);
 	// フェーズの取得
 	static int GetPhase(void)					{ return m_nPhase; };
 	// フェーズの設定
 	static void SetPhase(int const & nPhase)	{ m_nPhase = nPhase; };
+	// どの行列にブロックが落ちてくるか設定
+	static GRID SetFallPos(void);
 #if IMGUI_DEBUG
 
 	// 全体のデバッグ処理
@@ -507,6 +509,7 @@ private:
 	static HEIGHT_PRIORITY	m_Priority[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];			// 優先順位
 	//static int				m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
 	static int				m_nMaxHeight;		// 最大高さ
+	static int				m_nMaxWeight;		// 最大重さ
 #if BASEBLOCK_DEBUG
 	static int				m_nAll;				// 全体個数
 #endif // BASEBLOCK_DEBUG

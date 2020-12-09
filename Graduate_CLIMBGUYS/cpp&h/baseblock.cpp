@@ -27,6 +27,8 @@
 #define BLOCK_SHADOWSIZE		(25.0f)									// ステンシルシャドウのサイズ
 #define BLOCK_STATUS_TXT		("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
 #define BLOCK_LIMIT_Y			(-500.0f)								// ブロックの制限区域
+#define BLOCK_LIMIT_WEIGHT		(1)									// 重さの限界
+#define BLOCK_MAX_RATIO			(10)									// 倍率
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -38,6 +40,7 @@ CBaseblock::BLOCK_STATUS CBaseblock::m_BlockStatus = {};
 int	CBaseblock::m_nPhase = 0;					// フェーズ
 CBaseblock::HEIGHT_PRIORITY	CBaseblock::m_Priority[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX] = {};			// 優先順位
 int CBaseblock::m_nMaxHeight = 0;				// 最大高さ
+int	CBaseblock::m_nMaxWeight = 0;				// 最大重さ
 float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
 std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
 
@@ -1469,20 +1472,69 @@ void CBaseblock::SetHeight(
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 現在の最大の高さを再設定
+// 現在の優先順位を再設定
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CBaseblock::SetMaxHeight(void)
+void CBaseblock::SetMaxPriority(void)
 {
 	// 変数宣言
 	HEIGHT_PRIORITY * pPriority = &m_Priority[0][0];	// 高さポインタ
-	int nHeight = 0;						// 代入用の高さ
+	int nHeight = 0;									// 代入用の高さ
+	m_nMaxWeight = 0;									// 重さの初期化
 	// 最大高さを代入
-	for (int nCntHeight = 0; nCntHeight < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntHeight++, pPriority++)
+	for (int nCntPriority = 0; nCntPriority < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntPriority++, pPriority++)
 	{
+		// 高さの設定
 		if (nHeight >= pPriority->nHeight) continue;
 		nHeight = pPriority->nHeight;
 	}
 	m_nMaxHeight = nHeight;
+	pPriority = &m_Priority[0][0];	// 高さポインタ
+	// 最大重さを代入
+	for (int nCntPriority = 0; nCntPriority < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntPriority++, pPriority++)
+	{
+		// 重さの設定
+		if (pPriority->nHeight < 0) continue;
+		pPriority->nWeight = (m_nMaxHeight - pPriority->nHeight) * BLOCK_MAX_RATIO + BLOCK_LIMIT_WEIGHT;
+		// 最大重さの加算
+		m_nMaxWeight += pPriority->nWeight;
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの落ちる行列を設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CBaseblock::GRID CBaseblock::SetFallPos(void)
+{
+	// 変数宣言
+	HEIGHT_PRIORITY * pPriority = &m_Priority[0][0];	// 高さポインタ
+	int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フィード値
+	int nRand = rand() % m_nMaxWeight;					// 最大重さからのランダム値
+	int nWeight = 0;									// 重さ計算用
+	for (int nCntColumn = 0; nCntColumn < BASEBLOCK_FIELDMAX; nCntColumn++)
+	{
+		for (int nCntLine = 0; nCntLine < BASEBLOCK_FIELDMAX; nCntLine++)
+		{
+			// ブロックの設定がされていないとき
+			if (pPriority->nHeight < 0)
+			{
+				// 優先順位ポインター更新
+				pPriority++;
+				continue;
+			}
+			// 重さを加算
+			nWeight += pPriority->nWeight;
+			// ランダム値が重さ計算用の値を下回ったら
+			if (nRand <= nWeight)
+			{
+				// 落ちる行列高さ情報を返す
+				return CBaseblock::GRID(nCntColumn - nFeedValue, CBaseblock::GetBlockStatus().nAppearance + CBaseblock::GetMaxHeight(), nCntLine - nFeedValue);
+			}
+			// 優先順位ポインター更新
+			pPriority++;
+		}
+	}
+	// 中心
+	return GRID(0, 0, 0);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1731,12 +1783,17 @@ void CBaseblock::BlockStaticValue(void)
 	for (int nCntHeight = 0; nCntHeight < nCntMax; nCntHeight++,pPriority++)
 	{
 		pPriority->nHeight = -1;
+		pPriority->nWeight = BLOCK_LIMIT_WEIGHT;
 	}
 
 	m_nPhase = 0;
+	m_nMaxWeight = 0;
+	m_nMaxHeight = 0;
 }
 
+
 #if IMGUI_DEBUG
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 全てのデバッグ表示

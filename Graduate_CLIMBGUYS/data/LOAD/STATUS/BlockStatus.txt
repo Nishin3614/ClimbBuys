@@ -27,11 +27,11 @@ STATUS_SET
 	Phase 0
 		BlockGravity	= 0.000000 1.000000
 	Phase 1
-		BlockGravity	= 1.400000 1.000000
-	Phase 2
 		BlockGravity	= 1.800000 1.000000
+	Phase 2
+		BlockGravity	= 2.600000 1.000000
 	Phase 3
-		BlockGravity	= 2.200000 1.000000
+		BlockGravity	= 3.200000 1.000000
 	Phase 4
 		BlockGravity	= 2.600000 2.000000
 	Phase 5
@@ -46,7 +46,7 @@ STATUS_SET
 	Phase 0
 		DamegeFloor		= 0
 	Phase 1
-		DamegeFloor		= 4
+		DamegeFloor		= 5
 	Phase 2
 		DamegeFloor		= 4
 	Phase 3

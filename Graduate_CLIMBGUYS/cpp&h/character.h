@@ -14,10 +14,18 @@
 #include "model.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// マクロ定義
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#if ERROW_ACTION
+
+#define CHARACTER_DEBUG	(0)	// キャラクターデバッグ状態
+
+#endif // ERROW_ACTION
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class CMeshobit;
-class CCollision;
 class CStencilshadow;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,7 +52,13 @@ public:
 		MOTIONTYPE_NEUTRAL = 0,		// 待機モーション
 		MOTIONTYPE_MOVE,			// 移動モーション
 		MOTIONTYPE_DASH,			// ダッシュモーション
+		MOTIONTYPE_TACKLE,			// タックルモーション
 		MOTIONTYPE_JUMP,			// ジャンプモーション
+		MOTIONTYPE_BANZAI,			// バンザイモーション
+		MOTIONTYPE_VICTORY_01,		// 勝利モーション_01
+		MOTIONTYPE_VICTORY_02,		// 勝利モーション_02
+		MOTIONTYPE_VICTORY_03,		// 勝利モーション_03
+		MOTIONTYPE_VICTORY_04,		// 勝利モーション_04
 		MOTIONTYPE_MAX				// 最大数
 	} MOTIONTYPE;
 	// キャラクター
@@ -186,6 +200,8 @@ public:
 		int nMotionID,							// モーションID
 		int nNowKeyCnt = -1						// 現在のキーカウント
 	);
+	// 重力適用フラグの取得
+	static bool &GetGravity(void) { return m_bGravity; }
 	// 出現している人数取得
 	int GetAllCharacter(void) { return m_nAllCharacter; };
 	// キャラクター全ソースの読み込み
@@ -200,17 +216,25 @@ public:
 	void SetRotDest(D3DXVECTOR3 const &rotDest)		{ m_rotLast = rotDest; };
 	// 目標回転量取得
 	D3DXVECTOR3 GetRotDest(void) const				{ return m_rotLast; };
-#ifdef _DEBUG
-	virtual void  Debug(void);
+	// モーション設定
+	void SetMotion(int const nMotiontype);
+
+#if IMGUI_DEBUG
+
 	static void AllDebug(void);
+
+#endif // IMGUI_DEBUG
+
+#ifdef _DEBUG
+
+	virtual void  Debug(void);
+
 #endif // _DEBUG
 protected:
 	/* 関数 */
 	// 設定 //
 	// キャラクター
 	void SetCharacter(CHARACTER const character)	{ m_character = character; };
-	// モーション設定
-	void SetMotion(int const nMotiontype);
 	// 強制モーション設定
 	void ComplusionSetMotion(int const nMotiontype);
 	// 重力
@@ -273,6 +297,8 @@ private:
 	float										m_fLength;						// 攻撃の当たり範囲
 	bool										m_bJumpable;					// ジャンプ可能かどうか
 	bool										m_bDie;							// 死亡フラグ
+	static bool									m_bGravity;						// 重力を適用するフラグ
+
 	D3DXVECTOR3									m_Directvector;					// 方向のベクトル
 	std::vector<std::unique_ptr<CMeshobit>>		m_vec_pMeshObit;				// 奇跡
 	CStencilshadow								* m_pStencilshadow;				// ステンシルシャドウ

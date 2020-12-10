@@ -15,6 +15,7 @@
 /* Šî–{ */
 #include "main.h"
 #include "renderer.h"
+#include "Calculation.h"
 
 // ------------------------------------------
 //

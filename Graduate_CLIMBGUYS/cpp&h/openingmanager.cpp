@@ -20,19 +20,6 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 仮
-#define SPACE_Y (500)
-// タイトルロゴ形成用 ブロック座標
-// CLIMBGUYS
-#define STAGINGBLOCK_POS_C (D3DXVECTOR3(-600.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_L (D3DXVECTOR3(-450.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_I (D3DXVECTOR3(-300.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_M (D3DXVECTOR3(-150.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_B (D3DXVECTOR3(0.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_G (D3DXVECTOR3(150.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_U (D3DXVECTOR3(300.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_Y (D3DXVECTOR3(450.0f, 0.0f + SPACE_Y, 0));
-#define STAGINGBLOCK_POS_S (D3DXVECTOR3(600.0f, 0.0f + SPACE_Y, 0));
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -205,7 +192,7 @@ void COpeningManager::CreateAll()
 		false);								// シャドウマッピング状態
 
 	// ブロックの最大数分生成しポインタを保存
-	for (int nCnt = 0; nCnt < MAX_STAGINGBLOCK; nCnt++)
+	/*for (int nCnt = 0; nCnt < MAX_STAGINGBLOCK; nCnt++)
 	{
 		m_pStagingBlock[nCnt] = CStagingBlock::Create(
 			D3DXVECTOR3(0.0f, 1500.0f, 0.0f),
@@ -213,8 +200,9 @@ void COpeningManager::CreateAll()
 			D3DXVECTOR3(1.0f, 1.0f, 1.0f),
 			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
 			CScene_X::TYPE_OBJECT_BLOCK_C + nCnt,
-			false);
+			false,
+			);
 
 		m_pStagingBlock[nCnt]->SetBlockNum(nCnt);
-	}
+	}*/
 }

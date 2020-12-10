@@ -18,12 +18,11 @@
 #include "3Dparticle.h"
 #include "debugproc.h"
 #include "meshbox.h"
-#include "stand.h"
 #include "playerUI.h"
 #include "3Dline.h"
 #include "springblock.h"
 #include "resultUI.h"
-
+#include "Calculation.h"
 #include "sound.h"
 
 
@@ -32,15 +31,12 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define PLAYER_GRAVITY				(0.1f)		// プレイヤーの重力
 #define PLAYER_UPMOVELIMIT			(20.0f)		// プレイヤーの上昇移動量制限
 #define PLAYER_UNDERMOVELIMIT		(5.0f)		// プレイヤーの下降移動量制限
 #define DASH_TIME_MAX				(30)		// ダッシュしている時間
 #define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
 #define PLAYER_STATUS_TXT			("data/LOAD/STATUS/PlayerStatus.txt")	// プレイヤーのステータスのテキスト
 #define RESPAWN_POS					(D3DXVECTOR3(0.0f, 300.0f, 0.0f))		// リスポーン地点
-#define PLAYER_STANTIME				(60)									// プレイヤースタンタイム
-#define PLAYER_INVINCIBLETIME		(60)									// プレイヤー無敵タイム
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -55,21 +51,22 @@ int CPlayer::m_nDieCnt = 0;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 {
-	m_nCntState			= 0;					// ステートカウント
-	m_bDieFlag			= false;				// 死亡フラグ
-	m_bDashFlag			= false;				// ダッシュフラグ
-	m_bTackleFrag		= false;				// タックルフラグ
-	m_nCntDashTime		= 0;					// ダッシュ中の切り替えカウント
-	m_pPlayerUI			= nullptr;				// プレイヤーUIのポインタ
-	m_Record			= RECORD();				// 記録
+	m_nCntState				= 0;					// ステートカウント
+	m_bDieFlag				= false;				// 死亡フラグ
+	m_Power.bDashFlag		= false;				// ダッシュフラグ
+	m_Power.bTackleFrag		= false;				// タックルフラグ
+	m_Power.nCntDashTime	= 0;					// ダッシュ中の切り替えカウント
+	m_pPlayerUI				= nullptr;				// プレイヤーUIのポインタ
+	m_Record				= RECORD();				// 記録
+	m_Invincible			= _STATUSCHANGE();		// 無敵
+	m_Stan					= _STATUSCHANGE();		// スタン
+	m_Panic					= _STATUSCHANGE();		// パニック
+
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
-	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX;nCntCollision++)
-	{
-		pCollisionBox[nCntCollision] = NULL;
-	}
+	pCollisionBox = NULL;
 	// 当たり判定線の初期化
 	pCollisionLine = NULL;
 #endif // _DEBUG
@@ -91,7 +88,7 @@ void CPlayer::Init(void)
 	CCharacter::Init();
 
 	// パッドのポインタ取得
-	m_pPad = CManager::CManager::GetPad(GetPlayerTag());
+	m_pPad = CManager::GetPad(GetPlayerTag());
 
 	// プレイヤーUIの生成
 	m_pPlayerUI = CPlayerUI::Create(GetPlayerTag());
@@ -104,9 +101,9 @@ void CPlayer::Init(void)
 		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
 		{
 			// メッシュボックスの生成
-			pCollisionBox[nCntCollision] = CMeshBox::Create(m_pos + m_PlayerStatus.PlayerOffSet, m_PlayerStatus.PlayerSize, CMeshBox::COLLISION_TYPE::TYPE_CENTER);
+			pCollisionBox = CMeshBox::Create(m_pos + m_PlayerStatus.PlayerOffSet, m_PlayerStatus.PlayerSize, CMeshBox::COLLISION_TYPE::TYPE_CENTER);
 			// 薄青色に
-			pCollisionBox[nCntCollision]->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+			pCollisionBox->SetCol(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 		}
 
 		// 当たり判定のタイプが押し出しなら
@@ -140,11 +137,7 @@ void CPlayer::Uninit(void)
 	m_pPlayerUI = nullptr;
 
 #ifdef _DEBUG
-	// 当たり判定ボックスの初期化
-	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
-	{
-		pCollisionBox[nCntCollision] = NULL;
-	}
+	pCollisionBox = NULL;
 	pCollisionLine = NULL;
 #endif // _DEBUG
 }
@@ -176,6 +169,8 @@ void CPlayer::Update(void)
 		m_pPlayerUI->SetPos(GetPos() + D3DXVECTOR3(0.0f, 50.0f, 0.0f));
 	}
 
+	// 状態更新
+	StateUpdate();
 	// モーション設定処理
 	StatusMotion();
 	// キャラクター更新
@@ -191,18 +186,23 @@ void CPlayer::Update(void)
 		// 当たり判定のタイプがキャラクターなら
 		if (nCntCollision == CPlayer::COLLISIONTYPE_CHARACTER)
 		{
-			// NULLチェック
-			if (pCollisionBox[nCntCollision] == NULL) continue;
+			if (!pCollisionBox) continue;
 			// 位置設定
-			pCollisionBox[nCntCollision]->SetPos(m_pos + m_PlayerStatus.PlayerOffSet);
+			pCollisionBox->SetPos(m_pos + m_PlayerStatus.PlayerOffSet);
 			// サイズ設定
-			pCollisionBox[nCntCollision]->SetSize(m_PlayerStatus.PlayerSize);
+			pCollisionBox->SetSize(m_PlayerStatus.PlayerSize);
 			// 頂点座標の設定
-			pCollisionBox[nCntCollision]->SetVtxPos();
+			pCollisionBox->SetVtxPos();
+			// 当たり判定の可視化設定
+			if (CBaseMode::GetCollisionDisp() != pCollisionBox->GetDisp())
+			{
+				pCollisionBox->SetDisp(CBaseMode::GetCollisionDisp());
+			}
 		}
 		// 当たり判定のタイプが押し出しなら
 		else if (nCntCollision == CPlayer::COLLISIONTYPE_PUSH)
 		{
+			if (!pCollisionLine) continue;
 			D3DXVECTOR3 DirectVec = CCharacter::GetDirectionVec();
 #ifdef _DEBUG
 			CDebugproc::Print("方向:(%.2f,%.2f,%.2f)\n", DirectVec.x, DirectVec.y, DirectVec.z);
@@ -214,6 +214,11 @@ void CPlayer::Update(void)
 			pCollisionLine->SetPos(
 				m_pos + m_PlayerStatus.PushOffSet,
 				m_pos + m_PlayerStatus.PushOffSet - D3DXVECTOR3(CCharacter::GetDirectionVec().x * m_PlayerStatus.PushSize, 0.0f, CCharacter::GetDirectionVec().z * m_PlayerStatus.PushSize));
+			// 当たり判定の可視化設定
+			if (CBaseMode::GetCollisionDisp() != pCollisionLine->GetDisp())
+			{
+				pCollisionLine->SetDisp(CBaseMode::GetCollisionDisp());
+			}
 		}
 	}
 #endif // _DEBUG
@@ -224,23 +229,24 @@ void CPlayer::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::MyAction(void)
 {
+	if (m_Stan.bChange) return;
 	// 自キャラの移動処理
 	MyMove();
 
 	// 試験的ダッシュの切り替え
-	if (m_bDashFlag)
+	if (m_Power.bDashFlag)
 	{
-		m_nCntDashTime++;
+		m_Power.nCntDashTime++;
 
-		if (m_nCntDashTime > DASH_TIME_MAX)
+		if (m_Power.nCntDashTime > DASH_TIME_MAX)
 		{
 			// 初期化
-			m_nCntDashTime	= 0;
-			m_bDashFlag		= false;
-			m_bTackleFrag	= false;
+			m_Power.nCntDashTime	= 0;
+			m_Power.bDashFlag		= false;
+			m_Power.bTackleFrag		= false;
 		}
 	}
-	CDebugproc::Print("\nPlayerダッシュ %d\n", m_bDashFlag);
+	CDebugproc::Print("\nPlayerダッシュ %d\n", m_Power.bDashFlag);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -261,105 +267,191 @@ void CPlayer::MyMove(void)
 	CKeyboard *pKeyboard = CManager::GetKeyboard();
 
 	// 移動 //
-	/* キーボード */
-	// 左
-	if (pKeyboard->GetKeyboardPress(DIK_A))
+	if (!m_Power.bDashFlag &&
+		!m_Power.bCharge)
 	{
-		// 奥
-		if (pKeyboard->GetKeyboardPress(DIK_W))
-		{
-			rot.y = -D3DX_PI * 0.25f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
-		// 手前
-		else if (pKeyboard->GetKeyboardPress(DIK_S))
-		{
-			rot.y = -D3DX_PI * 0.75f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
+		/* キーボード */
 		// 左
-		else
+		if (pKeyboard->GetKeyboardPress(DIK_A))
 		{
-			rot.y = -D3DX_PI * 0.5f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
-	}
-	// 右
-	else if (pKeyboard->GetKeyboardPress(DIK_D))
-	{
-
-		// 奥
-		if (pKeyboard->GetKeyboardPress(DIK_W))
-		{
-			rot.y = D3DX_PI * 0.25f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
-		}
-		// 手前
-		else if (pKeyboard->GetKeyboardPress(DIK_S))
-		{
-			rot.y = D3DX_PI * 0.75f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-
-
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
+			// 奥
+			if (pKeyboard->GetKeyboardPress(DIK_W))
+			{
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_AW_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_SD_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
+			}
+			// 手前
+			else if (pKeyboard->GetKeyboardPress(DIK_S))
+			{
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_AS_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_WD_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
+			}
+			// 左
+			else
+			{
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_A_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_D_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
+			}
 		}
 		// 右
+		else if (pKeyboard->GetKeyboardPress(DIK_D))
+		{
+
+			// 奥
+			if (pKeyboard->GetKeyboardPress(DIK_W))
+			{
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_WD_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_AS_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
+			}
+			// 手前
+			else if (pKeyboard->GetKeyboardPress(DIK_S))
+			{
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_SD_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_AW_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
+			}
+			// 右
+			else
+			{
+				// パニック状態なら
+				if (!m_Panic.bChange)
+				{
+					rot.y = ROT_KEY_D_ON_CAMERA(fRot);
+				}
+				// それ以外
+				else
+				{
+					rot.y = ROT_KEY_A_ON_CAMERA(fRot);
+				}
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
+			}
+		}
+		// 奥に行く
+		else if (pKeyboard->GetKeyboardPress(DIK_W))
+		{
+			// パニック状態なら
+			if (!m_Panic.bChange)
+			{
+				rot.y = ROT_KEY_W_ON_CAMERA(fRot);
+			}
+			// それ以外
+			else
+			{
+				rot.y = ROT_KEY_S_ON_CAMERA(fRot);
+			}
+			PlayerMoveSet(
+				vec,
+				rot,
+				move
+			);
+		}
+		// 手前に行く
+		else if (pKeyboard->GetKeyboardPress(DIK_S))
+		{
+			// パニック状態なら
+			if (!m_Panic.bChange)
+			{
+				rot.y = ROT_KEY_S_ON_CAMERA(fRot);
+			}
+			// それ以外
+			else
+			{
+				rot.y = ROT_KEY_W_ON_CAMERA(fRot);
+			}
+			PlayerMoveSet(
+				vec,
+				rot,
+				move
+			);
+		}
+		// それ以外
 		else
 		{
-			rot.y = D3DX_PI * 0.5f + fRot;
-			vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
 
-			move.x -= vec.x * m_PlayerStatus.fMove;
-			move.z -= vec.z * m_PlayerStatus.fMove;
+		}
+
+		// 試験的キーボードジャンプ
+		if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
+		{
+			SetMotion(MOTIONTYPE_JUMP);
+			move.y += m_PlayerStatus.fJump;
+			SetJumpAble(false);
+		}
+		// 試験的タックル
+		if (pKeyboard->GetKeyboardTrigger(DIK_J))
+		{
+			SetMotion(MOTIONTYPE_TACKLE);
+			m_Power.bCharge = true;
 		}
 	}
-	// 奥に行く
-	else if (pKeyboard->GetKeyboardPress(DIK_W))
-	{
-		rot.y = D3DX_PI * 0.0f + fRot;
-		vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-		move.x -= vec.x * m_PlayerStatus.fMove;
-		move.z -= vec.z * m_PlayerStatus.fMove;
-	}
-	// 手前に行く
-	else if (pKeyboard->GetKeyboardPress(DIK_S))
-	{
-		rot.y = D3DX_PI * 1.0f + fRot;
-		vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-		move.x -= vec.x * m_PlayerStatus.fMove;
-		move.z -= vec.z * m_PlayerStatus.fMove;
-	}
-	// それ以外
-	else
-	{
-
-	}
-
-	// 試験的キーボードジャンプ
-	if (pKeyboard->GetKeyboardTrigger(DIK_SPACE) && GetJumpAble())
-	{
-		SetMotion(MOTIONTYPE_JUMP);
-		move.y += m_PlayerStatus.fJump;
-		SetJumpAble(false);
-	}
-	// 試験的タックル
-	if (pKeyboard->GetKeyboardTrigger(DIK_J))
-	{
-		SetMotion(MOTIONTYPE_DASH);
-		m_bDashFlag = true;
-		m_bTackleFrag = true;
-	}
-
 	/* ゲームパッド */
 	// パッド用 //
 	float fValueH, fValueV;		// ゲームパッドのスティック情報の取得用
@@ -371,8 +463,8 @@ void CPlayer::MyMove(void)
 		// ゲームパッドのスティック情報を取得
 		m_pPad->GetStickLeft(&fValueH, &fValueV);
 
-		// ダッシュしていないとき
-		if (!m_bDashFlag)
+		if (!m_Power.bDashFlag &&	// ダッシュ時
+			!m_Power.bCharge)		// チャージ時
 		{
 			// プレイヤー移動
 			// ゲームパッド移動
@@ -381,8 +473,14 @@ void CPlayer::MyMove(void)
 				SetMotion(MOTIONTYPE_MOVE);
 
 				// 角度の計算
-				fAngle = atan2f((float)fValueH, (float)fValueV);
-
+				if (m_Panic.bChange)
+				{
+					fAngle = atan2f(-fValueH, -fValueV);
+				}
+				else
+				{
+					fAngle = atan2f(fValueH, fValueV);
+				}
 				if (fAngle > D3DX_PI)
 				{
 					fAngle -= D3DX_PI * 2;
@@ -392,10 +490,11 @@ void CPlayer::MyMove(void)
 					fAngle += D3DX_PI * 2;
 				}
 				rot.y = fAngle + fRot;
-				vec = D3DXVECTOR3(sinf(rot.y), 0.0f, cosf(rot.y));
-				// スティックの角度によってプレイヤー移動
-				move.x -= sinf(fAngle + fRot) * (m_PlayerStatus.fMove);
-				move.z -= cosf(fAngle + fRot) * (m_PlayerStatus.fMove);
+				PlayerMoveSet(
+					vec,
+					rot,
+					move
+				);
 			}
 
 			// 試験的ジャンプ ( のちに中身変わる予定 多分 )
@@ -411,20 +510,7 @@ void CPlayer::MyMove(void)
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 			{
 				SetMotion(MOTIONTYPE_DASH);
-
-				m_bDashFlag = true;
-				m_bTackleFrag = true;
-
-				switch (CCalculation::CheckPadStick())
-				{
-				case DIRECTION::LEFT:
-				case DIRECTION::RIGHT:
-				case DIRECTION::UP:
-				case DIRECTION::DOWN:
-					move.x -= vec.x * m_PlayerStatus.fDash;
-					move.z -= vec.z * m_PlayerStatus.fDash;
-					break;
-				}
+				m_Power.bCharge = true;
 			}
 		}
 	}
@@ -463,14 +549,19 @@ void CPlayer::MyMove(void)
 	}
 	CCharacter::SetMove(move);
 
-	// キャラクターの重力加算処理
-	CCharacter::AddGravity(PLAYER_GRAVITY);
+	// 目標回転量の設定
 	CCharacter::SetRotDest(rot);
+}
 
-	//if (pKeyboard->GetKeyboardTrigger(DIK_C))
-	//{
-	//	CGame::GetPlayer(1)->SetRotDest(D3DXVECTOR3(0.0f, D3DX_PI / 2, 0.0f));
-	//}
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// プレイヤーの移動方向設定処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PlayerMoveSet(D3DXVECTOR3 & Vec, D3DXVECTOR3 const & Rot,D3DXVECTOR3 & Move)
+{
+	Vec = D3DXVECTOR3(sinf(Rot.y), 0.0f, cosf(Rot.y));
+	// スティックの角度によってプレイヤー移動
+	Move.x -= Vec.x * (m_PlayerStatus.fMove);
+	Move.z -= Vec.z * (m_PlayerStatus.fMove);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -499,26 +590,6 @@ void CPlayer::StatusMotion(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 足場判定
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CPlayer::StandJudg(
-	CScene_X * pScene_X,
-	bool const & bJudg
-)
-{
-	// 足場オブジェクトなら
-	if (pScene_X->GetObj() == CScene::OBJ_STAND)
-	{
-		// プレイヤータグが1プレイヤーなら
-		if (this->GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-		{
-			CStand * pStand = (CStand *)pScene_X;
-			pStand->SetDetermination(bJudg);
-		}
-	}
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 当たり判定の処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Collision(void)
@@ -527,60 +598,6 @@ void CPlayer::Collision(void)
 	CharacterCollision();
 	// ブロックの当たり判定
 	BlockCollision();
-	// 足場の当たり判定
-	StandCollision();
-}
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 足場ブロックとの判定
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CPlayer::StandCollision(void)
-{
-	// 変数宣言
-	CStand * pStand;									// シーンX情報
-	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
-	bool bOn = false;										// 上の当たり判定
-	bool bUnder = false;									// 下の当たり判定
-															// ブロックループ
-	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DSTAND); nCntBlock++)
-	{
-		// 当たり判定の初期化
-		Direct = COLLISIONDIRECTION::NONE;
-		// NULL代入
-		pStand = NULL;
-		// 情報取得
-		pStand = (CStand *)CScene::GetScene(CScene::LAYER_3DSTAND, nCntBlock);
-		// NULLなら
-		// ->関数を抜ける
-		if (pStand == NULL)
-		{
-			continue;
-		}
-		// 当たり判定
-		Direct = pStand->PushCollision(
-			CCharacter::GetObj(),
-			&CCharacter::GetPos(),
-			&CCharacter::GetPosOld(),
-			&CCharacter::GetMove(),
-			&m_PlayerStatus.PlayerSize,
-			m_PlayerStatus.PlayerOffSet
-		);
-		// ブロックの判定
-		// 上
-		if (Direct == COLLISIONDIRECTION::UP)
-		{
-			// ジャンプ可能設定
-			SetJumpAble(true);
-			// 足場判定
-			StandJudg(pStand, true);
-			// プレイヤーが下のブロックに当たっている
-			bOn ^= true;
-		}
-		else
-		{
-			// 足場判定
-			StandJudg(pStand, false);
-		}
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -592,12 +609,6 @@ void CPlayer::BlockCollision(void)
 	CBaseblock *			pBaseBlock;							// シーンX情報
 	COLLISIONDIRECTION		Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
 	CBaseblock::PUSHBLOCK	Pushblock;							// プッシュブロック情報
-	bool					bUp = false;						// 上の当たり判定
-	bool					bDown = false;						// 下の当たり判定
-	bool					bRight = false;						// 右の当たり判定
-	bool					bLeft = false;						// 左の当たり判定
-	bool					bFront = false;						// 前の当たり判定
-	bool					bBack = false;						// 後の当たり判定
 	float					fDistance = -1.0f;					// 距離
 	D3DXVECTOR3				PredictionPoint;					// 予測点
 	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet - D3DXVECTOR3(CCharacter::GetDirectionVec().x * m_PlayerStatus.PushSize, 0.0f, CCharacter::GetDirectionVec().z * m_PlayerStatus.PushSize);
@@ -614,10 +625,18 @@ void CPlayer::BlockCollision(void)
 		// NULLなら
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
-		// ダッシュ状態なら
-		if (pBaseBlock->GetType() != CBaseblock::TYPE::TYPE_FIELD &&
-			m_bTackleFrag &&
-			!pBaseBlock->GetPushAfter().bPushState)
+		else if (!CCalculation::Collision_Sphere(
+			CCharacter::GetPos(),
+			100.0f,
+			pBaseBlock->GetPos(),
+			1.0f
+		)) continue;
+		if (!(pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD ||	// フィールドブロックではない
+			pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_STEEL) &&	// 鋼鉄ブロックではない
+			m_Power.bTackleFrag &&										// 自身がタックルしている状態
+			!pBaseBlock->GetPushAfter().bPushState &&					// ブロックが押されている状態ではない
+			!pBaseBlock->GetFall()										// 落ちている状態ではない
+			)
 		{
 			// 方向に直線を出し
 			// 線とポリゴンで判定を取る
@@ -680,40 +699,50 @@ void CPlayer::BlockCollision(void)
 		// 前
 		if (Direct == COLLISIONDIRECTION::FRONT)
 		{
-			bFront = true;
+			m_DieStatus.bFront = true;
 		}
 		// 後
 		else if (Direct == COLLISIONDIRECTION::BACK)
 		{
-			bBack = true;
+			m_DieStatus.bBack = true;
 		}
 		// 左
 		else if (Direct == COLLISIONDIRECTION::LEFT)
 		{
-			bLeft = true;
+			m_DieStatus.bLeft = true;
 		}
 		// 右
 		else if (Direct == COLLISIONDIRECTION::RIGHT)
 		{
-			bRight = true;
+			m_DieStatus.bRight = true;
 		}
 		// 上
 		else if (Direct == COLLISIONDIRECTION::UP)
 		{
+			// パニックブロックなら
+			if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
+			{
+				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+			}
+			// 電気ブロックなら
+			else if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
+			{
+				ElectricUse();
+			}
 			// ジャンプ可能設定
 			SetJumpAble(true);
-			bUp = true;
+			m_DieStatus.bUp = true;
 		}
 		// 下
 		else if (Direct == COLLISIONDIRECTION::DOWN)
 		{
-			bDown = true;
+			m_DieStatus.bDown = true;
 		}
 	}
 	// 挟まったら死ぬ処理
-	if ((bUp && bDown) ||
-		(bFront && bBack) ||
-		(bRight && bLeft)
+	if ((m_DieStatus.bUp && m_DieStatus.bDown) ||
+		(m_DieStatus.bFront && m_DieStatus.bBack) ||
+		(m_DieStatus.bRight && m_DieStatus.bLeft)
 		)
 	{
 		if (!this->GetDie())
@@ -729,9 +758,10 @@ void CPlayer::BlockCollision(void)
 			}
 		}
 	}
+	m_DieStatus.Init();
 
 	// ブロックの押し出し処理
-	if (m_bTackleFrag)
+	if (m_Power.bTackleFrag)
 	{
 		if (Pushblock.pBlock)
 		{
@@ -741,25 +771,40 @@ void CPlayer::BlockCollision(void)
 			// 前
 			if (Pushblock.Direction == COLLISIONDIRECTION::FRONT)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, -1));
+				// キーボードとパッドのボタンを離したときの反応処理
+				// 押した瞬間から話したときの時間
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, -m_Power.nPushPower));
 			}
 			// 後
 			else if (Pushblock.Direction == COLLISIONDIRECTION::BACK)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, 1));
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(0, 0, m_Power.nPushPower));
 			}
 			// 左
 			else if (Pushblock.Direction == COLLISIONDIRECTION::LEFT)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(1, 0, 0));
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(m_Power.nPushPower, 0, 0));
 			}
 			// 右
 			else if (Pushblock.Direction == COLLISIONDIRECTION::RIGHT)
 			{
-				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-1, 0, 0));
+				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-m_Power.nPushPower, 0, 0));
 			}
-			m_bTackleFrag = false;
+			// ブロックがパニックブロックなら
+			if (Pushblock.pBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
+			{
+				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+			}
+			// ブロックが電気ブロックなら
+			else if (Pushblock.pBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
+			{
+				ElectricUse();
+			}
+
+			// 押し出す力を初期化
+			m_Power.nPushPower = 1;
 		}
+		m_Power.bTackleFrag = false;
 	}
 }
 
@@ -772,18 +817,20 @@ void CPlayer::CharacterCollision(void)
 	CPlayer * pPlayer;	// キャラクター情報
 	COLLISIONDIRECTION Direct;	// 当たり判定の方向
 	// ブロックループ
-	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntBlock++)
+	for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
 	{
 		// NULL代入
 		pPlayer = NULL;
 		// 情報取得
-		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntBlock);
+		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);
 		// NULLなら
 		// ->関数を抜ける
 		if (pPlayer == NULL)
 		{
 			continue;
 		}
+		// 無敵状態なら
+		else if (pPlayer->m_Invincible.bChange) continue;
 		// 当たり判定
 		Direct = pPlayer->PushCollision(
 			CCharacter::GetObj(),
@@ -817,9 +864,9 @@ void CPlayer::CharacterCollision(void)
 
 			// 相手プレイヤーの処理
 			// スタン状態設定
-			pPlayer->m_Stan.Set(true, PLAYER_STANTIME);
+			pPlayer->m_Stan.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
 			// 無敵状態設定
-			pPlayer->m_Invincible.Set(true, PLAYER_INVINCIBLETIME);
+			pPlayer->m_Invincible.Set(true, m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP] + m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
 		}
 	}
 }
@@ -875,7 +922,7 @@ void CPlayer::PlayerStatusLoad(void)
 	char cReadText[128];			// 文字として読み取る
 	char cHeadText[128];			// 比較用
 	char cDie[128];					// 不要な文字
-
+	int nCntStatus = 0;				// ステータスカウント
 	// ファイルを開く
 	pFile = fopen(PLAYER_STATUS_TXT, "r");
 
@@ -917,11 +964,6 @@ void CPlayer::PlayerStatusLoad(void)
 						{
 							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fJump);
 						}
-						// Dashが来たら
-						else if (strcmp(cHeadText, "Dash") == 0)
-						{
-							sscanf(cReadText, "%s %s %f", &cDie, &cDie, &m_PlayerStatus.fDash);
-						}
 						// NormalInertiaが来たら
 						else if (strcmp(cHeadText, "NormalInertia") == 0)
 						{
@@ -951,6 +993,27 @@ void CPlayer::PlayerStatusLoad(void)
 						else if (strcmp(cHeadText, "PushOffSet") == 0)
 						{
 							sscanf(cReadText, "%s %s %f %f %f", &cDie, &cDie, &m_PlayerStatus.PushOffSet.x, &m_PlayerStatus.PushOffSet.y, &m_PlayerStatus.PushOffSet.z);
+						}
+						// PowerTimeが来たら
+						else if (strcmp(cHeadText, "PowerTime") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxPowerTime);
+						}
+						// StanTimeが来たら
+						else if (strcmp(cHeadText, "StanTime") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxStanTime[nCntStatus]);
+						}
+						// InvincibleTimeが来たら
+						else if (strcmp(cHeadText, "InvincibleTime") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxInvincibleTime[nCntStatus]);
+							nCntStatus++;
+						}
+						// PanicTimeが来たら
+						else if (strcmp(cHeadText, "PanicTime") == 0)
+						{
+							sscanf(cReadText, "%s %s %d", &cDie, &cDie, &m_PlayerStatus.nMaxPanicTime);
 						}
 						else if (strcmp(cHeadText, "END_STATUS_SET") == 0)
 						{
@@ -996,13 +1059,25 @@ void CPlayer::PlayerStatusSave(void)
 		fprintf(pFile, "STATUS_SET\n");
 		fprintf(pFile, "	Move			= %.1f\n", m_PlayerStatus.fMove);
 		fprintf(pFile, "	Jump			= %.1f\n", m_PlayerStatus.fJump);
-		fprintf(pFile, "	Dash			= %.1f\n", m_PlayerStatus.fDash);
 		fprintf(pFile, "	NormalInertia	= %.2f\n", m_PlayerStatus.fNormalInertia);
 		fprintf(pFile, "	JumpInertia		= %.2f\n", m_PlayerStatus.fJumpInertia);
 		fprintf(pFile, "	PlayerSize		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerSize.x, m_PlayerStatus.PlayerSize.y, m_PlayerStatus.PlayerSize.z);
 		fprintf(pFile, "	PlayerOffSet	= %.1f	%.1f	%.1f\n", m_PlayerStatus.PlayerOffSet.x, m_PlayerStatus.PlayerOffSet.y, m_PlayerStatus.PlayerOffSet.z);
 		fprintf(pFile, "	PushSize		= %.1f\n", m_PlayerStatus.PushSize);
 		fprintf(pFile, "	PushOffSet		= %.1f	%.1f	%.1f\n", m_PlayerStatus.PushOffSet.x, m_PlayerStatus.PushOffSet.y, m_PlayerStatus.PushOffSet.z);
+		fprintf(pFile, "	PowerTime		= %d\n", m_PlayerStatus.nMaxPowerTime);
+
+		fprintf(pFile, "	StatusType_Block\n");
+		fprintf(pFile, "		StanTime		= %d\n", m_PlayerStatus.nMaxStanTime[STATUSTYPE_BLOCK]);
+		fprintf(pFile, "		InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_BLOCK]);
+		fprintf(pFile, "	StatusType_Jump\n");
+		fprintf(pFile, "		StanTime		= %d\n", m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
+		fprintf(pFile, "		InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP]);
+		fprintf(pFile, "	StatusType_Electric\n");
+		fprintf(pFile, "		StanTime		= %d\n", m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
+		fprintf(pFile, "		InvincibleTime	= %d\n", m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_ELECTRIC]);
+
+		fprintf(pFile, "	PanicTime		= %d\n", m_PlayerStatus.nMaxPanicTime);
 
 		fprintf(pFile, "END_STATUS_SET\n\n");
 
@@ -1028,6 +1103,134 @@ void CPlayer::PlayerStatusInitLoad(void)
 {
 	// プレイヤーの初期ステータスを代入
 	m_PlayerStatus	= m_PlayerStatusInit;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 状態更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::StateUpdate(void)
+{
+	// 力溜めの更新
+	PowerUpdate();
+	// スタン状態の更新
+	StanUpdate();
+	// 無敵状態の更新
+	InvincibleUpdate();
+	// パニック状態の更新
+	PanicUpdate();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 力溜めの更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PowerUpdate(void)
+{
+	if (!m_Power.bCharge) return;
+	if (m_Power.nCntTime == m_PlayerStatus.nMaxPowerTime)
+	{
+		m_Power.nPushPower++;
+	}
+	// ボタンが離されたら
+	if (CManager::GetKeyboard()->GetKeyboardRelease(DIK_J))
+	{
+		m_Power.bCharge = false;
+		m_Power.bDashFlag = true;
+		m_Power.bTackleFrag = true;
+		m_Power.nCntTime = 0;
+	}
+	// パッド
+	if (m_pPad)
+	{
+		// 試験的タックル ( のちに中身変わる予定 多分 )
+		if (m_pPad->GetRelease(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
+		{
+			m_Power.bCharge = false;
+			m_Power.bDashFlag = true;
+			m_Power.bTackleFrag = true;
+			m_Power.nCntTime = 0;
+		}
+	}
+	// 力溜めカウントアップ
+	m_Power.nCntTime++;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// スタン状態の更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::StanUpdate(void)
+{
+	// スタン状態ではないなら
+	if (!m_Stan.bChange) return;
+	// 規定値を超えたら
+	else if (m_Stan.nChangeTime >= m_Stan.nMaxTime)
+	{
+		// スタン状態の初期化処理
+		m_Stan.Init();
+	}
+	// スタンカウント更新
+	m_Stan.nChangeTime++;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 無敵状態の更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::InvincibleUpdate(void)
+{
+	// 無敵状態ではないなら
+	if (!m_Invincible.bChange) return;
+	// 規定値を超えたら
+	else if (m_Invincible.nChangeTime >= m_Invincible.nMaxTime)
+	{
+		// 無敵状態の初期化処理
+		m_Invincible.Init();
+	}
+	// 無敵カウント更新
+	m_Invincible.nChangeTime++;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// パニック状態の更新処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PanicUpdate(void)
+{
+	// 無敵状態ではないなら
+	if (!m_Panic.bChange) return;
+	// 規定値を超えたら
+	else if (m_Panic.nChangeTime >= m_Panic.nMaxTime)
+	{
+		// 無敵状態の初期化処理
+		m_Panic.Init();
+	}
+	// 無敵カウント更新
+	m_Panic.nChangeTime++;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 電気ブロック使用時
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::ElectricUse(void)
+{
+	// 変数宣言
+	CPlayer * pPlayer;	// キャラクター情報
+	// プレイヤーループ
+	for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
+	{
+		// NULL代入
+		pPlayer = NULL;
+		// 情報取得
+		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);
+		// NULLなら
+		// ->関数を抜ける
+		if (pPlayer == NULL ||
+			this == pPlayer)
+		{
+			continue;
+		}
+		// 無敵状態なら
+		else if (pPlayer->m_Invincible.bChange) continue;
+		pPlayer->m_Stan.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
+		pPlayer->m_Invincible.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC] + m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1089,26 +1292,82 @@ void CPlayer::PushBlock(
 
 	// ノックバック処理
 	this->SetPos(this->GetPos() + D3DXVECTOR3(0.0f, 10.0f, 0.0f));
-
-
 	// 落ちている状態なら
 	if (pBlock->GetFall() ||
-		pBlock->GetType() == CBaseblock::TYPE_FIELD) return;
+		pBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD) return;
 	CBaseblock::GRID NextGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
-	int nHeight;													// 高さ
-	// 行列高さの方向を押し出しブロックの行列高さに加算
-	NextGrid += Grid;
-	// その行列の積み重なっている高さを取得
-	nHeight = CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine);
-	// 押し出し方向にブロックが置かれていないかをチェック
-	if (NextGrid.nHeight <= CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine))
+	CBaseblock::GRID PushGrid = CBaseblock::GRID(0,0,0);
+
+	for (int nCntColumn = 0; nCntColumn < abs(Grid.nColumn); nCntColumn++)
 	{
-		return;
+		// 列が0超過
+		if (Grid.nColumn > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			NextGrid.nColumn++;
+		}
+		// 列が0未満
+		else if (Grid.nColumn < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			NextGrid.nColumn--;
+		}
+		// 押し出し方向にブロックが置かれていないかをチェック
+		if (NextGrid.nHeight <= CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine))
+		{
+			if (!PushGrid.nColumn) return;
+			break;
+		}
+		// 列が0超過
+		if (Grid.nColumn > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			PushGrid.nColumn++;
+		}
+		// 列が0未満
+		else if (Grid.nColumn < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			PushGrid.nColumn--;
+		}
+	}
+	for (int nCntLine = 0; nCntLine < abs(Grid.nLine); nCntLine++)
+	{
+		// 行が0超過
+		if (Grid.nLine > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			NextGrid.nLine++;
+		}
+		// 行が0未満
+		else if (Grid.nLine < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			NextGrid.nLine--;
+		}
+		// 押し出し方向にブロックが置かれていないかをチェック
+		if (NextGrid.nHeight <= CBaseblock::GetHeight(NextGrid.nColumn, NextGrid.nLine))
+		{
+			if (!PushGrid.nLine) return;
+			break;
+		}
+		// 行が0超過
+		if (Grid.nLine > 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに加算
+			PushGrid.nLine++;
+		}
+		// 行が0未満
+		else if (Grid.nLine < 0)
+		{
+			// 行列高さの方向を押し出しブロックの行列高さに減算
+			PushGrid.nLine--;
+		}
 	}
 	// 記録更新_押し出し回数
 	m_Record.nPushCnt++;
 	// 押し出し後の設定
-	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, Grid));
+	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, PushGrid));
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1131,50 +1390,53 @@ COLLISIONDIRECTION CPlayer::PushCollision(
 	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
 	bool bPush = false;
 	// 変数宣言
-	D3DXVECTOR3 MyPos = CCharacter::GetPos();
+	D3DXVECTOR3 MyPos = CCharacter::GetPos() + m_PlayerStatus.PlayerOffSet;
 	CGame::STAGE Stage = CGame::GetStage();						// ステージ
-
-	D3DXVECTOR3 Kari_Size = { 25.0f,50.0f,25.0f };	// 仮サイズ
-		// 素材のZ範囲
-	if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
-		pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+	// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 	{
 		// 素材のX範囲
-		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
-			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 		{
 			// 当たり判定(下)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
-				posOld->y + OffsetPos.y + size->y * 0.5f <= MyPos.y - Kari_Size.y * 0.5f)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - m_PlayerStatus.PlayerSize.y * 0.5f&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= MyPos.y - m_PlayerStatus.PlayerSize.y * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::DOWN;
 
 				// 素材状の左に
-				pos->y = MyPos.y - Kari_Size.y * 0.5f - size->y * 0.5f - OffsetPos.y;
-
-				// 移動量の初期化
-				move->y = 0.0f;
+				pos->y = MyPos.y - m_PlayerStatus.PlayerSize.y * 0.5f - size->y * 0.5f - OffsetPos.y;
+				if (move)
+				{
+					// 移動量の初期化
+					move->y = 0.0f;
+				}
 				// 押し出し状態がtrue
 				bPush = true;
 			}
 
 			// 当たり判定(上)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
-				posOld->y + OffsetPos.y - size->y * 0.5f >= MyPos.y + Kari_Size.y * 0.5f)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::UP;
 				// 素材状の左に
-				pos->y = MyPos.y + Kari_Size.y * 0.5f + size->y * 0.5f - OffsetPos.y;
-				// 移動量の初期化
-				move->y = 0.0f;
+				pos->y = MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f + size->y * 0.5f - OffsetPos.y;
+				if (move)
+				{
+					// 移動量の初期化
+					move->y = 0.0f;
+				}
 				// 押し出し状態がtrue
 				bPush = true;
 
 			}
 			// 当たり判定(下)
-			else if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.z * 0.5f&&
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - m_PlayerStatus.PlayerSize.z * 0.5f&&
 				pos->y + OffsetPos.y <= MyPos.y)
 			{
 				// めり込んでいる
@@ -1182,8 +1444,8 @@ COLLISIONDIRECTION CPlayer::PushCollision(
 			}
 
 			// 当たり判定(上)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
-				pos->y + OffsetPos.y - size->y > MyPos.y + Kari_Size.y * 0.5f)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f&&
+				pos->y + OffsetPos.y - size->y > MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::UP;
@@ -1193,52 +1455,57 @@ COLLISIONDIRECTION CPlayer::PushCollision(
 	// 当たった方向に情報が入っているなら
 	//if (bPush) return Direct;
 	// 素材のY範囲
-	if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
-		pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f)
+	if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - m_PlayerStatus.PlayerSize.y * 0.5f&&
+		pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f)
 	{
 		// 素材のZ範囲
-		if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
-			pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+		if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 		{
 			// 当たり判定(左)
-			if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::LEFT;
 				// 素材状の左に
-				pos->x = MyPos.x - Kari_Size.x * 0.5f - size->x * 0.5f - OffsetPos.x;
-				// 移動量の初期化
-				move->x = 0.0f;
+				pos->x = MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f - size->x * 0.5f - OffsetPos.x;
+				if (move)
+				{
+					// 移動量の初期化
+					move->x = 0.0f;
+				}
 				// 押し出し状態がtrue
 				bPush = true;
 			}
 			// 当たり判定(右)
-			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::RIGHT;
 
 				// 素材状の左に
-				pos->x = MyPos.x + Kari_Size.x * 0.5f + size->x * 0.5f - OffsetPos.x;
-
-				// 移動量の初期化
-				move->x = 0.0f;
+				pos->x = MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f + size->x * 0.5f - OffsetPos.x;
+				if (move)
+				{
+					// 移動量の初期化
+					move->x = 0.0f;
+				}
 				// 押し出し状態がtrue
 				bPush = true;
 			}
 			// 当たり判定(左)
-			else if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			else if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::LEFT;
 			}
 
 			// 当たり判定(右)
-			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::RIGHT;
@@ -1247,48 +1514,52 @@ COLLISIONDIRECTION CPlayer::PushCollision(
 		// 当たった方向に情報が入っているなら
 		//if (bPush) return Direct;
 		// 素材のX範囲
-		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
-			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 		{
 			// 当たり判定(手前)
-			if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::BACK;
 
 				// 素材状の左に
-				pos->z = MyPos.z - Kari_Size.z * 0.5f - size->z * 0.5f - OffsetPos.z;
-
-				// 移動量の初期化
-				move->z = 0.0f;
+				pos->z = MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f - size->z * 0.5f - OffsetPos.z;
+				if (move)
+				{
+					// 移動量の初期化
+					move->z = 0.0f;
+				}
 			}
 
 			// 当たり判定(奥)
-			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::FRONT;
 
 				// 素材状の左に
 				pos->z =
-					MyPos.z + Kari_Size.z * 0.5f +
+					MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f +
 					size->z * 0.5f - OffsetPos.z;
-
-				// 移動量の初期化
-				move->z = 0.0f;
+				if (move)
+				{
+					// 移動量の初期化
+					move->z = 0.0f;
+				}
 			}
 			// 当たり判定(手前)
-			else if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::BACK;
 			}
 			// 当たり判定(奥)
-			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::FRONT;
@@ -1321,18 +1592,17 @@ COLLISIONDIRECTION CPlayer::Collision(
 	D3DXVECTOR3 MyPos = CCharacter::GetPos();
 	CGame::STAGE Stage = CGame::GetStage();						// ステージ
 
-	D3DXVECTOR3 Kari_Size = { 25.0f,50.0f,25.0f };	// 仮サイズ
-													// 素材のZ範囲
-	if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
-		pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+	// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 	{
 		// 素材のX範囲
-		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
-			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 		{
 			// 当たり判定(下)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
-				posOld->y + OffsetPos.y + size->y * 0.5f <= MyPos.y - Kari_Size.y * 0.5f)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - m_PlayerStatus.PlayerSize.y * 0.5f&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= MyPos.y - m_PlayerStatus.PlayerSize.y * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::DOWN;
@@ -1341,8 +1611,8 @@ COLLISIONDIRECTION CPlayer::Collision(
 			}
 
 			// 当たり判定(上)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
-				posOld->y + OffsetPos.y - size->y * 0.5f >= MyPos.y + Kari_Size.y * 0.5f)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::UP;
@@ -1351,7 +1621,7 @@ COLLISIONDIRECTION CPlayer::Collision(
 
 			}
 			// 当たり判定(下)
-			else if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.z * 0.5f&&
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - m_PlayerStatus.PlayerSize.z * 0.5f&&
 				pos->y + OffsetPos.y <= MyPos.y)
 			{
 				// めり込んでいる
@@ -1359,8 +1629,8 @@ COLLISIONDIRECTION CPlayer::Collision(
 			}
 
 			// 当たり判定(上)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f&&
-				pos->y + OffsetPos.y - size->y > MyPos.y + Kari_Size.y * 0.5f)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f&&
+				pos->y + OffsetPos.y - size->y > MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::UP;
@@ -1370,16 +1640,16 @@ COLLISIONDIRECTION CPlayer::Collision(
 	// 当たった方向に情報が入っているなら
 	//if (bPush) return Direct;
 	// 素材のY範囲
-	if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - Kari_Size.y * 0.5f&&
-		pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + Kari_Size.y * 0.5f)
+	if (pos->y + OffsetPos.y + size->y * 0.5f > MyPos.y - m_PlayerStatus.PlayerSize.y * 0.5f&&
+		pos->y + OffsetPos.y - size->y * 0.5f < MyPos.y + m_PlayerStatus.PlayerSize.y * 0.5f)
 	{
 		// 素材のZ範囲
-		if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - Kari_Size.z * 0.5f&&
-			pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + Kari_Size.z * 0.5f)
+		if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 		{
 			// 当たり判定(左)
-			if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::LEFT;
@@ -1387,8 +1657,8 @@ COLLISIONDIRECTION CPlayer::Collision(
 				bPush = true;
 			}
 			// 当たり判定(右)
-			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::RIGHT;
@@ -1396,16 +1666,16 @@ COLLISIONDIRECTION CPlayer::Collision(
 				bPush = true;
 			}
 			// 当たり判定(左)
-			else if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - Kari_Size.x * 0.5f)
+			else if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::LEFT;
 			}
 
 			// 当たり判定(右)
-			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + Kari_Size.x * 0.5f&&
-				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + Kari_Size.x * 0.5f)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::RIGHT;
@@ -1414,12 +1684,12 @@ COLLISIONDIRECTION CPlayer::Collision(
 		// 当たった方向に情報が入っているなら
 		//if (bPush) return Direct;
 		// 素材のX範囲
-		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - Kari_Size.x * 0.5f&&
-			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + Kari_Size.x * 0.5f)
+		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
 		{
 			// 当たり判定(手前)
-			if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::BACK;
@@ -1427,23 +1697,23 @@ COLLISIONDIRECTION CPlayer::Collision(
 			}
 
 			// 当たり判定(奥)
-			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::FRONT;
 
 			}
 			// 当たり判定(手前)
-			else if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - Kari_Size.z * 0.5f)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z + size->z * 0.5f <= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::BACK;
 			}
 			// 当たり判定(奥)
-			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + Kari_Size.z * 0.5f&&
-				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + Kari_Size.z * 0.5f)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f&&
+				posOld->z + OffsetPos.z - size->z * 0.5f >= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::FRONT;
@@ -1502,18 +1772,24 @@ void CPlayer::Die(void)
 				CCharacter::Die();
 #ifdef _DEBUG
 				// 当たり判定ボックスの開放
-				for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
-				{
 					// NULLチェック
-					if (pCollisionBox[nCntCollision] == NULL) continue;
-					pCollisionBox[nCntCollision]->Release();
-					pCollisionBox[nCntCollision] = NULL;
+				if (pCollisionBox != NULL)
+				{
+					pCollisionBox->Release();
+					pCollisionBox = NULL;
+				}
+				// 当たり判定線の開放
+				// NULLチェック
+				if (pCollisionLine != NULL)
+				{
+					pCollisionLine->Release();
+					pCollisionLine = NULL;
 				}
 #endif // _DEBUG
 
 	}
 	// チュートリアルのときリスポーンする
-	else
+	if (CManager::GetMode() == CManager::MODE_TUTORIAL)
 	{
 		// パーティクル生成
 		C3DParticle::Create(
@@ -1588,57 +1864,98 @@ void CPlayer::Scene_NoOpponentCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Debug(void)
 {
-	// プレイヤー1人だけ通す(ステータスが共通のため)
-	if (GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-	{
-		if (ImGui::Begin(u8"プレイヤーのステータス"))
-		{
-			//if (ImGui::CollapsingHeader(u8"プレイヤーのステータス"))
-			{
-				// 移動量
-				ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
-				// ジャンプ力
-				ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0f, 1.0f, 50.0f);						/* 10.0f */
-				// ダッシュの移動量
-				ImGui::DragFloat(u8"ダッシュの移動量", &m_PlayerStatus.fDash, 1.0f, 1.0f, 100.0f);				/* 30.0f */
-				// 通常時の慣性
-				ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
-				// ジャンプ時の慣性
-				ImGui::DragFloat(u8"ジャンプ時の慣性", &m_PlayerStatus.fJumpInertia, 0.01f, 0.01f, 10.0f);		/* 1.6f */
-				// プレイヤーのサイズ
-				ImGui::DragFloat3(u8"プレイヤーのサイズ", m_PlayerStatus.PlayerSize, 1.0f, 0.0f, 500.0f);
-				// プレイヤーのオフセット
-				ImGui::DragFloat3(u8"プレイヤーのオフセット", m_PlayerStatus.PlayerOffSet, 1.0f, 0.0f, 500.0f);
-				// 押し出し用のサイズ
-				ImGui::DragFloat(u8"押し出し用のサイズ", &m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
-				// 押し出し用のオフセット
-				ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
-
-				// セーブボタン
-				if (ImGui::Button(u8"保存"))
-				{
-					// プレイヤーのステータスのセーブ
-					PlayerStatusSave();
-				}
-
-				// 改行キャンセル
-				ImGui::SameLine();
-
-				// 初期化
-				if (ImGui::Button(u8"初期化"))
-				{
-					// プレイヤーの初期ステータス代入
-					PlayerStatusInitLoad();
-				}
-				// 区切り線
-				ImGui::Separator();
-			}
-		}
-		// End
-		ImGui::End();
-	}
 }
 #endif // _DEBUG
+
+
+#if IMGUI_DEBUG
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ImGuiのデバッグ処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::AllDebugImGui(void)
+{
+
+	if (ImGui::Begin(u8"プレイヤーのステータス"))
+	{
+		//if (ImGui::CollapsingHeader(u8"プレイヤーのステータス"))
+		{
+			// 移動量
+			ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
+																										// ジャンプ力
+			ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0f, 1.0f, 50.0f);						/* 10.0f */
+																										// 通常時の慣性
+			ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
+																									// ジャンプ時の慣性
+			ImGui::DragFloat(u8"ジャンプ時の慣性", &m_PlayerStatus.fJumpInertia, 0.01f, 0.01f, 10.0f);		/* 1.6f */
+																									// プレイヤーのサイズ
+			ImGui::DragFloat3(u8"プレイヤーのサイズ", m_PlayerStatus.PlayerSize, 1.0f, 0.0f, 500.0f);
+			// プレイヤーのオフセット
+			ImGui::DragFloat3(u8"プレイヤーのオフセット", m_PlayerStatus.PlayerOffSet, 1.0f, 0.0f, 500.0f);
+			// 押し出し用のサイズ
+			ImGui::DragFloat(u8"押し出し用のサイズ", &m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
+			// 押し出し用のオフセット
+			ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
+			// 押し出す時間
+			ImGui::DragInt(u8"押し出す時間", &m_PlayerStatus.nMaxPowerTime, 1.0f, 0);
+			// ブロックに押し出されたとき
+			if (ImGui::TreeNode(u8"ブロックに押し出されたときのステータス設定"))
+			{
+				// スタン時間
+				ImGui::DragInt(u8"(b)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_BLOCK], 1.0f, 0);
+				// 無敵時間
+				ImGui::DragInt(u8"(b)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_BLOCK], 1.0f, 0);
+				ImGui::TreePop();
+			}
+			// ジャンプで踏み倒されたとき
+			if (ImGui::TreeNode(u8"ジャンプで踏み倒されたときのステータス設定"))
+			{
+				// スタン時間
+				ImGui::DragInt(u8"(j)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP], 1.0f, 0);
+				// 無敵時間
+				ImGui::DragInt(u8"(j)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP], 1.0f, 0);
+				ImGui::TreePop();
+			}
+			// 電気で感電したとき
+			if (ImGui::TreeNode(u8"電気で感電したときのステータス設定"))
+			{
+				// スタン時間
+				ImGui::DragInt(u8"(e)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
+				// 無敵時間
+				ImGui::DragInt(u8"(e)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
+				ImGui::TreePop();
+			}
+
+			// パニック時間
+			ImGui::DragInt(u8"パニック時間", &m_PlayerStatus.nMaxPanicTime, 1.0f, 0);
+			// 重力を適用するフラグの切り替え
+			ImGui::Checkbox(u8"重力", &GetGravity());
+
+			// セーブボタン
+			if (ImGui::Button(u8"保存"))
+			{
+				// プレイヤーのステータスのセーブ
+				PlayerStatusSave();
+			}
+
+			// 改行キャンセル
+			ImGui::SameLine();
+
+			// 初期化
+			if (ImGui::Button(u8"初期化"))
+			{
+				// プレイヤーの初期ステータス代入
+				PlayerStatusInitLoad();
+			}
+			// 区切り線
+			ImGui::Separator();
+		}
+	}
+	// End
+	ImGui::End();
+}
+#endif // IMGUI_DEBUG
+
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 生成処理

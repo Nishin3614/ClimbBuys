@@ -60,7 +60,19 @@ public:
 		STAGE_2,		// ステージ2
 		STAGE_MAX		// 最大ステージ数
 	} STAGE;
+	// float3型
 
+	/*
+	//struct D3DXVECTOR3 Float3;
+	typedef struct _FLOAT3 : public D3DXVECTOR3
+	{
+		union
+		{
+			D3DXVECTOR3 Float3;
+			float fFloat[3];
+		};
+	} FLOAT3;
+	*/
 	/* 関数 */
 	// コンストラクタ
 	CGame();
@@ -80,8 +92,10 @@ public:
 
 	// ステージの取得
 	static STAGE GetStage(void)					{ return m_Stage; };
-	// タイムの取得
+	// カウントタイムの取得
 	static int GetCntTime(void)					{ return m_nCntTime; };
+	// タイムの取得
+	static int GetTime(void)					{ return m_nTime; };
 	// カウントタイムを秒刻みで取得
 	static int GetSecond(void)					{ return m_nCntTime / 60; };
 	// 終了フラグの設定
@@ -104,7 +118,8 @@ private:
 	/* 変数 */
 	CPause *		m_pause;		// ポーズ
 	static STAGE	m_Stage;		// ステージ
-	static int		m_nCntTime;			// タイム
+	static int		m_nCntTime;		// タイム
+	static int		m_nTime;		// タイム
 	CGameUI			*m_pGameUI;		// ゲームUI
 	int				m_nCntFinish;	// 終了カウント
 	bool			m_bFinishFlag;	// 終了フラグ

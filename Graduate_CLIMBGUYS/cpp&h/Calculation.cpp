@@ -1588,6 +1588,18 @@ void CCalculation::CalcRotation_XYZ(D3DXVECTOR3 & rot)
 	CCalculation::CalcRotation(rot.y);
 	CCalculation::CalcRotation(rot.z);
 }
+
+//------------------------------------------------------------------------------
+// ランダムな浮動小数点数を生成
+//------------------------------------------------------------------------------
+float CCalculation::RandamFloat(float fMax, float fMin)
+{
+	std::random_device rd;
+	std::default_random_engine eng(rd());
+	std::uniform_real_distribution<float> distr((float)fMin, (float)fMax);
+	return distr(eng);
+}
+
 /*
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // XInputのパッド用関数
@@ -1761,6 +1773,8 @@ bool CCalculation::PadMoveInput(D3DXVECTOR3 & rMove, DIRECTION & direction, bool
 	return bInput;
 }
 
+#if IMGUI_DEBUG
+
 /*
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ImGui用関数
@@ -1828,6 +1842,8 @@ bool CCalculation::ImGui_Combobox(std::vector<std::string> aItemNameList, std::s
 #endif //DEBUG
 	return bChange;
 }
+
+#endif // IMGUI_DEBUG
 
 
 

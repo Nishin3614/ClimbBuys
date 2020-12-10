@@ -92,6 +92,7 @@ void CKeyboard::Update(void)
 	BYTE aKeyState[NUM_KEY_MAX];	// キーボードの入力情報
 	int nCntKey;
 
+	m_pDevice->Acquire();	// キーボードへのアクセス権を取得
 	// デバイスからデータを取得
 	if (SUCCEEDED(m_pDevice->GetDeviceState(sizeof(aKeyState), aKeyState)))
 	{
@@ -102,9 +103,15 @@ void CKeyboard::Update(void)
 				m_sbState = true;
 			}
 			m_aTrigger[nCntKey] = (m_aState[nCntKey] ^ aKeyState[nCntKey]) & aKeyState[nCntKey];
+			m_aRelease[nCntKey] = (m_aState[nCntKey] ^ aKeyState[nCntKey]) & m_aState[nCntKey];
+			if (m_aRelease[nCntKey] != 0)
+			{
+				printf("");
+			}
 			m_aState[nCntKey] = aKeyState[nCntKey];	// キープレス情報保存
 		}
 	}
+	/*
 	else
 	{
 		m_pDevice->Acquire();	// キーボードへのアクセス権を取得
@@ -118,10 +125,12 @@ void CKeyboard::Update(void)
 					m_sbState = true;
 				}
 				m_aTrigger[nCntKey] = (m_aState[nCntKey] ^ aKeyState[nCntKey]) & aKeyState[nCntKey];
+				m_aRelease[nCntKey] = (m_aState[nCntKey] ^ aKeyState[nCntKey]) & !aKeyState[nCntKey];
 				m_aState[nCntKey] = aKeyState[nCntKey];	// キープレス情報保存
 			}
 		}
 	}
+	*/
 }
 
 // ------------------------------------------
@@ -130,6 +139,14 @@ void CKeyboard::Update(void)
 bool CKeyboard::GetKeyboardPress(int nKey)
 {
 	return (m_aState[nKey] & 0x80) ? true : false;
+}
+
+// ------------------------------------------
+// 離した時状態を取得
+// ------------------------------------------
+bool CKeyboard::GetKeyboardRelease(int nKey)
+{
+	return (m_aRelease[nKey] & 0x80) ? true : false;
 }
 
 // ------------------------------------------

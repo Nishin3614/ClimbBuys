@@ -49,7 +49,10 @@ public:
 	void Draw(void);
 	// 生成処理
 	static CTitle * Create(void);
+
 protected:
 private:
+	int					m_nTime;								// パーティクルの出現時間カウント
+
 };
 #endif

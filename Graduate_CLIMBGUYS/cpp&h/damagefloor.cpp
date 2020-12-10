@@ -14,6 +14,7 @@
 #include "player.h"
 #include "basemode.h"
 #include "debugproc.h"
+#include "baseblock.h"
 
 #include "sound.h"
 
@@ -22,20 +23,20 @@
 // マクロ定義
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+#define FLOOR_YPLUS (10.0f)	// yの位置微調整
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool CDamageFloor::m_bUp = false;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // イニシャライザコンストラクタ
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 CDamageFloor::CDamageFloor() : CScene_THREE::CScene_THREE()
 {
-	m_MoveSpeed = 0.0f;									// 移動量の初期化
-	m_AscendUpToTime = 0;
+	m_bUp = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,9 +56,6 @@ void CDamageFloor::Init(void)
 
 	// 透明にさせる
 	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f));
-
-	m_MoveSpeed = 0.5f;
-	m_AscendUpToTime = 3600;
 
 	// デバッグ時のみ赤く表示
 	CScene_THREE::SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
@@ -117,14 +115,11 @@ void CDamageFloor::Update(void)
 	// ゲームモードだったら
 	if (CManager::GetMode() == CManager::MODE_GAME)
 	{
-		// タイマーの値を減らしていき0になったら床を上昇させる
-		if (m_AscendUpToTime-- <= 0)
+		if (m_bUp)
 		{
-			m_AscendUpToTime = 0;
 			// ダメージ床の上昇
 			Move();
 		}
-		CDebugproc::Print("タイマー %d\n", m_AscendUpToTime);
 	}
 
 	// 高さを比較
@@ -154,7 +149,7 @@ CDamageFloor * CDamageFloor::Create()
 	// シーン管理設定
 	pDamageFloor->ManageSetting(CScene::LAYER_FLOOR);
 	// 位置設定
-	pDamageFloor->SetPos(D3DXVECTOR3(0.0, -500.0f, 0.0f));
+	pDamageFloor->SetPos(D3DXVECTOR3(0.0, CBaseblock::GetBlockStatus().fInitFloor, 0.0f));
 	// サイズ設定
 	pDamageFloor->SetSize(FIELD_SIZE);
 	// 初期化処理
@@ -186,6 +181,8 @@ void CDamageFloor::UnLoad(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::ComparisonHeight()
 {
+
+
 	// プレイヤーの数分
 	for (int nCnt = 0; nCnt < 4; nCnt++)
 	{
@@ -215,5 +212,13 @@ void CDamageFloor::ComparisonHeight()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CDamageFloor::Move()
 {
-	this->GetPos().y += m_MoveSpeed;
+	// ダメージ床の高さ
+	int nDamegeFloor = CBaseblock::GetMaxHeight() - CBaseblock::GetBlockStatus().v_nDamageFloorHight[CBaseblock::GetPhase()];
+	float fFloorHeight = nDamegeFloor * CBaseblock::GetSizeRange();
+	this->GetPos().y += CBaseblock::GetBlockStatus().fFloorMove;
+	if (this->GetPos().y >= fFloorHeight + FLOOR_YPLUS &&
+		CBaseblock::GetBlockStatus().nMaxSprit - 1 > CBaseblock::GetPhase())
+	{
+		m_bUp = false;
+	}
 }

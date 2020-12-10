@@ -14,7 +14,6 @@
 //
 // ----------------------------------------------------------------------------------------------------
 #include "main.h"
-#include "shape.h"
 
 // ----------------------------------------------------------------------------------------------------
 //
@@ -83,6 +82,32 @@
 #define COMMENT02			("//------------------------------------------------------------\n")
 // テキスト用　イコール
 #define EQUAL				("=")
+
+/* キーボード移動処理 */
+// 奥
+static float const	ROT_KEY_W =	D3DX_PI * 0.0f;						// 奥
+#define				ROT_KEY_W_ON_CAMERA(fRot)	(ROT_KEY_W + fRot)	// 奥(カメラあり)
+// 右奥
+static float const	ROT_KEY_WD = D3DX_PI * 0.25f;					// 右奥
+#define				ROT_KEY_WD_ON_CAMERA(fRot)	(ROT_KEY_WD + fRot)	// 右奥(カメラあり)
+// 右
+static float const	ROT_KEY_D = D3DX_PI * 0.5f;						// 右
+#define				ROT_KEY_D_ON_CAMERA(fRot)	(ROT_KEY_D + fRot)	// 右(カメラあり)
+// 右前
+static float const	ROT_KEY_SD = D3DX_PI * 0.75f;					// 右前
+#define				ROT_KEY_SD_ON_CAMERA(fRot)	(ROT_KEY_SD + fRot)	// 右前(カメラあり)
+// 前
+static float const	ROT_KEY_S = D3DX_PI * 1.0f;						// 前
+#define				ROT_KEY_S_ON_CAMERA(fRot)	(ROT_KEY_S + fRot)	// 前(カメラあり)
+// 左前
+static float const	ROT_KEY_AS = -D3DX_PI * 0.75f;					// 左前
+#define				ROT_KEY_AS_ON_CAMERA(fRot)	(ROT_KEY_AS + fRot)	// 左前(カメラあり)
+// 左
+static float const	ROT_KEY_A = -D3DX_PI * 0.5f;					// 左
+#define				ROT_KEY_A_ON_CAMERA(fRot)	(ROT_KEY_A + fRot)	// 左(カメラあり)
+// 左奥
+static float const	ROT_KEY_AW = -D3DX_PI * 0.25f;					// 左奥
+#define				ROT_KEY_AW_ON_CAMERA(fRot)	(ROT_KEY_AW + fRot)	// 左奥(カメラあり)
 
 // ----------------------------------------------------------------------------------------------------
 //
@@ -161,21 +186,34 @@ private:
 typedef struct INTEGER2
 {
 	INTEGER2() {}
+	// 引数ありコンストラクタ
 	INTEGER2(int X, int Y)
 	{
 		nMax = X;
 		nMin = Y;
 	}
-	int nMax;
-	int	nMin;
-
-	union INTEGER2_UNION
+	// キャスト
+	inline operator int * ()
 	{
-		struct INTEGER2
+		return (int *)this;
+	}
+	// ランダムな値を返す
+	int Randam(void)
+	{
+		int nRange = nMax - nMin;
+		if (nRange <= 0) return nMin;
+		return rand() % nRange + nMin;
+	}
+	union
+	{
+		struct
 		{
-			int nInteger[2];
+			int nMax;
+			int	nMin;
 		};
 	};
+
+	int nInteger[2];
 }INTEGER2, *PINTEGER2;
 
 // 整数型3個
@@ -192,9 +230,6 @@ public:
 	// キャスト
 	inline operator int* ()
 	{
-		(int *)nX;
-		(int *)nY;
-		(int *)nX;
 		return *this;
 	}
 	inline operator CONST int* () const
@@ -287,6 +322,33 @@ typedef struct INTEGER4
 	int Z;
 	int	W;
 }INTEGER4, *PINTEGER4;
+
+// 浮動小数型2個
+typedef struct FLOAT2
+{
+	FLOAT2() {}
+	// 引数ありコンストラクタ
+	FLOAT2(float X, float Y)
+	{
+		fMax = X;
+		fMin = Y;
+	}
+	// キャスト
+	inline operator float * ()
+	{
+		return (float *)this;
+	}
+	union
+	{
+		struct
+		{
+			float fMax;
+			float fMin;
+		};
+	};
+
+	float fFloat[2];
+}FLOAT2, *PFLOAT2;
 
 // 配置オブジェクト情報(1:タイプ,2:位置,3:回転)
 typedef struct ARRANGEMENTOBJ
@@ -796,6 +858,10 @@ public:
 	static void CalcRotation(float &fRot);
 	// 回転を360度以内にする計算
 	static void CalcRotation_XYZ(D3DXVECTOR3 &rot);
+	// ランダムな浮動小数点数を生成
+	static float RandamFloat(float fMax, float fMin);
+	// 取得した値を倍にして返す
+	template<typename T> static T DoubleValue(T &Return, T Get);
 
 	/* XInputのパッド用関数 */
 	// 前回のスティック情報
@@ -819,6 +885,8 @@ public:
 	static PAD_STICK	m_PadStick[(int)PLAYER_TAG::PLAYER_MAX];		// コントローラーのスティック情報
 	static DIRECTION	m_direction;					//方向
 
+#if ERROW_ACTION
+
 	/* ImGui用関数 */
 	// ImGuiによるデバッグ情報
 	static void ImG_DebugInfo(void);
@@ -828,6 +896,8 @@ public:
 
 	// ImGuiのコンボボックス
 	static bool ImGui_Combobox(std::vector<std::string> aItemNameList, std::string aTitle, int &nValue);
+
+#endif // ERROW_ACTION
 
 protected:
 
@@ -841,5 +911,21 @@ private:
 // プロトタイプ宣言
 //
 // ----------------------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------------------
+//
+// template関数
+//
+// ----------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// 取得した値を倍にして返す
+//------------------------------------------------------------------------------
+template<typename T>
+inline T CCalculation::DoubleValue(T & Return, T Get)
+{
+	Return = (Get * 2);
+	return Return;
+}
 
 #endif

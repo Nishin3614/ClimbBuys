@@ -12,10 +12,10 @@
 #include "fade.h"
 #include "renderer.h"
 #include "manager.h"
-#include "collision.h"
 #include "stencilshadow.h"
 #include "camera.h"
 #include "baseblock.h"
+#include "player.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -28,6 +28,7 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool	CBaseMode::m_bCollisionDisp = true;				// 当たり判定の可視化状態
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ
@@ -70,7 +71,15 @@ void CBaseMode::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseMode::Update(void)
 {
-	CCollision::CollisionDetection();
+#if IMGUI_DEBUG
+
+	// ブロック全体のデバッグ処理
+	CBaseblock::AllDebug();
+	// プレイヤー全体のデバッグ処理
+	CPlayer::AllDebugImGui();
+
+#endif // 0
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -93,7 +102,7 @@ void CBaseMode::Debug(void)
 	CDebugproc::Print(NEWLINE);
 	CDebugproc::Print("--------- Debug Command ----------\n");
 	CDebugproc::Print("[F3] : 一時停止 [ %d ] : [ OFF : 0 / ON : 1 ]\n", m_bSceneStop);
-	CDebugproc::Print("[F4] : 1Fだけ更新\n");
+	CDebugproc::Print("[F4] : 1フレームだけ更新\n");
 	CDebugproc::Print("[F5] : 当たり判定の可視状態\n");
 	CDebugproc::Print(NEWLINE);
 	CDebugproc::Print("[Ctrl] + テンキー [0] : 現在のModeに遷移\n");
@@ -144,7 +153,7 @@ void CBaseMode::Debug(void)
 	//当たり判定の可視状態
 	if (key->GetKeyboardTrigger(DIK_F5))
 	{
-		CCollision::SetDispCollision(!CCollision::GetDispCollision());
+		m_bCollisionDisp = !m_bCollisionDisp;
 	}
 	// ステンシル描画状態の設定
 	if (key->GetKeyboardTrigger(DIK_F6))
@@ -189,9 +198,5 @@ void CBaseMode::Debug(void)
 			}
 		}
 	}
-
-	// ブロック全体のデバッグ処理
-	CBaseblock::AllDebug();
-
 }
 #endif // _DEBUG

@@ -40,6 +40,7 @@
 // ----------------------------------------
 C3DLine::C3DLine() : CScene::CScene()
 {
+	m_bDisp = true;
 }
 
 // ----------------------------------------
@@ -116,6 +117,7 @@ void C3DLine::Update(void)
 // ----------------------------------------
 void C3DLine::Draw(void)
 {
+	if (!m_bDisp) return;
 	// 変数宣言
 	LPDIRECT3DDEVICE9 pDevice =		// デバイスの取得
 		CManager::GetRenderer()->GetDevice();

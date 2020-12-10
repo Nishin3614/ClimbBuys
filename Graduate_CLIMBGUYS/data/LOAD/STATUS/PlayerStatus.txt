@@ -6,13 +6,23 @@ SCRIPT
 STATUS_SET
 	Move			= 1.0
 	Jump			= 7.5
-	Dash			= 0.0
 	NormalInertia	= 0.70
 	JumpInertia		= 1.00
 	PlayerSize		= 12.0	20.0	12.0
-	PlayerOffSet	= 0.0	15.0	0.0
-	PushSize		= 30.0
-	PushOffSet		= 0.0	15.0	0.0
+	PlayerOffSet	= 0.0	10.0	0.0
+	PushSize		= 25.0
+	PushOffSet		= 0.0	10.0	0.0
+	PowerTime		= 30
+	StatusType_Block
+		StanTime		= 60
+		InvincibleTime	= 0
+	StatusType_Jump
+		StanTime		= 60
+		InvincibleTime	= 60
+	StatusType_Electric
+		StanTime		= 120
+		InvincibleTime	= 60
+	PanicTime		= 180
 END_STATUS_SET
 
 END_SCRIPT

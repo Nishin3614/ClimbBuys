@@ -16,9 +16,6 @@
 #include "mouse.h"
 #include "connectblock.h"
 
-// テスト
-#include "3Dmap.h"
-
 // ------------------------------------------
 //
 // マクロ関数
@@ -37,8 +34,11 @@
 //
 // ------------------------------------------
 #ifdef _DEBUG
+
 CDebugproc * CRenderer::m_debugproc = NULL;
+
 #endif
+
 bool CRenderer::m_bDebug = false;				// デバッグモード
 
 D3DXVECTOR3 g_f = D3DVECTOR3_ZERO;
@@ -136,15 +136,22 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 	m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
+#if IMGUI_DEBUG
 
-#ifdef _DEBUG
 	// ImGuiのセットアップ
 	ImGui_SetUp(hWnd);
+
+#endif // IMGUI_DEBUG
+
+#ifdef _DEBUG
 	// デバッグプロシージャー
 	m_debugproc = new CDebugproc;
 	// デバッグ表示初期化
 	m_debugproc->Init(m_pDevice);
 #endif
+
+
+
 	// シーンの読み込み
 	CScene_load::LoadAll();
 	// カメラの生成
@@ -190,12 +197,16 @@ void CRenderer::Uninit(void)
 		m_pD3D->Release();
 		m_pD3D = NULL;
 	}
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
 	// ImGuiの終了
 	ImGui_ImplDX9_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+#endif
+
+#ifdef _DEBUG
 	// デバッグ表示
 	if (m_debugproc != NULL)
 	{
@@ -205,6 +216,8 @@ void CRenderer::Uninit(void)
 	}
 
 #endif // _DEBUG
+
+
 }
 
 // ------------------------------------------
@@ -212,12 +225,15 @@ void CRenderer::Uninit(void)
 // ------------------------------------------
 void CRenderer::Update(void)
 {
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	ImGui::Begin("SideWindow");
-#endif // _DEBUG
+
+#endif // IMGUI_DEBUG
+
 	// カメラの更新
 	m_pCamera->Update();
 	// ライトの更新
@@ -248,8 +264,6 @@ void CRenderer::Update(void)
 			CScene::UpdateAll();
 		}
 	}
-	// ImGuiの更新
-	UpdateImGui();
 #else // _RELEASE
 	// シーン
 	if (m_bDebug == false)
@@ -264,6 +278,14 @@ void CRenderer::Update(void)
 		}
 	}
 #endif // _DEBUG || _RELEASE
+
+#if IMGUI_DEBUG
+
+	// ImGuiの更新
+	UpdateImGui();
+
+#endif // IMGUI_DEBUG
+
 }
 
 // -----------------------
@@ -293,20 +315,28 @@ void CRenderer::Draw(void)
 		// デバッグ表示の描画
 		CDebugproc::Draw();
 
+#endif
+#if IMGUI_DEBUG
+
 		// ImGuiの描画
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-#endif
+
+#endif // IMGUI_DEBUG
+
 		// Direct3Dによる描画終了
 		m_pDevice->EndScene();
 	}
 
 	// バックバッファとフロートバッファの入れ替え
 	HRESULT result = m_pDevice->Present(NULL, NULL, NULL, NULL);
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
+
 	// Handle loss of D3D9 device
 	if (result == D3DERR_DEVICELOST && m_pDevice->TestCooperativeLevel() == D3DERR_DEVICENOTRESET)
 		ResetDevice();
+
 #endif
 
 }
@@ -516,7 +546,8 @@ CCamera * CRenderer::GetCamera(void)
 	return m_pCamera;
 }
 
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
 // ------------------------------------------
 // ImGuiのセットアップ処理
 // ------------------------------------------
@@ -577,15 +608,16 @@ void CRenderer::UpdateImGui(void)
 	m_pLight->Debug();
 	// 結合ブロックの静的なデバッグ処理
 	CConnectblock::StaticDebug();
-	// テスト 3Dマップの情報設定
-	C3DMap::Debug();
-
 
 	// ImGuiの更新終了
 	ImGui::End();
 	m_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
 	D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(m_clear_color.x*255.0f), (int)(m_clear_color.y*255.0f), (int)(m_clear_color.z*255.0f), (int)(m_clear_color.w*255.0f));
 }
+
+#endif // IMGUI_DEBUG
+
+#ifdef _DEBUG
 
 // ------------------------------------------
 // FPS描画処理

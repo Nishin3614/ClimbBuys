@@ -5,7 +5,6 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "normalblock.h"
-#include "collision.h"
 #include "debugproc.h"
 #include "game.h"
 
@@ -42,7 +41,7 @@ CNormalblock::~CNormalblock()
 void CNormalblock::Init()
 {
 	// ブロックタイプの設定
-	CBaseblock::SetType(TYPE_NORMAL);	// 普通のブロックタイプ
+	CBaseblock::SetType(BLOCKTYPE_NORMAL);	// 普通のブロックタイプ
 	// 落ちる設定
 	CBaseblock::SetFall(true);
 	// ベースブロック初期化処理
@@ -83,44 +82,6 @@ void CNormalblock::Scene_MyCollision(
 	CScene * pScene
 )
 {
-	if (nObjType == CCollision::OBJTYPE_BLOCK)
-	{
-		// シーン情報がNULLなら
-		// ->関数を抜ける
-		if (pScene == NULL) return;
-		if (!CBaseblock::GetFall()) return;
-		// 変数宣言
-		// シーン情報の代入
-		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
-		// 相手の落ちる状態がtrueなら
-		// ->関数を抜ける
-		if (pBaseBlock->GetFall()) return;
-		// 変数宣言
-		CBaseblock::GRID MyGrid = CBaseblock::GetGrid();	// 自分の行列高
-		CBaseblock::GRID OppGrid = pBaseBlock->GetGrid();	// 相手の行列高
-		// 同じ行列ではないなら
-		// ->関数を抜ける
-		if (!(MyGrid.nColumn == OppGrid.nColumn &&
-			MyGrid.nLine == OppGrid.nLine)) return;
-		// 変数宣言
-		int nHeight = CBaseblock::GetHeight(				// 高さ
-			MyGrid.nColumn,
-			MyGrid.nLine) + 1;
-		// 高さを行列高に代入
-		MyGrid.nHeight = nHeight;
-		// 高さの設定
-		CBaseblock::SetHeight(
-			MyGrid.nColumn,
-			MyGrid.nLine,
-			MyGrid.nHeight
-		);
-		// 現在の行列高の設定
-		CBaseblock::SetGrid(MyGrid);
-		// 位置設定
-		CBaseblock::SetPos(MyGrid.GetPos(m_fSizeRange));
-		// 落ちている状態設定
-		CBaseblock::SetFall(false);
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,43 +91,6 @@ void CNormalblock::Scene_MyCollision(
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CNormalblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
 {
-	if (nObjType == CCollision::OBJTYPE_BLOCK)
-	{
-		// シーン情報がNULLなら
-		// ->関数を抜ける
-		if (pScene == NULL) return;
-		if (!CBaseblock::GetFall()) return;
-		// シーン情報の代入
-		CBaseblock * pBaseBlock = (CBaseblock *)pScene;
-		// 相手の落ちる状態がtrueなら
-		// ->関数を抜ける
-		if (pBaseBlock->GetFall()) return;
-		// 変数宣言
-		CBaseblock::GRID MyGrid = CBaseblock::GetGrid();	// 自分の行列高
-		CBaseblock::GRID OppGrid = pBaseBlock->GetGrid();	// 相手の行列高
-															// 同じ行列ではないなら
-															// ->関数を抜ける
-		if (!(MyGrid.nColumn == OppGrid.nColumn &&
-			MyGrid.nLine == OppGrid.nLine)) return;
-		// 変数宣言
-		int nHeight = CBaseblock::GetHeight(				// 高さ
-			MyGrid.nColumn,
-			MyGrid.nLine) + 1;
-		// 高さを行列高に代入
-		MyGrid.nHeight = nHeight;
-		// 高さの設定
-		CBaseblock::SetHeight(
-			MyGrid.nColumn,
-			MyGrid.nLine,
-			MyGrid.nHeight
-		);
-		// 現在の行列高の設定
-		CBaseblock::SetGrid(MyGrid);
-		// 位置設定
-		CBaseblock::SetPos(MyGrid.GetPos(m_fSizeRange));
-		// 落ちている状態設定
-		CBaseblock::SetFall(false);
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -260,6 +184,7 @@ CNormalblock * CNormalblock::Create(
 	int				const & nModelId,	// モデル番号
 	GRID			const & Grid,		// 行列高さ番号
 	D3DXCOLOR		* pCol,				// 色
+	float			const & fGravity,	// 重力
 	CScene::LAYER	const & layer		// レイヤー
 )
 {
@@ -273,6 +198,7 @@ CNormalblock * CNormalblock::Create(
 	pNormalblock->SetGrid(Grid);			// 行列高さ
 	pNormalblock->SetPos(					// 位置
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
+	pNormalblock->SetGravity(fGravity);		// 重力
 	pNormalblock->SetModelId(nModelId);		// モデル番号
 	// 色がNULLではないなら
 	if (pCol != NULL)

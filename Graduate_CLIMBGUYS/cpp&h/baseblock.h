@@ -11,15 +11,18 @@
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #include "scene_x.h"
+#include <random>
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//#define BASEBLOCK_MINUSTOPLUS	(4)						// 行列をプラスに
-// やること
-// 行列のフィード値を格闘
+#if ERROW_ACTION
 
-//#define BASEBLOCK_RANGE			(50.0f)				// ブロックの範囲
+#define BASEBLOCK_DEBUG				(0)					// デバッグ処理状態
+
+#endif // ERROW_ACTION
+
+#define BASEBLOCK_FIELDMAX			(14)				// フィールドのブロック数
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -40,20 +43,15 @@ public:
 	// ベースブロック
 	typedef enum
 	{
-		TYPE_NORMAL = 0,	// 通常
-		TYPE_FIELD,			// フィールドブロック
-		TYPE_BOMB,			// ボムブロック
-		TYPE_SPRING,		// スプリングブロック
-		TYPE_MAX,			// タイプ全体数
-	} TYPE;
-
-	// ベースブロックの種類
-	enum class BlockType
-	{
-		NORMAL,
-		SPRING,
-		BOMB
-	};
+		BLOCKTYPE_NORMAL = 0,	// 通常
+		BLOCKTYPE_FIELD,		// フィールドブロック
+		BLOCKTYPE_BOMB,			// ボムブロック
+		BLOCKTYPE_SPRING,		// スプリングブロック
+		BLOCKTYPE_STEEL,		// 鋼鉄ブロック
+		BLOCKTYPE_PANIC,		// 混乱ブロック
+		BLOCKTYPE_ELECTRIC,		// 電気ブロック
+		BLOCKTYPE_MAX			// タイプ全体数
+	} BLOCKTYPE;
 
 	// 上下左右前後
 	typedef enum
@@ -148,6 +146,33 @@ public:
 		int nLine;		// 行
 		int nHeight;	// 高さ
 	} GRID;
+	// 高さにより優先順位を設定する
+	typedef struct _HEIGHT_PRIORITY
+	{
+		_HEIGHT_PRIORITY() {}
+		// 引数ありコンストラクタ
+		_HEIGHT_PRIORITY(int X, int Y)
+		{
+			nHeight = X;
+			nWeight = Y;
+		}
+		// キャスト
+		inline operator int * ()
+		{
+			return (int *)this;
+		}
+		union
+		{
+			struct
+			{
+				int nHeight;
+				int	nWeight;
+			};
+		};
+
+		int nInteger[2];
+	}HEIGHT_PRIORITY, *PHEIGHT_PRIORITY;
+
 	// ブロック全体に対しての距離の比較とブロック情報とどっち方向なら押されたか情報
 	typedef struct PUSHBLOCK
 	{
@@ -182,13 +207,39 @@ public:
 
 
 	// ----- ブロックのステータス ----- //
-	typedef struct
+	typedef struct _BLOCK_STATUS
 	{
-		float				fGravity;			// 重力
-		float				fMove;				// 移動力
-		int					nAppearance;		// 出現する高さ
-		float				fBasicShadowSize;	// シャドウサイズ
-	}BLOCK_STATUS;
+		_BLOCK_STATUS()
+		{
+			// ブロック用
+			fMove = 0;				// 移動力
+			nAppearance = 0;		// 出現する高さ
+			fBasicShadowSize = 0;	// シャドウサイズ
+			nMaxSprit = 0;			// 最大分割数
+			nChangeTime = 0;		// 変化させる時間(変化するタイミング)
+			nAppBlock = 0;			// ブロックが出現するタイミング
+
+			// ダメージ床用
+			fInitFloor = -100.0f;	// ダメージ床の初期位置
+			fFloorMove = 0;			// ダメージ床の移動速度
+			nFloorPhase = 0;		// ダメージ床の上がるフェーズタイミング
+		}
+		// ブロック用
+		float					fMove;					// 移動力
+		int						nAppearance;			// 出現する高さ
+		float					fBasicShadowSize;		// シャドウサイズ
+		int						nMaxSprit;				// 最大分割数
+		int						nChangeTime;			// 変化させる時間(変化するタイミング)
+		int						nAppBlock;				// ブロックが出現するタイミング
+		std::vector<INTEGER2>	v_nDropBlock;			// 落とすブロックの数
+		std::vector<FLOAT2>		v_fBlockGravity;		// 落ちる速度
+
+		// ダメージ床用
+		std::vector<int>		v_nDamageFloorHight;	// ダメージ床の高さ
+		float					fInitFloor;				// ダメージ床の初期位置
+		float					fFloorMove;				// ダメージ床の移動速度
+		int						nFloorPhase;			// ダメージ床の上がるフェーズタイミング
+	} BLOCK_STATUS;
 
 	/* 関数 */
 	// コンストラクタ
@@ -278,13 +329,17 @@ public:
 	);
 
 	// ベースブロック
-	void SetType(TYPE const type)					{ m_type = type; };
+	void SetType(BLOCKTYPE const Blocktype)			{ m_BlockType = Blocktype; };
 	// ベースブロック
-	TYPE GetType(void) const						{ return m_type; };
+	BLOCKTYPE GetType(void) const					{ return m_BlockType; };
 	// 落ちる状態設定
 	void SetFall(bool const & bFall)				{ m_bFall = bFall; };
 	// 落ちる状態取得
 	bool & GetFall(void)							{ return m_bFall; };
+	// 使用状態設定
+	void SetUse(bool const & bUse)					{ m_bUse = bUse; };
+	// 使用状態取得
+	bool & GetUse(void)								{ return m_bUse; };
 	// シャドウの使用状態状態設定
 	void SetShadow(bool const & bShadow)			{ m_bShadow = bShadow; };
 	// シャドウの使用状態状態取得
@@ -299,10 +354,11 @@ public:
 	void SetPushAfter(PUSHAFTER const &PushAfter);
 	// 前回の位置取得
 	D3DXVECTOR3 & GetPosOld(void)					{ return m_posOld; };
+
 	// ベースブロックの種類設定
-	void SetBaseBlockType(BlockType type)			{ m_BlockType = type; };
+	void SetGravity(float fGravity)					{ m_fGravity = fGravity; };
 	// ベースブロックの種類取得
-	BlockType GetBaseBlockType()					{ return m_BlockType; };
+	float GetGravity()								{ return m_fGravity; };
 	// 指定したベースブロックを削除する処理
 	//	pBlock	: ブロック情報
 	static bool DeleteBlock(
@@ -327,7 +383,7 @@ public:
 	static CBaseblock * Create_Self(
 		D3DXVECTOR3		const & pos,									// 位置
 		int				const & nModelId								// モデル番号
-		);
+	);
 	// unique_ptr作成(個人管理unique)
 	// ※戻り値はstd::moveで受け取る
 	//	pos			: 位置
@@ -360,7 +416,6 @@ public:
 	//static D3DXVECTOR3 CaluBlockPos(GRID const & Grid)
 	//{ return D3DXVECTOR3() }
 
-	/* 試験用 */
 	// 現在積み重なっているブロックの高さを取得
 	//	nColumn	: 列
 	//	nLine	: 行
@@ -390,17 +445,34 @@ public:
 	static void BlockStatusSave(void);
 	// ブロックの静的変数を初期化する
 	static void BlockStaticValue(void);
-#ifdef _DEBUG
+	// ブロックの最大高さを取得
+	static int GetMaxHeight(void) { return m_nMaxHeight; };
+	// ブロックの最大高さを再設定
+	static void SetMaxHeight(void);
+	// フェーズの取得
+	static int GetPhase(void)					{ return m_nPhase; };
+	// フェーズの設定
+	static void SetPhase(int const & nPhase)	{ m_nPhase = nPhase; };
+#if IMGUI_DEBUG
+
 	// 全体のデバッグ処理
 	static void AllDebug(void);
+
+#endif // ERROW_ACTION
+
+#ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
 #endif // _DEBUG
+#if BASEBLOCK_DEBUG
+	static void NumAllDebug(void);				// 全体個数を表示するデバッグ処理
+#endif // BASEBLOCK_DEBUG
 	/* 変数宣言 */
+
 
 protected:
 	/* 関数 */
-	//D3DXVECTOR3 & GetGridToGrid(GRID const & Grid) {}
+
 	// 設定 //
 	/* 変数宣言 */
 	static float			m_fSizeRange;	// サイズ範囲
@@ -413,6 +485,8 @@ private:
 	void Update_PushState(void);
 	// 自身のシャドウの出現条件処理
 	void Update_MyShadow(void);
+	// 上限処理
+	void Update_Limit(void);
 	// 当たり判定処理
 	void Collision(CBaseblock * pBlock);
 	// 自信と他のブロックの比較し、シャドウを更新させる処理
@@ -421,14 +495,22 @@ private:
 	static BLOCK_STATUS		m_BlockStatus;		// ブロックのステータス
 	CCircleshadow *			m_pShadowPolygon;	// シャドウポリゴン
 	D3DXVECTOR3				m_posOld;			// 前回の位置
-	TYPE					m_type;				// ベースブロック
-	BlockType				m_BlockType;		// ベースブロックの種類
+	BLOCKTYPE				m_BlockType;		// ベースブロック
 	GRID					m_grid;				// 盤面情報
 	PUSHAFTER				m_PushAfeter;		// 押し出した後要の変数
+	float					m_fGravity;			// 重力
 	bool					m_bFall;			// 落ちる状態
 	bool					m_bShadow;			// シャドウの使用状態
+	bool					m_bUse;				// 表示状態
+	static int				m_nPhase;			// フェーズ
 	// 試験用
-	static int m_anHeight[20][20];
+	static HEIGHT_PRIORITY	m_Priority[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];			// 優先順位
+	//static int				m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
+	static int				m_nMaxHeight;		// 最大高さ
+#if BASEBLOCK_DEBUG
+	static int				m_nAll;				// 全体個数
+#endif // BASEBLOCK_DEBUG
+
 };
 
 #endif

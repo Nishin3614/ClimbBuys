@@ -10,7 +10,6 @@
 #include "camera.h"
 #include "sound.h"
 #include "scene.h"
-#include "collision.h"
 #include "XInputPad.h"
 
 /* 描画 */
@@ -24,8 +23,6 @@
 #include "meshwall.h"
 #include "player.h"
 #include "ui_group.h"
-#include "3Dmap.h"
-#include "stand.h"
 #include "debugproc.h"
 #include "meshbox.h"
 #include "connect_fieldblock.h"
@@ -68,6 +65,9 @@ CTutorial::~CTutorial()
 // ------------------------------------------
 void CTutorial::Init(void)
 {
+	// 静的変数の初期化
+	CPlayer::InitDieCount();
+
 	// モード初期化
 	CBaseMode::Init();
 	// ブロックの静的変数の初期化処理
@@ -113,6 +113,7 @@ void CTutorial::Uninit(void)
 	{
 		// チュートリアルUIの終了
 		m_pTutorialUI->Uninit();
+		delete m_pTutorialUI;
 		m_pTutorialUI = nullptr;
 	}
 }
@@ -165,11 +166,6 @@ void CTutorial::Update(void)
 		{
 			CManager::GetFade()->SetFade(CManager::MODE_GAME);
 		}
-	}
-
-	if (CStand::GetDetermination() && m_nDeterminationCnt >= 0)
-	{
-		m_nDeterminationCnt--;
 	}
 	else
 	{

@@ -70,25 +70,6 @@ typedef struct MESHOBIT_DETAILS
 	D3DXCOLOR EndCol;			// 終点色
 } MESHOBIT_DETAILS;
 
-// 攻撃用当たり判定情報
-typedef struct COLLISION_DETAILS
-{
-	// コンストラクタ
-	COLLISION_DETAILS()
-	{
-		nCollisionID = 0;			// 当たり判定のID
-		fDouble = 1.0f;				// 倍率
-		nBeginFrame = 0;			// 始点フレーム
-		nEndFrame = 0;				// 終点フレーム
-		nDamage = 0;				// 始点色
-	};
-	int nCollisionID;			// 当たり判定のID
-	float fDouble;				// 倍率
-	int nBeginFrame;			// 始点フレーム
-	int nEndFrame;				// 終点フレーム
-	int nDamage;				// 始点色
-} COLLISION_DETAILS;
-
 // キー
 typedef struct KEY
 {
@@ -107,16 +88,10 @@ typedef struct KEY_INFO
 	KEY_INFO()
 	{
 		nFrame = 0;
-		nNumCollision = 0;
-		nMaxCollisiontime = 1;
-		nBlust = 1;
 		Key = NULL;
 		pMotionCamera = NULL;
 	}
 	int	nFrame;									// フレーム
-	int nNumCollision;							// 当たり判定の個数
-	int nMaxCollisiontime;						// 当たり判定の頻度
-	int nBlust;									// 吹っ飛び方
 	std::vector<MOTION_EFFECT> v_MotionEffect;		// モーションエフェクト
 	MOTION_CAMERA * pMotionCamera;				// モーションカメラ
 	KEY *Key;									// キー
@@ -130,26 +105,11 @@ typedef struct MOTION
 		nLoop = 0;								// ループ
 		nNumKey = 0;							// キー情報の数
 		nAllFrame = 0;							// モーション全体のフレーム数
-		Collision_nParts = 0;					// パーツ番号
-		Collision_Ofset = D3DVECTOR3_ZERO;		// オフセット
-		Collision_Radius = 0;					// 円の半径
-		Collision_StartFram = 0;				// 開始フレーム数
-		Collision_EndFram = 0;					// 終了フレーム数
-		Collision_Damage = 0;					// ダメージ数
 		KeyInfo = NULL;							// キー情報(モーション数)
 	}
 	int			nLoop;							// ループ
 	int			nNumKey;						// キー情報の数
 	int			nAllFrame = 0;					// モーション全体のフレーム数
-	// 当たり判定用 //
-	int			Collision_nParts;				// パーツ番号
-	D3DXVECTOR3	Collision_Ofset;				// オフセット
-	float		Collision_Radius;				// 円の半径
-	int			Collision_StartFram;			// 開始フレーム数
-	int			Collision_EndFram;				// 終了フレーム数
-	int			Collision_Damage;				// ダメージ数
-
-	std::vector<COLLISION_DETAILS> v_Collision;		// 当たり判定詳細情報
 	std::vector<MESHOBIT_DETAILS> v_MeshObit_detail;	// 軌跡の詳細
 	KEY_INFO	*KeyInfo;						// キー情報(モーション数)
 } MOTION;
@@ -179,51 +139,6 @@ typedef struct MESHOBIT_BASIC
 	D3DXVECTOR3 EndOffset;		// 終点オフセット
 	int nTexType;				// テクスチャータイプ
 } MESHOBIT_BASIC;
-
-// 矩形情報
-typedef struct RECTINFO
-{
-	// コンストラクタ
-	RECTINFO() = default;
-	D3DXVECTOR3 size;
-} RECTINFO;
-// 球情報
-typedef struct SPHEREINFO
-{
-	// コンストラクタ
-	SPHEREINFO() = default;
-	float fRadius;
-} SPHEREINFO;
-// 円柱情報
-typedef struct COLUMNINFO
-{
-	// コンストラクタ
-	COLUMNINFO() = default;
-	float fRadius;
-	float fVertical;
-} COLUMNINFO;
-
-// キャラクター用当たり判定の基本情報
-typedef struct CHARACTERCOLLISION
-{
-	// コンストラクタ
-	CHARACTERCOLLISION() = default;
-	D3DXVECTOR3 Offset;				// オフセット
-	std::unique_ptr<RECTINFO> RectInfo;				// 矩形情報
-	std::unique_ptr<SPHEREINFO> p_uni_SphereInfo;	// 球情報
-} CHARACTERCOLLISION;
-
-// 攻撃用当たり判定の基本情報
-typedef struct ATTACKCOLLISION
-{
-	// コンストラクタ
-	ATTACKCOLLISION() = default;
-	int			nParts;							// パーツ
-	D3DXVECTOR3 Offset;							// オフセット
-	std::unique_ptr<RECTINFO> p_uni_RectInfo;		// 矩形情報
-	std::unique_ptr<SPHEREINFO> p_uni_SphereInfo;	// 球情報
-	std::unique_ptr<COLUMNINFO> p_uni_ColumnInfo;	// 円柱情報
-} ATTACKCOLLISION;
 
 // モデル・モーションのの情報
 typedef struct MODEL_ALL

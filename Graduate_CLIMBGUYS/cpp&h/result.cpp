@@ -18,6 +18,13 @@
 #include "bg.h"
 #include "connect_fieldblock.h"
 #include "resultUI.h"
+#include "3Dparticle.h"
+
+//=============================================================================
+// マクロ定義
+//=============================================================================
+#define PLAYER_VICTORY_POS	(D3DXVECTOR3(0.0f, 25.0f, -100.0f))		// 勝者の位置
+#define PLAYER_LOSER_POS	(D3DXVECTOR3(40.0f + (10.0f * m_nCntLoser), 25.0f, 50.0f + (-25.0f * m_nCntLoser)))		// 敗者の位置
 
 //=============================================================================
 //
@@ -29,6 +36,12 @@ CResult::CResult()
 	// 初期化
 	m_pResultUI				= nullptr;		// リザルトUI
 	m_nCntPressButton		= 0;			// ボタンを押した回数
+	m_nCntLoser				= 0;			// 敗者のカウント
+
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		m_pPlayer[nCnt] = nullptr;			// プレイヤー
+	}
 }
 
 //=============================================================================
@@ -60,14 +73,14 @@ void CResult::Init()
 	// 結合されたフィールドブロックの生成
 	CConnect_fieldblock::Create(CGame::STAGE_1);
 
-	// プレイヤー
-	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
-
 	// プレイヤーの生成	試験的
-	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0, 300.0f, -50.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0, 300.0f, -50.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(-50.0, 300.0f, 50.0f));
-	pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(50.0, 300.0f, 50.0f));
+	m_pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0f, 25.0f, -50.0f));
+	m_pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0f, 25.0f, -50.0f));
+	m_pPlayer[(int)PLAYER_TAG::PLAYER_3] = CPlayer::Create(PLAYER_TAG::PLAYER_3, D3DXVECTOR3(-50.0f, 25.0f, 50.0f));
+	m_pPlayer[(int)PLAYER_TAG::PLAYER_4] = CPlayer::Create(PLAYER_TAG::PLAYER_4, D3DXVECTOR3(50.0f, 25.0f, 50.0f));
+
+	// プレイヤーのリザルトモーション
+	ResultMotion();
 }
 
 //=============================================================================
@@ -85,6 +98,15 @@ void CResult::Uninit(void)
 		// リザルトUIの終了
 		m_pResultUI->Uninit();
 		m_pResultUI = nullptr;
+	}
+
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		if (m_pPlayer[nCnt])
+		{
+			// プレイヤーの終了
+			m_pPlayer[nCnt] = nullptr;
+		}
 	}
 }
 
@@ -164,4 +186,41 @@ CResult * CResult::Create(void)
 	pResult->Init();
 
 	return pResult;
+}
+
+//=============================================================================
+//
+// リザルトモーション
+//
+//=============================================================================
+void CResult::ResultMotion(void)
+{
+	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
+	{
+		// 1位のプレイヤー
+		if (CResultUI::GetRecord(nCnt).nRanking == 1)
+		{
+			if (m_pPlayer[nCnt])
+			{
+				// ランダムで勝利モーションを行う
+				m_pPlayer[nCnt]->SetMotion((CCharacter::MOTIONTYPE)CCalculation::GetRandomRange(CCharacter::MOTIONTYPE_VICTORY_01, CCharacter::MOTIONTYPE_VICTORY_04));
+				// 勝者の位置の設定
+				m_pPlayer[nCnt]->SetPos(PLAYER_VICTORY_POS);
+			}
+		}
+		// 2位以下のプレイヤー
+		else
+		{
+			if (m_pPlayer[nCnt])
+			{
+				// 敗者のカウントアップ
+				m_nCntLoser++;
+
+				// バンザイモーション
+				m_pPlayer[nCnt]->SetMotion(CCharacter::MOTIONTYPE_BANZAI);
+				// 敗者の位置の設定
+				m_pPlayer[nCnt]->SetPos(PLAYER_LOSER_POS);
+			}
+		}
+	}
 }

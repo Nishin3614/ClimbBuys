@@ -20,7 +20,6 @@
 // 前方宣言
 //
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CCollision;		// 当たり判定クラス
 class CScene_THREE;		// シーン3Dクラス
 class CStencilshadow;	// ステンシルシャドウクラス
 
@@ -98,6 +97,9 @@ public:
 		TYPE_OBJECT_BLOCK_S,			// 当たり判定無し演出用ブロック
 		TYPE_BLOCK_SPRING,				// 特殊ブロック_バネ
 		TYPE_BLOCK_BOMB,				// 特殊ブロック_ボム
+		TYPE_OBJECT_VOLCANO,			// 火山
+		TYPE_BLOCKS_INVERTER,			// 電気ブロック
+		TYPE_BLOCKS_HARD,				// 硬いブロック
 		TYPE_MAX						// 最大数
 	} TYPE;
 
@@ -325,8 +327,6 @@ public:
 	CStencilshadow * GetStencillShadow(void) { return m_pStencilshadow; };
 	// 当たり判定状態取得
 	bool const GetbCollision(void);
-	// 当たり判定の情報を取得
-	CCollision * GetCollision(void);
 	// モデル情報の取得
 	static MODEL_LOAD * GetModelLoad(int const &nModelId);
 	// モデルidの取得
@@ -349,7 +349,6 @@ private:
 	float											m_fModelAlpha;		// モデルのアルファ値
 	D3DXCOLOR										* m_pModelCol;		// モデルカラー情報
 	CScene_THREE									* m_pShadow;		// まる影
-	CCollision										* m_Collision;		// 当たり判定
 	CStencilshadow									* m_pStencilshadow;	// ステンシルシャドウ
 };
 

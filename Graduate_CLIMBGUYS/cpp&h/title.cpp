@@ -7,6 +7,8 @@
 #include "title.h"
 #include "keyboard.h"
 #include "sound.h"
+#include "manager.h"
+#include "camera.h"
 
 /* 描画 */
 #include "fade.h"
@@ -21,6 +23,10 @@
 #include "normalblock.h"
 #include "bg.h"
 #include "connectblock.h"
+#include "stagingblock.h"
+#include "damagefloor.h"
+//#include "3Deffect.h"
+//#include "2Deffect.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -39,6 +45,7 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CTitle::CTitle()
 {
+	m_nTime = 0;
 
 }
 
@@ -58,14 +65,46 @@ void CTitle::Init(void)
 	// モード初期化
 	CBaseMode::Init();
 
+	// 3Dエフェクトの生成
+	C2DEffect::Create();
+
 	// タイトルUIの生成
 	CUi::LoadCreate(CUi::UITYPE_TILTE);
 
 	// ブロックの生成
-	CBaseblock::CreateInBulkBlock();
+	//CBaseblock::CreateInBulkBlock();
+
+	// とりあえずの仮
+	static D3DXVECTOR3 pos[MAX_STAGINGBLOCK];
+	pos[0] = STAGINGBLOCK_POS_C;
+	pos[1] = STAGINGBLOCK_POS_L;
+	pos[2] = STAGINGBLOCK_POS_I;
+	pos[3] = STAGINGBLOCK_POS_M;
+	pos[4] = STAGINGBLOCK_POS_B;
+	pos[5] = STAGINGBLOCK_POS_G;
+	pos[6] = STAGINGBLOCK_POS_U;
+	pos[7] = STAGINGBLOCK_POS_Y;
+	pos[8] = STAGINGBLOCK_POS_S;
+
+	// ブロックの最大数分生成しポインタを保存
+	for (int nCnt = 0; nCnt < MAX_STAGINGBLOCK; nCnt++)
+	{
+		CStagingBlock::Create(
+			pos[nCnt],
+			D3DVECTOR3_ZERO,
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f),
+			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
+			CScene_X::TYPE_OBJECT_BLOCK_C + nCnt,
+			false,
+			CStagingBlock::STAGING_BLOCKTYPE::LEVITATION
+		);
+	}
 
 	// 背景生成
 	CBg::Create(CTexture_manager::TYPE_BG_TITLE);
+
+	//
+	CStagingBlock::SetCondition(30, 6000, 1, CStagingBlock::STAGING_BLOCKTYPE::DESCENT);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,6 +112,7 @@ void CTitle::Init(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTitle::Uninit(void)
 {
+	CStagingBlock::SetEnd(false);
 	// モード終了
 	CBaseMode::Uninit();
 }
@@ -84,7 +124,22 @@ void CTitle::Update(void)
 {
 	// モード更新
 	CBaseMode::Update();
-	// ゲーム遷移
+
+	// 一定時間毎にエフェクトを出現
+	if (m_nTime++ % 10 == 0)
+	{
+		// パーティクル生成
+		C3DParticle::Create(
+			C3DParticle::PARTICLE_ID_AIRLINE,
+			SCREEN_CENTER_POS,
+			true
+		);
+	}
+
+	// 演出用オブジェクトの生成
+	CStagingBlock::Create_Block(SCREEN_CENTER_POS, D3DXVECTOR3(1280 * 0.5f, 0.0f,0.0f), CScene_X::TYPE_BLOCK_SPRING, CStagingBlock::STAGING_BLOCKTYPE::DESCENT);
+
+	// チュートリアルに画面遷移
 	if (CCalculation::PressAnyButton())
 	{
 		// フェード状態が何も起こっていない状態なら
@@ -95,20 +150,6 @@ void CTitle::Update(void)
 			CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
 		}
 	}
-
-	// 一定時間操作していなったら自動でタイトルへ移行する
-	//if (CBaseMode::GetTransitionCnt() <= 0)
-	//{
-	//	// フェード状態が何も起こっていない状態なら
-	//	if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-	//	{
-	//		CManager::GetFade()->SetFade(CManager::MODE_OPENING);
-	//	}
-	//}
-	//else
-	//{
-	//	CBaseMode::SetTransitionCnt(CBaseMode::GetTransitionCnt()-1);
-	//}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -132,3 +173,17 @@ CTitle * CTitle::Create(void)
 	// 生成したオブジェクトを返す
 	return pTitle;
 }
+
+// 一定時間操作していなったら自動でオープニングへ移行する
+//if (CBaseMode::GetTransitionCnt() <= 0)
+//{
+//	// フェード状態が何も起こっていない状態なら
+//	if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
+//	{
+//		CManager::GetFade()->SetFade(CManager::MODE_OPENING);
+//	}
+//}
+//else
+//{
+//	CBaseMode::SetTransitionCnt(CBaseMode::GetTransitionCnt()-1);
+//}

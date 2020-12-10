@@ -15,21 +15,18 @@
 #include "meshwall.h"
 #include "3Deffect.h"
 #include "time.h"
-#include "collision.h"
 #include "camera.h"
 #include "3Dparticle.h"
 #include "keyboard.h"
 #include "ui_group.h"
-#include "3Dmap.h"
 #include "player.h"
-#include "baseblock.h"
 #include "connectblock.h"
 #include "connect_fieldblock.h"
 #include "damagefloor.h"
 #include "bg.h"
 #include "XInputPad.h"
 #include "gameUI.h"
-
+#include "baseblock.h"
 #include "normalblock.h"
 #include "fieldblock.h"
 #include "springblock.h"
@@ -53,6 +50,7 @@
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CGame::STAGE	CGame::m_Stage = CGame::STAGE_1;	// ステージ
 int				CGame::m_nCntTime = 0;				// カウントタイム
+int				CGame::m_nTime = 0;					// タイム
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ
@@ -93,10 +91,12 @@ void CGame::Init(void)
 	CBg::Create(CTexture_manager::TYPE_BG);
 	// ゲームUIの生成
 	m_pGameUI = CGameUI::Create();
-
+	// オブジェクト生成
+	CScene_X::Create(D3DXVECTOR3(0.0f,0.0f,0.0f),
+		D3DVECTOR3_ZERO,
+		CScene_X::TYPE_OBJECT_VOLCANO);
 	// プレイヤー
 	CPlayer *pPlayer[(int)PLAYER_TAG::PLAYER_MAX] = {};
-
 	// プレイヤーの生成	試験的
 	pPlayer[(int)PLAYER_TAG::PLAYER_1] = CPlayer::Create(PLAYER_TAG::PLAYER_1, D3DXVECTOR3(-50.0, 300.0f, -50.0f));
 	pPlayer[(int)PLAYER_TAG::PLAYER_2] = CPlayer::Create(PLAYER_TAG::PLAYER_2, D3DXVECTOR3(50.0, 300.0f, -50.0f));
@@ -109,13 +109,16 @@ void CGame::Init(void)
 	//CConnectblock::TestCreate();
 	// ダメージ床の生成
 	CDamageFloor::Create();
+	// ダメージ床の開始フェーズが超えていたら
+	if (CBaseblock::GetBlockStatus().nFloorPhase <= CBaseblock::GetPhase())
+	{
+		CDamageFloor::SetUp(true);
+	}
 	/*
 	// 球の設定
 	CMeshsphere::Create(D3DXVECTOR3(0.0f, 0.0f, 3000.0f),
 		10000.0f);
 		*/
-
-
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -123,6 +126,9 @@ void CGame::Init(void)
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CGame::Uninit(void)
 {
+	// 静的変数の初期化
+	CPlayer::InitDieCount();
+
 	// モードの終了処理
 	CBaseMode::Uninit();
 	/*
@@ -139,6 +145,7 @@ void CGame::Uninit(void)
 	{
 		// ゲームUIの終了
 		m_pGameUI->Uninit();
+		delete m_pGameUI;
 		m_pGameUI = nullptr;
 	}
 
@@ -153,6 +160,30 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
+	// ブロックのフェーズ状態設定
+	if (m_nCntTime > 0 &&
+		!CBaseblock::GetBlockStatus().nChangeTime == 0 &&
+		m_nCntTime % DERAY_TIME(CBaseblock::GetBlockStatus().nChangeTime) == 0)
+	{
+		int nPhase = CBaseblock::GetPhase();
+		if (nPhase < CBaseblock::GetBlockStatus().nMaxSprit - 1)
+		{
+			nPhase++;
+			CBaseblock::SetPhase(nPhase);
+			// ダメージ床の開始フェーズが超えていたら
+			if (CBaseblock::GetBlockStatus().nFloorPhase <= nPhase)
+			{
+				CDamageFloor::SetUp(true);
+			}
+		}
+	}
+	// 経過時間を設定
+	if (m_nCntTime > 0 &&
+		m_nCntTime % DERAY_TIME(1) == 0)
+	{
+		m_nTime++;
+	}
+
 	// タイムカウント更新
 	m_nCntTime++;
 	// NULLチェック
@@ -212,6 +243,10 @@ void CGame::Update(void)
 			}
 		}
 	}
+#if BASEBLOCK_DEBUG
+	CBaseblock::NumAllDebug();
+#endif // BASEBLOCK_DEBUG
+
 #ifdef _DEBUG
 
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
@@ -278,6 +313,7 @@ CGame * CGame::Create(void)
 void CGame::StaticInit(void)
 {
 	m_nCntTime = 0;
+	m_nTime = 0;
 	CCharacter::InitStatic();
 	CBaseblock::BlockStaticValue();
 }

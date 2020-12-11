@@ -22,7 +22,9 @@
 
 #endif // ERROW_ACTION
 
-#define BASEBLOCK_FIELDMAX			(10)				// フィールドのブロック数
+#define BASEBLOCK_FIELDMAX			(9)				// フィールドのブロック数
+
+#define SPECIALBLOCK_MAXSORTPOINT	(100)			// 特殊ブロックの最大振り分けポイント
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 前方宣言
@@ -52,7 +54,17 @@ public:
 		BLOCKTYPE_ELECTRIC,		// 電気ブロック
 		BLOCKTYPE_MAX			// タイプ全体数
 	} BLOCKTYPE;
-
+	// 特殊爆弾情報
+	typedef enum
+	{
+		SPECIALBLOCK_NONE = 0,	// なし
+		SPECIALBLOCK_BOMB,		// ボム
+		SPECIALBLOCK_SPRING,	// ばね
+		SPECIALBLOCK_STEEL,		// 鋼鉄
+		SPECIALBLOCK_PANIC,		// こうらん
+		SPECIALBLOCK_ELECTRIC,	// 電気
+		SPECIALBLOCK_MAX		// 最大数
+	} SPECIALBLOCK;
 	// 上下左右前後
 	typedef enum
 	{
@@ -205,7 +217,49 @@ public:
 		D3DXVECTOR3	GoalPos;	// 目的位置
 	} PUSHAFTER;
 
+	// 特殊ブロックの各振り分けポイント
+	typedef struct _SPECIALSORT
+	{
+		// キャスト
+		operator int* () { return anSpecial; }
+		// 全て足した数
+		int AddSpecial(void)
+		{
+			int nAdd = 0;
+			for (int nCntSpecial = 0; nCntSpecial < SPECIALBLOCK_MAX; nCntSpecial++)
+			{
+				nAdd += anSpecial[nCntSpecial];
+			}
+			return nAdd;
+		}
+		// ランダム出力
+		SPECIALBLOCK GetRandam(void)
+		{
+			int nRand = (int)CCalculation::GetRandomRange((uint64_t)1, (uint64_t)SPECIALBLOCK_MAXSORTPOINT);
+			//int nRand = rand() % SPECIALBLOCK_MAXSORTPOINT;
 
+			int nAdd = 0;
+			for (int nCntSpecial = 0; nCntSpecial < SPECIALBLOCK_MAX; nCntSpecial++)
+			{
+				nAdd += anSpecial[nCntSpecial];
+				if (nAdd >= nRand)
+				{
+					return (SPECIALBLOCK)nCntSpecial;
+				}
+			}
+			return SPECIALBLOCK_NONE;
+		}
+		// 初期化処理
+		void Init(void)
+		{
+			int * npSpecial = anSpecial;
+			for (int nCntSpecial = 0; nCntSpecial < SPECIALBLOCK_MAX; nCntSpecial++, npSpecial++)
+			{
+				*npSpecial = 0;
+			}
+		}
+		int anSpecial[SPECIALBLOCK_MAX];
+	} SPECIALSORT;
 	// ----- ブロックのステータス ----- //
 	typedef struct _BLOCK_STATUS
 	{
@@ -218,29 +272,28 @@ public:
 			nMaxSprit = 0;			// 最大分割数
 			nChangeTime = 0;		// 変化させる時間(変化するタイミング)
 			nAppBlock = 0;			// ブロックが出現するタイミング
-
 			// ダメージ床用
 			fInitFloor = -100.0f;	// ダメージ床の初期位置
 			fFloorMove = 0;			// ダメージ床の移動速度
 			nFloorPhase = 0;		// ダメージ床の上がるフェーズタイミング
 		}
 		// ブロック用
-		float					fMove;					// 移動力
-		int						nAppearance;			// 出現する高さ
-		float					fBasicShadowSize;		// シャドウサイズ
-		int						nMaxSprit;				// 最大分割数
-		int						nChangeTime;			// 変化させる時間(変化するタイミング)
-		int						nAppBlock;				// ブロックが出現するタイミング
-		std::vector<INTEGER2>	v_nDropBlock;			// 落とすブロックの数
-		std::vector<FLOAT2>		v_fBlockGravity;		// 落ちる速度
+		float						fMove;							// 移動力
+		int							nAppearance;					// 出現する高さ
+		float						fBasicShadowSize;				// シャドウサイズ
+		int							nMaxSprit;						// 最大分割数
+		int							nChangeTime;					// 変化させる時間(変化するタイミング)
+		int							nAppBlock;						// ブロックが出現するタイミング
+		std::vector<SPECIALSORT>	v_Special;						// それぞれのブロックの出現する確率
+		std::vector<INTEGER2>		v_nDropBlock;					// 落とすブロックの数
+		std::vector<FLOAT2>			v_fBlockGravity;				// 落ちる速度
 
 		// ダメージ床用
-		std::vector<int>		v_nDamageFloorHight;	// ダメージ床の高さ
-		float					fInitFloor;				// ダメージ床の初期位置
-		float					fFloorMove;				// ダメージ床の移動速度
-		int						nFloorPhase;			// ダメージ床の上がるフェーズタイミング
+		std::vector<int>		v_nDamageFloorHight;			// ダメージ床の高さ
+		float					fInitFloor;						// ダメージ床の初期位置
+		float					fFloorMove;						// ダメージ床の移動速度
+		int						nFloorPhase;					// ダメージ床の上がるフェーズタイミング
 	} BLOCK_STATUS;
-
 	/* 関数 */
 	// コンストラクタ
 	CBaseblock();
@@ -455,6 +508,11 @@ public:
 	static void SetPhase(int const & nPhase)	{ m_nPhase = nPhase; };
 	// どの行列にブロックが落ちてくるか設定
 	static GRID SetFallPos(void);
+	// 特殊ブロックを度の行列に落ちてくるかの設定
+	static CBaseblock::GRID SetSpecialFallPos(void);
+	// 特殊ブロックの確立取得
+	static SPECIALSORT GetSpecialSort(int const & nPhase);
+
 #if IMGUI_DEBUG
 
 	// 全体のデバッグ処理
@@ -493,6 +551,22 @@ private:
 	void Collision(CBaseblock * pBlock);
 	// 自信と他のブロックの比較し、シャドウを更新させる処理
 	void Update_OtherShadow(CBaseblock * pBlock);
+
+#if IMGUI_DEBUG
+
+	/* ImGui用関数 */
+	// ブロックステータス用のImGui関数
+	static void BlockStatusImG(void);
+	// 特殊ブロックの名前別設定
+	static void SpecialSetImG(void);
+	// フェーズごとの各現在の確立振り分け数
+	static int NowSortPoint(int const & nBlockGravity);
+
+	// ダメージ床用のImGui関数
+	static void DamageStatusImG(void);
+
+#endif
+
 	/* 変数 */
 	static BLOCK_STATUS		m_BlockStatus;		// ブロックのステータス
 	CCircleshadow *			m_pShadowPolygon;	// シャドウポリゴン

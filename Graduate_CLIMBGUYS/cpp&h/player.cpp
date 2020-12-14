@@ -607,6 +607,13 @@ void CPlayer::Collision(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::BlockCollision(void)
 {
+	// やること
+	// 突っかかりをなくす
+
+
+
+
+
 	// 変数宣言
 	CBaseblock *			pBaseBlock;							// シーンX情報
 	COLLISIONDIRECTION		Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
@@ -705,19 +712,28 @@ void CPlayer::BlockCollision(void)
 			if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
 			{
 				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+				// ジャンプ可能設定
+				SetJumpAble(true);
 			}
 			// 電気ブロックなら
 			else if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
 			{
 				ElectricUse();
+				// ジャンプ可能設定
+				SetJumpAble(true);
 			}
 			// ばねブロックなら
 			else if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_SPRING)
 			{
 				SpringJump();
+				// ジャンプ可能設定
+				SetJumpAble(false);
 			}
-			// ジャンプ可能設定
-			SetJumpAble(true);
+			else
+			{
+				// ジャンプ可能設定
+				SetJumpAble(true);
+			}
 			m_DieStatus.bUp = true;
 		}
 		// 下
@@ -726,6 +742,12 @@ void CPlayer::BlockCollision(void)
 			m_DieStatus.bDown = true;
 		}
 	}
+
+
+
+
+
+
 	// 挟まったら死ぬ処理
 	if ((m_DieStatus.bUp && m_DieStatus.bDown) ||
 		(m_DieStatus.bFront && m_DieStatus.bBack) ||

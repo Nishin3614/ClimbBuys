@@ -359,6 +359,19 @@ public:
 		D3DXVECTOR3 * size,								// サイズ
 		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
 	);
+	// 押し出し当たり判定(ブロックが動いている場合)
+	//	Obj		: オブジェタイプ
+	//	pos		: 位置
+	//	move	: 移動量
+	//	size	: サイズ
+	COLLISIONDIRECTION PushCollision_BlockMove(
+		CScene::OBJ const & Obj,						// オブジェタイプ
+		D3DXVECTOR3 * pos,								// 位置
+		D3DXVECTOR3 * posOld,
+		D3DXVECTOR3 * move,								// 移動量
+		D3DXVECTOR3 * size,								// サイズ
+		D3DXVECTOR3 const & OffsetPos = D3DVECTOR3_ZERO	// オフセット位置
+	);
 	// 当たり判定
 	//	Obj		: オブジェタイプ
 	//	pos			: 位置

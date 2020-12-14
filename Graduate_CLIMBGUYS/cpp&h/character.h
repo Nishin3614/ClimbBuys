@@ -51,9 +51,10 @@ public:
 	{
 		MOTIONTYPE_NEUTRAL = 0,		// 待機モーション
 		MOTIONTYPE_MOVE,			// 移動モーション
-		MOTIONTYPE_DASH,			// ダッシュモーション
+		MOTIONTYPE_TACKLECHARGE,	// タックルチャージモーション
 		MOTIONTYPE_TACKLE,			// タックルモーション
 		MOTIONTYPE_JUMP,			// ジャンプモーション
+		MOTIONTYPE_FAINTED,			// 気絶モーション
 		MOTIONTYPE_BANZAI,			// バンザイモーション
 		MOTIONTYPE_VICTORY_01,		// 勝利モーション_01
 		MOTIONTYPE_VICTORY_02,		// 勝利モーション_02
@@ -250,6 +251,8 @@ protected:
 	int GetKeyInfoCnt(void) const					{ return m_keyinfoCnt; };
 	// モーションカメラの更新
 	void MotionCamera(void);
+	// 透明度変更処理
+	void AlphaCharacter(float const & fAlpha);
 	/* 変数 */
 	D3DXVECTOR3									m_pos;							// 位置
 	D3DXVECTOR3									m_move;							// 移動量

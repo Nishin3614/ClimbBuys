@@ -27,7 +27,7 @@
 #define BLOCK_SHADOWSIZE		(25.0f)									// ステンシルシャドウのサイズ
 #define BLOCK_STATUS_TXT		("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
 #define BLOCK_LIMIT_Y			(-500.0f)								// ブロックの制限区域
-#define BLOCK_LIMIT_WEIGHT		(1)									// 重さの限界
+#define BLOCK_LIMIT_WEIGHT		(1)										// 重さの限界
 #define BLOCK_MAX_RATIO			(10)									// 倍率
 #define BLOCK_SPECIALPOW		(2)										// 特殊ブロックの位置を微調整
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -609,22 +609,64 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 	CBaseblock::GRID MyGrid = this->GetGrid();					// 行列高
 	CGame::STAGE Stage = CGame::GetStage();						// ステージ
 
-	// やること
-	// 落ちるところの優先順位を付ける
-	// 上下の突っかかりをなくす
-//	if (CBaseblock::GetHeight(MyGrid.nColumn, MyGrid.nLine) <= MyGrid.nHeight)
-	{
 		// 素材のZ範囲
-		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
-			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 		{
-			// 素材のX範囲
-			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-				pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+
+				// 素材状の左に
+				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
+				//posOld->y = pos->y;
+				// 移動量の初期化
+				move->y = -1.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+				// 素材状の左に
+				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+				//posOld->y = pos->y;
+				// 移動量の初期化
+ 				move->y = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+				// タイプがボムなら
+				if (m_BlockType == BLOCKTYPE_BOMB)
+				{
+					// ボムの状態設定
+					CBombblock * pBombBlock = (CBombblock *)this;
+					pBombBlock->SetbBomb(true);
+				}
+				// タイプが電気なら
+				else if (m_BlockType == BLOCKTYPE_ELECTRIC)
+				{
+					// 電気の状態設定
+					CElectricblock * pElectBlock = (CElectricblock *)this;
+					pElectBlock->SetElectric(true);
+				}
+
+			}
+			if (Direct == COLLISIONDIRECTION::NONE)
 			{
 				// 当たり判定(下)
 				if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-					posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+					pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::DOWN;
@@ -632,15 +674,16 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					// 素材状の左に
 					pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
 					//posOld->y = pos->y;
+
 					// 移動量の初期化
-					move->y = -1.0f;
+					move->y = 0.0f;
 					// 押し出し状態がtrue
 					bPush = true;
 				}
 
 				// 当たり判定(上)
 				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-					posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+					pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::UP;
@@ -658,83 +701,32 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 						CBombblock * pBombBlock = (CBombblock *)this;
 						pBombBlock->SetbBomb(true);
 					}
-					// タイプが電気なら
-					else if (m_BlockType == BLOCKTYPE_ELECTRIC)
-					{
-						// 電気の状態設定
-						CElectricblock * pElectBlock = (CElectricblock *)this;
-						pElectBlock->SetElectric(true);
-					}
-
 				}
-				if (Direct == COLLISIONDIRECTION::NONE)
+				// 当たり判定(下)
+				else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+					pos->y + OffsetPos.y <= BlockPos.y)
 				{
-					// 当たり判定(下)
-					if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-						pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::DOWN;
+					// めり込んでいる
+					Direct = COLLISIONDIRECTION::DOWN;
+				}
 
-						// 素材状の左に
-						pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
-						//posOld->y = pos->y;
-
-						// 移動量の初期化
-						move->y = 0.0f;
-						// 押し出し状態がtrue
-						bPush = true;
-					}
-
-					// 当たり判定(上)
-					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-						pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
+				// 当たり判定(上)
+				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+					pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+				{
+					// めり込んでいる
+					Direct = COLLISIONDIRECTION::UP;
+					// タイプがボムなら
+					if (m_BlockType == BLOCKTYPE_BOMB)
 					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::UP;
-						// 素材状の左に
-						pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
-						//posOld->y = pos->y;
-						// 移動量の初期化
-						move->y = 0.0f;
-						// 押し出し状態がtrue
-						bPush = true;
-						// タイプがボムなら
-						if (m_BlockType == BLOCKTYPE_BOMB)
-						{
-							// ボムの状態設定
-							CBombblock * pBombBlock = (CBombblock *)this;
-							pBombBlock->SetbBomb(true);
-						}
-					}
-					// 当たり判定(下)
-					else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-						pos->y + OffsetPos.y <= BlockPos.y)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::DOWN;
-					}
-
-					// 当たり判定(上)
-					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-						pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::UP;
-						// タイプがボムなら
-						if (m_BlockType == BLOCKTYPE_BOMB)
-						{
-							// ボムの状態設定
-							CBombblock * pBombBlock = (CBombblock *)this;
-							pBombBlock->SetbBomb(true);
-						}
+						// ボムの状態設定
+						CBombblock * pBombBlock = (CBombblock *)this;
+						pBombBlock->SetbBomb(true);
 					}
 				}
 			}
 		}
 	}
-	// 当たった方向に情報が入っているなら
-	//if (bPush) return Direct;
 	// 素材のY範囲
 	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
 		pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange)
@@ -2151,6 +2143,7 @@ void CBaseblock::SpecialSetImG(void)
 				}
 			}
 		}
+		ImGui::TreePop();
 	}
 }
 

@@ -220,7 +220,8 @@
     <ClCompile Include="cpp&amp;h\signboard.cpp" />
     <ClCompile Include="cpp&amp;h\sound.cpp" />
     <ClCompile Include="cpp&amp;h\springblock.cpp" />
-    <ClCompile Include="cpp&amp;h\stagingblock.cpp" />
+    <ClCompile Include="cpp&amp;h\stagingObj.cpp" />
+    <ClCompile Include="cpp&amp;h\stagingObj_info.cpp" />
     <ClCompile Include="cpp&amp;h\steelblock.cpp" />
     <ClCompile Include="cpp&amp;h\stencilshadow.cpp" />
     <ClCompile Include="cpp&amp;h\texture_manager.cpp" />
@@ -300,7 +301,8 @@
     <ClInclude Include="cpp&amp;h\signboard.h" />
     <ClInclude Include="cpp&amp;h\sound.h" />
     <ClInclude Include="cpp&amp;h\springblock.h" />
-    <ClInclude Include="cpp&amp;h\stagingblock.h" />
+    <ClInclude Include="cpp&amp;h\stagingObj.h" />
+    <ClInclude Include="cpp&amp;h\stagingObj_info.h" />
     <ClInclude Include="cpp&amp;h\steelblock.h" />
     <ClInclude Include="cpp&amp;h\stencilshadow.h" />
     <ClInclude Include="cpp&amp;h\texture_manager.h" />

@@ -1,21 +1,21 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// 演出ブロック処理 [stagingblock.h]
+// 演出ブロック処理 [stagingobj_info.h]
 // Author : fujiwaramasato
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#ifndef _STAGINGBLOCK_H_
-#define _STAGINGBLOCK_H_
+#ifndef _STAGINGOBJ_INFO_H_
+#define _STAGINGOBJ_INFO_H_
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // インクルードファイル
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#include "title.h"
-#include "scene_x.h"
+#include "stagingobj.h"
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // マクロ定義
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#define MAX_STAGINGBLOCK (9)
+#define MAX_TITLEBLOCK_NUM (9)
 
 // 仮
 #define SPACE_Y (500)
@@ -41,31 +41,22 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // クラス
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class CStagingBlock : public CScene_X
+class CStagingObj_Info : public CScene
 {
 public:
-
-	enum class STAGING_BLOCKTYPE
+	/* 構造体 */
+	typedef struct Block_Condition
 	{
-		NORMAL,			// 通常
-		LEVITATION,		// 空中浮遊
-		ASCENT,			// 上昇
-		DESCENT,		// 下降
-		MAX
-	};
-
-	struct Block_Condition
-	{
-		int	nPerFrame[static_cast<int>(STAGING_BLOCKTYPE::MAX)];		// 何フレーム実行するか
-		int	nFrameBetween[static_cast<int>(STAGING_BLOCKTYPE::MAX)];	// 何フレーム枚に出現させるか
-		int	nToOnes[static_cast<int>(STAGING_BLOCKTYPE::MAX)];			// 一回にいくつ出現させるか
-	};
+		int	nPerFrame[static_cast<int>(CStagingObj::STAGING_OBJTYPE::MAX)];		// 何フレーム実行するか
+		int	nFrameBetween[static_cast<int>(CStagingObj::STAGING_OBJTYPE::MAX)];	// 何フレーム枚に出現させるか
+		int	nToOnes[static_cast<int>(CStagingObj::STAGING_OBJTYPE::MAX)];			// 一回にいくつ出現させるか
+	} Block_Condition;
 
 	/* 関数 */
 	// コンストラクタ
-	CStagingBlock();
+	CStagingObj_Info();
 	// デストラクタ
-	~CStagingBlock();
+	~CStagingObj_Info();
 	// 初期化処理
 	void Init(void);
 	// 更新処理
@@ -79,17 +70,6 @@ public:
 	static HRESULT Load(void);
 	// ベースブロック全ソースの開放
 	static void UnLoad(void);
-
-	// メモリの確保
-	static CStagingBlock *Create(
-		D3DXVECTOR3 const &pos,						// 位置
-		D3DXVECTOR3 const &rot,						// 回転
-		D3DXVECTOR3 const &size,					// サイズ倍率
-		D3DXCOLOR color,							// カラー
-		int const &nModelId,						// モデル番号
-		bool const &bShadowMap,						// シャドウマッピング状態
-		STAGING_BLOCKTYPE type
-	);
 
 	void Scene_MyCollision(
 		int const &nObjType = 0,	// オブジェクトタイプ
@@ -125,7 +105,7 @@ public:
 	D3DXVECTOR3 * Scene_GetPMove(void);
 
 	// ブロックの番号取得
-	int GetBlockNum() {return m_nBlockNun;};
+	int GetBlockNum() { return m_nBlockNun; };
 	// ブロックの番号設定
 	void SetBlockNum(int num) { m_nBlockNun = num; };
 	// ブロックが飛んでいくベクトルの設定
@@ -144,32 +124,24 @@ public:
 
 	/////// 二つセット ///////
 	// 生成するブロックの条件の設定
-	static void SetCondition(const int PerFrame, const int FrameBetween, const int ToOnes , STAGING_BLOCKTYPE type);
+	static void SetCondition(const int PerFrame, const int FrameBetween, const int ToOnes, CStagingObj::STAGING_OBJTYPE type);
+
+	// メモリの確保
+	static CStagingObj_Info *Create_StagingObj_Info();
 	// 一定時間毎に演出ブロックを生成
-	static void Create_Block(D3DXVECTOR3 Originpos,D3DXVECTOR3 Range, int const &nModelId, STAGING_BLOCKTYPE type);
+	static void Create_StagingObj(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int const &nModelId, CStagingObj::STAGING_OBJTYPE type,bool loop);
+	// 固定位置にオブジェクトを生成
+	static void Create_TitleObj();
 	// 条件の初期化
 	static void InitCondition();
-
-	////////////////////////////
-
-	// ブロックの移動処理
-	void BlockFall();
-	// ブロックの破裂
-	void BlockBurst();
 
 protected:
 private:
 	/* 関数 */
-	void				Levitating();							// 空中浮遊 タイトルで使う
-	void				Descent();								// 下降		タイトルで使う
-
-
-
 	/* 静的変数 */
 	static bool			m_bEnd;									// 演出終了フラグ
 
 	/* 変数 */
-	STAGING_BLOCKTYPE	m_BlockType = STAGING_BLOCKTYPE::NORMAL;// 演出ブロックの種類
 	static Block_Condition m_Condition;							// 条件の情報
 
 	float				m_fSpeed;								// 移動量

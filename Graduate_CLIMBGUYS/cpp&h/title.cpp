@@ -23,10 +23,12 @@
 #include "normalblock.h"
 #include "bg.h"
 #include "connectblock.h"
-#include "stagingblock.h"
 #include "damagefloor.h"
 //#include "3Deffect.h"
 //#include "2Deffect.h"
+
+#include "stagingObj_info.h"
+#include "stagingObj.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -46,7 +48,6 @@
 CTitle::CTitle()
 {
 	m_nTime = 0;
-
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -71,40 +72,17 @@ void CTitle::Init(void)
 	// タイトルUIの生成
 	CUi::LoadCreate(CUi::UITYPE_TILTE);
 
-	// ブロックの生成
-	//CBaseblock::CreateInBulkBlock();
-
-	// とりあえずの仮
-	static D3DXVECTOR3 pos[MAX_STAGINGBLOCK];
-	pos[0] = STAGINGBLOCK_POS_C;
-	pos[1] = STAGINGBLOCK_POS_L;
-	pos[2] = STAGINGBLOCK_POS_I;
-	pos[3] = STAGINGBLOCK_POS_M;
-	pos[4] = STAGINGBLOCK_POS_B;
-	pos[5] = STAGINGBLOCK_POS_G;
-	pos[6] = STAGINGBLOCK_POS_U;
-	pos[7] = STAGINGBLOCK_POS_Y;
-	pos[8] = STAGINGBLOCK_POS_S;
-
-	// ブロックの最大数分生成しポインタを保存
-	for (int nCnt = 0; nCnt < MAX_STAGINGBLOCK; nCnt++)
-	{
-		CStagingBlock::Create(
-			pos[nCnt],
-			D3DVECTOR3_ZERO,
-			D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
-			CScene_X::TYPE_OBJECT_BLOCK_C + nCnt,
-			false,
-			CStagingBlock::STAGING_BLOCKTYPE::LEVITATION
-		);
-	}
-
 	// 背景生成
 	CBg::Create(CTexture_manager::TYPE_BG_TITLE);
 
-	//
-	CStagingBlock::SetCondition(30, 6000, 1, CStagingBlock::STAGING_BLOCKTYPE::DESCENT);
+	// 設定
+	CStagingObj_Info::SetCondition(30, 6000, 1, CStagingObj::STAGING_OBJTYPE::NORMAL);
+	CStagingObj_Info::SetCondition(30, 6000, 1, CStagingObj::STAGING_OBJTYPE::LEVITATION);
+	CStagingObj_Info::SetCondition(30, 6000, 1, CStagingObj::STAGING_OBJTYPE::ASCENT);
+	CStagingObj_Info::SetCondition(30, 6000, 1, CStagingObj::STAGING_OBJTYPE::DESCENT);
+
+	// タイトルオブジェクトを生成
+	CStagingObj_Info::Create_TitleObj();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,7 +90,7 @@ void CTitle::Init(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTitle::Uninit(void)
 {
-	CStagingBlock::SetEnd(false);
+	//CStagingBlock::SetEnd(false);
 	// モード終了
 	CBaseMode::Uninit();
 }
@@ -122,9 +100,6 @@ void CTitle::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CTitle::Update(void)
 {
-	// モード更新
-	CBaseMode::Update();
-
 	// 一定時間毎にエフェクトを出現
 	if (m_nTime++ % 10 == 0)
 	{
@@ -136,8 +111,8 @@ void CTitle::Update(void)
 		);
 	}
 
-	// 演出用オブジェクトの生成
-	CStagingBlock::Create_Block(SCREEN_CENTER_POS, D3DXVECTOR3(1280 * 0.5f, 0.0f,0.0f), CScene_X::TYPE_BLOCK_SPRING, CStagingBlock::STAGING_BLOCKTYPE::DESCENT);
+	// 演出ブロックの生成
+	CStagingObj_Info::Create_StagingObj(D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), CScene_X::TYPE_BLOCK_SPRING, CStagingObj::STAGING_OBJTYPE::ASCENT,true);
 
 	// チュートリアルに画面遷移
 	if (CCalculation::PressAnyButton())
@@ -150,6 +125,9 @@ void CTitle::Update(void)
 			CManager::GetFade()->SetFade(CManager::MODE_TUTORIAL);
 		}
 	}
+
+	// モード更新
+	CBaseMode::Update();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -285,6 +285,12 @@ public:
 #ifdef _DEBUG
 	void Debug(void);
 #endif // _DEBUG
+#if IMGUI_DEBUG
+
+	static void AllDebugImGui(void);
+
+#endif // IMGUI_DEBUG
+
 	// 生成処理
 	//	tag	: プレイヤータグ
 	//	pos	: 位置
@@ -343,9 +349,9 @@ private:
 	// プレイヤーのステータスのロード
 	static void PlayerStatusLoad(void);
 	// プレイヤーのステータスのセーブ
-	void PlayerStatusSave(void);
+	static void PlayerStatusSave(void);
 	// プレイヤーのステータスの初期値のロード
-	void PlayerStatusInitLoad(void);
+	static void PlayerStatusInitLoad(void);
 
 	// プレイヤーの移動方向設定
 	void PlayerMoveSet(

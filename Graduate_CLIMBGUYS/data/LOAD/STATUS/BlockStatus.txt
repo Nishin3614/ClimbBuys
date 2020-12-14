@@ -1,9 +1,10 @@
 //------------------------------------------------------------
-// ブロックのステータス
+// ブロックとダメージ床のステータス
 //------------------------------------------------------------
 SCRIPT
 
 STATUS_SET
+// ブロックのステータス
 	AppBlock		= 5
 	Move			= 1.0
 	App				= 10
@@ -24,19 +25,101 @@ STATUS_SET
 	Phase 6
 		DropBlock		= 8 6
 	Phase 0
-		BlockGravity	= 0 1
+		BlockGravity	= 0.000000 1.000000
 	Phase 1
-		BlockGravity	= 2 1
+		BlockGravity	= 1.800000 1.000000
 	Phase 2
-		BlockGravity	= 3 1
+		BlockGravity	= 2.600000 1.000000
 	Phase 3
-		BlockGravity	= 4 1
+		BlockGravity	= 3.200000 1.000000
 	Phase 4
-		BlockGravity	= 4 2
+		BlockGravity	= 2.600000 2.000000
 	Phase 5
-		BlockGravity	= 5 2
+		BlockGravity	= 3.000000 2.000000
 	Phase 6
-		BlockGravity	= 6 2
+		BlockGravity	= 4.000000 2.000000
+	Phase 0
+	SPECIAL
+		NONE	= 30
+		BOMB	= 10
+		SPRING	= 10
+		STEEL	= 35
+		PANIC	= 10
+		ELECTRIC	= 5
+	SPECIALEND
+	Phase 0
+	SPECIAL
+		NONE	= 30
+		BOMB	= 10
+		SPRING	= 10
+		STEEL	= 35
+		PANIC	= 10
+		ELECTRIC	= 5
+	SPECIALEND
+	Phase 0
+	SPECIAL
+		NONE	= 30
+		BOMB	= 10
+		SPRING	= 10
+		STEEL	= 35
+		PANIC	= 10
+		ELECTRIC	= 5
+	SPECIALEND
+	Phase 0
+	SPECIAL
+		NONE	= 30
+		BOMB	= 10
+		SPRING	= 10
+		STEEL	= 35
+		PANIC	= 10
+		ELECTRIC	= 5
+	SPECIALEND
+	Phase 0
+	SPECIAL
+		NONE	= 30
+		BOMB	= 10
+		SPRING	= 10
+		STEEL	= 35
+		PANIC	= 10
+		ELECTRIC	= 5
+	SPECIALEND
+	Phase 0
+	SPECIAL
+		NONE	= 30
+		BOMB	= 10
+		SPRING	= 10
+		STEEL	= 35
+		PANIC	= 10
+		ELECTRIC	= 5
+	SPECIALEND
+	Phase 0
+	SPECIAL
+		NONE	= 30
+		BOMB	= 10
+		SPRING	= 10
+		STEEL	= 35
+		PANIC	= 10
+		ELECTRIC	= 5
+	SPECIALEND
+
+// ダメージ床のステータス
+	InitFloor		= -100.00
+	FloorMove		= 1.00
+	FloorPhase		= 1
+	Phase 0
+		DamegeFloor		= 0
+	Phase 1
+		DamegeFloor		= 5
+	Phase 2
+		DamegeFloor		= 4
+	Phase 3
+		DamegeFloor		= 4
+	Phase 4
+		DamegeFloor		= 3
+	Phase 5
+		DamegeFloor		= 3
+	Phase 6
+		DamegeFloor		= 2
 END_STATUS_SET
 
 END_SCRIPT

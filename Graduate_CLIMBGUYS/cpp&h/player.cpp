@@ -625,6 +625,12 @@ void CPlayer::BlockCollision(void)
 		// NULLなら
 		// ->関数を抜ける
 		if (pBaseBlock == NULL) continue;
+		else if (!CCalculation::Collision_Sphere(
+			CCharacter::GetPos(),
+			100.0f,
+			pBaseBlock->GetPos(),
+			1.0f
+		)) continue;
 		if (!(pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD ||	// フィールドブロックではない
 			pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_STEEL) &&	// 鋼鉄ブロックではない
 			m_Power.bTackleFrag &&										// 自身がタックルしている状態
@@ -1858,89 +1864,98 @@ void CPlayer::Scene_NoOpponentCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Debug(void)
 {
-	// プレイヤー1人だけ通す(ステータスが共通のため)
-	if (GetPlayerTag() == PLAYER_TAG::PLAYER_1)
-	{
-		if (ImGui::Begin(u8"プレイヤーのステータス"))
-		{
-			//if (ImGui::CollapsingHeader(u8"プレイヤーのステータス"))
-			{
-				// 移動量
-				ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
-				// ジャンプ力
-				ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0f, 1.0f, 50.0f);						/* 10.0f */
-				// 通常時の慣性
-				ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
-				// ジャンプ時の慣性
-				ImGui::DragFloat(u8"ジャンプ時の慣性", &m_PlayerStatus.fJumpInertia, 0.01f, 0.01f, 10.0f);		/* 1.6f */
-				// プレイヤーのサイズ
-				ImGui::DragFloat3(u8"プレイヤーのサイズ", m_PlayerStatus.PlayerSize, 1.0f, 0.0f, 500.0f);
-				// プレイヤーのオフセット
-				ImGui::DragFloat3(u8"プレイヤーのオフセット", m_PlayerStatus.PlayerOffSet, 1.0f, 0.0f, 500.0f);
-				// 押し出し用のサイズ
-				ImGui::DragFloat(u8"押し出し用のサイズ", &m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
-				// 押し出し用のオフセット
-				ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
-				// 押し出す時間
-				ImGui::DragInt(u8"押し出す時間", &m_PlayerStatus.nMaxPowerTime, 1.0f, 0);
-				// ブロックに押し出されたとき
-				if (ImGui::TreeNode(u8"ブロックに押し出されたときのステータス設定"))
-				{
-					// スタン時間
-					ImGui::DragInt(u8"(b)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_BLOCK], 1.0f, 0);
-					// 無敵時間
-					ImGui::DragInt(u8"(b)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_BLOCK], 1.0f, 0);
-					ImGui::TreePop();
-				}
-				// ジャンプで踏み倒されたとき
-				if (ImGui::TreeNode(u8"ジャンプで踏み倒されたときのステータス設定"))
-				{
-					// スタン時間
-					ImGui::DragInt(u8"(j)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP], 1.0f, 0);
-					// 無敵時間
-					ImGui::DragInt(u8"(j)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP], 1.0f, 0);
-					ImGui::TreePop();
-				}
-				// 電気で感電したとき
-				if (ImGui::TreeNode(u8"電気で感電したときのステータス設定"))
-				{
-					// スタン時間
-					ImGui::DragInt(u8"(e)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
-					// 無敵時間
-					ImGui::DragInt(u8"(e)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
-					ImGui::TreePop();
-				}
-
-				// パニック時間
-				ImGui::DragInt(u8"パニック時間", &m_PlayerStatus.nMaxPanicTime, 1.0f, 0);
-				// 重力を適用するフラグの切り替え
-				ImGui::Checkbox(u8"重力", &GetGravity());
-
-				// セーブボタン
-				if (ImGui::Button(u8"保存"))
-				{
-					// プレイヤーのステータスのセーブ
-					PlayerStatusSave();
-				}
-
-				// 改行キャンセル
-				ImGui::SameLine();
-
-				// 初期化
-				if (ImGui::Button(u8"初期化"))
-				{
-					// プレイヤーの初期ステータス代入
-					PlayerStatusInitLoad();
-				}
-				// 区切り線
-				ImGui::Separator();
-			}
-		}
-		// End
-		ImGui::End();
-	}
 }
 #endif // _DEBUG
+
+
+#if IMGUI_DEBUG
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ImGuiのデバッグ処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::AllDebugImGui(void)
+{
+
+	if (ImGui::Begin(u8"プレイヤーのステータス"))
+	{
+		//if (ImGui::CollapsingHeader(u8"プレイヤーのステータス"))
+		{
+			// 移動量
+			ImGui::DragFloat(u8"移動量", &m_PlayerStatus.fMove, 0.1f, 0.1f, 100.0f);						/* 3.0f */
+																										// ジャンプ力
+			ImGui::DragFloat(u8"ジャンプ力", &m_PlayerStatus.fJump, 1.0f, 1.0f, 50.0f);						/* 10.0f */
+																										// 通常時の慣性
+			ImGui::DragFloat(u8"通常時の慣性", &m_PlayerStatus.fNormalInertia, 0.01f, 0.01f, 10.0f);		/* 0.7f */
+																									// ジャンプ時の慣性
+			ImGui::DragFloat(u8"ジャンプ時の慣性", &m_PlayerStatus.fJumpInertia, 0.01f, 0.01f, 10.0f);		/* 1.6f */
+																									// プレイヤーのサイズ
+			ImGui::DragFloat3(u8"プレイヤーのサイズ", m_PlayerStatus.PlayerSize, 1.0f, 0.0f, 500.0f);
+			// プレイヤーのオフセット
+			ImGui::DragFloat3(u8"プレイヤーのオフセット", m_PlayerStatus.PlayerOffSet, 1.0f, 0.0f, 500.0f);
+			// 押し出し用のサイズ
+			ImGui::DragFloat(u8"押し出し用のサイズ", &m_PlayerStatus.PushSize, 1.0f, 0.0f, 500.0f);
+			// 押し出し用のオフセット
+			ImGui::DragFloat3(u8"押し出し用のオフセット", m_PlayerStatus.PushOffSet, 1.0f, 0.0f, 500.0f);
+			// 押し出す時間
+			ImGui::DragInt(u8"押し出す時間", &m_PlayerStatus.nMaxPowerTime, 1.0f, 0);
+			// ブロックに押し出されたとき
+			if (ImGui::TreeNode(u8"ブロックに押し出されたときのステータス設定"))
+			{
+				// スタン時間
+				ImGui::DragInt(u8"(b)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_BLOCK], 1.0f, 0);
+				// 無敵時間
+				ImGui::DragInt(u8"(b)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_BLOCK], 1.0f, 0);
+				ImGui::TreePop();
+			}
+			// ジャンプで踏み倒されたとき
+			if (ImGui::TreeNode(u8"ジャンプで踏み倒されたときのステータス設定"))
+			{
+				// スタン時間
+				ImGui::DragInt(u8"(j)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP], 1.0f, 0);
+				// 無敵時間
+				ImGui::DragInt(u8"(j)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP], 1.0f, 0);
+				ImGui::TreePop();
+			}
+			// 電気で感電したとき
+			if (ImGui::TreeNode(u8"電気で感電したときのステータス設定"))
+			{
+				// スタン時間
+				ImGui::DragInt(u8"(e)スタン時間", &m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
+				// 無敵時間
+				ImGui::DragInt(u8"(e)無敵時間", &m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_ELECTRIC], 1.0f, 0);
+				ImGui::TreePop();
+			}
+
+			// パニック時間
+			ImGui::DragInt(u8"パニック時間", &m_PlayerStatus.nMaxPanicTime, 1.0f, 0);
+			// 重力を適用するフラグの切り替え
+			ImGui::Checkbox(u8"重力", &GetGravity());
+
+			// セーブボタン
+			if (ImGui::Button(u8"保存"))
+			{
+				// プレイヤーのステータスのセーブ
+				PlayerStatusSave();
+			}
+
+			// 改行キャンセル
+			ImGui::SameLine();
+
+			// 初期化
+			if (ImGui::Button(u8"初期化"))
+			{
+				// プレイヤーの初期ステータス代入
+				PlayerStatusInitLoad();
+			}
+			// 区切り線
+			ImGui::Separator();
+		}
+	}
+	// End
+	ImGui::End();
+}
+#endif // IMGUI_DEBUG
+
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 生成処理

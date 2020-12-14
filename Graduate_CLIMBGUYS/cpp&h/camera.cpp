@@ -288,7 +288,7 @@ void CCamera::Update_Game(void)
 			// ダメージ床との距離が一定値より狭くなったら床と平行に高さを上げる
 			if (CCalculation::Range_Absolute(pDamageFloor->GetPos().y, m_posR.y) <= 100)
 			{
-				m_posR.y += pDamageFloor->GetDamageFloorMoveSpeed()/4;
+				m_posR.y += CBaseblock::GetBlockStatus().fFloorMove * 0.25f;
 			}
 		}
 
@@ -328,7 +328,8 @@ void CCamera::Draw(void)
 {
 }
 
-#ifdef _DEBUG
+#if IMGUI_DEBUG
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // カメラのデバッグ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -377,11 +378,6 @@ void CCamera::Debug(void)
 		// 区切り線
 		ImGui::Separator();
 	}
-	/*
-	CDebugproc::Print("PosV(%.1f,%.1f,%.1f)\n", m_posV.x, m_posV.y, m_posV.z);
-	CDebugproc::Print("m_posVDest(%.1f,%.1f,%.1f)\n", m_posVDest.x, m_posVDest.y, m_posVDest.z);
-	CDebugproc::Print("m_posVDiff(%.1f,%.1f,%.1f)\n", m_posVDiff.x, m_posVDiff.y, m_posVDiff.z);
-	*/
 }
 #endif // _DEBUG
 

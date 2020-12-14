@@ -192,15 +192,17 @@ typedef struct INTEGER2
 		nMax = X;
 		nMin = Y;
 	}
-	// int*型で返す
-	int * GetInteger(void)
-	{
-		return (int *)this;
-	}
 	// キャスト
 	inline operator int * ()
 	{
 		return (int *)this;
+	}
+	// ランダムな値を返す
+	int Randam(void)
+	{
+		int nRange = nMax - nMin;
+		if (nRange <= 0) return nMin;
+		return rand() % nRange + nMin;
 	}
 	union
 	{
@@ -320,6 +322,33 @@ typedef struct INTEGER4
 	int Z;
 	int	W;
 }INTEGER4, *PINTEGER4;
+
+// 浮動小数型2個
+typedef struct FLOAT2
+{
+	FLOAT2() {}
+	// 引数ありコンストラクタ
+	FLOAT2(float X, float Y)
+	{
+		fMax = X;
+		fMin = Y;
+	}
+	// キャスト
+	inline operator float * ()
+	{
+		return (float *)this;
+	}
+	union
+	{
+		struct
+		{
+			float fMax;
+			float fMin;
+		};
+	};
+
+	float fFloat[2];
+}FLOAT2, *PFLOAT2;
 
 // 配置オブジェクト情報(1:タイプ,2:位置,3:回転)
 typedef struct ARRANGEMENTOBJ
@@ -829,6 +858,8 @@ public:
 	static void CalcRotation(float &fRot);
 	// 回転を360度以内にする計算
 	static void CalcRotation_XYZ(D3DXVECTOR3 &rot);
+	// ランダムな浮動小数点数を生成
+	static float RandamFloat(float fMax, float fMin);
 	// 取得した値を倍にして返す
 	template<typename T> static T DoubleValue(T &Return, T Get);
 
@@ -854,6 +885,8 @@ public:
 	static PAD_STICK	m_PadStick[(int)PLAYER_TAG::PLAYER_MAX];		// コントローラーのスティック情報
 	static DIRECTION	m_direction;					//方向
 
+#if ERROW_ACTION
+
 	/* ImGui用関数 */
 	// ImGuiによるデバッグ情報
 	static void ImG_DebugInfo(void);
@@ -863,6 +896,8 @@ public:
 
 	// ImGuiのコンボボックス
 	static bool ImGui_Combobox(std::vector<std::string> aItemNameList, std::string aTitle, int &nValue);
+
+#endif // ERROW_ACTION
 
 protected:
 

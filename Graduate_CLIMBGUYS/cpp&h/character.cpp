@@ -44,7 +44,12 @@ int					CCharacter::m_NumParts[CHARACTER_MAX]		= {};		// 動かすキャラクター数
 int					CCharacter::m_NumModel[CHARACTER_MAX]		= {};		// 最大キャラクター数
 int					CCharacter::m_nAllCharacter					= 0;		// 出現しているキャラクター人数
 float				CCharacter::m_fAlpha						= 0.0f;		// 透明度
-bool				CCharacter::m_bGravity						= true;		// 重力を適用するフラグ
+#if CHARACTER_DEBUG
+bool				CCharacter::m_bGravity = false;		// 重力を適用するフラグ
+#else
+bool				CCharacter::m_bGravity = true;		// 重力を適用するフラグ
+#endif // CHARACTER_DEBUG
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
@@ -154,7 +159,7 @@ void CCharacter::Init()
 		// ステンシルシャドウの生成
 		m_pStencilshadow = CStencilshadow::Create(
 			m_pos,
-			D3DXVECTOR3(10.0f, 10000.0f, 10.0f),
+			D3DXVECTOR3(10.0f, 1000.0f, 10.0f),
 			CStencilshadow::TYPE_CYLINDER,
 			CScene::LAYER_3DCHARACTERSHADOW
 		);
@@ -203,6 +208,7 @@ void CCharacter::Update(void)
 	{
 		// 位置取得
 		D3DXVECTOR3 pos = m_pos;
+		pos.y += 10.0f;
 		// ステンシルシャドウの位置設定
 		m_pStencilshadow->SetPos(m_pos);
 	}
@@ -333,14 +339,6 @@ void CCharacter::ModelUpdate(void)
 		{
 			// 更新
 			m_pModel[nCntModel].Update();
-
-#ifdef _DEBUG
-			if (m_character == CHARACTER::CHARACTER_PLAYER_0)
-			{
-				//CDebugproc::Print("キャラクター番号(%d)\n", m_character);
-				//m_pModel[nCntModel].Debug();
-			}
-#endif // _DEBUG
 		}
 	}
 }
@@ -814,14 +812,24 @@ void CCharacter::InitStatic(void)
 }
 
 #ifdef _DEBUG
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デバッグ表示
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::Debug(void)
 {
+#if CHARACTER_DEBUG
+
 	// 移動量表示
 	CDebugproc::Print("キャラクター[%d]:移動量(%.2f,%.2f,%.2f)\n", m_character, m_move.x, m_move.y, m_move.z);
+
+#endif // CHARACTER_DEBUG
 }
+
+
+#endif // _DEBUG
+
+#if IMGUI_DEBUG
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デバッグ表示(キャラクター全体)
@@ -832,5 +840,5 @@ void CCharacter::AllDebug(void)
 
 	*/
 }
-#endif // _DEBUG
 
+#endif // IMGUI_DEBUG

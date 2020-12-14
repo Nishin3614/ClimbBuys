@@ -53,18 +53,12 @@ bool		g_bDestWind = false;	// ゲームを終了する
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine, int nCmdShow)
 {
 #if ERROW_ACTION
-	// メモリリーク検索設定
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(99);
-#endif
 	// メモリリーク検出
 	_CrtDumpMemoryLeaks();
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+#endif
 	//_CrtSetBreakAlloc(40474);
-	// メモリリーク検索設定
-	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(39110);
 
 	// シード値を時間にする
 	srand((unsigned)time(NULL));
@@ -116,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 		NULL				 // ウィンドウ作成データ
 	);
 
-#if ERROW_ACTION
+#ifdef _DEBUG
 	// コンソール呼び出し
 	AllocConsole();
 	FILE *fp = NULL;
@@ -234,7 +228,7 @@ void SetDestWind(bool const &bDest)
 	g_bDestWind = bDest;
 }
 
-#ifdef _DEBUG
+#if IMGUI_DEBUG
 // ----------------------------------------------------------------------------------------------------
 // ImGuiプロシージャー関数
 // ----------------------------------------------------------------------------------------------------
@@ -245,10 +239,10 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 // ----------------------------------------------------------------------------------------------------
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-#ifdef _DEBUG
+#if IMGUI_DEBUG
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return true;
-#endif // _DEBUG
+#endif // IMGUI_DEBUG
 
 	switch (uMsg)
 	{

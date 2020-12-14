@@ -23,8 +23,8 @@
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 /* D3DXVECTOR3((基準値 + 幅 * nCnt), ((サイズY / 2 + サイズY[下の画面外に出すため]) + (移動量 * ずらすフレーム数) * nCnt), 0.0f) */
-#define RESULT_UI_FRAME_POS								(D3DXVECTOR3((160.0f + 320.0f * nCnt), (1080.0f + 210.0f * nCnt), 0.0f))		// 枠の位置
-#define RESULT_UI_FRAME_SIZE							(D3DXVECTOR2(320.0f, SCREEN_HEIGHT))	// 枠のサイズ
+#define RESULT_UI_FRAME_POS								(D3DXVECTOR3((163.0f + 320.0f * nCnt), (1080.0f + 210.0f * nCnt), 0.0f))		// 枠の位置
+#define RESULT_UI_FRAME_SIZE							(D3DXVECTOR2(326.0f, SCREEN_HEIGHT))	// 枠のサイズ
 #define RESULT_UI_FRAME_MOVE_STOP_POS_Y					(360.0f)								// 枠の移動が止まる位置Y
 
 #define RESULT_UI_RANK_POS								(D3DXVECTOR3((265.0f + 320.0f * (nCnt - (int)RESULT_UI::RANK_01)), (740.0f + 210.0f * (nCnt - (int)RESULT_UI::RANK_01)), 0.0f))		// 順位の位置

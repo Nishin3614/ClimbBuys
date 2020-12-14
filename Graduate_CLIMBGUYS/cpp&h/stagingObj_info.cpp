@@ -1,10 +1,12 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
-// 演出ブロック処理 [stagingblock.cpp]
+// 演出ブロック処理 [stagingobj_info.cpp]
 // Author : fujiwaramasato
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#include "stagingblock.h"
+#include "stagingobj_info.h"
+//#include "stagingobj.h"
+
 #include "debugproc.h"
 
 #include "manager.h"
@@ -15,8 +17,6 @@
 #include "basemode.h"
 #include "opening.h"
 #include "openingmanager.h"
-
-#include "3dparticle.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -29,86 +29,58 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool CStagingBlock::m_bEnd = false;
-int CStagingBlock::m_nFrame = 0;
-CStagingBlock::Block_Condition CStagingBlock::m_Condition = {};
+bool CStagingObj_Info::m_bEnd = false;
+int CStagingObj_Info::m_nFrame = 0;
+CStagingObj_Info::Block_Condition CStagingObj_Info::m_Condition = {};
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CStagingBlock::CStagingBlock() : CScene_X::CScene_X()
+CStagingObj_Info::CStagingObj_Info() : CScene::CScene()
 {
 	m_bStopMove = false;
 	m_nAngle = 0;
 	m_Vector = D3DVECTOR3_ZERO;
-	m_BlockType = STAGING_BLOCKTYPE::NORMAL;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // デストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CStagingBlock::~CStagingBlock()
+CStagingObj_Info::~CStagingObj_Info()
 {
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 初期化処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Init()
+void CStagingObj_Info::Init()
 {
-	// 速さの初期値
-	m_fSpeed = 10.0f;
-	m_fBurstSpeed = 10.0f;
-	// 吹っ飛びベクトルをランダムに設定
-	SetBurstVector(CCalculation::RandomDirectionVector(NULL, true));
-	// シーンxの初期化
-	CScene_X::Init();
-	m_Vector.y = -1.0f;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 終了処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Uninit(void)
+void CStagingObj_Info::Uninit(void)
 {
-	CScene_X::Uninit();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 更新処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Update(void)
+void CStagingObj_Info::Update(void)
 {
-	switch (m_BlockType)
-	{
-	case CStagingBlock::STAGING_BLOCKTYPE::NORMAL:
-		break;
-	case CStagingBlock::STAGING_BLOCKTYPE::LEVITATION:
-		// 空中浮遊処理
-		Levitating();
-		break;
-	case CStagingBlock::STAGING_BLOCKTYPE::ASCENT:
-		break;
-	case CStagingBlock::STAGING_BLOCKTYPE::DESCENT:
-		// 下降処理
-		Descent();
-		break;
-	}
-
-	CScene_X::Update();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 描画処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Draw(void)
+void CStagingObj_Info::Draw(void)
 {
-	CScene_X::Draw();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ベースブロック全ソースの読み込み
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-HRESULT CStagingBlock::Load(void)
+HRESULT CStagingObj_Info::Load(void)
 {
 	return S_OK;
 }
@@ -116,34 +88,42 @@ HRESULT CStagingBlock::Load(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 読み込んだ情報を破棄処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::UnLoad(void)
+void CStagingObj_Info::UnLoad(void)
 {
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 純粋仮想関数 必要ない関数
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CStagingObj_Info::Scene_MyCollision(int const & nObjType, CScene * pScene) {}
+void CStagingObj_Info::Scene_OpponentCollision(int const & nObjType, CScene * pScene) {}
+void CStagingObj_Info::Scene_NoMyCollision(int const & nObjType, CScene * pScene) {}
+void CStagingObj_Info::Scene_NoOpponentCollision(int const & nObjType, CScene * pScene) {}
+D3DXVECTOR3 * CStagingObj_Info::Scene_GetPPos(void) { return nullptr; }
+D3DXVECTOR3 * CStagingObj_Info::Scene_GetPPosold(void) { return nullptr; }
+D3DXVECTOR3 * CStagingObj_Info::Scene_GetPMove(void) { return nullptr; }
+
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 条件の設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CStagingObj_Info::SetCondition(const int PerFrame, const int FrameBetween, const int ToOnes, CStagingObj::STAGING_OBJTYPE type)
+{
+	m_Condition.nPerFrame[static_cast<int>(type)] = PerFrame;
+	m_Condition.nFrameBetween[static_cast<int>(type)] = FrameBetween;
+	m_Condition.nToOnes[static_cast<int>(type)] = ToOnes;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // メモリの生成
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CStagingBlock * CStagingBlock::Create(D3DXVECTOR3 const &pos,
-	D3DXVECTOR3 const &rot,
-	D3DXVECTOR3 const &size,
-	D3DXCOLOR color,
-	int const &nModelId,
-	bool const &bShadowMap,
-	STAGING_BLOCKTYPE type)
+CStagingObj_Info * CStagingObj_Info::Create_StagingObj_Info()
 {
 	// 変数宣言
-	CStagingBlock * pStagingBlock = new CStagingBlock;
+	CStagingObj_Info * pStagingBlock = new CStagingObj_Info;
 
 	// シーン管理設定
 	pStagingBlock->ManageSetting(CScene::LAYER_3DOBJECT);
-
-	pStagingBlock->SetPos(pos);
-	pStagingBlock->SetRot(rot);
-	pStagingBlock->SetSize(size);
-	pStagingBlock->SetModelColor(color);
-	pStagingBlock->SetModelId(nModelId);
-	pStagingBlock->SetShadowMap(bShadowMap);
-	pStagingBlock->m_BlockType = type;
 
 	// 初期化処理
 	pStagingBlock->Init();
@@ -153,101 +133,9 @@ CStagingBlock * CStagingBlock::Create(D3DXVECTOR3 const &pos,
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 純粋仮想関数 必要ない関数
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Scene_MyCollision(int const & nObjType, CScene * pScene){}
-void CStagingBlock::Scene_OpponentCollision(int const & nObjType, CScene * pScene){}
-void CStagingBlock::Scene_NoMyCollision(int const & nObjType, CScene * pScene){}
-void CStagingBlock::Scene_NoOpponentCollision(int const & nObjType, CScene * pScene){}
-D3DXVECTOR3 * CStagingBlock::Scene_GetPPos(void){return nullptr;}
-D3DXVECTOR3 * CStagingBlock::Scene_GetPPosold(void){return nullptr;}
-D3DXVECTOR3 * CStagingBlock::Scene_GetPMove(void){return nullptr;}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ブロックの移動
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::BlockFall()
-{
-	if (!m_bStopMove)
-	{
-		D3DXVECTOR3 vector = COpeningManager::GetTargetpos(this->m_nBlockNun) - this->GetPos();
-		D3DXVec3Normalize(&vector, &vector);
-
-		D3DXVECTOR3 temppos = this->GetPos() + vector * m_fSpeed;
-
-		if (temppos.y <= COpeningManager::GetTargetpos(this->m_nBlockNun).y)
-		{
-			this->SetPos(COpeningManager::GetTargetpos(this->m_nBlockNun));
-		}
-		else
-		{
-			this->SetPos(this->GetPos() + vector * m_fSpeed);
-		}
-	}
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// ブロックの破裂
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::BlockBurst()
-{
-	if (this->m_nBlockNun == 4)
-	{
-		m_Vector = CManager::GetRenderer()->GetCamera()->GetPosV() - D3DXVECTOR3(this->GetPos().x, this->GetPos().y + 80, this->GetPos().z);
-
-		if (CCalculation::Range_Absolute(CManager::GetRenderer()->GetCamera()->GetPosV().z, this->GetPos().z) <= 50)
-		{
-			// タイトルへ遷移
-			// フェード状態が何も起こっていない状態なら
-			if (CManager::GetFade()->GetFade() == CFade::FADE_NONE)
-			{
-				CManager::GetFade()->SetFade(CManager::MODE_TITLE);
-			}
-		}
-		else
-		{
-			D3DXVec3Normalize(&m_Vector, &m_Vector);
-			this->SetPos(this->GetPos() + m_Vector * m_fBurstSpeed);
-		}
-	}
-	else
-	{
-		this->SetPos(this->GetPos() + m_Vector * m_fBurstSpeed);
-	}
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 空中浮遊処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Levitating()
-{
-	float fSpeed = (float)CCalculation::GetRandomRange(10, 30);
-
-	GetPos().y += sinf(m_nAngle++ * D3DX_PI / 50) * (fSpeed *= 0.1f);
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 下降処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Descent()
-{
-	GetPos().y -= 2.0f;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 条件の設定
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::SetCondition(const int PerFrame, const int FrameBetween, const int ToOnes, STAGING_BLOCKTYPE type)
-{
-	m_Condition.nPerFrame[static_cast<int>(type)]		= PerFrame;
-	m_Condition.nFrameBetween[static_cast<int>(type)]	= FrameBetween;
-	m_Condition.nToOnes[static_cast<int>(type)]			= ToOnes;
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 一定時間毎に演出ブロックを生成
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::Create_Block(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int const & nModelId, STAGING_BLOCKTYPE type)
+void CStagingObj_Info::Create_StagingObj(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int const & nModelId, CStagingObj::STAGING_OBJTYPE type, bool loop)
 {
 	m_nFrame++;
 
@@ -264,7 +152,7 @@ void CStagingBlock::Create_Block(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int c
 		if (Range != NULL)
 		{
 			CreatePos.x = CCalculation::Random(Originpos.x + Range.x);
-			CreatePos.y = Originpos.x;
+			CreatePos.y = Originpos.y;
 			CreatePos.z = Originpos.z;
 		}
 		else
@@ -273,12 +161,12 @@ void CStagingBlock::Create_Block(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int c
 		}
 
 		// オブジェクトの生成
-		CStagingBlock::Create(
+		CStagingObj::Create(
 			CreatePos,
 			RandomRot,
 			D3DXVECTOR3(3.0f, 3.0f, 3.0f),
 			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
-			CScene_X::TYPE_BLOCK_SPRING,
+			nModelId,
 			false,
 			type
 		);
@@ -290,14 +178,57 @@ void CStagingBlock::Create_Block(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int c
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 固定値にブロックを生成
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CStagingObj_Info::Create_TitleObj()
+{
+	CScene_X::TYPE type[MAX_TITLEBLOCK_NUM];
+	type[0] = CScene_X::TYPE_OBJECT_BLOCK_C;
+	type[1] = CScene_X::TYPE_OBJECT_BLOCK_L;
+	type[2] = CScene_X::TYPE_OBJECT_BLOCK_I;
+	type[3] = CScene_X::TYPE_OBJECT_BLOCK_M;
+	type[4] = CScene_X::TYPE_OBJECT_BLOCK_B;
+	type[5] = CScene_X::TYPE_OBJECT_BLOCK_G;
+	type[6] = CScene_X::TYPE_OBJECT_BLOCK_U;
+	type[7] = CScene_X::TYPE_OBJECT_BLOCK_Y;
+	type[8] = CScene_X::TYPE_OBJECT_BLOCK_S;
+
+	D3DXVECTOR3 pos[MAX_TITLEBLOCK_NUM];
+	pos[0] = STAGINGBLOCK_POS_C;
+	pos[1] = STAGINGBLOCK_POS_L;
+	pos[2] = STAGINGBLOCK_POS_I;
+	pos[3] = STAGINGBLOCK_POS_M;
+	pos[4] = STAGINGBLOCK_POS_B;
+	pos[5] = STAGINGBLOCK_POS_G;
+	pos[6] = STAGINGBLOCK_POS_U;
+	pos[7] = STAGINGBLOCK_POS_Y;
+	pos[8] = STAGINGBLOCK_POS_S;
+
+
+	for (int nCnt = 0; nCnt < MAX_TITLEBLOCK_NUM; nCnt++)
+	{
+		// オブジェクトの生成
+		CStagingObj::Create(
+			pos[nCnt],
+			D3DVECTOR3_ZERO,
+			D3DXVECTOR3(1.0f, 1.0f, 1.0f),
+			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
+			type[nCnt],
+			false,
+			CStagingObj::STAGING_OBJTYPE::LEVITATION
+		);
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 条件の初期化
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CStagingBlock::InitCondition()
+void CStagingObj_Info::InitCondition()
 {
-	for (int nCnt = 0; nCnt < static_cast<int>(STAGING_BLOCKTYPE::MAX); nCnt++)
+	for (int nCnt = 0; nCnt < static_cast<int>(CStagingObj::STAGING_OBJTYPE::MAX); nCnt++)
 	{
-		m_Condition.nPerFrame[nCnt]		 = NULL;
-		m_Condition.nFrameBetween[nCnt]	 = NULL;
-		m_Condition.nToOnes[nCnt]		 = NULL;
+		m_Condition.nPerFrame[nCnt] = NULL;
+		m_Condition.nFrameBetween[nCnt] = NULL;
+		m_Condition.nToOnes[nCnt] = NULL;
 	}
 }

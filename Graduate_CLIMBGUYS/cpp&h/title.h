@@ -52,7 +52,6 @@ public:
 
 protected:
 private:
-	int					m_nTime;								// パーティクルの出現時間カウント
-
+	int m_nTime;
 };
 #endif

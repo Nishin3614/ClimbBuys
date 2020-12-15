@@ -60,6 +60,7 @@ public:
 		MOTIONTYPE_VICTORY_02,		// 勝利モーション_02
 		MOTIONTYPE_VICTORY_03,		// 勝利モーション_03
 		MOTIONTYPE_VICTORY_04,		// 勝利モーション_04
+		MOTIONTYPE_V_01_WAIT,		// 処理モーション_01後の待機モーション
 		MOTIONTYPE_MAX				// 最大数
 	} MOTIONTYPE;
 	// キャラクター

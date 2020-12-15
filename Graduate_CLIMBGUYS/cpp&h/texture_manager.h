@@ -55,21 +55,22 @@ public:
 		TYPE_RESULT_UI_DEATH_01,	// リザルトUI_死因_01
 		TYPE_RESULT_UI_DEATH_02,	// リザルトUI_死因_02
 		TYPE_RESULT_UI_DEATH_03,	// リザルトUI_死因_03
-		TYPE_RESULT_UI_DEATH_04,	// リザルトUI_死因_04
 		TYPE_GAME_UI_NAME_TAG_01,	// ゲームUI_ネームタグ_01
 		TYPE_GAME_UI_NAME_TAG_02,	// ゲームUI_ネームタグ_02
 		TYPE_GAME_UI_NAME_TAG_03,	// ゲームUI_ネームタグ_03
 		TYPE_GAME_UI_NAME_TAG_04,	// ゲームUI_ネームタグ_04
+		TYPE_GAME_UI_GRAY_SQUARE,	// ゲームUI_灰色の四角
 		TYPE_GAME_UI_START,			// ゲームUI_START
 		TYPE_GAME_UI_FINISH,		// ゲームUI_FINISH
 		TYPE_TUTORIAL_UI_OK,		// チュートリアルUI_OKサイン
-		TYPE_EFFECT_SMOKE00,		// 煙
+		TYPE_EFFECT_SMOKE00,		// 噴火
 		TYPE_EFFECT_SMOKE01,		// 煙
 		TYPE_EFFECT_SPARK,			// 火花
 		TYPE_EFFECT_BLOCK,			// ブロック
 		TYPE_EFFECT_FIRE,			// 火
 		TYPE_EFFECT_EXPLOSION,		// 爆発
 		TYPE_BG_TITLE,				// タイトル背景
+		TYPE_BG_AIR_SLASH,			// 空気の線
 		TYPE_MAX					// 最大数
 	} TYPE;
 

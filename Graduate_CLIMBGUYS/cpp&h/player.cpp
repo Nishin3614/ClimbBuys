@@ -37,6 +37,8 @@
 #define DASH_ENABLE_STICK_RANGE		(0.8f)		// ダッシュを有効にするスティックの傾き
 #define PLAYER_STATUS_TXT			("data/LOAD/STATUS/PlayerStatus.txt")	// プレイヤーのステータスのテキスト
 #define RESPAWN_POS					(D3DXVECTOR3(0.0f, 300.0f, 0.0f))		// リスポーン地点
+#define INVINCIBLEALPHA				(0.2f)									// 無敵時の透明度
+#define NORMALALPHA					(1.0f)									// 通常時の透明度
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -448,7 +450,7 @@ void CPlayer::MyMove(void)
 		// 試験的タックル
 		if (pKeyboard->GetKeyboardTrigger(DIK_J))
 		{
-			SetMotion(MOTIONTYPE_TACKLE);
+			SetMotion(MOTIONTYPE_TACKLECHARGE);
 			m_Power.bCharge = true;
 		}
 	}
@@ -509,7 +511,7 @@ void CPlayer::MyMove(void)
 			// 試験的タックル ( のちに中身変わる予定 多分 )
 			if (m_pPad->GetTrigger(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
 			{
-				SetMotion(MOTIONTYPE_DASH);
+				SetMotion(MOTIONTYPE_TACKLECHARGE);
 				m_Power.bCharge = true;
 			}
 		}
@@ -605,6 +607,13 @@ void CPlayer::Collision(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::BlockCollision(void)
 {
+	// やること
+	// 突っかかりをなくす
+
+
+
+
+
 	// 変数宣言
 	CBaseblock *			pBaseBlock;							// シーンX情報
 	COLLISIONDIRECTION		Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
@@ -624,7 +633,8 @@ void CPlayer::BlockCollision(void)
 		pBaseBlock = (CBaseblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
 		// NULLなら
 		// ->関数を抜ける
-		if (pBaseBlock == NULL) continue;
+		if (!pBaseBlock) continue;
+		else if (!pBaseBlock->GetUse()) continue;
 		else if (!CCalculation::Collision_Sphere(
 			CCharacter::GetPos(),
 			100.0f,
@@ -674,27 +684,6 @@ void CPlayer::BlockCollision(void)
 			&m_PlayerStatus.PlayerSize,
 			m_PlayerStatus.PlayerOffSet
 		);
-
-		// ブロックの種類がバネブロックだったら
-		CSpringblock *pSpringblock = (CSpringblock *)CScene::GetScene(CScene::LAYER_3DBLOCK, nCntBlock);
-		if (pSpringblock && pSpringblock->GetModelId() == CScene_X::TYPE_BLOCK_SPRING)
-		{
-			if (// バネブロックの上からの処理
-				pSpringblock->PushCollision(
-					this,
-					m_PlayerStatus.PlayerOffSet,
-					&m_PlayerStatus.PlayerSize
-				))
-			{
-				SetJumpAble(false);
-				Direct = COLLISIONDIRECTION::NONE;
-			}
-			else
-			{
-				m_bSpringFlag = false;
-			}
-		}
-
 		// ブロックの判定
 		// 前
 		if (Direct == COLLISIONDIRECTION::FRONT)
@@ -723,14 +712,28 @@ void CPlayer::BlockCollision(void)
 			if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
 			{
 				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+				// ジャンプ可能設定
+				SetJumpAble(true);
 			}
 			// 電気ブロックなら
 			else if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
 			{
 				ElectricUse();
+				// ジャンプ可能設定
+				SetJumpAble(true);
 			}
-			// ジャンプ可能設定
-			SetJumpAble(true);
+			// ばねブロックなら
+			else if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_SPRING)
+			{
+				SpringJump();
+				// ジャンプ可能設定
+				SetJumpAble(false);
+			}
+			else
+			{
+				// ジャンプ可能設定
+				SetJumpAble(true);
+			}
 			m_DieStatus.bUp = true;
 		}
 		// 下
@@ -739,6 +742,12 @@ void CPlayer::BlockCollision(void)
 			m_DieStatus.bDown = true;
 		}
 	}
+
+
+
+
+
+
 	// 挟まったら死ぬ処理
 	if ((m_DieStatus.bUp && m_DieStatus.bDown) ||
 		(m_DieStatus.bFront && m_DieStatus.bBack) ||
@@ -867,6 +876,10 @@ void CPlayer::CharacterCollision(void)
 			pPlayer->m_Stan.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
 			// 無敵状態設定
 			pPlayer->m_Invincible.Set(true, m_PlayerStatus.nMaxInvincibleTime[STATUSTYPE_JUMP] + m_PlayerStatus.nMaxStanTime[STATUSTYPE_JUMP]);
+			// 透明化
+			pPlayer->AlphaCharacter(INVINCIBLEALPHA);
+			// 気絶モーション
+			pPlayer->SetMotion(MOTIONTYPE_FAINTED);
 		}
 	}
 }
@@ -1128,18 +1141,24 @@ void CPlayer::PowerUpdate(void)
 	if (!m_Power.bCharge) return;
 	if (m_Power.nCntTime == m_PlayerStatus.nMaxPowerTime)
 	{
-		m_Power.nPushPower++;
+		m_Power.bCharge = false;
+		m_Power.bDashFlag = true;
+		m_Power.bTackleFrag = true;
+		m_Power.nCntTime = 0;
+		SetMotion(MOTIONTYPE_TACKLE);
+		m_Power.nPushPower = 2;
 	}
 	// ボタンが離されたら
-	if (CManager::GetKeyboard()->GetKeyboardRelease(DIK_J))
+	else if (CManager::GetKeyboard()->GetKeyboardRelease(DIK_J))
 	{
 		m_Power.bCharge = false;
 		m_Power.bDashFlag = true;
 		m_Power.bTackleFrag = true;
 		m_Power.nCntTime = 0;
+		SetMotion(MOTIONTYPE_TACKLE);
 	}
 	// パッド
-	if (m_pPad)
+	else if (m_pPad)
 	{
 		// 試験的タックル ( のちに中身変わる予定 多分 )
 		if (m_pPad->GetRelease(CXInputPad::XINPUT_KEY::JOYPADKEY_X, 1))
@@ -1148,6 +1167,7 @@ void CPlayer::PowerUpdate(void)
 			m_Power.bDashFlag = true;
 			m_Power.bTackleFrag = true;
 			m_Power.nCntTime = 0;
+			SetMotion(MOTIONTYPE_TACKLE);
 		}
 	}
 	// 力溜めカウントアップ
@@ -1166,6 +1186,8 @@ void CPlayer::StanUpdate(void)
 	{
 		// スタン状態の初期化処理
 		m_Stan.Init();
+		// 通常モーション
+		SetMotion(MOTIONTYPE_NEUTRAL);
 	}
 	// スタンカウント更新
 	m_Stan.nChangeTime++;
@@ -1183,6 +1205,8 @@ void CPlayer::InvincibleUpdate(void)
 	{
 		// 無敵状態の初期化処理
 		m_Invincible.Init();
+		// 通常状態
+		CCharacter::AlphaCharacter(NORMALALPHA);
 	}
 	// 無敵カウント更新
 	m_Invincible.nChangeTime++;
@@ -1230,6 +1254,10 @@ void CPlayer::ElectricUse(void)
 		else if (pPlayer->m_Invincible.bChange) continue;
 		pPlayer->m_Stan.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
 		pPlayer->m_Invincible.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC] + m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
+		// 透明化
+		pPlayer->AlphaCharacter(INVINCIBLEALPHA);
+		// 気絶モーション
+		pPlayer->SetMotion(MOTIONTYPE_FAINTED);
 	}
 }
 
@@ -1238,7 +1266,7 @@ void CPlayer::ElectricUse(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::SpringJump(void)
 {
-	if (!m_bSpringFlag)
+	//if (!m_bSpringFlag)
 	{
 		// バネ
 		CManager::GetSound()->PlaySound(CSound::LABEL_SE_SPRING);
@@ -1274,7 +1302,7 @@ void CPlayer::SpringJump(void)
 		}
 		CCharacter::SetMove(move);
 
-		m_bSpringFlag = true;
+		//m_bSpringFlag = true;
 	}
 }
 
@@ -1513,6 +1541,18 @@ COLLISIONDIRECTION CPlayer::PushCollision(
 		}
 		// 当たった方向に情報が入っているなら
 		//if (bPush) return Direct;
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f >= MyPos.z - m_PlayerStatus.PlayerSize.z * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f <= MyPos.z + m_PlayerStatus.PlayerSize.z * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f)
+			{
+			}
+		}
+
+
 		// 素材のX範囲
 		if (pos->x + OffsetPos.x + size->x * 0.5f >= MyPos.x - m_PlayerStatus.PlayerSize.x * 0.5f&&
 			pos->x + OffsetPos.x - size->x * 0.5f <= MyPos.x + m_PlayerStatus.PlayerSize.x * 0.5f)
@@ -1864,6 +1904,10 @@ void CPlayer::Scene_NoOpponentCollision(int const & nObjType, CScene * pScene)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::Debug(void)
 {
+	if (CManager::GetKeyboard()->GetKeyboardTrigger(DIK_O))
+	{
+		m_move.x -= 0.1f;
+	}
 }
 #endif // _DEBUG
 

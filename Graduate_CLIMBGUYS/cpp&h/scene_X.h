@@ -100,6 +100,7 @@ public:
 		TYPE_OBJECT_VOLCANO,			// 火山
 		TYPE_BLOCKS_INVERTER,			// 電気ブロック
 		TYPE_BLOCKS_HARD,				// 硬いブロック
+		TYPE_BLOCKS_HATENA,				// ハテナブロック
 		TYPE_MAX						// 最大数
 	} TYPE;
 
@@ -120,6 +121,7 @@ public:
 		LPD3DXMESH			pMesh;						// メッシュ情報へのポインタ
 		LPD3DXBUFFER		pBuffMat;					// マテリアル情報へのポインタ
 		std::vector<LPDIRECT3DTEXTURE9> vec_pTexture;	// テクスチャー情報
+		std::vector<D3DCOLORVALUE>		vec_Diffuse;	// 元のカラー情報
 		DWORD				nNumMat;					// マテリアルの数
 		D3DXVECTOR3			vtxMinMaterials;			// モデル情報の位置の最小値
 		D3DXVECTOR3			vtxMaxMaterials;			// モデル情報の位置の最大値

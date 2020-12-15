@@ -92,7 +92,7 @@ void CGame::Init(void)
 	// ゲームUIの生成
 	m_pGameUI = CGameUI::Create();
 	// オブジェクト生成
-	CScene_X::Create(D3DXVECTOR3(0.0f,0.0f,0.0f),
+	CScene_X::Create(D3DXVECTOR3(0.0f,600.0f,0.0f),
 		D3DVECTOR3_ZERO,
 		CScene_X::TYPE_OBJECT_VOLCANO);
 	// プレイヤー
@@ -160,53 +160,53 @@ void CGame::Update(void)
 {
 	// モードの更新
 	CBaseMode::Update();
-	// ブロックのフェーズ状態設定
-	if (m_nCntTime > 0 &&
-		!CBaseblock::GetBlockStatus().nChangeTime == 0 &&
-		m_nCntTime % DERAY_TIME(CBaseblock::GetBlockStatus().nChangeTime) == 0)
-	{
-		int nPhase = CBaseblock::GetPhase();
-		if (nPhase < CBaseblock::GetBlockStatus().nMaxSprit - 1)
-		{
-			nPhase++;
-			CBaseblock::SetPhase(nPhase);
-			// ダメージ床の開始フェーズが超えていたら
-			if (CBaseblock::GetBlockStatus().nFloorPhase <= nPhase)
-			{
-				CDamageFloor::SetUp(true);
-			}
-		}
-	}
-	// 経過時間を設定
-	if (m_nCntTime > 0 &&
-		m_nCntTime % DERAY_TIME(1) == 0)
-	{
-		m_nTime++;
-	}
-
-	// タイムカウント更新
-	m_nCntTime++;
 	// NULLチェック
 	if (m_pGameUI)
 	{
-		// ゲームUIの更新
-		m_pGameUI->Update();
-	}
-
-	// スタートの表示が出た後に生成
-	if (m_pGameUI->GetStartFlag())
-	{
-		m_bOperatable = true;
-		if (m_bOperatable && !m_bBgm)
+		// スタートの表示が出た後に生成
+		if (m_pGameUI->GetStartFlag())
 		{
-			// ゲームスタート
-			CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
-			m_bBgm = true;
+			// ブロックのフェーズ状態設定
+			if (m_nCntTime > 0 &&
+				!CBaseblock::GetBlockStatus().nChangeTime == 0 &&
+				m_nCntTime % DERAY_TIME(CBaseblock::GetBlockStatus().nChangeTime) == 0)
+			{
+				int nPhase = CBaseblock::GetPhase();
+				if (nPhase < CBaseblock::GetBlockStatus().nMaxSprit - 1)
+				{
+					nPhase++;
+					CBaseblock::SetPhase(nPhase);
+					// ダメージ床の開始フェーズが超えていたら
+					if (CBaseblock::GetBlockStatus().nFloorPhase <= nPhase)
+					{
+						CDamageFloor::SetUp(true);
+					}
+				}
+			}
+			// 経過時間を設定
+			if (m_nCntTime > 0 &&
+				m_nCntTime % DERAY_TIME(1) == 0)
+			{
+				m_nTime++;
+			}
+			m_bOperatable = true;
+			if (m_bOperatable && !m_bBgm)
+			{
+				// ゲームスタート
+				CManager::GetSound()->PlaySound(CSound::LABEL_BGM_GAME);
+				m_bBgm = true;
+			}
+
+			// 結合されたブロックの更新ブロック生成
+			CConnectblock::Update_CreateBlock();
 		}
 
-		// 結合されたブロックの更新ブロック生成
-		CConnectblock::Update_CreateBlock();
+		// ゲームUIの更新
+		m_pGameUI->Update();
+		// タイムカウント更新
+		m_nCntTime++;
 	}
+
 	/*
 	// ポーズ状態ならば
 	if (m_state == STATE_PAUSE)

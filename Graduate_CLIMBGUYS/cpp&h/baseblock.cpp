@@ -27,7 +27,9 @@
 #define BLOCK_SHADOWSIZE		(25.0f)									// ステンシルシャドウのサイズ
 #define BLOCK_STATUS_TXT		("data/LOAD/STATUS/BlockStatus.txt")	// ブロックのステータスのテキスト
 #define BLOCK_LIMIT_Y			(-500.0f)								// ブロックの制限区域
-
+#define BLOCK_LIMIT_WEIGHT		(1)										// 重さの限界
+#define BLOCK_MAX_RATIO			(10)									// 倍率
+#define BLOCK_SPECIALPOW		(2)										// 特殊ブロックの位置を微調整
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
 // 静的変数宣言
@@ -38,6 +40,7 @@ CBaseblock::BLOCK_STATUS CBaseblock::m_BlockStatus = {};
 int	CBaseblock::m_nPhase = 0;					// フェーズ
 CBaseblock::HEIGHT_PRIORITY	CBaseblock::m_Priority[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX] = {};			// 優先順位
 int CBaseblock::m_nMaxHeight = 0;				// 最大高さ
+int	CBaseblock::m_nMaxWeight = 0;				// 最大重さ
 float	CBaseblock::m_fSizeRange = 0.0f;		// サイズ範囲
 std::vector<int>	CBaseblock::m_nFeedValue;	// フェードの値
 
@@ -149,58 +152,61 @@ void CBaseblock::Update(void)
 	}
 
 	// プッシュされている状態ではないなら
-	if (!m_PushAfeter.bPushState) return;
-	COLLISIONDIRECTION		Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
-	// プレイヤーのループ
-	for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
+	if (m_PushAfeter.bPushState ||
+		m_bFall)
 	{
-		// 情報取得
-		CPlayer * pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);	// プレイヤー情報
-		// 取得したブロックのNULLチェック ||
-		// 取得したブロックと現在ブロックが同じ
-		// ->ループスキップ
-		if (pPlayer == NULL) continue;
-		D3DXVECTOR3 PlayerSize = CPlayer::GetPlayerStatus().PlayerSize;
-		CPlayer::DIESTATUS &PlayerDieStatus = pPlayer->GetPlayerDieStatus();
-		Direct = CBaseblock::PushCollision(
-			CScene::OBJ_PLAYER,
-			&pPlayer->GetPos(),
-			&pPlayer->GetPosOld(),
-			&pPlayer->GetMove(),
-			&PlayerSize,
-			CPlayer::GetPlayerStatus().PlayerOffSet
-		);
+		COLLISIONDIRECTION		Direct = COLLISIONDIRECTION::NONE;	// 当たり判定の方向
+		// プレイヤーのループ
+		for (int nCntPlayer = 0; nCntPlayer < CScene::GetMaxLayer(CScene::LAYER_CHARACTER); nCntPlayer++)
+		{
+			// 情報取得
+			CPlayer * pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);	// プレイヤー情報
+			// 取得したブロックのNULLチェック ||
+			// 取得したブロックと現在ブロックが同じ
+			// ->ループスキップ
+			if (pPlayer == NULL) continue;
+			D3DXVECTOR3 PlayerSize = CPlayer::GetPlayerStatus().PlayerSize;
+			CPlayer::DIESTATUS &PlayerDieStatus = pPlayer->GetPlayerDieStatus();
+			Direct = CBaseblock::PushCollision_BlockMove(
+				CScene::OBJ_PLAYER,
+				&pPlayer->GetPos(),
+				&pPlayer->GetPosOld(),
+				&pPlayer->GetMove(),
+				&PlayerSize,
+				CPlayer::GetPlayerStatus().PlayerOffSet
+			);
 
-		// ブロックの判定
-		// 前
-		if (Direct == COLLISIONDIRECTION::FRONT)
-		{
-			PlayerDieStatus.bFront = true;
-		}
-		// 後
-		else if (Direct == COLLISIONDIRECTION::BACK)
-		{
-			PlayerDieStatus.bBack = true;
-		}
-		// 左
-		else if (Direct == COLLISIONDIRECTION::LEFT)
-		{
-			PlayerDieStatus.bLeft = true;
-		}
-		// 右
-		else if (Direct == COLLISIONDIRECTION::RIGHT)
-		{
-			PlayerDieStatus.bRight = true;
-		}
-		// 上
-		else if (Direct == COLLISIONDIRECTION::UP)
-		{
-			PlayerDieStatus.bUp = true;
-		}
-		// 下
-		else if (Direct == COLLISIONDIRECTION::DOWN)
-		{
-			PlayerDieStatus.bDown = true;
+			// ブロックの判定
+			// 前
+			if (Direct == COLLISIONDIRECTION::FRONT)
+			{
+				PlayerDieStatus.bFront = true;
+			}
+			// 後
+			else if (Direct == COLLISIONDIRECTION::BACK)
+			{
+				PlayerDieStatus.bBack = true;
+			}
+			// 左
+			else if (Direct == COLLISIONDIRECTION::LEFT)
+			{
+				PlayerDieStatus.bLeft = true;
+			}
+			// 右
+			else if (Direct == COLLISIONDIRECTION::RIGHT)
+			{
+				PlayerDieStatus.bRight = true;
+			}
+			// 上
+			else if (Direct == COLLISIONDIRECTION::UP)
+			{
+				PlayerDieStatus.bUp = true;
+			}
+			// 下
+			else if (Direct == COLLISIONDIRECTION::DOWN)
+			{
+				PlayerDieStatus.bDown = true;
+			}
 		}
 	}
 }
@@ -539,6 +545,7 @@ void CBaseblock::Update_OtherShadow(CBaseblock * pBlock)
 	}
 }
 
+
 #if BASEBLOCK_DEBUG
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 全体個数を表示するデバッグ処理
@@ -605,132 +612,110 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 	CBaseblock::GRID MyGrid = this->GetGrid();					// 行列高
 	CGame::STAGE Stage = CGame::GetStage();						// ステージ
 
-	// やること
-	// 落ちるところの優先順位を付ける
-	// 上下の突っかかりをなくす
-//	if (CBaseblock::GetHeight(MyGrid.nColumn, MyGrid.nLine) <= MyGrid.nHeight)
-	{
 		// 素材のZ範囲
-		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
-			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 		{
-			// 素材のX範囲
-			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-				pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+
+				// 素材状の左に
+				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
+				posOld->y = pos->y;
+				// 移動量の初期化
+				move->y = -1.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+				// 素材状の左に
+				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+				posOld->y = pos->y;
+				// 移動量の初期化
+ 				move->y = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+				// タイプがボムなら
+				if (m_BlockType == BLOCKTYPE_BOMB)
+				{
+					// ボムの状態設定
+					CBombblock * pBombBlock = (CBombblock *)this;
+					pBombBlock->SetbBomb(true);
+				}
+				// タイプが電気なら
+				else if (m_BlockType == BLOCKTYPE_ELECTRIC)
+				{
+					// 電気の状態設定
+					CElectricblock * pElectBlock = (CElectricblock *)this;
+					pElectBlock->SetElectric(true);
+				}
+
+			}
+			if (Direct == COLLISIONDIRECTION::NONE)
 			{
 				// 当たり判定(下)
 				if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-					posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
+					pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::DOWN;
 
 					// 素材状の左に
 					pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
-					//posOld->y = pos->y;
+					posOld->y = pos->y;
+
 					// 移動量の初期化
-					move->y = -1.0f;
+					move->y = 0.0f;
 					// 押し出し状態がtrue
 					bPush = true;
 				}
 
 				// 当たり判定(上)
 				else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-					posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
+					pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
 				{
 					// めり込んでいる
 					Direct = COLLISIONDIRECTION::UP;
 					// 素材状の左に
 					pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
-					//posOld->y = pos->y;
+					posOld->y = pos->y;
 					// 移動量の初期化
 					move->y = 0.0f;
 					// 押し出し状態がtrue
 					bPush = true;
-					// タイプがボムなら
-					if (m_BlockType == BLOCKTYPE_BOMB)
-					{
-						// ボムの状態設定
-						CBombblock * pBombBlock = (CBombblock *)this;
-						pBombBlock->SetbBomb(true);
-					}
-					// タイプが電気なら
-					else if (m_BlockType == BLOCKTYPE_ELECTRIC)
-					{
-						// 電気の状態設定
-						CElectricblock * pElectBlock = (CElectricblock *)this;
-						pElectBlock->SetElectric(true);
-					}
-
 				}
-				if (Direct == COLLISIONDIRECTION::NONE)
+				// 当たり判定(下)
+				else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+					pos->y + OffsetPos.y <= BlockPos.y)
 				{
-					// 当たり判定(下)
-					if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-						pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::DOWN;
+					// めり込んでいる
+					Direct = COLLISIONDIRECTION::DOWN;
+				}
 
-						// 素材状の左に
-						pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
-						//posOld->y = pos->y;
-
-						// 移動量の初期化
-						move->y = 0.0f;
-						// 押し出し状態がtrue
-						bPush = true;
-					}
-
-					// 当たり判定(上)
-					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-						pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::UP;
-						// 素材状の左に
-						pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
-						//posOld->y = pos->y;
-						// 移動量の初期化
-						move->y = 0.0f;
-						// 押し出し状態がtrue
-						bPush = true;
-						// タイプがボムなら
-						if (m_BlockType == BLOCKTYPE_BOMB)
-						{
-							// ボムの状態設定
-							CBombblock * pBombBlock = (CBombblock *)this;
-							pBombBlock->SetbBomb(true);
-						}
-					}
-					// 当たり判定(下)
-					else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
-						pos->y + OffsetPos.y <= BlockPos.y)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::DOWN;
-					}
-
-					// 当たり判定(上)
-					else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
-						pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
-					{
-						// めり込んでいる
-						Direct = COLLISIONDIRECTION::UP;
-						// タイプがボムなら
-						if (m_BlockType == BLOCKTYPE_BOMB)
-						{
-							// ボムの状態設定
-							CBombblock * pBombBlock = (CBombblock *)this;
-							pBombBlock->SetbBomb(true);
-						}
-					}
+				// 当たり判定(上)
+				else if (pos->y + OffsetPos.y > BlockPos.y + m_fSizeRange&&
+					pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange)
+				{
+					// めり込んでいる
+					Direct = COLLISIONDIRECTION::UP;
 				}
 			}
 		}
 	}
-	// 当たった方向に情報が入っているなら
-	//if (bPush) return Direct;
 	// 素材のY範囲
 	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
 		pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange)
@@ -747,7 +732,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				Direct = COLLISIONDIRECTION::LEFT;
 				// 素材状の左に
 				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
-				//posOld->x = pos->x;
+				posOld->x = pos->x;
 				// 移動量の初期化
 				move->x = 0.0f;
 				// 押し出し状態がtrue
@@ -761,7 +746,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				Direct = COLLISIONDIRECTION::RIGHT;
 				// 素材状の左に
 				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
-				//posOld->x = pos->x;
+				posOld->x = pos->x;
 				// 移動量の初期化
 				move->x = 0.0f;
 				// 押し出し状態がtrue
@@ -777,7 +762,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::LEFT;
 					// 素材状の左に
 					pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
-					//posOld->x = pos->x;
+					posOld->x = pos->x;
 					// 移動量の初期化
 					move->x = 0.0f;
 					// 押し出し状態がtrue
@@ -791,7 +776,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::RIGHT;
 					// 素材状の左に
 					pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
-					//posOld->x = pos->x;
+					posOld->x = pos->x;
 					// 移動量の初期化
 					move->x = 0.0f;
 					// 押し出し状態がtrue
@@ -827,7 +812,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				Direct = COLLISIONDIRECTION::BACK;
 				// 素材状の左に
 				pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
-				//posOld->z = pos->z;
+				posOld->z = pos->z;
 				// 移動量の初期化
 				move->z = 0.0f;
 			}
@@ -843,7 +828,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				pos->z =
 					BlockPos.z + m_fSizeRange * 0.5f +
 					size->z * 0.5f - OffsetPos.z;
-				//posOld->z = pos->z;
+				posOld->z = pos->z;
 
 				// 移動量の初期化
 				move->z = 0.0f;
@@ -858,7 +843,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::BACK;
 					// 素材状の左に
 					pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
-					//posOld->z = pos->z;
+					posOld->z = pos->z;
 					// 移動量の初期化
 					move->z = 0.0f;
 				}
@@ -874,7 +859,7 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					pos->z =
 						BlockPos.z + m_fSizeRange * 0.5f +
 						size->z * 0.5f - OffsetPos.z;
-					//posOld->z = pos->z;
+					posOld->z = pos->z;
 
 					// 移動量の初期化
 					move->z = 0.0f;
@@ -894,6 +879,209 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					Direct = COLLISIONDIRECTION::FRONT;
 				}
 			}
+		}
+	}
+
+	return Direct;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 押し出し当たり判定(ブロックが動いている場合)
+//	Obj		: オブジェタイプ
+//	pos		: 位置
+//	move	: 移動量
+//	size	: サイズ
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+COLLISIONDIRECTION CBaseblock::PushCollision_BlockMove(
+	CScene::OBJ const & Obj,						// オブジェタイプ
+	D3DXVECTOR3 * pos,								// 位置
+	D3DXVECTOR3 * posOld,
+	D3DXVECTOR3 * move,								// 移動量
+	D3DXVECTOR3 * size,								// サイズ
+	D3DXVECTOR3 const & OffsetPos					// オフセット位置
+)
+{
+	// 変数宣言
+	COLLISIONDIRECTION Direct = COLLISIONDIRECTION::NONE;		// どこの当たり判定か
+	bool bPush = false;
+	// 変数宣言
+	D3DXVECTOR3 BlockPos = CScene_X::GetPos();
+	D3DXVECTOR3 BlockPosOld = m_posOld;
+	CBaseblock::GRID MyGrid = this->GetGrid();					// 行列高
+	CGame::STAGE Stage = CGame::GetStage();						// ステージ
+
+																// 素材のZ範囲
+	if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+		pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+	{
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y + size->y * 0.5f <= m_posOld.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+
+				// 素材状の左に
+				pos->y = BlockPos.y - size->y * 0.5f - OffsetPos.y;
+				posOld->y = pos->y;
+
+				// 移動量の初期化
+				move->y = -1.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y * 0.5f >= m_posOld.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+				// 素材状の左に
+				pos->y = BlockPos.y + m_fSizeRange + size->y * 0.5f - OffsetPos.y;
+				posOld->y = pos->y;
+				// 移動量の初期化
+				move->y = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+				// タイプがボムなら
+				if (m_BlockType == BLOCKTYPE_BOMB)
+				{
+					// ボムの状態設定
+					CBombblock * pBombBlock = (CBombblock *)this;
+					pBombBlock->SetbBomb(true);
+				}
+			}
+			// 当たり判定(下)
+			else if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+				// タイプがボムなら
+				if (m_BlockType == BLOCKTYPE_BOMB)
+				{
+					// ボムの状態設定
+					CBombblock * pBombBlock = (CBombblock *)this;
+					pBombBlock->SetbBomb(true);
+				}
+			}
+		}
+	}
+	// 素材のY範囲
+	if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+		pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange)
+	{
+		// 素材のZ範囲
+		if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(左)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				pos->x + OffsetPos.x + size->x * 0.5f <= m_posOld.x - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+				// 素材状の左に
+				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
+				posOld->x = pos->x;
+				// 移動量の初期化
+				move->x = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				pos->x + OffsetPos.x - size->x * 0.5f >= m_posOld.x + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+				// 素材状の左に
+				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
+				posOld->x = pos->x;
+				// 移動量の初期化
+				move->x = 0.0f;
+				// 押し出し状態がtrue
+				bPush = true;
+			}
+			// 当たり判定(左)
+			else if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				pos->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::LEFT;
+			}
+			// 当たり判定(右)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				pos->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::RIGHT;
+			}
+		}
+		// 当たった方向に情報が入っているなら
+		//if (bPush) return Direct;
+		// 素材のX範囲
+		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
+		{
+			// 当たり判定(手前)
+			if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				pos->z + OffsetPos.z + size->z * 0.5f <= m_posOld.z - m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+				// 素材状の左に
+				pos->z = BlockPos.z - m_fSizeRange * 0.5f - size->z * 0.5f - OffsetPos.z;
+				posOld->z = pos->z;
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				pos->z + OffsetPos.z - size->z * 0.5f >= m_posOld.z + m_fSizeRange * 0.5f)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+
+				// 素材状の左に
+				pos->z =
+					BlockPos.z + m_fSizeRange * 0.5f +
+					size->z * 0.5f - OffsetPos.z;
+				posOld->z = pos->z;
+
+				// 移動量の初期化
+				move->z = 0.0f;
+			}
+			// 当たり判定(手前)
+			else if (pos->z + OffsetPos.z + size->z * 0.5f > BlockPos.z - m_fSizeRange * 0.5f&&
+				pos->z + OffsetPos.z + size->z * 0.5f <= BlockPos.z)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::BACK;
+			}
+			// 当たり判定(奥)
+			else if (pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f&&
+				pos->z + OffsetPos.z - size->z * 0.5f >= BlockPos.z)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::FRONT;
+			}
+
 		}
 	}
 
@@ -1135,6 +1323,9 @@ void CBaseblock::UnLoad(void)
 	// 落ちる速度の開放
 	m_BlockStatus.v_fBlockGravity.clear();
 	m_BlockStatus.v_fBlockGravity.shrink_to_fit();
+	// 落ちる速度の開放
+	m_BlockStatus.v_Special.clear();
+	m_BlockStatus.v_Special.shrink_to_fit();
 	// ダメージ床の開放
 	m_BlockStatus.v_nDamageFloorHight.clear();
 	m_BlockStatus.v_nDamageFloorHight.shrink_to_fit();
@@ -1421,6 +1612,12 @@ int CBaseblock::GetHeight(
 		//CCalculation::Messanger("CBaseblock::GetHeight関数->行列が上限下限が超えている");
 		return -1;
 	}
+	else if (nColumn + m_nFeedValue[CGame::GetStage()] >= BASEBLOCK_FIELDMAX ||
+		nLine + m_nFeedValue[CGame::GetStage()] >= BASEBLOCK_FIELDMAX)
+	{
+		//CCalculation::Messanger("CBaseblock::GetHeight関数->行列が上限下限が超えている");
+		return -1;
+	}
 	return m_Priority[nColumn + m_nFeedValue[CGame::GetStage()]][nLine + m_nFeedValue[CGame::GetStage()]].nHeight;
 }
 
@@ -1443,6 +1640,13 @@ void CBaseblock::SetHeight(
 		//CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
 		return;
 	}
+	else if (nColumn + m_nFeedValue[CGame::GetStage()] >= BASEBLOCK_FIELDMAX ||
+		nLine + m_nFeedValue[CGame::GetStage()] >= BASEBLOCK_FIELDMAX)
+	{
+		//CCalculation::Messanger("CBaseblock::GetHeight関数->行列が上限下限が超えている");
+		return;
+	}
+
 	// 高さを設定
 	m_Priority[nColumn + m_nFeedValue[CGame::GetStage()]][nLine + m_nFeedValue[CGame::GetStage()]].nHeight = nHeight;
 }
@@ -1464,25 +1668,135 @@ void CBaseblock::SetHeight(
 		//CCalculation::Messanger("CBaseblock::SetHeight関数->行列が上限下限が超えている");
 		return;
 	}
+	else if (Grid.nColumn + m_nFeedValue[CGame::GetStage()] >= BASEBLOCK_FIELDMAX ||
+		Grid.nLine + m_nFeedValue[CGame::GetStage()] >= BASEBLOCK_FIELDMAX)
+	{
+		//CCalculation::Messanger("CBaseblock::GetHeight関数->行列が上限下限が超えている");
+		return;
+	}
 	else if (m_Priority[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]].nHeight <= Grid.nHeight) return;
 	m_Priority[Grid.nColumn + m_nFeedValue[CGame::GetStage()]][Grid.nLine + m_nFeedValue[CGame::GetStage()]].nHeight = Grid.nHeight;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 現在の最大の高さを再設定
+// 現在の優先順位を再設定
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CBaseblock::SetMaxHeight(void)
+void CBaseblock::SetMaxPriority(void)
 {
 	// 変数宣言
 	HEIGHT_PRIORITY * pPriority = &m_Priority[0][0];	// 高さポインタ
-	int nHeight = 0;						// 代入用の高さ
+	int nHeight = 0;									// 代入用の高さ
+	m_nMaxWeight = 0;									// 重さの初期化
 	// 最大高さを代入
-	for (int nCntHeight = 0; nCntHeight < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntHeight++, pPriority++)
+	for (int nCntPriority = 0; nCntPriority < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntPriority++, pPriority++)
 	{
+		// 高さの設定
 		if (nHeight >= pPriority->nHeight) continue;
 		nHeight = pPriority->nHeight;
 	}
 	m_nMaxHeight = nHeight;
+	pPriority = &m_Priority[0][0];	// 高さポインタ
+	// 最大重さを代入
+	for (int nCntPriority = 0; nCntPriority < BASEBLOCK_FIELDMAX * BASEBLOCK_FIELDMAX; nCntPriority++, pPriority++)
+	{
+		// 重さの設定
+		if (pPriority->nHeight < 0) continue;
+		pPriority->nWeight = (m_nMaxHeight - pPriority->nHeight) * BLOCK_MAX_RATIO + BLOCK_LIMIT_WEIGHT;
+		// 最大重さの加算
+		m_nMaxWeight += pPriority->nWeight;
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの落ちる行列を設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CBaseblock::GRID CBaseblock::SetFallPos(void)
+{
+	// 変数宣言
+	HEIGHT_PRIORITY * pPriority = &m_Priority[0][0];	// 高さポインタ
+	int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フィード値
+	int nRand = (int)CCalculation::GetRandomRange((uint64_t)1, (uint64_t)m_nMaxWeight);
+	//int nRand = rand() % m_nMaxWeight;					// 最大重さからのランダム値
+	int nWeight = 0;									// 重さ計算用
+	for (int nCntColumn = 0; nCntColumn < BASEBLOCK_FIELDMAX; nCntColumn++)
+	{
+		for (int nCntLine = 0; nCntLine < BASEBLOCK_FIELDMAX; nCntLine++)
+		{
+			// ブロックの設定がされていないとき
+			if (pPriority->nHeight < 0)
+			{
+				// 優先順位ポインター更新
+				pPriority++;
+				continue;
+			}
+			// 重さを加算
+			nWeight += pPriority->nWeight;
+			// ランダム値が重さ計算用の値を下回ったら
+			if (nRand <= nWeight)
+			{
+				if (nCntColumn > BASEBLOCK_FIELDMAX - 2)
+				{
+					nCntColumn -= 2;
+				}
+				if (nCntLine > BASEBLOCK_FIELDMAX - 2)
+				{
+					nCntLine -= 2;
+				}
+				// 落ちる行列高さ情報を返す
+				return CBaseblock::GRID(nCntColumn - nFeedValue, CBaseblock::GetBlockStatus().nAppearance + CBaseblock::GetMaxHeight(), nCntLine - nFeedValue);
+			}
+			// 優先順位ポインター更新
+			pPriority++;
+		}
+	}
+	// 中心
+	return GRID(0, 0, 0);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックの落ちる行列を設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CBaseblock::GRID CBaseblock::SetSpecialFallPos(void)
+{
+	// 変数宣言
+	HEIGHT_PRIORITY * pPriority = &m_Priority[0][0];	// 高さポインタ
+	int nFeedValue = m_nFeedValue[CGame::GetStage()];	// フィード値
+	int nRand = (int)CCalculation::GetRandomRange((uint64_t)1, (uint64_t)m_nMaxWeight);
+	//int nRand = rand() % m_nMaxWeight;					// 最大重さからのランダム値
+	int nWeight = 0;									// 重さ計算用
+	for (int nCntColumn = 0; nCntColumn < BASEBLOCK_FIELDMAX; nCntColumn++)
+	{
+		for (int nCntLine = 0; nCntLine < BASEBLOCK_FIELDMAX; nCntLine++)
+		{
+			// ブロックの設定がされていないとき
+			if (pPriority->nHeight < 0)
+			{
+				// 優先順位ポインター更新
+				pPriority++;
+				continue;
+			}
+			// 重さを加算
+			nWeight += pPriority->nWeight;
+			// ランダム値が重さ計算用の値を下回ったら
+			if (nRand <= nWeight)
+			{
+				// 落ちる行列高さ情報を返す
+				return CBaseblock::GRID(nCntColumn - nFeedValue, CBaseblock::GetBlockStatus().nAppearance + CBaseblock::GetMaxHeight() + BLOCK_SPECIALPOW, nCntLine - nFeedValue);
+			}
+			// 優先順位ポインター更新
+			pPriority++;
+		}
+	}
+	// 中心
+	return GRID(0, 0, 0);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 特殊ブロックの確立取得
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CBaseblock::SPECIALSORT CBaseblock::GetSpecialSort(int const & nPhase)
+{
+	return m_BlockStatus.v_Special[nPhase];
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1499,6 +1813,7 @@ void CBaseblock::BlockStatusLoad(void)
 	int nCntDropSprit = 0;			// 落とすブロック数カウント
 	int nCntBlockGravity = 0;		// 重力カウント
 	int nCntFloor = 0;				// 床カウント
+	int nCntSpecial = 0;			// 特殊ブロックカウント
 									// ファイルを開く
 	pFile = fopen(BLOCK_STATUS_TXT, "r");
 
@@ -1554,15 +1869,18 @@ void CBaseblock::BlockStatusLoad(void)
 							std::vector<INTEGER2>	v_nSprit(m_BlockStatus.nMaxSprit);
 							std::vector<FLOAT2>		v_fSprit(m_BlockStatus.nMaxSprit);
 							std::vector<int>		v_nFloorSprit(m_BlockStatus.nMaxSprit);
+							std::vector<SPECIALSORT>	v_Special(m_BlockStatus.nMaxSprit);
 							for (size_t CntSprit = 0; CntSprit < v_nSprit.size(); CntSprit++)
 							{
 								v_nSprit[CntSprit] = INTEGER2(0, 0);
 								v_fSprit[CntSprit] = FLOAT2(0, 0);
 								v_nFloorSprit[CntSprit] = 0;
+								v_Special[CntSprit].Init();
 							}
 							m_BlockStatus.v_nDropBlock = v_nSprit;
 							m_BlockStatus.v_fBlockGravity = v_fSprit;
 							m_BlockStatus.v_nDamageFloorHight = v_nFloorSprit;
+							m_BlockStatus.v_Special = v_Special;
 						}
 						// ChangeTimeが来たら
 						else if (strcmp(cHeadText, "ChangeTime") == 0)
@@ -1595,6 +1913,73 @@ void CBaseblock::BlockStatusLoad(void)
 								&m_BlockStatus.v_fBlockGravity[nCntBlockGravity].fMin);
 							nCntBlockGravity++;
 						}
+						// 特殊ブロックがきたら //
+						else if (strcmp(cHeadText, "NONE") == 0)
+						{
+							if (nCntSpecial >= (int)m_BlockStatus.v_Special.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_Special[nCntSpecial].anSpecial[SPECIALBLOCK_NONE]);
+						}
+						else if (strcmp(cHeadText, "BOMB") == 0)
+						{
+							if (nCntSpecial >= (int)m_BlockStatus.v_Special.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_Special[nCntSpecial].anSpecial[SPECIALBLOCK_BOMB]);
+						}
+						else if (strcmp(cHeadText, "SPRING") == 0)
+						{
+							if (nCntSpecial >= (int)m_BlockStatus.v_Special.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_Special[nCntSpecial].anSpecial[SPECIALBLOCK_SPRING]);
+						}
+						else if (strcmp(cHeadText, "STEEL") == 0)
+						{
+							if (nCntSpecial >= (int)m_BlockStatus.v_Special.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_Special[nCntSpecial].anSpecial[SPECIALBLOCK_STEEL]);
+						}
+						else if (strcmp(cHeadText, "PANIC") == 0)
+						{
+							if (nCntSpecial >= (int)m_BlockStatus.v_Special.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_Special[nCntSpecial].anSpecial[SPECIALBLOCK_PANIC]);
+						}
+						else if (strcmp(cHeadText, "ELECTRIC") == 0)
+						{
+							if (nCntSpecial >= (int)m_BlockStatus.v_Special.size())
+							{
+								continue;
+							}
+							sscanf(cReadText, "%s %s %d",
+								&cDie, &cDie,
+								&m_BlockStatus.v_Special[nCntSpecial].anSpecial[SPECIALBLOCK_ELECTRIC]);
+						}
+						else if (strcmp(cHeadText, "SPECIALEND") == 0)
+						{
+							nCntSpecial++;
+						}
+
+
 						// ダメージ床の初期位置が来たら
 						else if (strcmp(cHeadText, "InitFloor") == 0)
 						{
@@ -1689,6 +2074,52 @@ void CBaseblock::BlockStatusSave(void)
 				m_BlockStatus.v_fBlockGravity[nCntBlockGravity].fMin
 			);
 		}
+		for (size_t nCntSprit = 0; nCntSprit < m_BlockStatus.v_Special.size(); nCntSprit++)
+		{
+			fprintf(pFile, "	Phase %zd\n", nCntBlockGravity);
+			fprintf(pFile, "	SPECIAL\n");
+			int * npSpecial = (int *)m_BlockStatus.v_Special[nCntSprit];
+			for (int nCntSpecial = 0; nCntSpecial < SPECIALBLOCK_MAX; nCntSpecial++, npSpecial++)
+			{
+				if (nCntSpecial == SPECIALBLOCK_NONE)
+				{
+					fprintf(pFile, "		NONE	= %d\n",
+						*npSpecial
+					);
+				}
+				else if (nCntSpecial == SPECIALBLOCK_BOMB)
+				{
+					fprintf(pFile, "		BOMB	= %d\n",
+						*npSpecial
+					);
+				}
+				else if (nCntSpecial == SPECIALBLOCK_SPRING)
+				{
+					fprintf(pFile, "		SPRING	= %d\n",
+						*npSpecial
+					);
+				}
+				else if (nCntSpecial == SPECIALBLOCK_STEEL)
+				{
+					fprintf(pFile, "		STEEL	= %d\n",
+						*npSpecial
+					);
+				}
+				else if (nCntSpecial == SPECIALBLOCK_PANIC)
+				{
+					fprintf(pFile, "		PANIC	= %d\n",
+						*npSpecial
+					);
+				}
+				else if (nCntSpecial == SPECIALBLOCK_ELECTRIC)
+				{
+					fprintf(pFile, "		ELECTRIC	= %d\n",
+						*npSpecial
+					);
+				}
+			}
+			fprintf(pFile, "	SPECIALEND\n");
+		}
 
 		fprintf(pFile, "\n// ダメージ床のステータス\n");
 		fprintf(pFile, "	InitFloor		= %.2f\n", m_BlockStatus.fInitFloor);
@@ -1731,131 +2162,33 @@ void CBaseblock::BlockStaticValue(void)
 	for (int nCntHeight = 0; nCntHeight < nCntMax; nCntHeight++,pPriority++)
 	{
 		pPriority->nHeight = -1;
+		pPriority->nWeight = BLOCK_LIMIT_WEIGHT;
 	}
 
 	m_nPhase = 0;
+	m_nMaxWeight = 0;
+	m_nMaxHeight = 0;
 }
 
+
 #if IMGUI_DEBUG
+
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 全てのデバッグ表示
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::AllDebug(void)
 {
-
 	// ブロックを出現させる処理と合わせる
 	if (ImGui::Begin(u8"ブロックとダメージ床のステータス"))
 	{
 		// 必要情報表示
 		ImGui::Text(u8"経過時間(%d)\n", CGame::GetTime());
 		ImGui::Text(u8"フェーズ状態(%d)\n", m_nPhase);
-		// 変数宣言
-		std::vector<int>		v_nFloorSprit(m_BlockStatus.nMaxSprit);
-		// 落ちるブロック数
-		if (ImGui::TreeNode(u8"ブロックのステータス"))
-		{
-			// 出現する時間
-			ImGui::DragInt(u8"出現する時間", &m_BlockStatus.nAppBlock, 1.0f, 1, 1000);					/* 10.0f */
-			// 移動量
-			ImGui::DragFloat(u8"移動量", &m_BlockStatus.fMove, 0.1f, 0.1f, 100.0f);
-			// 落ちる高さ
-			ImGui::DragInt(u8"落ちる高さ", &m_BlockStatus.nAppearance, 1.0f);						/* 10.0f */
-			// 最大分割数
-			if (ImGui::DragInt(u8"変化する回数", &m_BlockStatus.nMaxSprit, 1.0f, 1, 100))						/* 10.0f */
-			{
-				// 分割数に合わせ、数値を更新
-				std::vector<INTEGER2>	v_Sprit(m_BlockStatus.nMaxSprit);
-				std::vector<FLOAT2>		v_fSprit(m_BlockStatus.nMaxSprit);
-				// 初期化
-				for (int nCntSprit = 0; nCntSprit < m_BlockStatus.nMaxSprit; nCntSprit++)
-				{
-					v_Sprit[nCntSprit] = INTEGER2(0, 0);
-					v_fSprit[nCntSprit] = FLOAT2(0, 0);
-				}
-
-				// 落ちるブロック数
-				for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
-				{
-					if (nCntDropSprit >= (size_t)m_BlockStatus.nMaxSprit) break;
-					v_Sprit[nCntDropSprit] = m_BlockStatus.v_nDropBlock[nCntDropSprit];
-				}
-				m_BlockStatus.v_nDropBlock.clear();
-				m_BlockStatus.v_nDropBlock.shrink_to_fit();
-				m_BlockStatus.v_nDropBlock = v_Sprit;
-				// 落ちる速度
-				for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_fBlockGravity.size(); nCntBlockGravity++)
-				{
-					if (nCntBlockGravity >= (size_t)m_BlockStatus.nMaxSprit) break;
-					v_fSprit[nCntBlockGravity] = m_BlockStatus.v_fBlockGravity[nCntBlockGravity];
-				}
-				m_BlockStatus.v_fBlockGravity.clear();
-				m_BlockStatus.v_fBlockGravity.shrink_to_fit();
-				m_BlockStatus.v_fBlockGravity = v_fSprit;
-				// ダメージ床
-				for (size_t nCntFloor = 0; nCntFloor < m_BlockStatus.v_nDamageFloorHight.size(); nCntFloor++)
-				{
-					if (nCntFloor >= (size_t)m_BlockStatus.nMaxSprit) break;
-					v_nFloorSprit[nCntFloor] = m_BlockStatus.v_nDamageFloorHight[nCntFloor];
-				}
-				m_BlockStatus.v_nDamageFloorHight.clear();
-				m_BlockStatus.v_nDamageFloorHight.shrink_to_fit();
-				m_BlockStatus.v_nDamageFloorHight = v_nFloorSprit;
-			}
-			// 変化させる時間
-			ImGui::DragInt(u8"変化させる時間", &m_BlockStatus.nChangeTime, 1.0f);					/* 10.0f */
-			// 落ちるブロック数
-			if (ImGui::TreeNode(u8"落ちるブロック数(最大値、最小値)"))
-			{
-				for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
-				{
-					ImGui::Text("Phase %d", nCntDropSprit);
-					std::string sName = " (";
-					sName += std::to_string(nCntDropSprit * m_BlockStatus.nChangeTime) + u8"秒)";
-					// 落とすブロックの数
-					ImGui::DragInt2(sName.c_str(), (int *)m_BlockStatus.v_nDropBlock[nCntDropSprit], 1.0f);					/* 10.0f */
-				}
-				ImGui::TreePop();
-			}
-			// 落ちる速度
-			if (ImGui::TreeNode(u8"落ちる速度(最大値、最小値)"))
-			{
-				for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_fBlockGravity.size(); nCntBlockGravity++)
-				{
-					ImGui::Text("Phase %d", nCntBlockGravity);
-					std::string sName = " (";
-					sName += std::to_string(nCntBlockGravity * m_BlockStatus.nChangeTime) + u8"秒)";
-					// 落ちる速度
-					ImGui::DragFloat2(sName.c_str(), (float *)m_BlockStatus.v_fBlockGravity[nCntBlockGravity], 0.1f);					/* 10.0f */
-				}
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}
-		// 落ちるブロック数
-		if (ImGui::TreeNode(u8"ダメージのステータス"))
-		{
-			// ダメージ床の初期位置
-			ImGui::DragFloat(u8"ダメージ床の初期位置", &m_BlockStatus.fInitFloor, 0.1f);
-			// ダメージ床の移動速度
-			ImGui::DragFloat(u8"ダメージ床の移動速度", &m_BlockStatus.fFloorMove, 0.1f, 0.1f, 100.0f);
-			// ダメージ床の上がるフェーズタイミング
-			ImGui::DragInt(u8"ダメージ床の上がるPhase", &m_BlockStatus.nFloorPhase, 1.0f,0,m_BlockStatus.nMaxSprit);						/* 10.0f */
-			// ダメージ床の高さ
-			if (ImGui::TreeNode(u8"ダメージ床の高さ"))
-			{
-				for (size_t nCntFloor = 0; nCntFloor < m_BlockStatus.v_nDamageFloorHight.size(); nCntFloor++)
-				{
-					ImGui::Text("Phase %d", nCntFloor);
-					std::string sName = " (";
-					sName += std::to_string(nCntFloor * m_BlockStatus.nChangeTime) + u8"秒)";
-					// ダメージ床の高さ
-					ImGui::DragInt(sName.c_str(), &m_BlockStatus.v_nDamageFloorHight[nCntFloor], 1.0f);					/* 10.0f */
-				}
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}
+		// ブロックステータス用のImGui関数
+		BlockStatusImG();
+		// ダメージ床用のImGui関数
+		DamageStatusImG();
 
 		// セーブボタン
 		if (ImGui::Button(u8"保存"))
@@ -1866,6 +2199,201 @@ void CBaseblock::AllDebug(void)
 	}
 	// End
 	ImGui::End();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ブロックステータス用のImGui関数
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::BlockStatusImG(void)
+{
+	// 落ちるブロック数
+	if (ImGui::TreeNode(u8"ブロックのステータス"))
+	{
+		// 出現する時間
+		ImGui::DragInt(u8"出現する時間", &m_BlockStatus.nAppBlock, 1.0f, 1, 1000);					/* 10.0f */
+																								// 移動量
+		ImGui::DragFloat(u8"移動量", &m_BlockStatus.fMove, 0.1f, 0.1f, 100.0f);
+		// 落ちる高さ
+		ImGui::DragInt(u8"落ちる高さ", &m_BlockStatus.nAppearance, 1.0f);						/* 10.0f */
+																							// 最大分割数
+		if (ImGui::DragInt(u8"変化する回数", &m_BlockStatus.nMaxSprit, 1.0f, 1, 100))						/* 10.0f */
+		{
+			// 変数宣言
+			std::vector<int>		v_nFloorSprit(m_BlockStatus.nMaxSprit);
+			// 分割数に合わせ、数値を更新
+			std::vector<INTEGER2>	v_Sprit(m_BlockStatus.nMaxSprit);
+			std::vector<FLOAT2>		v_fSprit(m_BlockStatus.nMaxSprit);
+			// 初期化
+			for (int nCntSprit = 0; nCntSprit < m_BlockStatus.nMaxSprit; nCntSprit++)
+			{
+				v_Sprit[nCntSprit] = INTEGER2(0, 0);
+				v_fSprit[nCntSprit] = FLOAT2(0, 0);
+			}
+
+			// 落ちるブロック数
+			for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+			{
+				if (nCntDropSprit >= (size_t)m_BlockStatus.nMaxSprit) break;
+				v_Sprit[nCntDropSprit] = m_BlockStatus.v_nDropBlock[nCntDropSprit];
+			}
+			m_BlockStatus.v_nDropBlock.clear();
+			m_BlockStatus.v_nDropBlock.shrink_to_fit();
+			m_BlockStatus.v_nDropBlock = v_Sprit;
+			// 落ちる速度
+			for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_fBlockGravity.size(); nCntBlockGravity++)
+			{
+				if (nCntBlockGravity >= (size_t)m_BlockStatus.nMaxSprit) break;
+				v_fSprit[nCntBlockGravity] = m_BlockStatus.v_fBlockGravity[nCntBlockGravity];
+			}
+			m_BlockStatus.v_fBlockGravity.clear();
+			m_BlockStatus.v_fBlockGravity.shrink_to_fit();
+			m_BlockStatus.v_fBlockGravity = v_fSprit;
+			// ダメージ床
+			for (size_t nCntFloor = 0; nCntFloor < m_BlockStatus.v_nDamageFloorHight.size(); nCntFloor++)
+			{
+				if (nCntFloor >= (size_t)m_BlockStatus.nMaxSprit) break;
+				v_nFloorSprit[nCntFloor] = m_BlockStatus.v_nDamageFloorHight[nCntFloor];
+			}
+			m_BlockStatus.v_nDamageFloorHight.clear();
+			m_BlockStatus.v_nDamageFloorHight.shrink_to_fit();
+			m_BlockStatus.v_nDamageFloorHight = v_nFloorSprit;
+		}
+		// 変化させる時間
+		ImGui::DragInt(u8"変化させる時間", &m_BlockStatus.nChangeTime, 1.0f);					/* 10.0f */
+																						// 落ちるブロック数
+		if (ImGui::TreeNode(u8"落ちるブロック数(最大値、最小値)"))
+		{
+			for (size_t nCntDropSprit = 0; nCntDropSprit < m_BlockStatus.v_nDropBlock.size(); nCntDropSprit++)
+			{
+				ImGui::Text("Phase %d", nCntDropSprit);
+				std::string sName = " (";
+				sName += std::to_string(nCntDropSprit * m_BlockStatus.nChangeTime) + u8"秒)";
+				// 落とすブロックの数
+				ImGui::DragInt2(sName.c_str(), (int *)m_BlockStatus.v_nDropBlock[nCntDropSprit], 1.0f);					/* 10.0f */
+			}
+			ImGui::TreePop();
+		}
+		// 落ちる速度
+		if (ImGui::TreeNode(u8"落ちる速度(最大値、最小値)"))
+		{
+			for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_fBlockGravity.size(); nCntBlockGravity++)
+			{
+				ImGui::Text("Phase %d", nCntBlockGravity);
+				std::string sName = " (";
+				sName += std::to_string(nCntBlockGravity * m_BlockStatus.nChangeTime) + u8"秒)";
+				// 落ちる速度
+				ImGui::DragFloat2(sName.c_str(), (float *)m_BlockStatus.v_fBlockGravity[nCntBlockGravity], 0.1f);					/* 10.0f */
+			}
+			ImGui::TreePop();
+		}
+		// 特殊ブロックの名前別設定
+		SpecialSetImG();
+
+		ImGui::TreePop();
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 特殊ブロックの名前別設定
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::SpecialSetImG(void)
+{
+	// 特殊ブロックの落ちる確率
+	if (ImGui::TreeNode(u8"特殊ブロックの落ちる確率"))
+	{
+		for (size_t nCntBlockGravity = 0; nCntBlockGravity < m_BlockStatus.v_Special.size(); nCntBlockGravity++)
+		{
+			ImGui::Text(u8"Phase %zd", nCntBlockGravity);
+			ImGui::Text(u8"現在の振り分け数(%d / %d)",NowSortPoint(nCntBlockGravity), SPECIALBLOCK_MAXSORTPOINT);
+			// 割り当てポイントが最大以上なら
+			if (NowSortPoint(nCntBlockGravity) >= SPECIALBLOCK_MAXSORTPOINT)
+			{
+				ImGui::Text(u8"※※※※※ 割り当てが最大です。※※※※※");
+			}
+			int * npSpecial = (int *)m_BlockStatus.v_Special[nCntBlockGravity];
+			for (int nCntSpecial = 0; nCntSpecial < SPECIALBLOCK_MAX; nCntSpecial++, npSpecial++)
+			{
+				std::string sName = "[Phase ";
+				sName += std::to_string(nCntBlockGravity) + "] ";
+				int nOldSpecial = *npSpecial;
+				if (nCntSpecial == SPECIALBLOCK_NONE)
+				{
+					sName += u8"何もなし(%)";
+				}
+				else if (nCntSpecial == SPECIALBLOCK_BOMB)
+				{
+					sName += u8"ボムブロック(%)";
+				}
+				else if (nCntSpecial == SPECIALBLOCK_SPRING)
+				{
+					sName += u8"ばねブロック(%)";
+				}
+				else if (nCntSpecial == SPECIALBLOCK_STEEL)
+				{
+					sName += u8"鉄ブロック(%)";
+				}
+				else if (nCntSpecial == SPECIALBLOCK_PANIC)
+				{
+					sName += u8"こうらんブロック(%)";
+				}
+				else if (nCntSpecial == SPECIALBLOCK_ELECTRIC)
+				{
+					sName += u8"電気ブロック(%)";
+				}
+				ImGui::InputInt(sName.c_str(), npSpecial);
+
+				// 下限設定
+				if (*npSpecial < 0)
+				{
+					*npSpecial = 0;
+				}
+				// 振り分けポイントが最大なら
+				if (NowSortPoint(nCntBlockGravity) > SPECIALBLOCK_MAXSORTPOINT)
+				{
+					*npSpecial = nOldSpecial;
+				}
+			}
+		}
+		ImGui::TreePop();
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// フェーズごとの各現在の確立振り分け数
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+int CBaseblock::NowSortPoint(int const & nBlockGravity)
+{
+	return m_BlockStatus.v_Special[nBlockGravity].AddSpecial();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ダメージ床用のImGui関数
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::DamageStatusImG(void)
+{
+	if (ImGui::TreeNode(u8"ダメージのステータス"))
+	{
+		// ダメージ床の初期位置
+		ImGui::DragFloat(u8"ダメージ床の初期位置", &m_BlockStatus.fInitFloor, 0.1f);
+		// ダメージ床の移動速度
+		ImGui::DragFloat(u8"ダメージ床の移動速度", &m_BlockStatus.fFloorMove, 0.1f, 0.1f, 100.0f);
+		// ダメージ床の上がるフェーズタイミング
+		ImGui::DragInt(u8"ダメージ床の上がるPhase", &m_BlockStatus.nFloorPhase, 1.0f, 0, m_BlockStatus.nMaxSprit);						/* 10.0f */
+																																// ダメージ床の高さ
+		if (ImGui::TreeNode(u8"ダメージ床の高さ"))
+		{
+			for (size_t nCntFloor = 0; nCntFloor < m_BlockStatus.v_nDamageFloorHight.size(); nCntFloor++)
+			{
+				ImGui::Text("Phase %d", nCntFloor);
+				std::string sName = " (";
+				sName += std::to_string(nCntFloor * m_BlockStatus.nChangeTime) + u8"秒)";
+				// ダメージ床の高さ
+				ImGui::DragInt(sName.c_str(), &m_BlockStatus.v_nDamageFloorHight[nCntFloor], 1.0f);					/* 10.0f */
+			}
+			ImGui::TreePop();
+		}
+		ImGui::TreePop();
+	}
 }
 
 #endif // IMGUI_DEBUG

@@ -26,19 +26,14 @@
 // 静的変数宣言
 //
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-int	CConnectblock::m_nCntTime = 0;				// カウントタイム
+int	CConnectblock::m_nCntTime = 0;						// カウントタイム
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // オーバーローバーコンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CConnectblock::CConnectblock() : CScene::CScene()
+CConnectblock::CConnectblock()
 {
-	m_pos = D3DVECTOR3_ZERO;
-	m_move = D3DVECTOR3_ZERO;
-	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Shape = SHAPE_RECT;
-	// ランダムに色情報を設定
-	CCalculation::GetRandomColor(m_col);
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,39 +44,16 @@ CConnectblock::~CConnectblock()
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 初期化処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CConnectblock::Init()
-{
-	// ブロック設定
-	SetBlockShape();
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 終了処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CConnectblock::Uninit(void)
-{
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 更新処理
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CConnectblock::Update(void)
-{
-
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ブロックの設定
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::SetBlockShape(void)
 {
 	// 変数宣言
-	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());
+	SHAPE Shape = (SHAPE)(CCalculation::GetRandomRange(SHAPE_CROSS_STEP_01, SHAPE_MAX - 1));	// 形
+	D3DXCOLOR col;																	// 色
+	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());					// フェード値
 	// 形
-	CBaseblock::GRID BaseGrid =
-		CBaseblock::GRID(-nFeedValue + rand() % (nFeedValue * 2), CBaseblock::GetBlockStatus().nAppearance + CBaseblock::GetMaxHeight(), -nFeedValue + rand() % (nFeedValue * 2));
+	CBaseblock::GRID BaseGrid = CBaseblock::SetFallPos();
 	// 重力設定
 	int nPhase = CBaseblock::GetPhase();											// フェーズ
 	float fGravity;																	// 重力
@@ -105,232 +77,180 @@ void CConnectblock::SetBlockShape(void)
 	{
 		fGravity = (float)fMinGravity;
 	}
-	switch (m_Shape)
+	switch (Shape)
 	{
-		// 矩形
-	case SHAPE_RECT:
-		m_col = COLOR_ORANGE;
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid,NULL, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 1), &m_col,fGravity);
-		break;
-		// Iブロック
-	case SHAPE_I:
-		m_col = COLOR_LIGHTRED;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col, fGravity);
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(2, 0, 0), NULL, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(3, 0, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(4, 0, 0), &m_col, fGravity);
-		break;
-		// Jブロック
-	case SHAPE_J:
-		m_col = COLOR_EMERALD;
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, NULL, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col, fGravity);
-		break;
-		// Lブロック
-	case SHAPE_L:
-		m_col = COLOR_LIGHTBLUE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 2, 0), &m_col, fGravity);
-		break;
-		// Sブロック
-	case SHAPE_S:
-		m_col = COLOR_YELLOW;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 0), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
-		break;
-		// Tブロック
-	case SHAPE_T:
-		m_col = COLOR_LIGHTBLUE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, -1, 0), &m_col, fGravity);
-		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
-
-		break;
-		// Zブロック
-	case SHAPE_Z:
-		m_col = COLOR_LIGHTBLUE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col,fGravity);
-		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
-		break;
-		// バネブロック
-	case SHAPE_SPRING:
-		m_col = COLOR_ORANGE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col, fGravity);
-		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(1, 1, 0), NULL, fGravity);
-		break;
 		// クロスブロック_1段
 	case SHAPE_CROSS_STEP_01:
-		m_col = COLOR_LIME;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col,fGravity);
+		col = COLOR_RED;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &col, fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &col,fGravity);
 		break;
 		// クロスブロック_2段
 	case SHAPE_CROSS_STEP_02:
-		m_col = COLOR_LIME;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 2), &m_col,fGravity);
+		col = COLOR_GREEN;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &col, fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 2), &col,fGravity);
 		break;
 		// 中空きプラスブロック_1段
 	case SHAPE_PLUS_CENTER_HOLE_STEP_01:
-		m_col = COLOR_LIGHTBLUE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &m_col,fGravity);
+		col = COLOR_BLUE;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
 		break;
 		// 中空きプラスブロック_2段
 	case SHAPE_PLUS_CENTER_HOLE_STEP_02:
-		m_col = COLOR_LIGHTBLUE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 2), &m_col,fGravity);
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(0, 0, 0), NULL, fGravity);
+		col = COLOR_YELLOW;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 2), &col,fGravity);
 
 		break;
 		// プラスブロック
 	case SHAPE_PLUS:
-		m_col = COLOR_YELLOW;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &m_col,fGravity);
+		col = COLOR_VIOLET;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
 		break;
 		// 中突起プラスブロック
 	case SHAPE_PLUS_CENTER_PROTRUSION:
-		m_col = COLOR_YELLOW;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &m_col,fGravity);
-		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(0, 0, 0), NULL, fGravity);
+		col = COLOR_LIGHTBLUE;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &col,fGravity);
 		break;
 		// 対角線ブロック_01
 	case SHAPE_DIAGONAL_01:
-		m_col = COLOR_LIGHTRED;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
+		col = COLOR_ORANGE;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &col, fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &col,fGravity);
 		break;
 		// 対角線ブロック_02
 	case SHAPE_DIAGONAL_02:
-		m_col = COLOR_LIME;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &m_col,fGravity);
+		col = COLOR_LIME;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &col,fGravity);
 		break;
 		// 髭ブロック_01
 	case SHAPE_BEARD_01:
-		m_col = COLOR_EMERALD;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &m_col,fGravity);
+		col = COLOR_PURPURE;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
 		break;
 		// 髭ブロック_02
 	case SHAPE_BEARD_02:
-		m_col = COLOR_LIGHTRED;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
+		col = COLOR_PINK;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &col,fGravity);
 		break;
 		// 髭ブロック_03
 	case SHAPE_BEARD_03:
-		m_col = COLOR_ORANGE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col,fGravity);
-		CSpringblock::Create(53, BaseGrid + CBaseblock::GRID(1, 1, 1), NULL, fGravity);
+		col = COLOR_EMERALD;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &col, fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &col,fGravity);
 
 		break;
 		// 髭ブロック_04
 	case SHAPE_BEARD_04:
-		m_col = COLOR_LIGHTRED;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &m_col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &m_col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &m_col,fGravity);
+		col = COLOR_LIGHTRED;
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &col, fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
+		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &col,fGravity);
 		break;
 	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 描画処理
+// 特殊ブロックの設定
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CConnectblock::Draw(void)
+void CConnectblock::SetSpecialBlock(void)
 {
-
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 当たった後の処理
-//	nObjType	: オブジェクトタイプ
-//	pScene		: 相手のシーン情報
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CConnectblock::Scene_MyCollision(
-	int const & nObjType,
-	CScene * pScene
-)
-{
-
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 相手に当てられた後の処理
-//	nObjType	: オブジェクトタイプ
-//	pScene		: 相手のシーン情報
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CConnectblock::Scene_OpponentCollision(int const & nObjType, CScene * pScene)
-{
-
+	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());					// フェード値
+	// 落ちる位置設定
+	CBaseblock::GRID BaseGrid = CBaseblock::SetSpecialFallPos();
+	// 重力設定
+	int nPhase = CBaseblock::GetPhase();											// フェーズ
+	float fGravity;																	// 重力
+	float fMinGravity = 0;															// 最小値
+	float fMaxGravity = 0;															// 最大値
+	if (nPhase >= CBaseblock::GetBlockStatus().nMaxSprit)
+	{
+		fMinGravity = CBaseblock::GetBlockStatus().v_fBlockGravity[CBaseblock::GetBlockStatus().nMaxSprit - 1].fMin;	// 最小値
+		fMaxGravity = CBaseblock::GetBlockStatus().v_fBlockGravity[CBaseblock::GetBlockStatus().nMaxSprit - 1].fMax;	// 最大値
+	}
+	else
+	{
+		fMinGravity = CBaseblock::GetBlockStatus().v_fBlockGravity[nPhase].fMin;	// 最小値
+		fMaxGravity = CBaseblock::GetBlockStatus().v_fBlockGravity[nPhase].fMax;	// 最大値
+	}
+	if (fMinGravity < fMaxGravity)
+	{
+		fGravity = CCalculation::RandamFloat(fMaxGravity, fMinGravity);
+	}
+	else
+	{
+		fGravity = (float)fMinGravity;
+	}
+	CBaseblock::SPECIALBLOCK SpecialBlock;
+	SpecialBlock = CBaseblock::GetSpecialSort(nPhase).GetRandam();
+	switch (SpecialBlock)
+	{
+	case CBaseblock::SPECIALBLOCK_NONE:
+		break;
+	case CBaseblock::SPECIALBLOCK_BOMB:
+		CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid, NULL, fGravity);
+		break;
+	case CBaseblock::SPECIALBLOCK_SPRING:
+		CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid, NULL, fGravity);
+		break;
+	case CBaseblock::SPECIALBLOCK_STEEL:
+		CSteelblock::Create(CScene_X::TYPE_BLOCKS_HARD, BaseGrid, NULL, fGravity);
+		break;
+	case CBaseblock::SPECIALBLOCK_PANIC:
+		CPanicblock::Create(CScene_X::TYPE_BLOCKS_HATENA, BaseGrid, NULL, fGravity);
+		break;
+	case CBaseblock::SPECIALBLOCK_ELECTRIC:
+		CElectricblock::Create(CScene_X::TYPE_BLOCKS_INVERTER, BaseGrid, NULL, fGravity);
+		break;
+	default:
+		break;
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -347,71 +267,6 @@ HRESULT CConnectblock::Load(void)
 void CConnectblock::UnLoad(void)
 {
 
-}
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 作成(シーン管理)
-//	pos			: 位置
-//	layer		: レイヤー
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CConnectblock * CConnectblock::Create(
-	D3DXVECTOR3		const & pos,									// 位置
-	SHAPE			const & shape,									// 形情報
-	CScene::LAYER	const & layer									// レイヤー
-)
-{
-	// 変数宣言
-	CConnectblock * pConnectblock;		// シーン2Dクラス
-	// メモリの生成(初め->基本クラス,後->派生クラス)
-	pConnectblock = new CConnectblock();
-	// 設定
-	pConnectblock->m_pos = pos;				// 位置
-	pConnectblock->m_Shape = shape;
-	// 初期化処理
-	pConnectblock->Init();
-	// 生成したオブジェクトを返す
-	return pConnectblock;
-}
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 作成(個人管理)
-//	pos			: 位置
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CConnectblock * CConnectblock::Create_Self(
-	D3DXVECTOR3		const & pos,									// 位置
-	SHAPE			const & shape									// 形情報
-)
-{
-	// 変数宣言
-	CConnectblock * pConnectblock;		// シーン2Dクラス
-									// メモリの生成(初め->基本クラス,後->派生クラス)
-	pConnectblock = new CConnectblock;
-	// 設定
-	pConnectblock->m_pos = pos;				// 位置
-	// 初期化処理
-	pConnectblock->Init();
-	// 生成したオブジェクトを返す
-	return pConnectblock;
-}
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// unique_ptr作成(個人管理unique)
-// ※戻り値はstd::moveで受け取る
-//	pos			: 位置
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-std::unique_ptr<CConnectblock> CConnectblock::Creat_Unique(
-	D3DXVECTOR3		const & pos,									// 位置
-	SHAPE			const & shape									// 形情報
-)
-{
-	// 変数宣言
-	std::unique_ptr<CConnectblock> pConnectblock(new CConnectblock);		// シーン2Dクラス
-	// 設定
-	pConnectblock->m_pos = pos;				// 位置
-	// 初期化処理
-	pConnectblock->Init();
-	// 生成したオブジェクトを返す
-	return pConnectblock;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -464,15 +319,17 @@ void CConnectblock::Update_CreateBlock(void)
 		{
 			nDropBlock += rand() % (nRange + 1);
 		}
+		// 最大の高さと重さを再設定
+		CBaseblock::SetMaxPriority();
 
-		// 最大の高さを再設定
-		CBaseblock::SetMaxHeight();
 		// ブロックを落とす数
 		for (int nCnt = 0; nCnt < nDropBlock; nCnt++)
 		{
-			// 結合されたブロックの生成SHAPE_MAX SHAPE_BEARD_04
-			Create(D3DVECTOR3_ZERO, (SHAPE)(CCalculation::GetRandomRange(SHAPE_RECT, SHAPE_MAX - 1)));
+			// 結合されたブロックの生成
+			SetBlockShape();
 		}
+		// 特殊ブロックの生成
+		SetSpecialBlock();
 	}
 	// カウントタイムアップ
 	m_nCntTime++;
@@ -531,8 +388,8 @@ void CConnectblock::Tutorial_InitArrangementBlock(void)
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 3, 1), &Col,1.0f);
 
 	// バネ
-	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(2, 0, 1), &Col, 1.0f);
-	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(6, 0, 1), &Col, 1.0f);
+	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(2, 0, 1), NULL, 1.0f);
+	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(6, 0, 1), NULL, 1.0f);
 
 	// ボム
 	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 1), NULL, 1.0f);
@@ -574,12 +431,12 @@ void CConnectblock::StaticDebug(void)
 		// パニックブロック生成
 		if (ImGui::Button("CreatePanic"))
 		{
-			CPanicblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f), 1.0f);
+			CPanicblock::Create(CScene_X::TYPE_BLOCKS_HATENA, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]),NULL, 1.0f);
 		}
 		// 電気ブロック生成
 		if (ImGui::Button("CreateElectric"))
 		{
-			CElectricblock::Create(CScene_X::TYPE_BLOCK, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), &D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f), 1.0f);
+			CElectricblock::Create(CScene_X::TYPE_BLOCKS_INVERTER, CBaseblock::GRID(nBlockGrid[0], nBlockGrid[1], nBlockGrid[2]), NULL, 1.0f);
 		}
 	}
 	ImGui::End();

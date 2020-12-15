@@ -67,6 +67,9 @@
     <Filter Include="Number">
       <UniqueIdentifier>{69af0c86-88ca-4ada-a761-8802a8f40839}</UniqueIdentifier>
     </Filter>
+    <Filter Include="StagingObj">
+      <UniqueIdentifier>{082e1bd3-d55c-407b-b408-43b3c1051725}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cpp&amp;h\2Dpresents.cpp">
@@ -264,9 +267,6 @@
     <ClCompile Include="cpp&amp;h\opening.cpp">
       <Filter>Mode</Filter>
     </ClCompile>
-    <ClCompile Include="cpp&amp;h\stagingblock.cpp">
-      <Filter>Model\Block</Filter>
-    </ClCompile>
     <ClCompile Include="cpp&amp;h\openingmanager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -296,6 +296,12 @@
     </ClCompile>
     <ClCompile Include="cpp&amp;h\electricblock.cpp">
       <Filter>Model\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\stagingObj.cpp">
+      <Filter>StagingObj</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp&amp;h\stagingObj_info.cpp">
+      <Filter>StagingObj</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -500,9 +506,6 @@
     <ClInclude Include="cpp&amp;h\opening.h">
       <Filter>Mode</Filter>
     </ClInclude>
-    <ClInclude Include="cpp&amp;h\stagingblock.h">
-      <Filter>Model\Block</Filter>
-    </ClInclude>
     <ClInclude Include="cpp&amp;h\openingmanager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -532,6 +535,12 @@
     </ClInclude>
     <ClInclude Include="cpp&amp;h\electricblock.h">
       <Filter>Model\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\stagingObj.h">
+      <Filter>StagingObj</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp&amp;h\stagingObj_info.h">
+      <Filter>StagingObj</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

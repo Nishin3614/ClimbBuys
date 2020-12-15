@@ -226,6 +226,10 @@ void CScene_X::Draw(void)
 			// モデルカラーの設定
 			pMat->MatD3D.Diffuse = *m_pModelCol;
 		}
+		else
+		{
+			pMat->MatD3D.Diffuse = m_pModelLoad[m_nModelId]->vec_Diffuse[nCntMat];
+		}
 		// プレイヤー(雷)の透明度
 		pMat->MatD3D.Diffuse.a = m_fModelAlpha;
 
@@ -451,7 +455,7 @@ HRESULT CScene_X::UnLoadModel(void)
 			m_pModelLoad[nCntModel]->pBuffMat = NULL;
 		}
 
-		// テクスチャーの開放
+		// テクスチャーと元のカラー情報の開放
 		for (int nCntTex = 0; nCntTex < (signed)m_pModelLoad[nCntModel]->vec_pTexture.size(); nCntTex++)
 		{
 			if (m_pModelLoad[nCntModel]->vec_pTexture[nCntTex] != NULL)
@@ -461,6 +465,8 @@ HRESULT CScene_X::UnLoadModel(void)
 			}
 			m_pModelLoad[nCntModel]->vec_pTexture.clear();
 			m_pModelLoad[nCntModel]->vec_pTexture.shrink_to_fit();
+			m_pModelLoad[nCntModel]->vec_Diffuse.clear();
+			m_pModelLoad[nCntModel]->vec_Diffuse.shrink_to_fit();
 		}
 		// モデル読み込み変数の初期化
 		m_pModelLoad[nCntModel].reset();
@@ -495,9 +501,13 @@ void CScene_X::ModelSetting(MODEL_LOAD * pModel_load)
 	// マテリアル情報を取得
 	for (int nCntMat = 0; nCntMat < (int)pModel_load->nNumMat; nCntMat++, pMat++)
 	{
+		// テクスチャーの反映
 		LPDIRECT3DTEXTURE9 pTexture = NULL;
 		D3DXCreateTextureFromFile(pDevice, pMat->pTextureFilename, &pTexture);
 		pModel_load->vec_pTexture.push_back(std::move(pTexture));
+		// 元のカラー情報を保存
+		D3DCOLORVALUE Diffuse = pMat->MatD3D.Diffuse;
+		pModel_load->vec_Diffuse.push_back(Diffuse);
 	}
 
 	// 頂点バッファをロック

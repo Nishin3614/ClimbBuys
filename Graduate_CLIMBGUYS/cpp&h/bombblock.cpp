@@ -93,6 +93,8 @@ void CBombblock::Update(void)
 		);
 		// 爆発音
 		CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
+		// シャドウのリリース処理
+		ShadowRelease();
 		// リリース
 		Release();
 	}

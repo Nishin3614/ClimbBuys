@@ -9,6 +9,7 @@
 #include "game.h"
 #include "3Dparticle.h"
 #include "sound.h"
+#include "player.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -29,6 +30,7 @@ CElectricblock::CElectricblock() : CBaseblock::CBaseblock()
 {
 	m_bElect = false;
 	m_bPlayerPush = false;
+	m_PushPlayer = PLAYER_TAG::NONE;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,6 +92,10 @@ void CElectricblock::Update(void)
 		);
 		// 爆発音
 		CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
+		// プレイヤーに電気ブロック使用時の状態を付与する
+		CPlayer::ElectricUse(m_PushPlayer);
+		// シャドウのリリース処理
+		ShadowRelease();
 		// リリース
 		Release();
 	}

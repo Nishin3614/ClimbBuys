@@ -24,7 +24,7 @@
 #include "resultUI.h"
 #include "Calculation.h"
 #include "sound.h"
-
+#include "electricblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -268,6 +268,8 @@ void CPlayer::MyMove(void)
 	vec = CCharacter::GetDirectionVec();						// ベクトル
 	CKeyboard *pKeyboard = CManager::GetKeyboard();
 
+	// 走っている状態ではない
+	m_bRun = false;
 	// 移動 //
 	if (!m_Power.bDashFlag &&
 		!m_Power.bCharge)
@@ -333,6 +335,8 @@ void CPlayer::MyMove(void)
 					move
 				);
 			}
+			// 走っている状態
+			m_bRun = true;
 		}
 		// 右
 		else if (pKeyboard->GetKeyboardPress(DIK_D))
@@ -395,6 +399,8 @@ void CPlayer::MyMove(void)
 					move
 				);
 			}
+			// 走っている状態
+			m_bRun = true;
 		}
 		// 奥に行く
 		else if (pKeyboard->GetKeyboardPress(DIK_W))
@@ -414,6 +420,8 @@ void CPlayer::MyMove(void)
 				rot,
 				move
 			);
+			// 走っている状態
+			m_bRun = true;
 		}
 		// 手前に行く
 		else if (pKeyboard->GetKeyboardPress(DIK_S))
@@ -433,11 +441,14 @@ void CPlayer::MyMove(void)
 				rot,
 				move
 			);
+			// 走っている状態
+			m_bRun = true;
 		}
 		// それ以外
 		else
 		{
-
+			// 走っている状態ではない
+			m_bRun = false;
 		}
 
 		// 試験的キーボードジャンプ
@@ -472,7 +483,8 @@ void CPlayer::MyMove(void)
 			// ゲームパッド移動
 			if (fValueH != 0 || fValueV != 0)
 			{
-				SetMotion(MOTIONTYPE_MOVE);
+				// 走っている状態
+				m_bRun = true;
 
 				// 角度の計算
 				if (m_Panic.bChange)
@@ -571,14 +583,8 @@ void CPlayer::PlayerMoveSet(D3DXVECTOR3 & Vec, D3DXVECTOR3 const & Rot,D3DXVECTO
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::StatusMotion(void)
 {
-	/*
-	// ジャンプ中
-	if (!CCharacter::GetbLanding())
-	{
-		SetMotion(MOTIONTYPE_JAMP);
-	}
 	// 移動中
-	else if (CCharacter::GetbMove())
+	if (m_bRun)
 	{
 		// モーション設定(移動)
 		SetMotion(MOTIONTYPE_MOVE);
@@ -588,7 +594,6 @@ void CPlayer::StatusMotion(void)
 	{
 		SetMotion(MOTIONTYPE_NEUTRAL);
 	}
-	*/
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -615,6 +620,9 @@ void CPlayer::BlockCollision(void)
 	D3DXVECTOR3				PredictionPoint;					// 予測点
 	PredictionPoint = m_pos + m_PlayerStatus.PushOffSet - D3DXVECTOR3(CCharacter::GetDirectionVec().x * m_PlayerStatus.PushSize, 0.0f, CCharacter::GetDirectionVec().z * m_PlayerStatus.PushSize);
 	Pushblock = CBaseblock::PUSHBLOCK(NULL, -1.0f, Direct);
+
+
+
 	// ブロックループ
 	for (int nCntBlock = 0; nCntBlock < CScene::GetMaxLayer(CScene::LAYER_3DBLOCK); nCntBlock++)
 	{
@@ -711,7 +719,12 @@ void CPlayer::BlockCollision(void)
 			// 電気ブロックなら
 			else if (pBaseBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
 			{
-				ElectricUse();
+				CElectricblock * pElectBlock = (CElectricblock *)pBaseBlock;
+				if (pElectBlock)
+				{
+					pElectBlock->SetPlayerTag(GetPlayerTag());
+					pElectBlock->SetElectric(true);
+				}
 				// ジャンプ可能設定
 				SetJumpAble(true);
 			}
@@ -735,10 +748,6 @@ void CPlayer::BlockCollision(void)
 			m_DieStatus.bDown = true;
 		}
 	}
-
-
-
-
 
 
 	// 挟まったら死ぬ処理
@@ -792,20 +801,10 @@ void CPlayer::BlockCollision(void)
 			{
 				PushBlock(Pushblock.pBlock, CBaseblock::GRID(-m_Power.nPushPower, 0, 0));
 			}
-			// ブロックがパニックブロックなら
-			if (Pushblock.pBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
-			{
-				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
-			}
-			// ブロックが電気ブロックなら
-			else if (Pushblock.pBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
-			{
-				ElectricUse();
-			}
 
-			// 押し出す力を初期化
-			m_Power.nPushPower = 1;
 		}
+		// 押し出す力を初期化
+		m_Power.nPushPower = 1;
 		m_Power.bTackleFrag = false;
 	}
 }
@@ -873,6 +872,11 @@ void CPlayer::CharacterCollision(void)
 			pPlayer->AlphaCharacter(INVINCIBLEALPHA);
 			// 気絶モーション
 			pPlayer->SetMotion(MOTIONTYPE_FAINTED);
+			// 移動状態の初期化処理
+			D3DXVECTOR3 Oppmove = pPlayer->GetMove();
+			Oppmove.x = 0.0f;
+			Oppmove.z = 0.0f;
+			pPlayer->SetMove(Oppmove);
 		}
 	}
 }
@@ -1225,7 +1229,7 @@ void CPlayer::PanicUpdate(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 電気ブロック使用時
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CPlayer::ElectricUse(void)
+void CPlayer::ElectricUse(PLAYER_TAG const & PlayerTag)
 {
 	// 変数宣言
 	CPlayer * pPlayer;	// キャラクター情報
@@ -1238,11 +1242,8 @@ void CPlayer::ElectricUse(void)
 		pPlayer = (CPlayer *)CScene::GetScene(CScene::LAYER_CHARACTER, nCntPlayer);
 		// NULLなら
 		// ->関数を抜ける
-		if (pPlayer == NULL ||
-			this == pPlayer)
-		{
-			continue;
-		}
+		if (pPlayer == NULL) continue;
+		else if (pPlayer->GetPlayerTag() == PlayerTag) continue;
 		// 無敵状態なら
 		else if (pPlayer->m_Invincible.bChange) continue;
 		pPlayer->m_Stan.Set(true, m_PlayerStatus.nMaxStanTime[STATUSTYPE_ELECTRIC]);
@@ -1251,6 +1252,11 @@ void CPlayer::ElectricUse(void)
 		pPlayer->AlphaCharacter(INVINCIBLEALPHA);
 		// 気絶モーション
 		pPlayer->SetMotion(MOTIONTYPE_FAINTED);
+		// 移動状態の初期化処理
+		D3DXVECTOR3 move = pPlayer->GetMove();
+		move.x = 0.0f;
+		move.z = 0.0f;
+		pPlayer->SetMove(move);
 	}
 }
 
@@ -1318,7 +1324,7 @@ void CPlayer::PushBlock(
 		pBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD) return;
 	CBaseblock::GRID NextGrid = pBlock->GetGrid();					// 押し出しブロックの行列高情報
 	CBaseblock::GRID PushGrid = CBaseblock::GRID(0,0,0);
-
+	bool bPush = false;												// 押し出し状態
 	for (int nCntColumn = 0; nCntColumn < abs(Grid.nColumn); nCntColumn++)
 	{
 		// 列が0超過
@@ -1387,6 +1393,24 @@ void CPlayer::PushBlock(
 	}
 	// 記録更新_押し出し回数
 	m_Record.nPushCnt++;
+	if (PushGrid.nColumn != 0 ||
+		PushGrid.nLine != 0)
+	{
+		// ブロックがパニックブロックなら
+		if (pBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
+		{
+			m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+		}
+		// ブロックが電気ブロックなら
+		else if (pBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)
+		{
+			CElectricblock * pElectBlock = (CElectricblock * )pBlock;
+			if (pElectBlock)
+			{
+				pElectBlock->SetPlayerTag(GetPlayerTag());
+			}
+		}
+	}
 	// 押し出し後の設定
 	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, PushGrid));
 }

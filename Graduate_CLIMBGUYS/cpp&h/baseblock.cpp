@@ -345,9 +345,7 @@ void CBaseblock::Update_MyShadow(void)
 	// 真下にブロックが存在していないなら
 	else if (CBaseblock::GetHeight(this->GetGrid().nColumn, this->GetGrid().nLine) < 0)
 	{
-		m_pShadowPolygon->SetShadow(false);
-		m_pShadowPolygon->Release();
-		m_pShadowPolygon = NULL;
+		ShadowRelease();
 		m_bShadow = false;
 		return;
 	}
@@ -384,12 +382,8 @@ void CBaseblock::Update_Limit(void)
 	{
 		// リリース処理
 		Release();
-		// シャドウが存在しているなら
-		if (m_pShadowPolygon)
-		{
-			// シャドウをリリース
-			m_pShadowPolygon->Release();
-		}
+		// シャドウのリリース処理
+		ShadowRelease();
 	}
 	if (m_bFall) return;
 	// ダメージ床のループ
@@ -725,13 +719,13 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
 		{
 			// 当たり判定(左)
-			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
-				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f - 0.1f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f + 0.1f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::LEFT;
 				// 素材状の左に
-				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
+				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x - 0.1f;
 				posOld->x = pos->x;
 				// 移動量の初期化
 				move->x = 0.0f;
@@ -739,13 +733,13 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				bPush = true;
 			}
 			// 当たり判定(右)
-			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
-				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f + 0.1f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f + 0.1f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::RIGHT;
 				// 素材状の左に
-				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
+				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x + 0.1f;
 				posOld->x = pos->x;
 				// 移動量の初期化
 				move->x = 0.0f;
@@ -1580,6 +1574,21 @@ void CBaseblock::SetPushAfter(PUSHAFTER const & PushAfter)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 影のリリース処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::ShadowRelease(void)
+{
+	// シャドウが存在しているなら
+	if (m_pShadowPolygon)
+	{
+		// シャドウをリリース
+		m_pShadowPolygon->Release();
+		m_pShadowPolygon = NULL;
+		m_bShadow = false;
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 指定したベースブロックを削除する処理
 //	pBlock	: ブロック情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1597,12 +1606,8 @@ bool CBaseblock::DeleteBlock(
 	CBaseblock::FallBlock_Grid(pBlock->GetGrid());
 	// 押したブロックの現在までいた行列の高さ情報を更新
 	CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(0, -1, 0));
-	// シャドウのリリース処理
-	if (pBlock->m_pShadowPolygon)
-	{
-		// シャドウをリリース
-		pBlock->m_pShadowPolygon->Release();
-	}
+	// シャドウをリリース処理
+	pBlock->ShadowRelease();
 	// リリース処理
 	pBlock->Release();
 	return true;

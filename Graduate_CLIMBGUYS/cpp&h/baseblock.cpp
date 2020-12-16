@@ -65,6 +65,8 @@ CBaseblock::CBaseblock() : CScene_X::CScene_X()
 	m_bShadow = true;									// シャドウの使用状態
 	m_bUse = true;										// 使用状態
 	m_fGravity = 0.0f;									// 重力
+	m_pUpBlock = NULL;									// 上にあるブロック情報
+	m_pDownBlock = NULL;									// 下にあるブロック情報
 #if BASEBLOCK_DEBUG
 
 	m_nAll++;
@@ -112,6 +114,8 @@ void CBaseblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Uninit(void)
 {
+	// ブロックの上下情報をNULLに
+	BlockMoveOrDelete();
 	CScene_X::Uninit();
 }
 
@@ -415,13 +419,13 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		this->GetType() == CBaseblock::BLOCKTYPE_FIELD) return;
 	// 変数宣言
 	COLLISIONDIRECTION Direct;	// 当たり判定方向
-	// 当たり判定
+								// 当たり判定
 	Direct = Collision(
 		CScene::OBJ_BLOCK,
 		&pBlock->GetPos(),
 		&pBlock->GetPosOld(),
 		&pBlock->GetModel()->size,
-		D3DXVECTOR3(0.0f, pBlock->GetModel()->size.y, 0.0f)
+		D3DXVECTOR3(0.0f, pBlock->GetModel()->size.y * 0.5f, 0.0f)
 	);
 	// どこにもあたっていなければ
 	if (Direct == COLLISIONDIRECTION::NONE) return;
@@ -456,8 +460,27 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		this->SetPos(MyGrid.GetPos(m_fSizeRange));
 		// 落ちている状態設定
 		this->SetFall(false);
+
+		// 上下ブロック情報をつなげる
+		CBaseblock * pThisBlock = pBlock;
+		CBaseblock * pUpBlock = pBlock->m_pUpBlock;
+		while (pUpBlock)
+		{
+			pThisBlock = pUpBlock;
+			pUpBlock = pThisBlock->m_pUpBlock;
+		}
+		this->m_pDownBlock = pThisBlock;
+		pThisBlock->m_pUpBlock = this;
 	}
-	else if (Direct == COLLISIONDIRECTION::UP) {}
+	else if (Direct == COLLISIONDIRECTION::UP)
+	{
+		// 相手の落ちる状態がtrueなら
+		// ->関数を抜ける
+		if (pBlock->GetFall()) return;
+		// 上下ブロック情報をつなげる
+		this->m_pUpBlock = pBlock;
+		pBlock->m_pDownBlock = this;
+	}
 	else
 	{
 		// プレイヤーから押されていない場合
@@ -614,8 +637,10 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
 			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 		{
+
 			// 当たり判定(下)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+			if (!this->m_pDownBlock &&
+				pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
 				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
 			{
 				// めり込んでいる
@@ -631,7 +656,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 			}
 
 			// 当たり判定(上)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+			else if (!this->m_pUpBlock &&
+				pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
 				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
 			{
 				// めり込んでいる
@@ -657,6 +683,13 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					CElectricblock * pElectBlock = (CElectricblock *)this;
 					pElectBlock->SetElectric(true);
 				}
+				// タイプがばねなら
+				else if (m_BlockType == BLOCKTYPE_SPRING)
+				{
+					// 電気の状態設定
+					move->y = 0;
+				}
+
 
 			}
 			if (Direct == COLLISIONDIRECTION::NONE)
@@ -719,13 +752,13 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 			pos->z + OffsetPos.z - size->z * 0.5f < BlockPos.z + m_fSizeRange * 0.5f)
 		{
 			// 当たり判定(左)
-			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f - 0.1f&&
-				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f + 0.1f)
+			if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x + size->x * 0.5f <= BlockPos.x - m_fSizeRange * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::LEFT;
 				// 素材状の左に
-				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x - 0.1f;
+				pos->x = BlockPos.x - m_fSizeRange * 0.5f - size->x * 0.5f - OffsetPos.x;
 				posOld->x = pos->x;
 				// 移動量の初期化
 				move->x = 0.0f;
@@ -733,13 +766,13 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 				bPush = true;
 			}
 			// 当たり判定(右)
-			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f + 0.1f&&
-				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f + 0.1f)
+			else if (pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f&&
+				posOld->x + OffsetPos.x - size->x * 0.5f >= BlockPos.x + m_fSizeRange * 0.5f)
 			{
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::RIGHT;
 				// 素材状の左に
-				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x + 0.1f;
+				pos->x = BlockPos.x + m_fSizeRange * 0.5f + size->x * 0.5f - OffsetPos.x;
 				posOld->x = pos->x;
 				// 移動量の初期化
 				move->x = 0.0f;
@@ -1418,6 +1451,22 @@ COLLISIONDIRECTION CBaseblock::Collision(
 			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
 		{
 			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+			/*
+			// 当たり判定(下)
 			if (pos->y + OffsetPos.y >= BlockPos.y)
 			{
 				// めり込んでいる
@@ -1430,6 +1479,7 @@ COLLISIONDIRECTION CBaseblock::Collision(
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::UP;
 			}
+			*/
 		}
 	}
 	// 素材のY範囲
@@ -1571,6 +1621,29 @@ void CBaseblock::SetPushAfter(PUSHAFTER const & PushAfter)
 {
 	m_PushAfeter = PushAfter;
 	m_PushAfeter.GoalPos = (m_grid + m_PushAfeter.PushGrid).GetPos(m_fSizeRange);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 自身のブロックが移動または削除処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::BlockMoveOrDelete(void)
+{
+	// 変数宣言
+	CBaseblock * pUpBlock = this->m_pUpBlock;		// 上のブロック情報
+	CBaseblock * pDownBlock = this->m_pDownBlock;	// 下のブロック情報
+	// 上のブロックの情報NULLチェック
+	if (pUpBlock)
+	{
+		pUpBlock->m_pDownBlock = NULL;
+	}
+	// 下のブロックの情報NULLチェック
+	if (pDownBlock)
+	{
+		pDownBlock->m_pUpBlock = NULL;
+	}
+	// 自身の下と上のブロック情報をNULLに
+	this->m_pDownBlock = NULL;
+	this->m_pUpBlock = NULL;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

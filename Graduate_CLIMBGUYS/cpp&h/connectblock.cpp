@@ -344,7 +344,7 @@ void CConnectblock::Tutorial_InitArrangementBlock(void)
 	D3DXCOLOR Col = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
 
 	// 基準値
-	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue, 0, -nFeedValue);
+	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue, 1, -nFeedValue);
 
 	// ブロックの生成
 	// 01

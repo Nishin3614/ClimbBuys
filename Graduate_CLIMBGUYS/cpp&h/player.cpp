@@ -1393,6 +1393,7 @@ void CPlayer::PushBlock(
 	}
 	// 記録更新_押し出し回数
 	m_Record.nPushCnt++;
+	// 押し出せるブロックなら
 	if (PushGrid.nColumn != 0 ||
 		PushGrid.nLine != 0)
 	{
@@ -1410,6 +1411,8 @@ void CPlayer::PushBlock(
 				pElectBlock->SetPlayerTag(GetPlayerTag());
 			}
 		}
+		// 移動時の処理
+		pBlock->BlockMoveOrDelete();
 	}
 	// 押し出し後の設定
 	pBlock->SetPushAfter(CBaseblock::PUSHAFTER(true, PushGrid));

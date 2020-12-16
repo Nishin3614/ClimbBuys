@@ -60,7 +60,10 @@ public:
 		MOTIONTYPE_VICTORY_02,		// 勝利モーション_02
 		MOTIONTYPE_VICTORY_03,		// 勝利モーション_03
 		MOTIONTYPE_VICTORY_04,		// 勝利モーション_04
-		MOTIONTYPE_V_01_WAIT,		// 処理モーション_01後の待機モーション
+		MOTIONTYPE_V_01_WAIT,		// 勝利モーション_01後の待機モーション
+		MOTIONTYPE_V_02_WAIT,		// 勝利モーション_02後の待機モーション
+		MOTIONTYPE_V_03_WAIT,		// 勝利モーション_03後の待機モーション
+		MOTIONTYPE_V_04_WAIT,		// 勝利モーション_04後の待機モーション
 		MOTIONTYPE_MAX				// 最大数
 	} MOTIONTYPE;
 	// キャラクター
@@ -275,6 +278,7 @@ private:
 	void ModelUpdate(void);									// モデルの更新
 	void Motion_Effect(void);								// モーションエフェクト
 	void Motion_Obit(void);									// モーション軌跡
+	void WaitMotion(void);									// 待機モーション
 	/* 変数 */
 	/* 構造体のスタティックにする */
 	static MODEL_ALL							*m_modelAll[CHARACTER_MAX];		// モデル全体の情報

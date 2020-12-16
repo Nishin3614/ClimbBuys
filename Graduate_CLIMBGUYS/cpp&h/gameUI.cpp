@@ -29,6 +29,7 @@
 #define GAME_UI_TIMER_COLOR						(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f))	// タイマーの色
 #define TIMER_INIT_NUM							(3)									// タイマーの初期値
 
+#define GAME_UI_GRAY_SQUARE_SIZE				(D3DXVECTOR2(SCREEN_WIDTH, 400.0f))	// 灰色の四角のサイズ
 #define GAME_UI_SIGNAL_SIZE						(D3DXVECTOR2(700.0f, 350.0f))		// 合図のサイズ
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -143,7 +144,13 @@ CGameUI * CGameUI::Create(void)
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pGameUI = new CGameUI();
 
-	// シーン2Dの生成
+	// 灰色の四角
+	pGameUI->m_pScene2D[(int)GAME_UI::GRAY_SQUARE] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_GRAY_SQUARE_SIZE, (CTexture_manager::TYPE_GAME_UI_GRAY_SQUARE));
+	// 半透明
+	pGameUI->m_pScene2D[(int)GAME_UI::GRAY_SQUARE]->SetCol(D3DXCOLOR_CA(1.0f, 0.5f));
+	pGameUI->m_pScene2D[(int)GAME_UI::GRAY_SQUARE]->Set_Vtx_Col();
+
+	// スタートロゴ
 	pGameUI->m_pScene2D[(int)GAME_UI::START] = CScene_TWO::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, GAME_UI_SIGNAL_SIZE, (CTexture_manager::TYPE_GAME_UI_START));
 	// 透明にする
 	pGameUI->m_pScene2D[(int)GAME_UI::START]->SetCol(D3DXCOLOR_ZERO);
@@ -215,9 +222,13 @@ void CGameUI::StartTimer()
 		{
 			if (m_pScene2D[(int)GAME_UI::START])
 			{
+				// 灰色の四角の削除
+				m_pScene2D[(int)GAME_UI::GRAY_SQUARE]->Release();
+				m_pScene2D[(int)GAME_UI::GRAY_SQUARE] = nullptr;
 				// スタートの合図の削除
 				m_pScene2D[(int)GAME_UI::START]->Release();
 				m_pScene2D[(int)GAME_UI::START] = nullptr;
+
 			}
 			// スタートフラグをオンにする
 			m_bStart = true;

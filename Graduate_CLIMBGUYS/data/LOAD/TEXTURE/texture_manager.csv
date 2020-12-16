@@ -21,11 +21,11 @@ data/TEXTURE/UI/RESULT/rank_04.png
 data/TEXTURE/UI/RESULT/cause_death_00.png
 data/TEXTURE/UI/RESULT/cause_death_01.png
 data/TEXTURE/UI/RESULT/cause_death_02.png
-data/TEXTURE/UI/RESULT/cause_death_03.png
 data/TEXTURE/UI/GAME/name_tag_01.png
 data/TEXTURE/UI/GAME/name_tag_02.png
 data/TEXTURE/UI/GAME/name_tag_03.png
 data/TEXTURE/UI/GAME/name_tag_04.png
+data/TEXTURE/UI/GAME/gray.png
 data/TEXTURE/UI/GAME/start_signal.png
 data/TEXTURE/UI/GAME/finish_signal.png
 data/TEXTURE/UI/TUTORIAL/OKtex.png

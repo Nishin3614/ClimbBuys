@@ -40,6 +40,7 @@ public:
 	enum class GAME_UI
 	{
 		UI_NONE = -1,
+		GRAY_SQUARE,			// 灰色の四角
 		START,					// 始め
 		FINISH,					// 終了
 		UI_MAX

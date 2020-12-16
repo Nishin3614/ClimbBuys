@@ -146,6 +146,11 @@ public:
 		{
 			return nColumn >= Grid.nColumn && nLine >= Grid.nLine && nHeight >= Grid.nHeight;
 		}
+		// 行列高さの>=のオペレーション
+		bool operator > (GRID & Grid)
+		{
+			return nColumn > Grid.nColumn && nLine > Grid.nLine && nHeight > Grid.nHeight;
+		}
 		D3DXVECTOR3 GetPos(float const & fRange)
 		{
 			D3DXVECTOR3 pos;
@@ -459,6 +464,8 @@ public:
 	void SetGravity(float fGravity)					{ m_fGravity = fGravity; };
 	// ベースブロックの種類取得
 	float GetGravity()								{ return m_fGravity; };
+	// 影のリリース処理
+	void ShadowRelease(void);
 	// 指定したベースブロックを削除する処理
 	//	pBlock	: ブロック情報
 	static bool DeleteBlock(

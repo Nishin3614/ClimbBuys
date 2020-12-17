@@ -466,6 +466,7 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		CBaseblock * pUpBlock = pBlock->m_pUpBlock;
 		while (pUpBlock)
 		{
+			if (pUpBlock == this) break;
 			pThisBlock = pUpBlock;
 			pUpBlock = pThisBlock->m_pUpBlock;
 		}
@@ -1631,7 +1632,6 @@ void CBaseblock::BlockMoveOrDelete(void)
 	// 変数宣言
 	CBaseblock * pUpBlock = this->m_pUpBlock;		// 上のブロック情報
 	CBaseblock * pDownBlock = this->m_pDownBlock;	// 下のブロック情報
-	// 上のブロックの情報NULLチェック
 	if (pUpBlock)
 	{
 		pUpBlock->m_pDownBlock = NULL;
@@ -2721,7 +2721,7 @@ void CBaseblock::SpecialSetImG(void)
 				}
 				else if (nCntSpecial == SPECIALBLOCK_PANIC)
 				{
-					sName += u8"こうらんブロック(%)";
+					sName += u8"パニックブロック(%)";
 				}
 				else if (nCntSpecial == SPECIALBLOCK_ELECTRIC)
 				{

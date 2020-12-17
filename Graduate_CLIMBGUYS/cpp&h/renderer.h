@@ -22,7 +22,7 @@
 // ------------------------------------------
 #if ERROW_ACTION
 
-#define IMGUI_DEBUG	(1)	// ImGuiのデバッグ処理
+#define IMGUI_DEBUG	(0)	// ImGuiのデバッグ処理
 
 #endif // ERROW_ACTION
 

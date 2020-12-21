@@ -1257,6 +1257,21 @@ void CPlayer::ElectricUse(PLAYER_TAG const & PlayerTag)
 		move.x = 0.0f;
 		move.z = 0.0f;
 		pPlayer->SetMove(move);
+		// 雷エフェクト生成
+		CScene_THREE * pThunder = CScene_THREE::Create(
+			CScene_THREE::OFFSET_TYPE_VERTICAL_UNDER,			// タイプ
+			pPlayer->GetPos() + D3DXVECTOR3(0.0f, -0.0f, 0.0f), // 位置
+			D3DXVECTOR3(100.0f, 100.0f, 0.0f),					// サイズ
+			CTexture_manager::TYPE_EFFECT_THUNDER,				// テクスチャータイプ
+			D3DVECTOR3_ZERO,									// 角度
+			true,												// ビルボード
+			false,												// Zバッファ
+			true,												// ライティング
+			true);												// アルファブレンド
+		pThunder->SetTexAnim(
+			5, 5, 2, false
+		);
+
 	}
 }
 

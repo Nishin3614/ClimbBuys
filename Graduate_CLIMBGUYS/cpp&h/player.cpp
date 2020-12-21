@@ -1416,6 +1416,7 @@ void CPlayer::PushBlock(
 		if (pBlock->GetType() == CBaseblock::BLOCKTYPE_PANIC)
 		{
 			m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
+
 		}
 		// ブロックが電気ブロックなら
 		else if (pBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)

@@ -316,7 +316,8 @@ void CCharacter::Motion(void)
 			// ループしないとき
 			if (m_modelAll[m_character]->pMotion[m_nMotiontype]->nLoop == 0)
 			{
-				m_nMotiontype = 0;	// モーションタイプ
+				// 待機モーション
+				WaitMotion();
 			}
 			// 初期化
 			m_keyinfoCnt = 0;				// キー情報
@@ -443,6 +444,39 @@ void CCharacter::Motion_Obit()
 			m_modelAll[m_character]->pMotion[m_nMotiontype]->v_MeshObit_detail.at(nCntMotionObit).nObitID).nPart));
 		// 軌跡の描画
 		m_vec_pMeshObit.at(m_modelAll[m_character]->pMotion[m_nMotiontype]->v_MeshObit_detail.at(nCntMotionObit).nObitID)->Draw();
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 待機モーション
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CCharacter::WaitMotion(void)
+{
+	// 勝利モーション01のとき
+	if (m_nMotiontype == MOTIONTYPE::MOTIONTYPE_VICTORY_01)
+	{
+		m_nMotiontype = MOTIONTYPE::MOTIONTYPE_V_01_WAIT;
+	}
+	// 勝利モーション02のとき
+	else if (m_nMotiontype == MOTIONTYPE::MOTIONTYPE_VICTORY_02)
+	{
+		m_nMotiontype = MOTIONTYPE::MOTIONTYPE_V_02_WAIT;
+	}
+	// 勝利モーション03のとき
+	else if (m_nMotiontype == MOTIONTYPE::MOTIONTYPE_VICTORY_03)
+	{
+		m_nMotiontype = MOTIONTYPE::MOTIONTYPE_V_03_WAIT;
+	}
+	// 勝利モーション04のとき
+	else if (m_nMotiontype == MOTIONTYPE::MOTIONTYPE_VICTORY_04)
+	{
+		m_nMotiontype = MOTIONTYPE::MOTIONTYPE_V_04_WAIT;
+	}
+	// 勝利モーションじゃないとき
+	else
+	{
+		// ニュートラルモーション
+		m_nMotiontype = 0;
 	}
 }
 

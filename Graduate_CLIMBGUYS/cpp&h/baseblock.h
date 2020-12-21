@@ -146,6 +146,11 @@ public:
 		{
 			return nColumn >= Grid.nColumn && nLine >= Grid.nLine && nHeight >= Grid.nHeight;
 		}
+		// 行列高さの>=のオペレーション
+		bool operator > (GRID & Grid)
+		{
+			return nColumn > Grid.nColumn && nLine > Grid.nLine && nHeight > Grid.nHeight;
+		}
 		D3DXVECTOR3 GetPos(float const & fRange)
 		{
 			D3DXVECTOR3 pos;
@@ -459,6 +464,10 @@ public:
 	void SetGravity(float fGravity)					{ m_fGravity = fGravity; };
 	// ベースブロックの種類取得
 	float GetGravity()								{ return m_fGravity; };
+	// 自身のブロックが移動または削除処理
+	void BlockMoveOrDelete(void);
+	// 影のリリース処理
+	void ShadowRelease(void);
 	// 指定したベースブロックを削除する処理
 	//	pBlock	: ブロック情報
 	static bool DeleteBlock(
@@ -559,7 +568,6 @@ public:
 	static CBaseblock::GRID SetSpecialFallPos(void);
 	// 特殊ブロックの確立取得
 	static SPECIALSORT GetSpecialSort(int const & nPhase);
-
 #if IMGUI_DEBUG
 
 	// 全体のデバッグ処理
@@ -628,9 +636,13 @@ private:
 	static int				m_nPhase;			// フェーズ
 	// 試験用
 	static HEIGHT_PRIORITY	m_Priority[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];			// 優先順位
-	//static int				m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
+	//static int			m_anHeight[BASEBLOCK_FIELDMAX][BASEBLOCK_FIELDMAX];	// それぞれの行列の高さ
 	static int				m_nMaxHeight;		// 最大高さ
 	static int				m_nMaxWeight;		// 最大重さ
+
+	// テスト
+	CBaseblock *			m_pUpBlock;			// 上にあるブロック情報
+	CBaseblock *			m_pDownBlock;		// 下にあるブロック情報
 #if BASEBLOCK_DEBUG
 	static int				m_nAll;				// 全体個数
 #endif // BASEBLOCK_DEBUG

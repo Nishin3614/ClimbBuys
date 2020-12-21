@@ -93,6 +93,8 @@ void CBombblock::Update(void)
 		);
 		// 爆発音
 		CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
+		// シャドウのリリース処理
+		ShadowRelease();
 		// リリース
 		Release();
 	}
@@ -185,7 +187,7 @@ CBombblock * CBombblock::Create(
 		D3DXVECTOR3(Grid.nColumn * m_fSizeRange, Grid.nHeight * m_fSizeRange, Grid.nLine * m_fSizeRange));
 	pBombblock->SetGravity(fGravity);		// 重力
 	pBombblock->SetModelId(nModelId);		// モデル番号
-											// 色がNULLではないなら
+	// 色がNULLではないなら
 	if (pCol != NULL)
 	{
 		// モデルの色を変える
@@ -277,7 +279,8 @@ void CBombblock::AroundDelete(void)
 
 		// フィールドブロックなら
 		if (this == pBlock ||
-			pBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD) continue;
+			pBlock->GetType() == CBaseblock::BLOCKTYPE_FIELD ||
+			pBlock->GetType() == CBaseblock::BLOCKTYPE_STEEL) continue;
 
 		// 範囲内にブロックが存在しているなら
 		if (this->GetGrid() + CBaseblock::GRID(-1, -1, -1) <= pBlock->GetGrid() &&

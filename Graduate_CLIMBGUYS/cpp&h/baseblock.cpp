@@ -65,6 +65,8 @@ CBaseblock::CBaseblock() : CScene_X::CScene_X()
 	m_bShadow = true;									// シャドウの使用状態
 	m_bUse = true;										// 使用状態
 	m_fGravity = 0.0f;									// 重力
+	m_pUpBlock = NULL;									// 上にあるブロック情報
+	m_pDownBlock = NULL;									// 下にあるブロック情報
 #if BASEBLOCK_DEBUG
 
 	m_nAll++;
@@ -112,6 +114,8 @@ void CBaseblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Uninit(void)
 {
+	// ブロックの上下情報をNULLに
+	BlockMoveOrDelete();
 	CScene_X::Uninit();
 }
 
@@ -345,9 +349,7 @@ void CBaseblock::Update_MyShadow(void)
 	// 真下にブロックが存在していないなら
 	else if (CBaseblock::GetHeight(this->GetGrid().nColumn, this->GetGrid().nLine) < 0)
 	{
-		m_pShadowPolygon->SetShadow(false);
-		m_pShadowPolygon->Release();
-		m_pShadowPolygon = NULL;
+		ShadowRelease();
 		m_bShadow = false;
 		return;
 	}
@@ -384,12 +386,8 @@ void CBaseblock::Update_Limit(void)
 	{
 		// リリース処理
 		Release();
-		// シャドウが存在しているなら
-		if (m_pShadowPolygon)
-		{
-			// シャドウをリリース
-			m_pShadowPolygon->Release();
-		}
+		// シャドウのリリース処理
+		ShadowRelease();
 	}
 	if (m_bFall) return;
 	// ダメージ床のループ
@@ -427,7 +425,7 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		&pBlock->GetPos(),
 		&pBlock->GetPosOld(),
 		&pBlock->GetModel()->size,
-		D3DXVECTOR3(0.0f, pBlock->GetModel()->size.y, 0.0f)
+		D3DXVECTOR3(0.0f, pBlock->GetModel()->size.y * 0.5f, 0.0f)
 	);
 	// どこにもあたっていなければ
 	if (Direct == COLLISIONDIRECTION::NONE) return;
@@ -462,8 +460,28 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		this->SetPos(MyGrid.GetPos(m_fSizeRange));
 		// 落ちている状態設定
 		this->SetFall(false);
+
+		// 上下ブロック情報をつなげる
+		CBaseblock * pThisBlock = pBlock;
+		CBaseblock * pUpBlock = pBlock->m_pUpBlock;
+		while (pUpBlock)
+		{
+			if (pUpBlock == this) break;
+			pThisBlock = pUpBlock;
+			pUpBlock = pThisBlock->m_pUpBlock;
+		}
+		this->m_pDownBlock = pThisBlock;
+		pThisBlock->m_pUpBlock = this;
 	}
-	else if (Direct == COLLISIONDIRECTION::UP) {}
+	else if (Direct == COLLISIONDIRECTION::UP)
+	{
+		// 相手の落ちる状態がtrueなら
+		// ->関数を抜ける
+		if (pBlock->GetFall()) return;
+		// 上下ブロック情報をつなげる
+		this->m_pUpBlock = pBlock;
+		pBlock->m_pDownBlock = this;
+	}
 	else
 	{
 		// プレイヤーから押されていない場合
@@ -620,8 +638,10 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 		if (pos->x + OffsetPos.x + size->x * 0.5f > BlockPos.x - m_fSizeRange * 0.5f&&
 			pos->x + OffsetPos.x - size->x * 0.5f < BlockPos.x + m_fSizeRange * 0.5f)
 		{
+
 			// 当たり判定(下)
-			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+			if (!this->m_pDownBlock &&
+				pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
 				posOld->y + OffsetPos.y + size->y * 0.5f <= BlockPos.y)
 			{
 				// めり込んでいる
@@ -637,7 +657,8 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 			}
 
 			// 当たり判定(上)
-			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+			else if (!this->m_pUpBlock &&
+				pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
 				posOld->y + OffsetPos.y - size->y * 0.5f >= BlockPos.y + m_fSizeRange)
 			{
 				// めり込んでいる
@@ -663,6 +684,13 @@ COLLISIONDIRECTION CBaseblock::PushCollision(
 					CElectricblock * pElectBlock = (CElectricblock *)this;
 					pElectBlock->SetElectric(true);
 				}
+				// タイプがばねなら
+				else if (m_BlockType == BLOCKTYPE_SPRING)
+				{
+					// 電気の状態設定
+					move->y = 0;
+				}
+
 
 			}
 			if (Direct == COLLISIONDIRECTION::NONE)
@@ -1424,6 +1452,22 @@ COLLISIONDIRECTION CBaseblock::Collision(
 			pos->x + OffsetPos.x - size->x * 0.5f <= BlockPos.x + m_fSizeRange * 0.5f)
 		{
 			// 当たり判定(下)
+			if (pos->y + OffsetPos.y + size->y * 0.5f > BlockPos.y&&
+				pos->y + OffsetPos.y <= BlockPos.y)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::DOWN;
+			}
+
+			// 当たり判定(上)
+			else if (pos->y + OffsetPos.y - size->y * 0.5f < BlockPos.y + m_fSizeRange&&
+				pos->y + OffsetPos.y - size->y > BlockPos.y + m_fSizeRange)
+			{
+				// めり込んでいる
+				Direct = COLLISIONDIRECTION::UP;
+			}
+			/*
+			// 当たり判定(下)
 			if (pos->y + OffsetPos.y >= BlockPos.y)
 			{
 				// めり込んでいる
@@ -1436,6 +1480,7 @@ COLLISIONDIRECTION CBaseblock::Collision(
 				// めり込んでいる
 				Direct = COLLISIONDIRECTION::UP;
 			}
+			*/
 		}
 	}
 	// 素材のY範囲
@@ -1580,6 +1625,43 @@ void CBaseblock::SetPushAfter(PUSHAFTER const & PushAfter)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 自身のブロックが移動または削除処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::BlockMoveOrDelete(void)
+{
+	// 変数宣言
+	CBaseblock * pUpBlock = this->m_pUpBlock;		// 上のブロック情報
+	CBaseblock * pDownBlock = this->m_pDownBlock;	// 下のブロック情報
+	if (pUpBlock)
+	{
+		pUpBlock->m_pDownBlock = NULL;
+	}
+	// 下のブロックの情報NULLチェック
+	if (pDownBlock)
+	{
+		pDownBlock->m_pUpBlock = NULL;
+	}
+	// 自身の下と上のブロック情報をNULLに
+	this->m_pDownBlock = NULL;
+	this->m_pUpBlock = NULL;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 影のリリース処理
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CBaseblock::ShadowRelease(void)
+{
+	// シャドウが存在しているなら
+	if (m_pShadowPolygon)
+	{
+		// シャドウをリリース
+		m_pShadowPolygon->Release();
+		m_pShadowPolygon = NULL;
+		m_bShadow = false;
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 指定したベースブロックを削除する処理
 //	pBlock	: ブロック情報
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1597,12 +1679,8 @@ bool CBaseblock::DeleteBlock(
 	CBaseblock::FallBlock_Grid(pBlock->GetGrid());
 	// 押したブロックの現在までいた行列の高さ情報を更新
 	CBaseblock::SetHeight(pBlock->GetGrid() + CBaseblock::GRID(0, -1, 0));
-	// シャドウのリリース処理
-	if (pBlock->m_pShadowPolygon)
-	{
-		// シャドウをリリース
-		pBlock->m_pShadowPolygon->Release();
-	}
+	// シャドウをリリース処理
+	pBlock->ShadowRelease();
 	// リリース処理
 	pBlock->Release();
 	return true;
@@ -2643,7 +2721,7 @@ void CBaseblock::SpecialSetImG(void)
 				}
 				else if (nCntSpecial == SPECIALBLOCK_PANIC)
 				{
-					sName += u8"こうらんブロック(%)";
+					sName += u8"パニックブロック(%)";
 				}
 				else if (nCntSpecial == SPECIALBLOCK_ELECTRIC)
 				{

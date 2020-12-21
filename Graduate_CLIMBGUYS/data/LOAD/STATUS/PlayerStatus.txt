@@ -5,7 +5,7 @@ SCRIPT
 
 STATUS_SET
 	Move			= 1.0
-	Jump			= 7.5
+	Jump			= 7.2
 	NormalInertia	= 0.70
 	JumpInertia		= 1.00
 	PlayerSize		= 12.0	20.0	12.0

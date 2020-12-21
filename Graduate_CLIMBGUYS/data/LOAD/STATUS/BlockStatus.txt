@@ -33,34 +33,34 @@ STATUS_SET
 	Phase 3
 		BlockGravity	= 3.200000 1.000000
 	Phase 4
-		BlockGravity	= 2.600000 2.000000
+		BlockGravity	= 3.800000 2.000000
 	Phase 5
-		BlockGravity	= 3.000000 2.000000
+		BlockGravity	= 4.400000 2.000000
 	Phase 6
-		BlockGravity	= 4.000000 2.000000
+		BlockGravity	= 5.000000 2.000000
 	Phase 0
 	SPECIAL
-		NONE	= 30
+		NONE	= 20
 		BOMB	= 10
-		SPRING	= 10
-		STEEL	= 35
+		SPRING	= 15
+		STEEL	= 40
 		PANIC	= 10
 		ELECTRIC	= 5
 	SPECIALEND
 	Phase 0
 	SPECIAL
-		NONE	= 30
+		NONE	= 20
 		BOMB	= 10
 		SPRING	= 10
-		STEEL	= 35
+		STEEL	= 45
 		PANIC	= 10
 		ELECTRIC	= 5
 	SPECIALEND
 	Phase 0
 	SPECIAL
-		NONE	= 30
-		BOMB	= 10
-		SPRING	= 10
+		NONE	= 20
+		BOMB	= 15
+		SPRING	= 15
 		STEEL	= 35
 		PANIC	= 10
 		ELECTRIC	= 5

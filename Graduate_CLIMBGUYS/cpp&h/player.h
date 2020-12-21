@@ -318,6 +318,8 @@ public:
 	static int GetDieCount() { return m_nDieCnt; };
 	// プレイヤーのステータス情報取得
 	static PLAYER_STATUS GetPlayerStatus(void) { return m_PlayerStatus; };
+	// 電気ブロック使用時
+	static void ElectricUse(PLAYER_TAG const & PlayerTag);
 	// プレイヤーの死亡状態の取得
 	DIESTATUS &GetPlayerDieStatus(void) { return m_DieStatus; };
 protected:
@@ -370,8 +372,6 @@ private:
 	void InvincibleUpdate(void);
 	// パニック状態の更新
 	void PanicUpdate(void);
-	// 電気ブロック使用時
-	void ElectricUse(void);
 
 	/* 変数 */
 	CXInputPad					*m_pPad;						// パッドのポインタ
@@ -384,6 +384,7 @@ private:
 	STATUSCHANGE				m_Panic;						// パニック状態
 	CPlayerUI					*m_pPlayerUI;					// プレイヤーUI
 	bool						m_bSpringFlag;					// ばねの判定を一回だけ通す
+	bool						m_bRun;							// 走っている状態かどうか
 	RECORD						m_Record;						// 記録情報
 
 	static int					m_nDieCnt;						// 死亡人数 仮

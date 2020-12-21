@@ -89,6 +89,15 @@ public:
 		OFFSET_TYPE const &offsettype = OFFSET_TYPE_VERTICAL_CENTER,	// オフセットタイプ
 		VERTEX_3D * pVtx = NULL											// 頂点情報
 	);
+	// テクスチャー設定
+	//	first		: 初期の位置
+	//	last		: 末期の位置
+	//	pVtx		: 頂点情報
+	void Set_Vtx_Tex(
+		D3DXVECTOR2 const &first = D3DXVECTOR2(0.0f, 0.0f),	// 初期の配置
+		D3DXVECTOR2 const &last = D3DXVECTOR2(1.0f, 1.0f),	// 末期の配置
+		VERTEX_3D * pVtx = NULL								// 頂点情報
+	);
 	// 頂点カラー
 	void Set_Vtx_Col(VERTEX_3D * pVtx = NULL);
 	// サイズ
@@ -112,12 +121,17 @@ public:
 		m_nTexType = nTexType;
 	};
 	// アニメーション設定
-	void SetAnimation(
-		float fTexX,
-		float fTexY,
-		float fTexY2,
-		int nPatternAnim
+	//	nMaxCntAnim			: 最大アニメーションカウント
+	//	nMaxHorizonAnim		: 最大水平アニメーションカウント
+	//	nMaxVirticalAnim	: 最大垂直アニメーションカウント
+	//	bLoop				: ループ状態
+	void SetTexAnim(
+		int	const &nMaxCntAnim,			// 最大アニメーションカウント
+		int	const &nMaxHorizonAnim,		// 最大水平アニメーションカウント
+		int	const &nMaxVirticalAnim,	// 最大垂直アニメーションカウント
+		bool const & bLoop				// ループするかしないか
 	);
+
 	// ビルボード状態
 	void SetBillboard(bool const &bBillboard) { m_bBillboard = bBillboard; };
 	// Z軸状態
@@ -183,6 +197,9 @@ public:
 protected:
 private:
 	/* 関数 */
+	// アニメーション更新処理
+	void Updata_Animation(void);
+
 	void Offset_Virtical_Center(VERTEX_3D *pVtx);					// オフセットが縦のセンター
 	void Offset_Virtical_Left(VERTEX_3D *pVtx);						// オフセットが縦の左
 	void Offset_Virtical_Under(VERTEX_3D *pVtx);					// オフセットが縦の下
@@ -196,6 +213,7 @@ private:
 	D3DXMATRIX  m_mtxWorld;											// ワールドマトリックス
 	D3DXCOLOR	m_col;												// カラー
 	OFFSET_TYPE	m_offsetType;										// オフセットタイプ
+	std::unique_ptr<ANIMATION> m_unipAnim;							// アニメーション情報
 	float m_fLengh;													// 長さ
 	float m_fAngle;													// 角度
 	bool m_bBillboard;												// ビルボード状態

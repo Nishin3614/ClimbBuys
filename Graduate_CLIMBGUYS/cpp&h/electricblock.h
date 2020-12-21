@@ -83,6 +83,8 @@ public:
 	);
 	// 電気発動状態設定
 	void SetElectric(bool const & bElect) { m_bElect = bElect; };
+	// 押し出されたときのプレイヤー番号設定
+	void SetPlayerTag(PLAYER_TAG const & Tag) { m_PushPlayer = Tag; };
 	// 電気ブロック全ソースの読み込み
 	static HRESULT Load(void);
 	// 電気ブロック全ソースの開放
@@ -129,8 +131,10 @@ private:
 	/* 関数 */
 
 	/* 変数 */
-	bool	m_bElect;		// 電気発動状態
-	bool	m_bPlayerPush;	// プレイヤーに当たったら
+	bool		m_bElect;		// 電気発動状態
+	bool		m_bPlayerPush;	// プレイヤーに当たったら
+	PLAYER_TAG	m_PushPlayer;	// 押されたときのプレイヤー番号
+
 };
 
 #endif

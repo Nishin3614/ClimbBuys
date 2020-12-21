@@ -55,7 +55,8 @@ public:
 		LABEL_SE_RESULT,				// ƒŠƒUƒ‹ƒg
 		LABEL_SE_EXPLOSION,				// ”š”­
 		LABEL_SE_THUNDER,				// —‹
-		LABEL_MAX,						// Å‘å”
+		LABEL_SE_THUNDER2,				// —‹
+		LABEL_MAX						// Å‘å”
 	} LABEL;
 	/* ŠÖ” */
 	CSound();

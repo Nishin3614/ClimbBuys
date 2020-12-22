@@ -28,7 +28,8 @@
 class CMeshBox;		// メッシュボックスクラス
 class CPlayerUI;	// プレイヤーUI
 
-class C3DLine;	// 3D線クラス
+class C3DLine;		// 3D線クラス
+class CScene_THREE; // シーン3D
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // クラス
@@ -389,7 +390,7 @@ private:
 
 	static int					m_nDieCnt;						// 死亡人数 仮
 	DIESTATUS					m_DieStatus;					// 死亡状態
-
+	CScene_THREE				*m_pPanic;						// 混乱
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox;
 	C3DLine *	pCollisionLine;

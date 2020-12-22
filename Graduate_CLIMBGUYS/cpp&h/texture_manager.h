@@ -72,6 +72,7 @@ public:
 		TYPE_BG_TITLE,				// タイトル背景
 		TYPE_BG_AIR_SLASH,			// 空気の線
 		TYPE_EFFECT_THUNDER,		// 雷のエフェクト
+		TYPE_EFFECT_PANIC,			// 混乱
 		TYPE_MAX					// 最大数
 	} TYPE;
 

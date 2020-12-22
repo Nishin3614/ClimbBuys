@@ -419,7 +419,7 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		this->GetType() == CBaseblock::BLOCKTYPE_FIELD) return;
 	// •Ï”éŒ¾
 	COLLISIONDIRECTION Direct;	// “–‚½‚è”»’è•ûŒü
-								// “–‚½‚è”»’è
+	// “–‚½‚è”»’è
 	Direct = Collision(
 		CScene::OBJ_BLOCK,
 		&pBlock->GetPos(),

@@ -500,6 +500,7 @@ typedef struct ANIMATION
 		nMaxVirticalAnim = 1;			// 最大垂直のアニメーションパターン数
 		fHorizonSize = 1.0f;			// 水平のアニメーション1つのサイズ
 		fVirticalSize = 1.0f;			// 垂直のアニメーション1つのサイズ
+		bLoop = false;					// アニメーションがループするかしないか
 	}
 	int					nCntAnim;			// アニメカウント
 	int					nMaxCntAnim;		// 最大アニメカウント
@@ -509,6 +510,7 @@ typedef struct ANIMATION
 	int					nMaxVirticalAnim;	// 最大垂直のアニメーションパターン数
 	float				fHorizonSize;		// 水平のアニメーション1つのサイズ
 	float				fVirticalSize;		// 垂直のアニメーション1つのサイズ
+	bool				bLoop;				// アニメーションがループするかしないか
 } ANIMATION, *PANIMATION;
 
 // ----------------------------------------------------------------------------------------------------

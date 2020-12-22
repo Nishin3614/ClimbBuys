@@ -127,6 +127,7 @@ void CScene_THREE::Uninit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CScene_THREE::Update(void)
 {
+	Updata_Animation();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -217,6 +218,57 @@ void CScene_THREE::Draw(void)
 		2
 		);
 	CManager::GetRenderer()->SetType(CRenderer::TYPE_NORMAL);
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// アニメーション更新処理
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CScene_THREE::Updata_Animation(void)
+{
+	// アニメーション情報がNULLなら
+	// ->関数を抜ける
+	if (m_unipAnim == NULL) return;
+
+	// カウントアニメアップ
+	m_unipAnim->nCntAnim++;
+	// カウントアニメが最大カウントアニメで割り切れたら
+	if (m_unipAnim->nCntAnim % m_unipAnim->nMaxCntAnim == 0)
+	{
+		// 変数宣言
+		D3DXVECTOR2 FirstPos;	// 初期位置
+		D3DXVECTOR2 EndPos;		// 末期位置
+								// 水平アニメーションカウントアップ
+		m_unipAnim->nHorizonAnim++;
+		if (m_unipAnim->nHorizonAnim >= m_unipAnim->nMaxHorizonAnim)
+		{
+			// 水平アニメーションカウント初期化
+			m_unipAnim->nHorizonAnim = 0;
+			// 垂直アニメーションカウントアップ
+			m_unipAnim->nVirticalAnim++;
+			if (m_unipAnim->nVirticalAnim >= m_unipAnim->nMaxVirticalAnim)
+			{
+				// 垂直アニメーションカウント初期化
+				m_unipAnim->nVirticalAnim = 0;
+				// ループしないなら
+				if (!m_unipAnim->bLoop)
+				{
+					Release();
+				}
+			}
+		}
+		// 始点位置
+		FirstPos = D3DXVECTOR2(
+			m_unipAnim->nHorizonAnim * m_unipAnim->fHorizonSize,
+			m_unipAnim->nVirticalAnim * m_unipAnim->fVirticalSize
+		);
+		// 終点位置
+		EndPos = D3DXVECTOR2(
+			m_unipAnim->nHorizonAnim * m_unipAnim->fHorizonSize + m_unipAnim->fHorizonSize,
+			m_unipAnim->nVirticalAnim * m_unipAnim->fVirticalSize + m_unipAnim->fVirticalSize
+		);
+		// テクスチャー座標設定
+		Set_Vtx_Tex(FirstPos, EndPos);
+	}
 }
 
 #ifdef _DEBUG
@@ -515,6 +567,90 @@ void CScene_THREE::Set_Vtx_Col(VERTEX_3D * pVtx)
 	}
 }
 
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// テクスチャー設定
+//	first		: 初期の位置
+//	last		: 末期の位置
+//	pVtx		: 頂点情報
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CScene_THREE::Set_Vtx_Tex(
+	D3DXVECTOR2 const &first,	// 初期の配置
+	D3DXVECTOR2 const &last,	// 最後の配置
+	VERTEX_3D * pVtx			// 頂点情報
+)
+{
+	// 頂点情報がNULLなら
+	if (pVtx == NULL)
+	{
+		// 頂点データの範囲をロックし、頂点バッファへのポインタ
+		m_pVtxBuff->Lock(
+			0,
+			0,
+			(void **)&pVtx,
+			0);
+		// 頂点テクスチャー
+		pVtx[0].tex = D3DXVECTOR2(first.x, first.y);
+		pVtx[1].tex = D3DXVECTOR2(last.x, first.y);
+		pVtx[2].tex = D3DXVECTOR2(first.x, last.y);
+		pVtx[3].tex = D3DXVECTOR2(last.x, last.y);
+		// 頂点情報がヌルだったら
+		// アンロック
+		m_pVtxBuff->Unlock();
+	}
+	// それ以外なら
+	else
+	{
+		// 頂点テクスチャー
+		pVtx[0].tex = D3DXVECTOR2(first.x, first.y);
+		pVtx[1].tex = D3DXVECTOR2(last.x, first.y);
+		pVtx[2].tex = D3DXVECTOR2(first.x, last.y);
+		pVtx[3].tex = D3DXVECTOR2(last.x, last.y);
+	}
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// テクスチャーアニメーションの設定
+//	nMaxCntAnim			: 最大アニメーションカウント
+//	nMaxHorizonAnim		: 最大水平アニメーションカウント
+//	nMaxVirticalAnim	: 最大垂直アニメーションカウント
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CScene_THREE::SetTexAnim(
+	int	const &nMaxCntAnim,			// 最大アニメーションカウント
+	int	const &nMaxHorizonAnim,		// 最大水平アニメーションカウント
+	int	const &nMaxVirticalAnim,	// 最大垂直アニメーションカウント
+	bool const & bLoop				// ループするかしないか
+)
+{
+	// アニメーション情報がNULLなら
+	if (m_unipAnim == NULL)
+	{
+		// アニメーション情報のメモリ確保
+		m_unipAnim.reset(new ANIMATION);
+	}
+	// 変数宣言
+	D3DXVECTOR2 FirstPos;
+	D3DXVECTOR2 EndPos;
+	// 各項目の設定
+	m_unipAnim->nMaxCntAnim = nMaxCntAnim;					// 最大アニメーションカウント
+	m_unipAnim->nMaxHorizonAnim = nMaxHorizonAnim;			// 最大水平アニメーションカウント
+	m_unipAnim->nMaxVirticalAnim = nMaxVirticalAnim;		// 最大垂直アニメーションカウント
+	m_unipAnim->fHorizonSize = 1.0f / nMaxHorizonAnim;		// 垂直アニメーションの1つのサイズ
+	m_unipAnim->fVirticalSize = 1.0f / nMaxVirticalAnim;	// 垂直アニメーションの1つのサイズ
+	m_unipAnim->bLoop = bLoop;								// ループするかしないか
+	// 始点位置
+	FirstPos = D3DXVECTOR2(
+		m_unipAnim->nHorizonAnim * m_unipAnim->fHorizonSize,
+		m_unipAnim->nVirticalAnim * m_unipAnim->fVirticalSize
+	);
+	// 終点位置
+	EndPos = D3DXVECTOR2(
+		m_unipAnim->nHorizonAnim * m_unipAnim->fHorizonSize + m_unipAnim->fHorizonSize,
+		m_unipAnim->nVirticalAnim * m_unipAnim->fVirticalSize + m_unipAnim->fVirticalSize
+	);
+	// テクスチャー座標設定
+	Set_Vtx_Tex(FirstPos, EndPos);
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 表示テクスチャー設定処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -588,25 +724,3 @@ void CScene_THREE::Offset_Side_Center(VERTEX_3D * pVtx)
 	pVtx[2].pos = D3DXVECTOR3(-m_size.x * 0.5f,0.0f , -m_size.z * 0.5f);
 	pVtx[3].pos = D3DXVECTOR3(m_size.x * 0.5f,0.0f, -m_size.z * 0.5f);
 }
-
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// アニメーション生成
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void CScene_THREE::SetAnimation(float fTexX, float fTexY, float fTexY2, int nPatternAnim)
-{
-	// 変数宣言
-	VERTEX_3D *pVtx;	// 頂点情報
-
-	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-	// テクスチャ座標の設定
-	pVtx[0].tex = D3DXVECTOR2(0.0f + nPatternAnim * fTexX, fTexY2);
-	pVtx[1].tex = D3DXVECTOR2(fTexX + nPatternAnim * fTexX, fTexY2);
-	pVtx[2].tex = D3DXVECTOR2(0.0f + nPatternAnim * fTexX, fTexY);
-	pVtx[3].tex = D3DXVECTOR2(fTexX + nPatternAnim * fTexX, fTexY);
-
-	// 頂点データをアンロックする
-	m_pVtxBuff->Unlock();
-}
-

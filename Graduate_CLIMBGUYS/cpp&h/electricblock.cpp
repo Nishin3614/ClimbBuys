@@ -91,7 +91,7 @@ void CElectricblock::Update(void)
 			this->GetPos()
 		);
 		// 爆発音
-		CManager::GetSound()->PlaySound(CSound::LABEL_SE_EXPLOSION);
+		CManager::GetSound()->PlaySound(CSound::LABEL_SE_THUNDER);
 		// プレイヤーに電気ブロック使用時の状態を付与する
 		CPlayer::ElectricUse(m_PushPlayer);
 		// シャドウのリリース処理

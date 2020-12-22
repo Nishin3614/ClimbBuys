@@ -153,16 +153,17 @@ public:
 	int const &GetTexType(void) const { return m_nTexType; };
 	// シーン管理
 	static CScene_THREE * Create(
-		OFFSET_TYPE	const & type,									// タイプ
-		D3DXVECTOR3 const & pos,									// 位置
-		D3DXVECTOR3 const & size,									// サイズ
-		int			const & nTexType,								// テクスチャータイプ
-		D3DXVECTOR3	const & rot = D3DVECTOR3_ZERO,					// 角度
-		bool		const & bBillboard = false,						// ビルボード
-		bool		const & bZEneble = false,						// Zバッファ
-		bool		const & bLighting = false,						// ライティング
-		bool		const & bAlpha = false,							// アルファブレンド
-		D3DXCOLOR	const & col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)	// 色
+		OFFSET_TYPE		const & type,									// タイプ
+		D3DXVECTOR3		const & pos,									// 位置
+		D3DXVECTOR3		const & size,									// サイズ
+		int				const & nTexType,								// テクスチャータイプ
+		CScene::LAYER	const & Layer = CScene::LAYER_3DOBJECT,			// レイヤー順番
+		D3DXVECTOR3		const & rot = D3DVECTOR3_ZERO,					// 角度
+		bool			const & bBillboard = false,						// ビルボード
+		bool			const & bZEneble = false,						// Zバッファ
+		bool			const & bLighting = false,						// ライティング
+		bool			const & bAlpha = false,							// アルファブレンド
+		D3DXCOLOR		const & col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)	// 色
 	);
 
 	// 個人管理

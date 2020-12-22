@@ -284,16 +284,17 @@ void CScene_THREE::Debug(void)
 // シーン管理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CScene_THREE * CScene_THREE::Create(
-	OFFSET_TYPE	const & type,			// タイプ
-	D3DXVECTOR3 const & pos,			// 位置
-	D3DXVECTOR3 const & size,			// サイズ
-	int			const & nTexType,		// テクスチャータイプ
-	D3DXVECTOR3	const & rot,			// 角度
-	bool		const & bBillboard,		// ビルボード
-	bool		const & bZEneble,		// Zバッファ
-	bool		const & bLighting,		// ライティング
-	bool		const & bAlpha,			// アルファブレンド
-	D3DXCOLOR	const & col				// 色
+	OFFSET_TYPE		const & type,			// タイプ
+	D3DXVECTOR3		const & pos,			// 位置
+	D3DXVECTOR3		const & size,			// サイズ
+	int				const & nTexType,		// テクスチャータイプ
+	CScene::LAYER	const & Layer,			// レイヤー順番
+	D3DXVECTOR3		const & rot,			// 角度
+	bool			const & bBillboard,		// ビルボード
+	bool			const & bZEneble,		// Zバッファ
+	bool			const & bLighting,		// ライティング
+	bool			const & bAlpha,			// アルファブレンド
+	D3DXCOLOR		const & col				// 色
 )
 {
 	// 変数宣言

@@ -91,6 +91,5 @@ private:
 	RESULT_SCORE			m_ResultScore[(int)PLAYER_TAG::PLAYER_MAX];		// リザルトスコア
 	D3DXVECTOR3				m_move;											// 移動量
 	static CPlayer::RECORD	m_Record[(int)PLAYER_TAG::PLAYER_MAX];			// 記録情報
-	int						m_nDigit[(int)PLAYER_TAG::PLAYER_MAX];			// 桁数
 };
 #endif

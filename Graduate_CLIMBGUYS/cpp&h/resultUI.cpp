@@ -64,7 +64,6 @@ CResultUI::CResultUI()
 	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		m_ResultScore[nCnt] = {};				// リザルトスコア
-		m_nDigit[nCnt]		= {};				// 桁数
 	}
 	m_move					= D3DVECTOR3_ZERO;	// 移動量
 }

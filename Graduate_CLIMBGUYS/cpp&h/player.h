@@ -373,6 +373,8 @@ private:
 	void InvincibleUpdate(void);
 	// パニック状態の更新
 	void PanicUpdate(void);
+	// パニックのエフェクトを出す
+	void PanicEffectCreate(void);
 
 	/* 変数 */
 	CXInputPad					*m_pPad;						// パッドのポインタ
@@ -390,7 +392,7 @@ private:
 
 	static int					m_nDieCnt;						// 死亡人数 仮
 	DIESTATUS					m_DieStatus;					// 死亡状態
-	CScene_THREE				*m_pPanic;						// 混乱
+	CScene_THREE				*m_pPanic;						// パニックエフェクト
 #ifdef _DEBUG
 	CMeshBox * pCollisionBox;
 	C3DLine *	pCollisionLine;

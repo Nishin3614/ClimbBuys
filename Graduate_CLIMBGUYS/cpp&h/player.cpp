@@ -64,7 +64,7 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_Stan					= _STATUSCHANGE();		// スタン
 	m_Panic					= _STATUSCHANGE();		// パニック
 	m_pPanic				= nullptr;				// 混乱エフェクト
-	
+
 
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
@@ -727,6 +727,7 @@ void CPlayer::BlockCollision(void)
 						GetPos(), 											// 位置
 						D3DXVECTOR3(60.0f, 30.0f, 0.0f),					// サイズ
 						CTexture_manager::TYPE_EFFECT_PANIC,				// テクスチャータイプ
+						CScene::LAYER_3DOBJECT,
 						D3DVECTOR3_ZERO,									// 角度
 						true,												// ビルボード
 						false,												// Zバッファ
@@ -1467,6 +1468,7 @@ void CPlayer::PushBlock(
 					GetPos(), 											// 位置
 					D3DXVECTOR3(60.0f, 30.0f, 0.0f),					// サイズ
 					CTexture_manager::TYPE_EFFECT_PANIC,				// テクスチャータイプ
+					CScene::LAYER_3DOBJECT,
 					D3DVECTOR3_ZERO,									// 角度
 					true,												// ビルボード
 					false,												// Zバッファ

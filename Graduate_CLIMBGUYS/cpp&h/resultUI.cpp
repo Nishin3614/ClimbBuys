@@ -64,6 +64,7 @@ CResultUI::CResultUI()
 	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		m_ResultScore[nCnt] = {};				// リザルトスコア
+		m_nDigit[nCnt]		= {};				// 桁数
 	}
 	m_move					= D3DVECTOR3_ZERO;	// 移動量
 }
@@ -175,7 +176,7 @@ CResultUI * CResultUI::Create(void)
 	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
 	{
 		// リザルトスコアの生成
-		pResultUI->m_ResultScore[nCnt].m_pSurvivalTime	= CMultiNumber::Create(D3DVECTOR3_ZERO, D3DVECTOR2_ZERO, 0, 3, 20.0f);
+		pResultUI->m_ResultScore[nCnt].m_pSurvivalTime	= CMultiNumber::Create(D3DVECTOR3_ZERO, D3DVECTOR2_ZERO, 0, std::to_string(pResultUI->m_Record[nCnt].nTime).length(), 20.0f);
 		pResultUI->m_ResultScore[nCnt].m_pPressBlock	= CMultiNumber::Create(D3DVECTOR3_ZERO, D3DVECTOR2_ZERO, 0, 2, 20.0f);
 	}
 	// 初期化処理

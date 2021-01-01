@@ -25,6 +25,7 @@
 #include "Calculation.h"
 #include "sound.h"
 #include "electricblock.h"
+#include "2Dpresents.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -48,6 +49,7 @@
 CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatus		= {};		// プレイヤーのステータス
 CPlayer::PLAYER_STATUS CPlayer::m_PlayerStatusInit	= {};		// プレイヤーの初期ステータス
 int CPlayer::m_nDieCnt = 0;
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // コンストラクタ処理
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,7 +66,6 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_Stan					= _STATUSCHANGE();		// スタン
 	m_Panic					= _STATUSCHANGE();		// パニック
 	m_pPanic				= nullptr;				// 混乱エフェクト
-
 
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
@@ -1273,6 +1274,9 @@ void CPlayer::PanicUpdate(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::ElectricUse(PLAYER_TAG const & PlayerTag)
 {
+	C2DPresents * pThunder = C2DPresents::Create(CScene_TWO::OFFSET_TYPE_CENTER, SCREEN_CENTER_POS, SCREEN_SIZE, -1,0.0f,D3DXCOLOR(0.0f, 0.0f, 0.0f,0.3f),CScene::LAYER_PARTICLE);
+	pThunder->SetCooperation(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.3f), 1,1);
+	pThunder->SetTimeOver(40);
 	// 変数宣言
 	CPlayer * pPlayer;	// キャラクター情報
 	// プレイヤーループ
@@ -1303,9 +1307,9 @@ void CPlayer::ElectricUse(PLAYER_TAG const & PlayerTag)
 		CScene_THREE * pThunder = CScene_THREE::Create(
 			CScene_THREE::OFFSET_TYPE_VERTICAL_UNDER,			// タイプ
 			pPlayer->GetPos(),									// 位置
-			D3DXVECTOR3(100.0f, 100.0f, 0.0f),					// サイズ
+			D3DXVECTOR3(50.0f, 500.0f, 0.0f),					// サイズ
 			CTexture_manager::TYPE_EFFECT_THUNDER,				// テクスチャータイプ
-			CScene::LAYER_3DOBJECT,								// レイヤー順番
+			CScene::LAYER_3DPARTICLE,								// レイヤー順番
 			D3DVECTOR3_ZERO,									// 角度
 			true,												// ビルボード
 			false,												// Zバッファ
@@ -1314,7 +1318,6 @@ void CPlayer::ElectricUse(PLAYER_TAG const & PlayerTag)
 		pThunder->SetTexAnim(
 			5, 5, 2, false
 		);
-
 	}
 }
 

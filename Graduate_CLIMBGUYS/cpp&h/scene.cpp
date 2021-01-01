@@ -38,7 +38,7 @@ CScene::CScene()
 	// フラグ
 	m_bDeadFrag = false;
 	// 更新を止めるかどうか
-	m_bStop = true;
+	m_bStop = false;
 	// 描画状態
 	m_bDraw = true;
 	// オブジェタイプ
@@ -99,8 +99,11 @@ void CScene::UpdateAll(void)
 		{
 			for (int nCntScene = 0; nCntScene < (signed)m_pScene[nCntLayer].size(); nCntScene++)
 			{
-				// 更新
-				m_pScene[nCntLayer][nCntScene]->Update();
+				if (!m_pScene[nCntLayer][nCntScene]->m_bStop)
+				{
+					// 更新
+					m_pScene[nCntLayer][nCntScene]->Update();
+				}
 #ifdef _DEBUG
 				// デバッグ表示
 				m_pScene[nCntLayer][nCntScene]->Debug();
@@ -115,9 +118,10 @@ void CScene::UpdateAll(void)
 	{
 		for (int nCntLayer = 0; nCntLayer < LAYER_MAX; nCntLayer++)
 		{
-			for (int nCntScene = 0; nCntScene < (signed)m_pScene[nCntLayer].size(); nCntScene++)
+			if (nCntLayer == LAYER_3DPARTICLE ||
+				nCntLayer == LAYER_PARTICLE)
 			{
-				if (m_pScene[nCntLayer][nCntScene]->m_bStop == false)
+				for (int nCntScene = 0; nCntScene < (signed)m_pScene[nCntLayer].size(); nCntScene++)
 				{
 					// 更新
 					m_pScene[nCntLayer][nCntScene]->Update();

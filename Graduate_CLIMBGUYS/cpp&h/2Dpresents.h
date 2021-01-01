@@ -165,6 +165,9 @@ public:
 	void SetFadeOut_Compulsion(
 		bool const & bCompulsion
 	);
+	// 時間制限の設定
+	void SetTimeOver(int const & nMaxTime);
+
 	// フェードアウトの使用設定
 	bool GetFadeOut_Bool(void);
 	// フェードアウトの強制終了
@@ -187,7 +190,6 @@ public:
 	int const GetFadeOutMaxAnimTime(void);
 	// フェードアウトのアニメタイムを取得
 	int const GetFadeOutAnimTime(void);
-
 	// 作成(2Dプレゼンツ継承あり)
 	//	offsettype	: タイプ
 	//	pos			: 位置
@@ -235,6 +237,7 @@ public:
 		float		const & frot = 0.0f,								// 角度
 		D3DXCOLOR	const & col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)		// 色
 	);
+
 
 protected:
 	// 設定 //
@@ -356,7 +359,17 @@ private:
 		P_COL_FLASHING pCol_flash;		// 色情報
 		P_SCALING pScal;				// スケール情報
 	} COOPERATION, *P_COOPERATION;
-
+	// 時間制限情報
+	typedef struct _TIMEOVER
+	{
+		_TIMEOVER()
+		{
+			nMaxTime = 0;	// 最大時間
+			nCntTime = 0;	// カウントタイム
+		}
+		int	nMaxTime;	// 最大時間
+		int nCntTime;	// カウントタイム
+	} TIMEOVER,*P_TIMEOVER;
 	/* 関数 */
 	// 点滅更新
 	void Update_ColorFlashing(void);
@@ -382,7 +395,8 @@ private:
 	bool Update_FadeOut(void);
 	// 強調更新
 	bool Update_Cooperation(void);
-
+	// 時間制限の更新処理
+	void Update_TimeOver(void);
 	/* 変数 */
 	// 強調情報
 	P_COOPERATION m_pCooperation;		// 強調情報
@@ -392,6 +406,8 @@ private:
 	P_FADE m_pFadeOut;					// フェード情報
 	// フェードタイプ
 	FADETYPE m_Fadetype;				// フェードタイプ
+	// 時間経過での削除
+	P_TIMEOVER	m_pTimeOver;			// 時間制限
 };
 
 #endif

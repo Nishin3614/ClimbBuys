@@ -303,7 +303,7 @@ CScene_THREE * CScene_THREE::Create(
 	// メモリの生成(初め->基本クラス,後->派生クラス)
 	pScene_Three = new CScene_THREE();
 	// シーン管理設定
-	pScene_Three->ManageSetting(CScene::LAYER_3DOBJECT);
+	pScene_Three->ManageSetting(Layer);
 	// 設定
 	pScene_Three->m_offsetType = type;			// タイプ
 	pScene_Three->m_pos = pos;					// 位置

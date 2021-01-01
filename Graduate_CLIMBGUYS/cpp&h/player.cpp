@@ -65,7 +65,7 @@ CPlayer::CPlayer(CHARACTER const &character) : CCharacter::CCharacter(character)
 	m_Invincible			= _STATUSCHANGE();		// 無敵
 	m_Stan					= _STATUSCHANGE();		// スタン
 	m_Panic					= _STATUSCHANGE();		// パニック
-	m_pPanic				= nullptr;				// 混乱エフェクト
+	m_pPanic				= nullptr;				// パニックエフェクト
 
 	CScene::SetObj(CScene::OBJ::OBJ_PLAYER);	// オブジェクトタイプの設定
 
@@ -141,7 +141,7 @@ void CPlayer::Uninit(void)
 	// プレイヤーUIの初期化
 	m_pPlayerUI = nullptr;
 
-	// 混乱エフェクトの初期化
+	// パニックエフェクトの初期化
 	m_pPanic = nullptr;
 
 #ifdef _DEBUG
@@ -720,30 +720,8 @@ void CPlayer::BlockCollision(void)
 			{
 				m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
 
-				// 混乱エフェクト
-				if (!m_pPanic)
-				{
-					m_pPanic = CScene_THREE::Create(
-						CScene_THREE::OFFSET_TYPE_VERTICAL_UNDER,			// タイプ
-						GetPos(), 											// 位置
-						D3DXVECTOR3(60.0f, 30.0f, 0.0f),					// サイズ
-						CTexture_manager::TYPE_EFFECT_PANIC,				// テクスチャータイプ
-						CScene::LAYER_3DOBJECT,
-						D3DVECTOR3_ZERO,									// 角度
-						true,												// ビルボード
-						false,												// Zバッファ
-						true,												// ライティング
-						true);												// アルファブレンド
-				}
-				if(m_pPanic)
-				{
-					m_pPanic->SetTexAnim(
-						4,			//アニメーションカウント
-						6,			//水平のアニメーション数
-						1,			//垂直のアニメーション数
-						true		//ループするかしないか
-					);
-				}
+				// パニックエフェクトの生成
+				PanicEffectCreate();
 				// ジャンプ可能設定
 				SetJumpAble(true);
 			}
@@ -1253,20 +1231,52 @@ void CPlayer::PanicUpdate(void)
 		// パニック状態の初期化処理
 		m_Panic.Init();
 
-		// 混乱エフェクトを消す
+		// パニックエフェクトを消す
 		if (m_pPanic)
 		{
 			m_pPanic->Release();
 			m_pPanic = nullptr;
 		}
 	}
-	// 混乱エフェクトの位置をプレイヤーに合わせる
+	// パニックエフェクトの位置をプレイヤーに合わせる
 	if (m_pPanic)
 	{
 		m_pPanic->SetPos(GetPos());
 	}
 	// パニックカウント更新
 	m_Panic.nChangeTime++;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// パニックエフェクトの生成
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CPlayer::PanicEffectCreate(void)
+{
+	// 生成されていないとき
+	if (!m_pPanic)
+	{
+		m_pPanic = CScene_THREE::Create(
+			CScene_THREE::OFFSET_TYPE_VERTICAL_UNDER,			// タイプ
+			GetPos(), 											// 位置
+			D3DXVECTOR3(60.0f, 30.0f, 0.0f),					// サイズ
+			CTexture_manager::TYPE_EFFECT_PANIC,				// テクスチャータイプ
+			CScene::LAYER_3DOBJECT,
+			D3DVECTOR3_ZERO,									// 角度
+			true,												// ビルボード
+			false,												// Zバッファ
+			true,												// ライティング
+			true);												// アルファブレンド
+	}
+	// 生成されているとき
+	if (m_pPanic)
+	{
+		m_pPanic->SetTexAnim(
+			4,			//アニメーションカウント
+			6,			//水平のアニメーション数
+			1,			//垂直のアニメーション数
+			true		//ループするかしないか
+		);
+	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1463,30 +1473,8 @@ void CPlayer::PushBlock(
 		{
 			m_Panic.Set(true, m_PlayerStatus.nMaxPanicTime);
 
-			// 混乱エフェクト
-			if (!m_pPanic)
-			{
-				m_pPanic = CScene_THREE::Create(
-					CScene_THREE::OFFSET_TYPE_VERTICAL_UNDER,			// タイプ
-					GetPos(), 											// 位置
-					D3DXVECTOR3(60.0f, 30.0f, 0.0f),					// サイズ
-					CTexture_manager::TYPE_EFFECT_PANIC,				// テクスチャータイプ
-					CScene::LAYER_3DOBJECT,
-					D3DVECTOR3_ZERO,									// 角度
-					true,												// ビルボード
-					false,												// Zバッファ
-					true,												// ライティング
-					true);												// アルファブレンド
-			}
-			if (m_pPanic)
-			{
-				m_pPanic->SetTexAnim(
-					4,			//アニメーションカウント
-					6,			//水平のアニメーション数
-					1,			//垂直のアニメーション数
-					true		//ループするかしないか
-				);
-			}
+			// パニックエフェクトの生成
+			PanicEffectCreate();
 		}
 		// ブロックが電気ブロックなら
 		else if (pBlock->GetType() == CBaseblock::BLOCKTYPE_ELECTRIC)

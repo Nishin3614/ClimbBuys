@@ -90,6 +90,6 @@ private:
 	CScene_TWO				*m_pScene2D[(int)RESULT_UI::UI_MAX];			// シーン2D
 	RESULT_SCORE			m_ResultScore[(int)PLAYER_TAG::PLAYER_MAX];		// リザルトスコア
 	D3DXVECTOR3				m_move;											// 移動量
-	static CPlayer::RECORD	m_Record[(int)PLAYER_TAG::PLAYER_MAX];			// 記録情報 
+	static CPlayer::RECORD	m_Record[(int)PLAYER_TAG::PLAYER_MAX];			// 記録情報
 };
 #endif

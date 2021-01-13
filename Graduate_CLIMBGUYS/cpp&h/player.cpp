@@ -1258,7 +1258,7 @@ void CPlayer::PanicEffectCreate(void)
 		m_pPanic = CScene_THREE::Create(
 			CScene_THREE::OFFSET_TYPE_VERTICAL_UNDER,			// タイプ
 			GetPos(), 											// 位置
-			D3DXVECTOR3(60.0f, 30.0f, 0.0f),					// サイズ
+			D3DXVECTOR3(70.0f, 50.0f, 0.0f),					// サイズ
 			CTexture_manager::TYPE_EFFECT_PANIC,				// テクスチャータイプ
 			CScene::LAYER_3DOBJECT,
 			D3DVECTOR3_ZERO,									// 角度

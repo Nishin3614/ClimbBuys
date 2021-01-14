@@ -392,19 +392,12 @@ void CConnectblock::Tutorial_InitArrangementBlock(void)
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 2, 7), &Col,1.0f);
 
 	// 02
-	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(7, 0, 5), &Col,1.0f);
-	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(6, 0, 6), &Col,1.0f);
-	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(5, 0, 7), &Col,1.0f);
-	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(7, 0, 7), &Col,1.0f);
-	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(6, 1, 6), &Col,1.0f);
-
-	// 03
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 0, 3), &Col,1.0f);
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 0, 4), &Col,1.0f);
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(5, 0, 4), &Col,1.0f);
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 0, 5), &Col,1.0f);
 
-	// 04
+	// 03
 	CNormalblock::Create(2, BaseGrid, &Col, 1.0f);
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(0, 0, 1), &Col,1.0f);
 	CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(1, 0, 0), &Col,1.0f);
@@ -424,11 +417,18 @@ void CConnectblock::Tutorial_InitArrangementBlock(void)
 
 	// バネ
 	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(2, 0, 1), NULL, 1.0f);
-	CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(6, 0, 1), NULL, 1.0f);
 
 	// ボム
-	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 1), NULL, 1.0f);
 	CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 0, 4), NULL, 1.0f);
+
+	// パニック
+	CPanicblock::Create(CScene_X::TYPE_BLOCKS_HATENA, BaseGrid + CBaseblock::GRID(6, 0, 1), NULL, 1.0f);
+
+	// 鋼鉄
+	CSteelblock::Create(CScene_X::TYPE_BLOCKS_HARD, BaseGrid + CBaseblock::GRID(7, 0, 4), NULL, 1.0f);
+
+	// 電気
+	CElectricblock::Create(CScene_X::TYPE_BLOCKS_INVERTER, BaseGrid + CBaseblock::GRID(6, 0, 7), NULL, 1.0f);
 }
 
 #if IMGUI_DEBUG

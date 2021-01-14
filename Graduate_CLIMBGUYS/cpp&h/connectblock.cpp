@@ -490,6 +490,19 @@ void CConnectblock::Tutorial_UpdateArrangementBlock(void)
 	}
 }
 
+void CConnectblock::Tutorial_InitArrangementBlock(CBaseblock * pBlock)
+{
+	for (int nCnt = 0; nCnt < (int)RESPAWN_BLOCK::TYPE_MAX; nCnt++)
+	{
+		// ƒuƒƒbƒN‚ª‘¶Ý‚·‚é
+		if (pBlock == m_pTutorialRespawnBlock[nCnt])
+		{
+			m_pTutorialRespawnBlock[nCnt] = NULL;
+		}
+	}
+
+}
+
 #if IMGUI_DEBUG
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

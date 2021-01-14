@@ -14,6 +14,7 @@
 #include "3dparticle.h"
 #include "player.h"
 #include "damagefloor.h"
+#include "connectblock.h"
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //
@@ -114,6 +115,11 @@ void CBaseblock::Init()
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CBaseblock::Uninit(void)
 {
+	// リリース時
+	if (CManager::GetMode() == CManager::MODE_TUTORIAL)
+	{
+		CConnectblock::Tutorial_InitArrangementBlock(this);
+	}
 	// ブロックの上下情報をNULLに
 	BlockMoveOrDelete();
 	CScene_X::Uninit();
@@ -388,6 +394,7 @@ void CBaseblock::Update_Limit(void)
 		Release();
 		// シャドウのリリース処理
 		ShadowRelease();
+
 	}
 	if (m_bFall) return;
 	// ダメージ床のループ

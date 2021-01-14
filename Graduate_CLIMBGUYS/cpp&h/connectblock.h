@@ -88,6 +88,8 @@ public:
 	// チュートリアルのブロックの更新
 	static void Tutorial_UpdateArrangementBlock(void);
 
+	// チュートリアルの初期化
+	static void Tutorial_InitArrangementBlock(CBaseblock * pBlock);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);

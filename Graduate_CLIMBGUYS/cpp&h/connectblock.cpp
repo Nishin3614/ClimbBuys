@@ -451,7 +451,7 @@ void CConnectblock::Tutorial_InitArrangementBlock(void)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// 静的なデバッグ表示
+// チュートリアルのリスポーンブロックの更新
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CConnectblock::Tutorial_UpdateArrangementBlock(void)
 {
@@ -460,33 +460,53 @@ void CConnectblock::Tutorial_UpdateArrangementBlock(void)
 	// 基準値
 	CBaseblock::GRID BaseGrid = CBaseblock::GRID(-nFeedValue, 1, -nFeedValue);
 
-	for (int nCnt = 0; nCnt < (int)RESPAWN_BLOCK::TYPE_MAX; nCnt++)
+	// 消えたら生成
+	// 03
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_UP])
 	{
-		// 消えたら生成
-		if (!m_pTutorialRespawnBlock[nCnt])
-		{
-			// 03
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_UP] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 10, 5), &Col, 1.0f);
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_LEFT] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 10, 4), &Col, 1.0f);
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_RIGHT] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(5, 10, 4), &Col, 1.0f);
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_DOWN] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 10, 3), &Col, 1.0f);
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_UP] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 10, 5), &Col, 1.0f);
+	}
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_LEFT])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_LEFT] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(3, 10, 4), &Col, 1.0f);
+	}
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_RIGHT])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_RIGHT] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(5, 10, 4), &Col, 1.0f);
+	}
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_DOWN])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_NORMAL_DOWN] = CNormalblock::Create(2, BaseGrid + CBaseblock::GRID(4, 10, 3), &Col, 1.0f);
+	}
 
-			// バネ
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_SPRING] = CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(2, 10, 1), NULL, 1.0f);
+	// バネ
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_SPRING])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_SPRING] = CSpringblock::Create(CScene_X::TYPE_BLOCK_SPRING, BaseGrid + CBaseblock::GRID(2, 10, 1), NULL, 1.0f);
+	}
 
-			// ボム
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_BOMB] = CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 10, 4), NULL, 1.0f);
+	// ボム
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_BOMB])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_BOMB] = CBombblock::Create(CScene_X::TYPE_BLOCK_BOMB, BaseGrid + CBaseblock::GRID(4, 10, 4), NULL, 1.0f);
+	}
 
-			// パニック
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_PANIC] = CPanicblock::Create(CScene_X::TYPE_BLOCKS_HATENA, BaseGrid + CBaseblock::GRID(6, 10, 1), NULL, 1.0f);
+	// パニック
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_PANIC])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_PANIC] = CPanicblock::Create(CScene_X::TYPE_BLOCKS_HATENA, BaseGrid + CBaseblock::GRID(6, 10, 1), NULL, 1.0f);
+	}
 
-			// 鋼鉄
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_STEEL] = CSteelblock::Create(CScene_X::TYPE_BLOCKS_HARD, BaseGrid + CBaseblock::GRID(7, 10, 4), NULL, 1.0f);
+	// 鋼鉄
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_STEEL])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_STEEL] = CSteelblock::Create(CScene_X::TYPE_BLOCKS_HARD, BaseGrid + CBaseblock::GRID(7, 10, 4), NULL, 1.0f);
+	}
 
-			// 電気
-			m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_ELECTRIC] = CElectricblock::Create(CScene_X::TYPE_BLOCKS_INVERTER, BaseGrid + CBaseblock::GRID(6, 10, 7), NULL, 1.0f);
-
-		}
+	// 電気
+	if (!m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_ELECTRIC])
+	{
+		m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_ELECTRIC] = CElectricblock::Create(CScene_X::TYPE_BLOCKS_INVERTER, BaseGrid + CBaseblock::GRID(6, 10, 7), NULL, 1.0f);
 	}
 }
 

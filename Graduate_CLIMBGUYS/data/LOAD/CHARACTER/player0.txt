@@ -2401,6 +2401,12 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 0 / 3 >> ---
 		FRAME = 22
+		EFFECT
+			OFFSET = 0.0 50.0 100.0
+			START_END = 0 30
+			PARTS = 0
+			PARTICLE = 3
+		END_EFFECT
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 -0.20 0.00
 			ROT = -0.13 0.41 -0.03
@@ -2497,12 +2503,6 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 2 / 3 >> ---
 		FRAME = 39
-		EFFECT
-			OFFSET = 0.0 50.0 100.0
-			START_END = 0 80
-			PARTS = 0
-			PARTICLE = 6
-		END_EFFECT
 
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 -0.60 0.00
@@ -2560,6 +2560,12 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 0 / 2 >> ---
 		FRAME = 30
+		EFFECT
+			OFFSET = 0.0 50.0 100.0
+			START_END = 0 30
+			PARTS = 0
+			PARTICLE = 3
+		END_EFFECT
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 0.00 0.00
 			ROT = -0.16 0.00 0.00
@@ -2608,12 +2614,6 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 1 / 2 >> ---
 		FRAME = 28
-		EFFECT
-			OFFSET = 0.0 50.0 100.0
-			START_END = 0 80
-			PARTS = 0
-			PARTICLE = 6
-		END_EFFECT
 
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 -0.60 0.00
@@ -2671,6 +2671,13 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 0 / 2 >> ---
 		FRAME = 30
+		EFFECT
+			OFFSET = 0.0 50.0 100.0
+			START_END = 0 30
+			PARTS = 0
+			PARTICLE = 3
+		END_EFFECT
+
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 2.30 0.00
 			ROT = -0.06 0.06 0.22
@@ -2719,12 +2726,6 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 1 / 2 >> ---
 		FRAME = 30
-		EFFECT
-			OFFSET = 0.0 50.0 100.0
-			START_END = 0 80
-			PARTS = 0
-			PARTICLE = 6
-		END_EFFECT
 
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 2.80 0.00
@@ -2782,6 +2783,13 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 0 / 2 >> ---
 		FRAME = 30
+		EFFECT
+			OFFSET = 0.0 50.0 100.0
+			START_END = 0 30
+			PARTS = 0
+			PARTICLE = 3
+		END_EFFECT
+
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 -0.60 0.00
 			ROT = -0.28 0.00 0.00
@@ -2830,12 +2838,6 @@ MOTIONSET
 
 	KEYSET			# --- << KEY : 1 / 2 >> ---
 		FRAME = 30
-		EFFECT
-			OFFSET = 0.0 50.0 100.0
-			START_END = 0 80
-			PARTS = 0
-			PARTICLE = 6
-		END_EFFECT
 
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 -0.10 0.00

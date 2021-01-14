@@ -98,6 +98,7 @@ void CPlayer::Init(void)
 	// プレイヤーUIの生成
 	m_pPlayerUI = CPlayerUI::Create(GetPlayerTag());
 
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
@@ -606,7 +607,8 @@ void CPlayer::StatusMotion(void)
 	if (CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_01_WAIT ||
 		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_02_WAIT ||
 		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_03_WAIT ||
-		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_04_WAIT) return;
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_04_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_BANZAI) return;
 	// 移動中
 	if (m_bRun)
 	{

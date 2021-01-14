@@ -134,6 +134,9 @@ void CTutorial::Update(void)
 		m_pTutorialUI->Update();
 	}
 
+	// チュートリアルのリスポーンブロックの更新
+	CConnectblock::Tutorial_UpdateArrangementBlock();
+
 //#ifdef _DEBUG
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};
 

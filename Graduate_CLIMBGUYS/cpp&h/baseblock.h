@@ -464,6 +464,10 @@ public:
 	void SetGravity(float fGravity)					{ m_fGravity = fGravity; };
 	// ベースブロックの種類取得
 	float GetGravity()								{ return m_fGravity; };
+	// 上にあるブロックの情報設定
+	void SetUpBlock(CBaseblock * pBlock)			{ m_pUpBlock = pBlock; };
+	// 下にあるブロックの情報設定
+	void SetUnderBlock(CBaseblock * pBlock)			{ m_pDownBlock = pBlock; };
 	// 自身のブロックが移動または削除処理
 	void BlockMoveOrDelete(void);
 	// 影のリリース処理

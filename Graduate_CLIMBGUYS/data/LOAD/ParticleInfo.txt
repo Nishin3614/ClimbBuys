@@ -51,7 +51,7 @@ OFFSET
 	# 一度に出せる個数情報
 	NUMBER = 10
 	# テクスチャータイプ情報
-	TEXTYPE = 5
+	TEXTYPE = -1
 	# アニメーション情報
 	# エフェクトタイプ情報
 	EFFECTTYPE = 5
@@ -156,32 +156,46 @@ OFFSET
 END_OFFSET
 
 #==============================================================================
-# [3] tly2
+# [3] TutorialEffect
 #==============================================================================
 OFFSET
+	# 位置ランダム
+	SET_POSRAND
+		POSX = 400 -200
+		POSY = 100 50
+		POSZ = 0 0
+	ENDSET_POSRAND
+	# サイズランダム
+	SET_SIZERAND
+		SIZEX = 100 50
+		SIZEY = 50 50
+	ENDSET_SIZERAND
+	# ライフランダム
+	SET_LIFERAND
+		MAX = 10
+		MIN = 10
+	ENDSET_LIFERAND
 	# 位置情報
 	POS = 0.0 0.0 0.0
 	# 色情報
 	COL = 1.0 1.0 1.0 1.0
 	# サイズ情報
-	SIZE = 300.0 400.0
+	SIZE = 0.0 0.0
 	SIZE_CHANGE = 0.0
 	# 回転情報
-	ROT = 0.0 0.0 2.0ff
+	ROT = 0.0 0.0 0.0
 	# 方向情報
 	VECTOR = 0.0 0.0 0.0
 	# スピード情報
 	SPEED = 0.0
 	# ライフ情報
-	LIFE = 120
+	LIFE = 0
 	# フレーム情報
 	FRAME = 1
 	# 一度に出せる個数情報
-	NUMBER = 1
+	NUMBER = 3
 	# テクスチャータイプ情報
-	TEXTYPE = 33
-	# アニメーション情報
-	ANIMATION = 1 5 4
+	TEXTYPE = 29
 	# エフェクトタイプ情報
 	EFFECTTYPE = 5
 	# パーティクルタイプ情報

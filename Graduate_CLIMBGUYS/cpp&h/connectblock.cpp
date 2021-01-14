@@ -52,6 +52,8 @@ void CConnectblock::SetBlockShape(void)
 	SHAPE Shape = (SHAPE)(CCalculation::GetRandomRange(SHAPE_CROSS_STEP_01, SHAPE_MAX - 1));	// 形
 	D3DXCOLOR col;																	// 色
 	int nFeedValue = CBaseblock::GetFeedValue(CGame::GetStage());					// フェード値
+	CNormalblock * pNormalBlock1;
+	CNormalblock * pNormalBlock2;
 	// 形
 	CBaseblock::GRID BaseGrid = CBaseblock::SetFallPos();
 	// 重力設定
@@ -91,16 +93,31 @@ void CConnectblock::SetBlockShape(void)
 		// クロスブロック_2段
 	case SHAPE_CROSS_STEP_02:
 		col = COLOR_RED;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &col, fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 0), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 2), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 2), &col,fGravity);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid, &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 0), &col,fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 0), &col,fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 0), &col,fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 2), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 2), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 2), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 2), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
 		break;
 		// 中空きプラスブロック_1段
 	case SHAPE_PLUS_CENTER_HOLE_STEP_01:
@@ -113,15 +130,26 @@ void CConnectblock::SetBlockShape(void)
 		// 中空きプラスブロック_2段
 	case SHAPE_PLUS_CENTER_HOLE_STEP_02:
 		col = COLOR_BLUE;
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 1), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 1), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 2), &col,fGravity);
 
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 0), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 1, 1), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 1, 1), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 2), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
 		break;
 		// プラスブロック
 	case SHAPE_PLUS:
@@ -135,12 +163,19 @@ void CConnectblock::SetBlockShape(void)
 		// 中突起プラスブロック
 	case SHAPE_PLUS_CENTER_PROTRUSION:
 		col = COLOR_LIGHTBLUE;
+
+		pNormalBlock1 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col, fGravity);
+		pNormalBlock2 = CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &col, fGravity);
+		pNormalBlock1->SetUpBlock(pNormalBlock2);
+		pNormalBlock2->SetUnderBlock(pNormalBlock1);
+
+
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 0), &col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(0, 0, 1), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 1), &col,fGravity);
+
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(2, 0, 1), &col,fGravity);
 		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 0, 2), &col,fGravity);
-		CNormalblock::Create(CScene_X::TYPE_BLOCK, BaseGrid + CBaseblock::GRID(1, 1, 1), &col,fGravity);
+
 		break;
 		// 対角線ブロック_01
 	case SHAPE_DIAGONAL_01:

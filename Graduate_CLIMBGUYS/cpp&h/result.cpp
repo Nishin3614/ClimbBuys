@@ -19,6 +19,7 @@
 #include "connect_fieldblock.h"
 #include "resultUI.h"
 #include "3Dparticle.h"
+#include "ui.h"
 
 //=============================================================================
 // マクロ定義
@@ -81,6 +82,8 @@ void CResult::Init()
 
 	// プレイヤーのリザルトモーション
 	ResultMotion();
+	// リザルトUIの生成
+	CUi::LoadCreate(CUi::UITYPE_RESULT);
 }
 
 //=============================================================================

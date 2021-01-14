@@ -165,6 +165,19 @@ void CPlayer::Update(void)
 			// 自キャラの行動処理
 			MyAction();
 		}
+		else
+		{
+			D3DXVECTOR3 move;
+			move = CCharacter::GetMove();
+			move.x = 0;
+			move.z = 0;
+			CCharacter::SetMove(move);
+			m_bRun = false;
+		}
+	}
+	else if (CManager::GetMode() == CManager::MODE_RESULT)
+	{
+
 	}
 	else
 	{
@@ -589,6 +602,11 @@ void CPlayer::PlayerMoveSet(D3DXVECTOR3 & Vec, D3DXVECTOR3 const & Rot,D3DXVECTO
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::StatusMotion(void)
 {
+	// 勝利モーション01のとき
+	if (CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_01_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_02_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_03_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_04_WAIT) return;
 	// 移動中
 	if (m_bRun)
 	{

@@ -432,9 +432,6 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 	// 下方向に当たっていたら
 	else if (Direct == COLLISIONDIRECTION::DOWN)
 	{
-		// 相手の落ちる状態がtrueなら
-		// ->関数を抜ける
-		if (pBlock->GetFall()) return;
 		// 変数宣言
 		CBaseblock::GRID MyGrid = this->GetGrid();		// 自分の行列高
 		CBaseblock::GRID OppGrid = pBlock->GetGrid();	// 相手の行列高
@@ -446,41 +443,73 @@ void CBaseblock::Collision(CBaseblock * pBlock)
 		int nHeight = this->GetHeight(				// 高さ
 			MyGrid.nColumn,
 			MyGrid.nLine) + 1;
-		// 高さを行列高に代入
-		MyGrid.nHeight = nHeight;
-		// 高さの設定
-		this->SetHeight(
-			MyGrid.nColumn,
-			MyGrid.nLine,
-			MyGrid.nHeight
-		);
-		// 現在の行列高の設定
-		this->SetGrid(MyGrid);
-		// 位置設定
-		this->SetPos(MyGrid.GetPos(m_fSizeRange));
-		// 落ちている状態設定
-		this->SetFall(false);
-
-		// 上下ブロック情報をつなげる
-		CBaseblock * pThisBlock = pBlock;
-		CBaseblock * pUpBlock = pBlock->m_pUpBlock;
-		while (pUpBlock)
+		/*
+		// 相手の落ちる状態がtrueなら
+		// ->関数を抜ける
+		if (pBlock->GetFall())
 		{
-			if (pUpBlock == this) break;
-			pThisBlock = pUpBlock;
-			pUpBlock = pThisBlock->m_pUpBlock;
+			// 上下ブロック情報をつなげる
+			CBaseblock * pThisBlock = pBlock;
+			CBaseblock * pUpBlock = pBlock->m_pUpBlock;
+			while (pUpBlock)
+			{
+				if (pUpBlock == this) break;
+				pThisBlock = pUpBlock;
+				pUpBlock = pThisBlock->m_pUpBlock;
+			}
+			this->m_pDownBlock = pThisBlock;
+			pThisBlock->m_pUpBlock = this;
+			// 位置設定
+			this->SetPos(pThisBlock->GetPos() + D3DXVECTOR3(0.0f,m_fSizeRange,0.0f));
 		}
-		this->m_pDownBlock = pThisBlock;
-		pThisBlock->m_pUpBlock = this;
+		*/
+		if (!pBlock->GetFall())
+		{
+			// 高さを行列高に代入
+			MyGrid.nHeight = nHeight;
+			// 高さの設定
+			this->SetHeight(
+				MyGrid.nColumn,
+				MyGrid.nLine,
+				MyGrid.nHeight
+			);
+			// 現在の行列高の設定
+			this->SetGrid(MyGrid);
+			// 位置設定
+			this->SetPos(MyGrid.GetPos(m_fSizeRange));
+			// 落ちている状態設定
+			this->SetFall(false);
+
+			// 上下ブロック情報をつなげる
+			CBaseblock * pThisBlock = pBlock;
+			CBaseblock * pUpBlock = pBlock->m_pUpBlock;
+			while (pUpBlock)
+			{
+				if (pUpBlock == this) break;
+				pThisBlock = pUpBlock;
+				pUpBlock = pThisBlock->m_pUpBlock;
+			}
+			this->m_pDownBlock = pThisBlock;
+			pThisBlock->m_pUpBlock = this;
+		}
 	}
 	else if (Direct == COLLISIONDIRECTION::UP)
 	{
 		// 相手の落ちる状態がtrueなら
 		// ->関数を抜ける
-		if (pBlock->GetFall()) return;
-		// 上下ブロック情報をつなげる
-		this->m_pUpBlock = pBlock;
-		pBlock->m_pDownBlock = this;
+		if (pBlock->GetFall())
+		{
+			// 上下ブロック情報をつなげる
+			this->m_pUpBlock = pBlock;
+			pBlock->m_pDownBlock = this;
+			pBlock->SetGravity(this->GetGravity());
+		}
+		else
+		{
+			// 上下ブロック情報をつなげる
+			this->m_pUpBlock = pBlock;
+			pBlock->m_pDownBlock = this;
+		}
 	}
 	else
 	{

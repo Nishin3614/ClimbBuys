@@ -135,26 +135,6 @@ void CResultUI::Update(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CResultUI::Draw(void)
 {
-	for (int nCnt = 0; nCnt < (int)RESULT_UI::UI_MAX; nCnt++)
-	{
-		if (m_pScene2D[nCnt])
-		{
-			// 描画
-			m_pScene2D[nCnt]->Draw();
-		}
-	}
-	for (int nCnt = 0; nCnt < (int)PLAYER_TAG::PLAYER_MAX; nCnt++)
-	{
-		/* --- リザルトスコアの描画 --- */
-		if (m_ResultScore[nCnt].m_pSurvivalTime)
-		{
-			m_ResultScore[nCnt].m_pSurvivalTime->Draw();	// 生存時間
-		}
-		if (m_ResultScore[nCnt].m_pPressBlock)
-		{
-			m_ResultScore[nCnt].m_pPressBlock->Draw();		// ブロックを押した回数
-		}
-	}
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -332,8 +312,6 @@ void CResultUI::UpdateSettingFrame(void)
 			// 位置の設定
 			m_pScene2D[nCnt]->SetPosition(pos);
 			m_pScene2D[nCnt]->Set_Vtx_Pos();
-			// 更新
-			m_pScene2D[nCnt]->Update();
 		}
 	}
 }
@@ -379,8 +357,6 @@ void CResultUI::UpdateSettingScore(void)
 			// 位置の設定
 			m_ResultScore[nCnt].m_pPressBlock->SetPos(PressBlockPos);
 
-			// 更新
-			m_ResultScore[nCnt].m_pPressBlock->Update();
 		}
 	}
 }

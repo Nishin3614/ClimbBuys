@@ -383,6 +383,11 @@ void CCharacter::Limit(void)
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CCharacter::Motion_Effect(void)
 {
+	if (m_nMotiontype >= MOTIONTYPE_V_01_WAIT &&
+		m_nMotiontype <= MOTIONTYPE_V_04_WAIT)
+	{
+		printf("");
+	}
 	// •Ï”éŒ¾
 	D3DXVECTOR3 pos;
 	for (int nCntMotionEffect = 0; nCntMotionEffect < (signed)m_modelAll[m_character]->pMotion[m_nMotiontype]->KeyInfo[m_keyinfoCnt].v_MotionEffect.size(); nCntMotionEffect++)

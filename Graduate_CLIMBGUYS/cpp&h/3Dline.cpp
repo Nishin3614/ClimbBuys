@@ -101,6 +101,7 @@ void C3DLine::Uninit(void)
 		m_pVtxBuff->Release();
 		m_pVtxBuff = NULL;
 	}
+	m_ppos = NULL;
 }
 
 // ----------------------------------------

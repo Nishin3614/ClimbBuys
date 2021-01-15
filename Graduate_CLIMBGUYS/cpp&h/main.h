@@ -65,7 +65,7 @@
 #define SCREEN_WIDTH	(1280)			// 横
 #define SCREEN_HEIGHT	(720)			// 縦
 #define INTERVAL_TIME	(60 * 10)		// インターバル時間
-#define ERROW_ACTION	(1)				// デバッグ状態
+#define ERROW_ACTION	(0)				// デバッグ状態
 #define SAFE_RELEASE(pObj) { if(pObj != NULL) { (pObj)->Release(); (pObj) = NULL; }}
 
 // ------------------------------------------

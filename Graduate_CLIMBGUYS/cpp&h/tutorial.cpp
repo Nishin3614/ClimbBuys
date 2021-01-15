@@ -30,6 +30,7 @@
 #include "damagefloor.h"
 #include "bg.h"
 #include "tutorialUI.h"
+#include "light.h"
 
 // ------------------------------------------
 //
@@ -103,6 +104,9 @@ void CTutorial::Init(void)
 
 	// ダメージ床の生成
 	CDamageFloor::Create();
+	// ライトの設定
+	CManager::GetRenderer()->GetLight()->ModeSetLight();
+
 }
 
 // ------------------------------------------

@@ -101,6 +101,10 @@ public:
 		TYPE_BLOCKS_INVERTER,			// 電気ブロック
 		TYPE_BLOCKS_HARD,				// 硬いブロック
 		TYPE_BLOCKS_HATENA,				// ハテナブロック
+		TYPE_PLAYER00_ALL,				// プレイヤー00 全体
+		TYPE_PLAYER01_ALL,				// プレイヤー01 全体
+		TYPE_PLAYER02_ALL,				// プレイヤー02 全体
+		TYPE_PLAYER03_ALL,				// プレイヤー03 全体
 		TYPE_MAX						// 最大数
 	} TYPE;
 

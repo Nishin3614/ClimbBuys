@@ -122,14 +122,16 @@ public:
 	// 演出終了フラグの取得
 	static bool GetEnd() { return m_bEnd; };
 
-	/////// 二つセット ///////
-	// 生成するブロックの条件の設定
+	// 生成するオブジェクトの条件の設定　オブジェクト単体
 	static void SetCondition(const int PerFrame, const int FrameBetween, const int ToOnes, CStagingObj::STAGING_OBJTYPE type);
 
 	// メモリの確保
 	static CStagingObj_Info *Create_StagingObj_Info();
 	// 一定時間毎に演出ブロックを生成
 	static void Create_StagingObj(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int const &nModelId, CStagingObj::STAGING_OBJTYPE type,bool loop);
+	// 一定時間毎に演出ブロックを生成　範囲選択
+	static void Create_StagingObj_RangeSelect(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int const &nModelIdfirst, int const &nModelIdend, CStagingObj::STAGING_OBJTYPE type, bool loop);
+
 	// 固定位置にオブジェクトを生成
 	static void Create_TitleObj();
 	// 条件の初期化

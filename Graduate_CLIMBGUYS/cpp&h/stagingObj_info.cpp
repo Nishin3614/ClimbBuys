@@ -184,44 +184,89 @@ void CStagingObj_Info::Create_StagingObj_RangeSelect(D3DXVECTOR3 Originpos, D3DX
 {
 	m_nFrame++;
 
-	if (m_nFrame % m_Condition.nPerFrame[static_cast<int>(type)] == 0 && m_Condition.nFrameBetween[static_cast<int>(type)] > m_nFrame)
+	if (loop)
 	{
-		D3DXVECTOR3 CreatePos;
-		D3DXVECTOR3 RandomRot;
-
-		RandomRot.x = CCalculation::Random_PI();
-		RandomRot.y = CCalculation::Random_PI();
-		RandomRot.z = CCalculation::Random_PI();
-
-		// ランダムな座標を求める
-		if (Range != NULL)
+		if (m_nFrame % m_Condition.nPerFrame[static_cast<int>(type)] == 0)
 		{
-			CreatePos.x = CCalculation::Random(Originpos.x + Range.x);
-			CreatePos.y = Originpos.y;
-			CreatePos.z = Originpos.z;
+			D3DXVECTOR3 CreatePos;
+			D3DXVECTOR3 RandomRot;
+
+			RandomRot.x = CCalculation::Random_PI();
+			RandomRot.y = CCalculation::Random_PI();
+			RandomRot.z = CCalculation::Random_PI();
+
+			// ランダムな座標を求める
+			if (Range != NULL)
+			{
+				CreatePos.x = CCalculation::Random(Originpos.x + Range.x);
+				CreatePos.y = Originpos.y;
+				CreatePos.z = Originpos.z;
+			}
+			else
+			{
+				CreatePos = Originpos;
+			}
+
+			// プレイヤーモデルをランダムに選択
+			int nRandomModel = (int)CCalculation::GetRandomRange(nModelIdfirst, nModelIdend);
+
+			// オブジェクトの生成
+			CStagingObj::Create(
+				CreatePos,
+				RandomRot,
+				D3DXVECTOR3(3.0f, 3.0f, 3.0f),
+				D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
+				nRandomModel,
+				false,
+				type
+			);
 		}
 		else
 		{
-			CreatePos = Originpos;
+			return;
 		}
-
-		// プレイヤーモデルをランダムに選択
-		int nRandomModel = CCalculation::GetRandomRange(nModelIdfirst, nModelIdend);
-
-		// オブジェクトの生成
-		CStagingObj::Create(
-			CreatePos,
-			RandomRot,
-			D3DXVECTOR3(3.0f, 3.0f, 3.0f),
-			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
-			nRandomModel,
-			false,
-			type
-		);
 	}
 	else
 	{
-		return;
+		if (m_nFrame % m_Condition.nPerFrame[static_cast<int>(type)] == 0 && m_Condition.nFrameBetween[static_cast<int>(type)] > m_nFrame)
+		{
+			D3DXVECTOR3 CreatePos;
+			D3DXVECTOR3 RandomRot;
+
+			RandomRot.x = CCalculation::Random_PI();
+			RandomRot.y = CCalculation::Random_PI();
+			RandomRot.z = CCalculation::Random_PI();
+
+			// ランダムな座標を求める
+			if (Range != NULL)
+			{
+				CreatePos.x = CCalculation::Random(Originpos.x + Range.x);
+				CreatePos.y = Originpos.y;
+				CreatePos.z = Originpos.z;
+			}
+			else
+			{
+				CreatePos = Originpos;
+			}
+
+			// プレイヤーモデルをランダムに選択
+			int nRandomModel = (int)CCalculation::GetRandomRange(nModelIdfirst, nModelIdend);
+
+			// オブジェクトの生成
+			CStagingObj::Create(
+				CreatePos,
+				RandomRot,
+				D3DXVECTOR3(3.0f, 3.0f, 3.0f),
+				D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
+				nRandomModel,
+				false,
+				type
+			);
+		}
+		else
+		{
+			return;
+		}
 	}
 }
 

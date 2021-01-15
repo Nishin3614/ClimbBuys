@@ -76,6 +76,10 @@ void CTutorial::Init(void)
 	// チュートリアルUIの生成
 	CUi::LoadCreate(CUi::UITYPE_TUTORIAL);
 	m_pTutorialUI = CTutorialUI::Create();
+		// オブジェクト生成
+	CScene_X::Create(D3DXVECTOR3(-17.0f,-57.0f,25.0f),
+		D3DVECTOR3_ZERO,
+		CScene_X::TYPE_OBJECT_VOLCANO);
 
 	// 3Dエフェクトの生成
 	C3DEffect::Create();
@@ -129,6 +133,9 @@ void CTutorial::Update(void)
 		// チュートリアルUIの更新
 		m_pTutorialUI->Update();
 	}
+
+	// チュートリアルのリスポーンブロックの更新
+	CConnectblock::Tutorial_UpdateArrangementBlock();
 
 //#ifdef _DEBUG
 	CXInputPad *InpudPad[(int)PLAYER_TAG::PLAYER_MAX] = {};

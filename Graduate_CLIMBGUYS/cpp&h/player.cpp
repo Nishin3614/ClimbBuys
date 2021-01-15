@@ -98,6 +98,7 @@ void CPlayer::Init(void)
 	// プレイヤーUIの生成
 	m_pPlayerUI = CPlayerUI::Create(GetPlayerTag());
 
+
 #ifdef _DEBUG
 	// 当たり判定ボックスの初期化
 	for (int nCntCollision = 0; nCntCollision < CPlayer::COLLISIONTYPE_MAX; nCntCollision++)
@@ -165,6 +166,19 @@ void CPlayer::Update(void)
 			// 自キャラの行動処理
 			MyAction();
 		}
+		else
+		{
+			D3DXVECTOR3 move;
+			move = CCharacter::GetMove();
+			move.x = 0;
+			move.z = 0;
+			CCharacter::SetMove(move);
+			m_bRun = false;
+		}
+	}
+	else if (CManager::GetMode() == CManager::MODE_RESULT)
+	{
+
 	}
 	else
 	{
@@ -589,6 +603,12 @@ void CPlayer::PlayerMoveSet(D3DXVECTOR3 & Vec, D3DXVECTOR3 const & Rot,D3DXVECTO
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CPlayer::StatusMotion(void)
 {
+	// 勝利モーション01のとき
+	if (CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_01_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_02_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_03_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_V_04_WAIT ||
+		CCharacter::GetMotion() == CCharacter::MOTIONTYPE::MOTIONTYPE_BANZAI) return;
 	// 移動中
 	if (m_bRun)
 	{
@@ -1258,7 +1278,7 @@ void CPlayer::PanicEffectCreate(void)
 		m_pPanic = CScene_THREE::Create(
 			CScene_THREE::OFFSET_TYPE_VERTICAL_UNDER,			// タイプ
 			GetPos(), 											// 位置
-			D3DXVECTOR3(60.0f, 30.0f, 0.0f),					// サイズ
+			D3DXVECTOR3(70.0f, 50.0f, 0.0f),					// サイズ
 			CTexture_manager::TYPE_EFFECT_PANIC,				// テクスチャータイプ
 			CScene::LAYER_3DOBJECT,
 			D3DVECTOR3_ZERO,									// 角度

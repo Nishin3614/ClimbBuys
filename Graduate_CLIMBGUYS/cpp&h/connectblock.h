@@ -46,6 +46,21 @@ public:
 		SHAPE_MAX						// 最大数
 	} SHAPE;
 
+	// チュートリアルのリスポーンするブロック
+	enum class RESPAWN_BLOCK
+	{
+		TYPE_NONE = -1,
+		TYPE_NORMAL_UP,					// ノーマル上
+		TYPE_NORMAL_LEFT,				// ノーマル左
+		TYPE_NORMAL_RIGHT,				// ノーマル右
+		TYPE_NORMAL_DOWN,				// ノーマル下
+		TYPE_SPRING,					// バネ
+		TYPE_BOMB,						// ボム
+		TYPE_PANIC,						// パニック
+		TYPE_STEEL,						// 鋼鉄
+		TYPE_ELECTRIC,					// 電気
+		TYPE_MAX
+	};
 	/* 構造体 */
 
 	/* 関数 */
@@ -69,6 +84,12 @@ public:
 
 	// チュートリアルのブロックの初期配置
 	static void Tutorial_InitArrangementBlock(void);
+
+	// チュートリアルのブロックの更新
+	static void Tutorial_UpdateArrangementBlock(void);
+
+	// チュートリアルの初期化
+	static void Tutorial_InitArrangementBlock(CBaseblock * pBlock);
 #ifdef _DEBUG
 	// デバッグ処理
 	virtual void  Debug(void);
@@ -89,7 +110,9 @@ protected:
 private:
 	/* 関数 */
 	/* 変数 */
-	static int								m_nCntTime;						// カウントタイム
+	static int				m_nCntTime;												// カウントタイム
+
+	static CBaseblock		*m_pTutorialRespawnBlock[(int)RESPAWN_BLOCK::TYPE_MAX];	// チュートリアルのリスポーンブロック
 };
 
 #endif

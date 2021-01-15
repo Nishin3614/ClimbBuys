@@ -179,7 +179,7 @@ CStagingObj * CStagingObj::Create(
 	pStagingBlock->SetPos(pos);
 	pStagingBlock->SetRot(rot);
 	pStagingBlock->SetSize(size);
-	pStagingBlock->SetModelColor(color);
+	//pStagingBlock->SetModelColor(color);
 	pStagingBlock->SetModelId(nModelId);
 	pStagingBlock->SetShadowMap(bShadowMap);
 	pStagingBlock->m_ObjType = type;

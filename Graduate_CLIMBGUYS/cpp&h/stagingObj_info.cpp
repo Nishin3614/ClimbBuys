@@ -178,6 +178,54 @@ void CStagingObj_Info::Create_StagingObj(D3DXVECTOR3 Originpos, D3DXVECTOR3 Rang
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// 一定時間毎に演出ブロックを生成
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void CStagingObj_Info::Create_StagingObj_RangeSelect(D3DXVECTOR3 Originpos, D3DXVECTOR3 Range, int const & nModelIdfirst, int const & nModelIdend, CStagingObj::STAGING_OBJTYPE type, bool loop)
+{
+	m_nFrame++;
+
+	if (m_nFrame % m_Condition.nPerFrame[static_cast<int>(type)] == 0 && m_Condition.nFrameBetween[static_cast<int>(type)] > m_nFrame)
+	{
+		D3DXVECTOR3 CreatePos;
+		D3DXVECTOR3 RandomRot;
+
+		RandomRot.x = CCalculation::Random_PI();
+		RandomRot.y = CCalculation::Random_PI();
+		RandomRot.z = CCalculation::Random_PI();
+
+		// ランダムな座標を求める
+		if (Range != NULL)
+		{
+			CreatePos.x = CCalculation::Random(Originpos.x + Range.x);
+			CreatePos.y = Originpos.y;
+			CreatePos.z = Originpos.z;
+		}
+		else
+		{
+			CreatePos = Originpos;
+		}
+
+		// プレイヤーモデルをランダムに選択
+		int nRandomModel = CCalculation::GetRandomRange(nModelIdfirst, nModelIdend);
+
+		// オブジェクトの生成
+		CStagingObj::Create(
+			CreatePos,
+			RandomRot,
+			D3DXVECTOR3(3.0f, 3.0f, 3.0f),
+			D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),
+			nRandomModel,
+			false,
+			type
+		);
+	}
+	else
+	{
+		return;
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 固定値にブロックを生成
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void CStagingObj_Info::Create_TitleObj()

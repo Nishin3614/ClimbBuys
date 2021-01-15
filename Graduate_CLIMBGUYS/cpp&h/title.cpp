@@ -112,7 +112,9 @@ void CTitle::Update(void)
 	}
 
 	// 演出ブロックの生成
-	CStagingObj_Info::Create_StagingObj(D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), CScene_X::TYPE_BLOCK_SPRING, CStagingObj::STAGING_OBJTYPE::ASCENT,true);
+	//CStagingObj_Info::Create_StagingObj(D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), CScene_X::TYPE_PLAYER00_ALL, CStagingObj::STAGING_OBJTYPE::ASCENT,true);
+	CStagingObj_Info::Create_StagingObj_RangeSelect(D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), D3DXVECTOR3(1280 * 0.5f, 0.0f, 0.0f), CScene_X::TYPE_PLAYER00_ALL, CScene_X::TYPE_PLAYER03_ALL, CStagingObj::STAGING_OBJTYPE::ASCENT, true);
+
 
 	// チュートリアルに画面遷移
 	if (CCalculation::PressAnyButton())

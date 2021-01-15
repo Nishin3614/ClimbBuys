@@ -51,6 +51,7 @@ public:
 	D3DLIGHT9 &GetLight(TYPE type);		// ライト情報
 	D3DXCOLOR &GetCol(TYPE type);		// 色情報
 	D3DVECTOR &GetVec(TYPE type);		// 方向情報
+	void ModeSetLight(void);			// モードによるライトの設定
 protected:
 
 private:

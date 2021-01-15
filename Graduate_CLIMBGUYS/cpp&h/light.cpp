@@ -200,3 +200,35 @@ D3DVECTOR & CLight::GetVec(TYPE type)
 {
 	return 	m_light[type].Direction;
 }
+
+// ----------------------------------------
+// モードによるライトの設定
+// ----------------------------------------
+void CLight::ModeSetLight(void)
+{
+	// 変数宣言
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();	// デバイスの取得
+	D3DXVECTOR3 Direct = D3DVECTOR3_ZERO;
+	D3DXVECTOR3 * pVecDir = m_VecDir;
+	if (CManager::GetMode() == CManager::MODE_TITLE)
+	{
+		m_VecDir[TYPE_MAIN] = D3DXVECTOR3(-0.5f, -1.0f, 1.0f);
+		m_VecDir[TYPE_SUB1] = D3DXVECTOR3(-1.0f, -1.0f, 1.0f);
+		m_VecDir[TYPE_SUB2] = D3DXVECTOR3(1.0f, 1.0f, -1.0f);
+	}
+	else
+	{
+		m_VecDir[TYPE_MAIN] = D3DXVECTOR3(-0.5f, -1.0f, 0.5f);
+		m_VecDir[TYPE_SUB1] = D3DXVECTOR3(-0.5f, 1.0f, -0.5f);
+		m_VecDir[TYPE_SUB2] = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
+	}
+
+	for (int nCntLight = 0; nCntLight < TYPE_MAX; nCntLight++)
+	{
+		// ライトの方向の設定
+		D3DXVec3Normalize(&Direct, &m_VecDir[nCntLight]);		// 正規化
+		m_light[nCntLight].Direction = Direct;					// ライトに代入
+																// ライトを設定する
+		pDevice->SetLight(nCntLight, &m_light[nCntLight]);
+	}
+}
